@@ -6,23 +6,18 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Inertia::render('Login/Login');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return inertia('Register/Register');
+        return Inertia::render('Register/Register');
     }
 
     /**
@@ -31,54 +26,95 @@ class UserController extends Controller
     public function store(Request $request)
     {
         // dd($request);
-        sleep(1);
         $validated = $request->validate([
-        'username' => 'required|string',
-        'nickname' => 'required|string',
-        'email' => 'required|email|unique:users,email',
-        'address' => 'required|string',
-        'password' => 'required|string|min:3',
-        'role' => 'required|string',
-        'status' => 'required|string',
+            'nickname' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'address' => 'required|string',
+            'password' => 'required|string|min:3',
+            'role' => 'required|string',
+            'status' => 'required|string',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
 
-        return redirect('/');
-
+        return redirect()->route('users.activate', ['user' => $user->id]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(User $user)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(User $user)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, User $user)
     {
-        //
+        $validated = $request->validate([
+            'nickname' => 'required|string',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'address' => 'required|string',
+            'password' => 'nullable|string|min:3',
+            'number' => 'required|string',
+            'role' => 'required|string',
+            'status' => 'required|string',
+        ]);
+
+        if (!empty($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']); // keep old password
+        }
+
+        $user->update($validated);
+        dd($validated);
+        return redirect('/');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $campaign)
     {
-        //
+        
     }
+    public function activate($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        return Inertia::render('Register/OTP_Confirmation', [
+            'user' => $user->only(['id', 'nickname', 'email', 'address', 'role', 'status']),
+        ]);
+    }
+    public function activateUser(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'number' => 'required|string',
+        ]);
+        $user->update([
+            'status' => 'active',
+        ]);
+
+        return redirect()->route('users.index');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/'); // Redirect to intended page or homepage
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ]);
+    }
+
+
 }

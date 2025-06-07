@@ -7,17 +7,25 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@tailwindcss/postcss": "^4.1.8",
         "@tailwindcss/vite": "^4.0.0",
         "@vitejs/plugin-react": "^4.5.1",
+        "autoprefixer": "^10.4.21",
         "axios": "^1.8.2",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^1.2.0",
-        "tailwindcss": "^4.0.0",
+        "postcss": "^8.5.4",
+        "tailwindcss": "^4.1.8",
+        "tw-animate-css": "^1.3.4",
         "vite": "^6.2.4"
     },
     "dependencies": {
         "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/react": "^2.0.11",
-        "react-dom": "^19.1.0"
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "lucide-react": "^0.513.0",
+        "react-dom": "^19.1.0",
+        "tailwind-merge": "^3.3.0"
     }
 }
