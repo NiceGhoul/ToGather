@@ -37,7 +37,14 @@ class UserController extends Controller
         'nickname' => 'required|string',
         'email' => 'required|email|unique:users,email',
         'address' => 'required|string',
-        'password' => 'required|string|min:3',
+        'password' => [
+            'required',
+            'string',
+            'min:8',
+            'regex:/[a-z]/',
+            'regex:/[A-Z]/',
+            'regex:/[0-9]/'
+    ],
         'role' => 'required|string',
         'status' => 'required|string',
         ]);
