@@ -108,10 +108,10 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/'); // Redirect to intended page or homepage
+            return redirect()->intended('/'); 
         }
 
-        return back()->withErrors([
+        return back()->withErrors([     
             'email' => 'The provided credentials do not match our records.',
         ]);
     }
