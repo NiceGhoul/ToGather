@@ -84,6 +84,8 @@ export default function Register() {
             confirmPassword: true,
         });
 
+        const password = formData.password;
+
         if (!formData.email.trim()) {
             newErrors.email = "Please fill in your email address.";
         } else if (!emailRegex.test(formData.email)) {
@@ -94,8 +96,24 @@ export default function Register() {
                 "This email is already registered. Try a different one.";
         }
 
-        if (!formData.password) {
+        if (!password) {
             newErrors.password = "Password is required.";
+        } else {
+            if (password.length < 8) {
+                newErrors.password = "Password must be at least 8 characters.";
+            }
+            if (!/[A-Z]/.test(password)) {
+                newErrors.password =
+                    "Password must include at least one uppercase letter.";
+            }
+            if (!/[a-z]/.test(password)) {
+                newErrors.password =
+                    "Password must include at least one lowercase letter.";
+            }
+            if (!/\d/.test(password)) {
+                newErrors.password =
+                    "Password must include at least one number.";
+            }
         }
 
         if (!formData.confirmPassword) {
