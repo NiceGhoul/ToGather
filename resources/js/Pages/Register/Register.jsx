@@ -1,132 +1,544 @@
 import { Inertia } from "@inertiajs/inertia";
-import React, { useState } from 'react';
+import React, { useState, useRef } from "react";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
 } from "@/components/ui/card";
-import Layout_LR from "../../Layouts/Layout_LR"
-import { Link } from '@inertiajs/react';
+import Layout_Register from "../../Layouts/Layout_Register";
+import { Link } from "@inertiajs/react";
+import axios from "axios";
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    nickname: '',
-    address: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    Inertia.post('/users', {
-      ...formData,
-      role: 'user',
-      status: 'inactive',
+    const [step, setStep] = useState(1);
+    const otpRefs = Array.from({ length: 6 }, () => useRef(null));
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+        confirmPassword: "",
+        fullname: "",
+        nickname: "",
+        address: "",
+        otp: "",
     });
-  };
+    const [errors, setErrors] = useState({});
+    const [touched, setTouched] = useState({});
 
-  return (
-    <Layout_LR>
-        <Card className="bg-[#BCA3CA]">
-            <CardHeader className="mt-5">
-            <CardTitle className="text-2xl mx-auto">Sign Up</CardTitle>
-            <CardDescription className="mx-auto">Please fill out the form below to register.</CardDescription>
-            </CardHeader>
+    const [otpTimer, setOtpTimer] = useState(60);
+    const [isCounting, setIsCounting] = useState(true);
+    React.useEffect(() => {
+        let interval;
+        if (step === 2 && isCounting && otpTimer > 0) {
+            interval = setInterval(() => {
+                setOtpTimer((prev) => prev - 1);
+            }, 1000);
+        } else if (otpTimer === 0) {
+            setIsCounting(false);
+        }
 
-            <CardContent className="mb-5">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                    <label htmlFor="email">Email</label>
-                    <input
-                        value={formData.email}
-                        onChange={handleChange}
-                        type="email"
-                        id="email"
-                        name="email"
-                        className="block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white"
-                        placeholder="Enter your email"
-                        required
-                    />
-                    </div>
+        return () => clearInterval(interval);
+    }, [step, isCounting, otpTimer]);
 
-                    <div>
-                    <label htmlFor="nickname">Nickname</label>
-                    <input
-                        value={formData.nickname}
-                        onChange={handleChange}
-                        id="nickname"
-                        name="nickname"
-                        className="block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white"
-                        placeholder="Enter your nickname"
-                        required
-                    />
-                    </div>
+    const handleResendOtp = () => {
+        setOtpTimer(60);
+        setIsCounting(true);
+        setFormData((prev) => ({ ...prev, otp: "" }));
+        setTouched((prev) => ({ ...prev, otp: false }));
+    };
 
-                    <div>
-                    <label htmlFor="address">Address</label>
-                    <input
-                        value={formData.address}
-                        onChange={handleChange}
-                        id="address"
-                        name="address"
-                        className="block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white"
-                        placeholder="Enter your address"
-                        required
-                    />
-                    </div>
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        setTouched({ ...touched, [name]: true });
 
-                    <div>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        value={formData.password}
-                        onChange={handleChange}
-                        type="password"
-                        id="password"
-                        name="password"
-                        className="block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white"
-                        placeholder="Enter your password"
-                        required
-                    />
-                    </div>
+        // Clear error kalau sudah valid
+        setErrors((prev) => {
+            const updatedErrors = { ...prev };
+            if (name === "password" && value) {
+                delete updatedErrors.password;
+            }
+            if (name === "confirmPassword" && value === formData.password) {
+                delete updatedErrors.confirmPassword;
+            }
+            if (name === "fullname" && value.trim()) {
+                delete updatedErrors.fullname;
+            }
+            if (name === "nickname" && value.trim()) {
+                delete updatedErrors.nickname;
+            }
+            if (name === "address" && value.trim()) {
+                delete updatedErrors.address;
+            }
+            return updatedErrors;
+        });
+    };
 
-                    <div>
-                    <label htmlFor="confirmPassword">Confirm Password</label>
-                    <input
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        type="password"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        className="block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white"
-                        placeholder="Confirm your password"
-                        required
-                    />
-                    </div>
+    const validateStep1 = () => {
+        const newErrors = {};
+        setTouched({
+            email: true,
+            password: true,
+            confirmPassword: true,
+        });
 
-                    <CardFooter className="flex justify-end p-0">
-                    <button type="submit" className="register-btn mt-4">
-                        Submit
-                    </button>
-                    </CardFooter>
-                </form>
-                <p className="text-sm mt-4  mx-auto">
-                    Already have an account? <Link href="/login" className="font-semibold">Login</Link>
-                </p>
-            </CardContent>
-        </Card>
-    </Layout_LR>
-  );
+        if (!formData.email.trim()) {
+            newErrors.email = "Please fill in your email address.";
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email =
+                "Invalid email format. Please enter a valid email.";
+        } else if (emailExists) {
+            newErrors.email =
+                "This email is already registered. Try a different one.";
+        }
+
+        if (!formData.password) {
+            newErrors.password = "Password is required.";
+        }
+
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = "Please confirm your password.";
+        } else if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = "Passwords do not match.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const [emailExists, setEmailExists] = useState(false);
+    const [emailChecked, setEmailChecked] = useState(false);
+
+    const handleEmailChange = async (e) => {
+        const value = e.target.value;
+        setFormData({ ...formData, email: value });
+        setTouched({ ...touched, email: true });
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!value.trim()) {
+            setEmailExists(false);
+            setEmailChecked(false);
+            setErrors((prev) => ({
+                ...prev,
+                email: "Please fill in your email address.",
+            }));
+            return;
+        }
+
+        if (!emailRegex.test(value)) {
+            setErrors((prev) => ({
+                ...prev,
+                email: "Invalid email format. Please enter a valid email.",
+            }));
+            return;
+        }
+
+        try {
+            const res = await axios.get(
+                `/check-email?email=${encodeURIComponent(value)}`
+            );
+            const exists = res.data.exists;
+            setEmailExists(exists);
+            setEmailChecked(true);
+
+            setErrors((prev) => {
+                const updatedErrors = { ...prev };
+                if (!exists) delete updatedErrors.email;
+                else
+                    updatedErrors.email =
+                        "This email is already registered. Try a different one.";
+                return updatedErrors;
+            });
+        } catch (error) {
+            console.error("Fail To Check Email:", error);
+        }
+    };
+
+    const validateStep2 = () => {
+        const newErrors = {};
+        setTouched((prev) => ({ ...prev, otp: true }));
+
+        if (!formData.otp || formData.otp.length !== 6) {
+            newErrors.otp = "OTP must be 6 digits.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleNext = () => {
+        if (step === 1 && !validateStep1()) return;
+        if (step === 2 && !validateStep2()) return;
+        setStep(step + 1);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        Inertia.post(
+            "/users",
+            { ...formData, role: "user", status: "active" },
+            {
+                onSuccess: () => Inertia.visit("/login"),
+            }
+        );
+    };
+
+    const isLongEnough = formData.password.length >= 8;
+    const hasUpperLower =
+        /[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password);
+    const hasNumber = /\d/.test(formData.password);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailValid = emailRegex.test(formData.email);
+    const confirmValid =
+        formData.confirmPassword &&
+        formData.confirmPassword === formData.password;
+    return (
+        <Layout_Register>
+            <Card className="bg-[#BCA3CA] rounded-2xl max-w-md mx-auto mt-12">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-2xl">
+                        {step === 1
+                            ? "Sign Up"
+                            : step === 2
+                            ? "OTP Authentication"
+                            : "Finish Your Account"}
+                    </CardTitle>
+                    <CardDescription className="mt-2">
+                        {step === 1 &&
+                            "Kindly fill in this form to set up your ToGather account"}
+                        {step === 2 && (
+                            <>
+                                Please enter the 6 digit one time code
+                                <br /> we have sent to &lt;{formData.email}&gt;
+                            </>
+                        )}
+                        {step === 3 && "Finish your account detail"}
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent className="mb-5">
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {step === 1 && (
+                            <>
+                                <div>
+                                    <label htmlFor="email">Email</label>
+                                    <input
+                                        value={formData.email}
+                                        onChange={handleEmailChange}
+                                        onBlur={() =>
+                                            setTouched({
+                                                ...touched,
+                                                email: true,
+                                            })
+                                        }
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        className={`input ${
+                                            touched.email && !emailValid
+                                                ? "border-red-500 ring-red-500"
+                                                : touched.email && emailValid
+                                                ? "border-green-500 ring-green-500"
+                                                : ""
+                                        }`}
+                                        placeholder="Example@gmail.com"
+                                    />
+
+                                    {touched.email && errors.email && (
+                                        <p className="text-sm mt-1 text-red-600">
+                                            ✖ {errors.email}
+                                        </p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label htmlFor="password">Password</label>
+                                    <input
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        onBlur={() =>
+                                            setTouched({
+                                                ...touched,
+                                                password: true,
+                                            })
+                                        }
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        className={`input ${
+                                            touched.password && errors.password
+                                                ? "border-red-500 ring-red-500"
+                                                : ""
+                                        }`}
+                                        placeholder="Enter your password"
+                                    />
+                                    {touched.password && (
+                                        <ul className="text-sm mt-1 space-y-1">
+                                            <li
+                                                className={
+                                                    isLongEnough
+                                                        ? "text-green-600"
+                                                        : "text-red-600"
+                                                }
+                                            >
+                                                {isLongEnough ? "✔" : "✖"} 8 or
+                                                more characters
+                                            </li>
+                                            <li
+                                                className={
+                                                    hasUpperLower
+                                                        ? "text-green-600"
+                                                        : "text-red-600"
+                                                }
+                                            >
+                                                {hasUpperLower ? "✔" : "✖"}{" "}
+                                                Upper & lowercase letters
+                                            </li>
+                                            <li
+                                                className={
+                                                    hasNumber
+                                                        ? "text-green-600"
+                                                        : "text-red-600"
+                                                }
+                                            >
+                                                {hasNumber ? "✔" : "✖"} At least
+                                                one number
+                                            </li>
+                                        </ul>
+                                    )}
+                                </div>
+                                <div>
+                                    <label htmlFor="confirmPassword">
+                                        Confirm Password
+                                    </label>
+                                    <input
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        onBlur={() =>
+                                            setTouched({
+                                                ...touched,
+                                                confirmPassword: true,
+                                            })
+                                        }
+                                        type="password"
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        className={`input ${
+                                            touched.confirmPassword &&
+                                            !confirmValid
+                                                ? "border-red-500 ring-red-500"
+                                                : touched.confirmPassword &&
+                                                  confirmValid
+                                                ? "border-green-500 ring-green-500"
+                                                : ""
+                                        }`}
+                                        placeholder="Confirm your password"
+                                    />
+                                    {touched.confirmPassword && (
+                                        <p
+                                            className={`text-sm mt-1 flex items-center gap-1 ${
+                                                confirmValid
+                                                    ? "text-green-600"
+                                                    : "text-red-600"
+                                            }`}
+                                        >
+                                            {confirmValid ? "✔" : "✖"}{" "}
+                                            {confirmValid
+                                                ? "Password match"
+                                                : errors.confirmPassword ||
+                                                  "Passwords do not match"}
+                                        </p>
+                                    )}
+                                </div>
+                            </>
+                        )}
+
+                        {step === 2 && (
+                            <div className="text-center">
+                                <div className="flex justify-center gap-2">
+                                    {[...Array(6)].map((_, i) => (
+                                        <input
+                                            key={i}
+                                            ref={otpRefs[i]}
+                                            type="text"
+                                            maxLength="1"
+                                            className={`w-10 h-12 text-center rounded border ${
+                                                touched.otp && errors.otp
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            }`}
+                                            value={formData.otp[i] || ""}
+                                            onChange={(e) => {
+                                                const value =
+                                                    e.target.value.replace(
+                                                        /\D/,
+                                                        ""
+                                                    );
+                                                const newOtp =
+                                                    formData.otp.split("");
+                                                newOtp[i] = value;
+                                                const newOtpValue =
+                                                    newOtp.join("");
+
+                                                setFormData({
+                                                    ...formData,
+                                                    otp: newOtpValue,
+                                                });
+
+                                                // Auto-focus ke next box jika ada value
+                                                if (value && i < 5) {
+                                                    otpRefs[
+                                                        i + 1
+                                                    ].current?.focus();
+                                                }
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (
+                                                    e.key === "Backspace" &&
+                                                    !formData.otp[i] &&
+                                                    i > 0
+                                                ) {
+                                                    otpRefs[
+                                                        i - 1
+                                                    ].current?.focus();
+                                                }
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                                {touched.otp && errors.otp && (
+                                    <p className="text-sm text-red-600 mt-2">
+                                        {errors.otp}
+                                    </p>
+                                )}
+                                {isCounting ? (
+                                    <p className="mt-2 text-sm text-gray-700">
+                                        Didn’t receive OTP ?{" "}
+                                        <span className="font-semibold">
+                                            Resend again in 00:
+                                            {otpTimer
+                                                .toString()
+                                                .padStart(2, "0")}
+                                        </span>
+                                    </p>
+                                ) : (
+                                    <p className="mt-2 text-sm text-gray-700">
+                                        Didn’t receive OTP?{" "}
+                                        <button
+                                            type="button"
+                                            onClick={handleResendOtp}
+                                            className="font-semibold text-blue-800 hover:underline"
+                                        >
+                                            Send Again
+                                        </button>
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {step === 3 && (
+                            <>
+                                <div>
+                                    <label htmlFor="fullName">Full Name</label>
+                                    <input
+                                        value={formData.fullName}
+                                        onChange={handleChange}
+                                        id="fullName"
+                                        name="fullName"
+                                        className={input}
+                                        placeholder="Enter your full name"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="nickname">Nickname</label>
+                                    <input
+                                        value={formData.nickname}
+                                        onChange={handleChange}
+                                        id="nickname"
+                                        name="nickname"
+                                        className={input}
+                                        placeholder="Enter your nickname"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="address">Alamat</label>
+                                    <input
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        id="address"
+                                        name="address"
+                                        className={input}
+                                        placeholder="Enter your address"
+                                        required
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        <div className="flex items-center justify-center gap-24 mt-4 relative">
+                            {[1, 2, 3].map((n, index) => (
+                                <div
+                                    key={n}
+                                    className="relative z-10 flex items-center"
+                                >
+                                    <div
+                                        className={`w-6 h-6 rounded-full text-sm flex items-center justify-center font-bold ${
+                                            step >= n
+                                                ? "bg-[#5a4070] text-white"
+                                                : "bg-white text-black border border-gray-300"
+                                        }`}
+                                    >
+                                        {n}
+                                    </div>
+                                    {index < 2 && (
+                                        <div
+                                            className={`absolute top-1/2 left-full transform -translate-y-1/2 w-24 h-1 ${
+                                                step > n
+                                                    ? "bg-[#5a4070]"
+                                                    : "bg-white"
+                                            }`}
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        <CardFooter className="flex justify-end items-center p-0 pt-4">
+                            {step < 3 ? (
+                                <button
+                                    type="button"
+                                    onClick={handleNext}
+                                    className="register-btn"
+                                >
+                                    {step === 2 ? "Submit" : "Next"}
+                                </button>
+                            ) : (
+                                <button type="submit" className="register-btn">
+                                    Done
+                                </button>
+                            )}
+                        </CardFooter>
+                    </form>
+                    {step === 1 && (
+                        <p className="text-sm mt-6 text-center">
+                            Already have an account?{" "}
+                            <Link
+                                href="/login"
+                                className="font-semibold text-blue-800 hover:underline"
+                            >
+                                Login Now
+                            </Link>
+                        </p>
+                    )}
+                </CardContent>
+            </Card>
+        </Layout_Register>
+    );
 }
+
+const input = `block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300
+    placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white`;

@@ -39,7 +39,12 @@ class UserController extends Controller
 
         $user = User::create($validated);
 
-        return redirect()->route('users.activate', ['user' => $user->id]);
+        if ($validated['status'] === 'inactive') {
+        return Inertia::location(route('users.activate', ['user' => $user->id]));
+    } else {
+        return Inertia::location(route('users.index')); // login page
+    }
+
     }
 
     public function show(User $user)
@@ -77,7 +82,7 @@ class UserController extends Controller
 
     public function destroy(User $campaign)
     {
-        
+
     }
     public function activate($userId)
     {
@@ -96,7 +101,7 @@ class UserController extends Controller
             'status' => 'active',
         ]);
 
-        return redirect()->route('users.index');
+        return Inertia::location(route('users.index'));
     }
 
     public function login(Request $request)
@@ -108,13 +113,23 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/'); 
+            return redirect()->intended('/');
         }
 
-        return back()->withErrors([     
+        return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ]);
     }
+
+    public function checkEmail(Request $request)
+    {
+        $email = $request->query('email');
+
+        $exists = User::where('email', $email)->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
+
 
 
 }

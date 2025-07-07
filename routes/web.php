@@ -15,5 +15,8 @@ Route::get('/login', [UserController::class, 'index'])->name('users.index');
 Route::post('/login', [UserController::class, 'login'])->name('users.login');
 
 Route::get('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
+Route::get('/check-email', [UserController::class, 'checkEmail']);
+
+
 
 Route::post('/users/{user}/activate', [UserController::class, 'activateUser'])->name('users.activateUser');
