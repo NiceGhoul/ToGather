@@ -189,7 +189,9 @@ export default function Register() {
 
     const handleNext = () => {
         if (step === 1 && !validateStep1()) return;
+
         if (step === 2 && !validateStep2()) return;
+
         setStep(step + 1);
     };
 
@@ -197,7 +199,11 @@ export default function Register() {
         e.preventDefault();
         Inertia.post(
             "/users",
-            { ...formData, role: "user", status: "active" },
+            {
+                ...formData,
+                role: "user",
+                status: "active",
+            },
             {
                 onSuccess: () => Inertia.visit("/login"),
             }
@@ -539,6 +545,11 @@ export default function Register() {
                                     Done
                                 </button>
                             )}
+                        </CardFooter>
+                        <CardFooter className="flex justify-end p-0">
+                            <Link href="/" className="register-btn mt-4">
+                                Back
+                            </Link>
                         </CardFooter>
                     </form>
                     {step === 1 && (

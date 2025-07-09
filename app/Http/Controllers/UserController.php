@@ -84,25 +84,7 @@ class UserController extends Controller
     {
 
     }
-    public function activate($userId)
-    {
-        $user = User::findOrFail($userId);
 
-        return Inertia::render('Register/OTP_Confirmation', [
-            'user' => $user->only(['id', 'nickname', 'email', 'address', 'role', 'status']),
-        ]);
-    }
-    public function activateUser(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'number' => 'required|string',
-        ]);
-        $user->update([
-            'status' => 'active',
-        ]);
-
-        return Inertia::location(route('users.index'));
-    }
 
     public function login(Request $request)
     {
@@ -113,13 +95,16 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/');
+            // dd(Auth::user());
+            return Inertia::location('/');
         }
 
-        return back()->withErrors([
+        return redirect()->back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ]);
     }
+
+
 
     public function checkEmail(Request $request)
     {
@@ -129,6 +114,33 @@ class UserController extends Controller
 
         return response()->json(['exists' => $exists]);
     }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|string|size:6',
+        ]);
+
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        // if ($user->otp !== $request->otp) {
+        //     return response()->json(['message' => 'Invalid OTP'], 422);
+        // }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Inertia::location('/');
+    }
+
 
 
 
