@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -95,13 +96,13 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            // dd(Auth::user());
             return Inertia::location('/');
         }
 
+        // Return error jika login gagal
         return redirect()->back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+            'email' => 'Incorrect email or password.'
+        ])->withInput($request->except('password'));
     }
 
 
