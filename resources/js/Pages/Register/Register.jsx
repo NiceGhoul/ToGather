@@ -13,22 +13,42 @@ import { Link } from "@inertiajs/react";
 import axios from "axios";
 
 export default function Register() {
+    //State buat step-step di form (1: Email, Password, Confirm Password, 2: OTP, 3: Fullname, Nickname, Address)
     const [step, setStep] = useState(1);
+
+    //Ref untuk input OTP (6 digit)
     const otpRefs = Array.from({ length: 6 }, () => useRef(null));
+
+    //Ref untuk input field lain (biar auto focus)
+    const emailRef = useRef(null);
+    const fullNameRef = useRef(null);
+    const passwordRef = useRef(null);
+    const confirmPasswordRef = useRef(null);
+    const nicknameRef = useRef(null);
+    const addressRef = useRef(null);
+
+    //State untuk data form
     const [formData, setFormData] = useState({
         email: "",
         password: "",
         confirmPassword: "",
-        fullname: "",
+        fullName: "",
         nickname: "",
         address: "",
         otp: "",
     });
+
+    //State untuk error validasi
     const [errors, setErrors] = useState({});
+
+    //State untuk menandai field yang sudah disentuh
     const [touched, setTouched] = useState({});
 
+    //State untuk timer OTP
     const [otpTimer, setOtpTimer] = useState(60);
     const [isCounting, setIsCounting] = useState(true);
+
+    //Efek countdown timer OTP
     React.useEffect(() => {
         let interval;
         if (step === 2 && isCounting && otpTimer > 0) {
@@ -38,23 +58,26 @@ export default function Register() {
         } else if (otpTimer === 0) {
             setIsCounting(false);
         }
-
         return () => clearInterval(interval);
     }, [step, isCounting, otpTimer]);
 
+    //Handler untuk resend OTP
     const handleResendOtp = () => {
         setOtpTimer(60);
         setIsCounting(true);
         setFormData((prev) => ({ ...prev, otp: "" }));
         setTouched((prev) => ({ ...prev, otp: false }));
+        setTimeout(() => {
+            otpRefs[0]?.current?.focus();
+        }, 0);
     };
 
+    //Handler perubahan input form
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
         setTouched({ ...touched, [name]: true });
 
-        // Clear error kalau sudah valid
         setErrors((prev) => {
             const updatedErrors = { ...prev };
             if (name === "password" && value) {
@@ -63,8 +86,8 @@ export default function Register() {
             if (name === "confirmPassword" && value === formData.password) {
                 delete updatedErrors.confirmPassword;
             }
-            if (name === "fullname" && value.trim()) {
-                delete updatedErrors.fullname;
+            if (name === "fullName" && value.trim()) {
+                delete updatedErrors.fullName;
             }
             if (name === "nickname" && value.trim()) {
                 delete updatedErrors.nickname;
@@ -76,6 +99,7 @@ export default function Register() {
         });
     };
 
+    //Validasi step 1
     const validateStep1 = () => {
         const newErrors = {};
         setTouched({
@@ -85,7 +109,7 @@ export default function Register() {
         });
 
         const password = formData.password;
-
+        //Cek email
         if (!formData.email.trim()) {
             newErrors.email = "Please fill in your email address.";
         } else if (!emailRegex.test(formData.email)) {
@@ -96,6 +120,7 @@ export default function Register() {
                 "This email is already registered. Try a different one.";
         }
 
+        //Cek password
         if (!password) {
             newErrors.password = "Password is required.";
         } else {
@@ -116,6 +141,7 @@ export default function Register() {
             }
         }
 
+        //Cek confirm password
         if (!formData.confirmPassword) {
             newErrors.confirmPassword = "Please confirm your password.";
         } else if (formData.password !== formData.confirmPassword) {
@@ -126,9 +152,11 @@ export default function Register() {
         return Object.keys(newErrors).length === 0;
     };
 
+    //State & handler untuk mengecek apakah email sudah terdaftar
     const [emailExists, setEmailExists] = useState(false);
     const [emailChecked, setEmailChecked] = useState(false);
 
+    //Handler untuk perubahan email (cek ke backend)
     const handleEmailChange = async (e) => {
         const value = e.target.value;
         setFormData({ ...formData, email: value });
@@ -175,6 +203,7 @@ export default function Register() {
         }
     };
 
+    //Validasi step 2
     const validateStep2 = () => {
         const newErrors = {};
         setTouched((prev) => ({ ...prev, otp: true }));
@@ -187,14 +216,20 @@ export default function Register() {
         return Object.keys(newErrors).length === 0;
     };
 
+    //Handler tombol next
     const handleNext = () => {
         if (step === 1 && !validateStep1()) return;
-
         if (step === 2 && !validateStep2()) return;
+
+        if (step === 1) {
+            setFormData((prev) => ({ ...prev, otp: "" }));
+            setTouched((prev) => ({ ...prev, otp: false }));
+        }
 
         setStep(step + 1);
     };
 
+    //Handler tombol submit di akhir
     const handleSubmit = (e) => {
         e.preventDefault();
         Inertia.post(
@@ -210,6 +245,15 @@ export default function Register() {
         );
     };
 
+    //Handler tombol back
+    const handleBack = () => {
+        if (step === 1) {
+            window.location.href = "/";
+        } else {
+            setStep(1);
+        }
+    };
+
     const isLongEnough = formData.password.length >= 8;
     const hasUpperLower =
         /[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password);
@@ -219,6 +263,36 @@ export default function Register() {
     const confirmValid =
         formData.confirmPassword &&
         formData.confirmPassword === formData.password;
+
+    //Untuk auto focus input
+    React.useEffect(() => {
+        if (step === 1) {
+            setTimeout(() => {
+                emailRef.current?.focus();
+            }, 0);
+        }
+        if (step === 2) {
+            setFormData((prev) => ({ ...prev, otp: "" }));
+            setTouched((prev) => ({ ...prev, otp: false }));
+            setTimeout(() => {
+                otpRefs[0]?.current?.focus();
+            }, 0);
+        }
+        if (step === 3) {
+            setTimeout(() => {
+                fullNameRef.current?.focus();
+            }, 0);
+        }
+    }, [step]);
+
+    //Auto refresh
+    React.useEffect(() => {
+        const timeout = setTimeout(() => {
+            setStep(1);
+        }, 300000); // 5 menit
+        return () => clearTimeout(timeout);
+    }, [step, formData]);
+
     return (
         <Layout_Register>
             <Card className="bg-[#BCA3CA] rounded-2xl max-w-md mx-auto mt-12">
@@ -244,12 +318,65 @@ export default function Register() {
                 </CardHeader>
 
                 <CardContent className="mb-5">
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form
+                        onSubmit={handleSubmit}
+                        className="space-y-4"
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                // STEP 1: Email, Password, Confirm Password
+                                if (step === 1) {
+                                    if (
+                                        document.activeElement ===
+                                        emailRef.current
+                                    ) {
+                                        e.preventDefault();
+                                        passwordRef.current?.focus();
+                                    } else if (
+                                        document.activeElement ===
+                                        passwordRef.current
+                                    ) {
+                                        e.preventDefault();
+                                        confirmPasswordRef.current?.focus();
+                                    } else if (
+                                        document.activeElement ===
+                                        confirmPasswordRef.current
+                                    ) {
+                                        e.preventDefault();
+                                        handleNext();
+                                    }
+                                }
+                                // STEP 3: Fullname, Nickname, Address
+                                else if (step === 3) {
+                                    if (
+                                        document.activeElement ===
+                                        fullNameRef.current
+                                    ) {
+                                        e.preventDefault();
+                                        nicknameRef.current?.focus();
+                                    } else if (
+                                        document.activeElement ===
+                                        nicknameRef.current
+                                    ) {
+                                        e.preventDefault();
+                                        addressRef.current?.focus();
+                                    } else if (
+                                        document.activeElement ===
+                                        addressRef.current
+                                    ) {
+                                        // Submit form
+                                        // Jangan preventDefault agar form submit jalan
+                                    }
+                                }
+                                // STEP 2: Sudah dihandle di input OTP
+                            }
+                        }}
+                    >
                         {step === 1 && (
                             <>
                                 <div>
                                     <label htmlFor="email">Email</label>
                                     <input
+                                        ref={emailRef}
                                         value={formData.email}
                                         onChange={handleEmailChange}
                                         onBlur={() =>
@@ -280,6 +407,7 @@ export default function Register() {
                                 <div>
                                     <label htmlFor="password">Password</label>
                                     <input
+                                        ref={passwordRef}
                                         value={formData.password}
                                         onChange={handleChange}
                                         onBlur={() =>
@@ -338,6 +466,7 @@ export default function Register() {
                                         Confirm Password
                                     </label>
                                     <input
+                                        ref={confirmPasswordRef}
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
                                         onBlur={() =>
@@ -428,6 +557,15 @@ export default function Register() {
                                                         i - 1
                                                     ].current?.focus();
                                                 }
+                                                // Enter langsung submit OTP (handleNext)
+                                                if (
+                                                    e.key === "Enter" &&
+                                                    formData.otp.length === 6 &&
+                                                    i === 5
+                                                ) {
+                                                    e.preventDefault();
+                                                    handleNext();
+                                                }
                                             }}
                                         />
                                     ))}
@@ -467,6 +605,7 @@ export default function Register() {
                                 <div>
                                     <label htmlFor="fullName">Full Name</label>
                                     <input
+                                        ref={fullNameRef}
                                         value={formData.fullName}
                                         onChange={handleChange}
                                         id="fullName"
@@ -479,6 +618,7 @@ export default function Register() {
                                 <div>
                                     <label htmlFor="nickname">Nickname</label>
                                     <input
+                                        ref={nicknameRef}
                                         value={formData.nickname}
                                         onChange={handleChange}
                                         id="nickname"
@@ -491,6 +631,7 @@ export default function Register() {
                                 <div>
                                     <label htmlFor="address">Alamat</label>
                                     <input
+                                        ref={addressRef}
                                         value={formData.address}
                                         onChange={handleChange}
                                         id="address"
@@ -547,9 +688,13 @@ export default function Register() {
                             )}
                         </CardFooter>
                         <CardFooter className="flex justify-end p-0">
-                            <Link href="/" className="register-btn mt-4">
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="register-btn mt-4"
+                            >
                                 Back
-                            </Link>
+                            </button>
                         </CardFooter>
                     </form>
                     {step === 1 && (
