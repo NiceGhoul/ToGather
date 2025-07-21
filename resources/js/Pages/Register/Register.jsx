@@ -691,7 +691,7 @@ export default function Register() {
                             <button
                                 type="button"
                                 onClick={handleBack}
-                                className="register-btn mt-4"
+                                className="back-btn mt-4"
                             >
                                 Back
                             </button>
@@ -702,7 +702,7 @@ export default function Register() {
                             Already have an account?{" "}
                             <Link
                                 href="/login"
-                                className="font-semibold text-blue-800 hover:underline"
+                                className="font-semibold text-back hover:underline"
                             >
                                 Login Now
                             </Link>

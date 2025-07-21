@@ -7,7 +7,13 @@ export default function Navbar_Guest() {
                 <nav className="flex justify-between items-center px-6 py-4">
                     <div>
                         <Link className="nav-link" href="/">
-                            Home for Guest
+                            Home 
+                        </Link>
+                        <Link className="nav-link" href="/">
+                            Campaign 
+                        </Link>
+                        <Link className="nav-link" href="/">
+                            Article 
                         </Link>
                     </div>
 

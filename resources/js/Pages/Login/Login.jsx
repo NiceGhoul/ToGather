@@ -160,7 +160,7 @@ export default function Login() {
                             {/* Error dari backend (email/password missmatch) hanya di bawah tombol submit */}
                         </CardFooter>
                         <CardFooter className="flex justify-end p-0">
-                            <Link href="/" className="register-btn mt-4">
+                            <Link href="/" className="back-btn mt-4">
                                 Back
                             </Link>
                         </CardFooter>
