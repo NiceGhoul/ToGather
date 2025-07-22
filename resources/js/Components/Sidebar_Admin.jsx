@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Inbox, Search, Settings, LogOut , Users, Megaphone, Receipt } from "lucide-react"
 import { router } from "@inertiajs/react";
 import {
     Sidebar,
@@ -12,24 +12,24 @@ import {
 } from "@/components/ui/sidebar"
 const items = [
     {
-        title: "Home",
+        title: "Dashboard",
         url: "#",
         icon: Home,
     },
     {
-        title: "Inbox",
+        title: "User",
         url: "#",
-        icon: Inbox,
+        icon: Users,
     },
     {
-        title: "Calendar",
+        title: "Campaign",
         url: "#",
-        icon: Calendar,
+        icon: Megaphone,
     },
     {
-        title: "Search",
+        title: "Transaction",
         url: "#",
-        icon: Search,
+        icon: Receipt,
     },
     {
         title: "Settings",
@@ -43,25 +43,26 @@ export function Sidebar_Admin() {
         router.post("/logout");
     };
     return (
-        <Sidebar>
+        <Sidebar className="w-64">
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-base mb-4">Application</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
+                                <SidebarMenuItem key={item.title} className="mb-4">
                                     <SidebarMenuButton asChild>
                                         <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
+                                            <item.icon className="scale-140"/>
+                                            <span className="text-base">{item.title}</span>
                                         </a>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
                             <SidebarMenuItem>
                                 <SidebarMenuButton onClick={handleLogout}>
-                                    Logout
+                                    <LogOut /> 
+                                    <span className="text-base">Logout</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
