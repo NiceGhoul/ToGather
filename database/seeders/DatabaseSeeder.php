@@ -56,14 +56,11 @@ class DatabaseSeeder extends Seeder
         CampaignComment::factory()->count(50)->create();
         $campaignComments = CampaignComment::all();
 
-        // 6. Create Campaign Replies
         CampaignReply::factory()->count(100)->create(); 
 
-        // 7. Create Article Comments
         ArticleComment::factory()->count(40)->create();
         $articleComments = ArticleComment::all();
 
-        // 8. Create Article Replies
         ArticleReply::factory()->count(80)->create();
 
         Donation::factory()->count(70)->create();
