@@ -11,20 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaigns', function (Blueprint $table) {
+        Schema::create('articles', function (Blueprint $table) {
             $table->id(); 
             $table->foreignId('user_id')
                   ->constrained('users')
                   ->onDelete('cascade');
-            $table->foreignId('verified_by')
-                  ->nullable()
-                  ->constrained('users')
-                  ->onDelete('set null');
-            $table->string('title');
-            $table->decimal('goal_amount', 10, 2); 
-            $table->string('status')->default('pending');
-            $table->text('description'); 
-            $table->decimal('collected_amount', 10, 2)->default(0.00);
+            $table->string('title'); 
+            $table->longText('content'); 
             $table->timestamps();
         });
     }
@@ -34,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaigns');
+        Schema::dropIfExists('articles');
     }
 };

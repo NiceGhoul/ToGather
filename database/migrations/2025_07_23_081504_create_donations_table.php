@@ -11,20 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaigns', function (Blueprint $table) {
+        Schema::create('donations', function (Blueprint $table) {
             $table->id(); 
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->onDelete('cascade');
-            $table->foreignId('verified_by')
                   ->nullable()
                   ->constrained('users')
                   ->onDelete('set null');
-            $table->string('title');
-            $table->decimal('goal_amount', 10, 2); 
+            $table->foreignId('campaign_id')
+                  ->constrained('campaigns')
+                  ->onDelete('cascade');
+            $table->decimal('amount', 10, 2);
+            $table->text('message')->nullable();
+            $table->boolean('anonymous')->default(false);
             $table->string('status')->default('pending');
-            $table->text('description'); 
-            $table->decimal('collected_amount', 10, 2)->default(0.00);
+
             $table->timestamps();
         });
     }
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaigns');
+        Schema::dropIfExists('donations');
     }
 };

@@ -11,20 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaigns', function (Blueprint $table) {
-            $table->id(); 
+        Schema::create('verification_requests', function (Blueprint $table) {
+            $table->id(); // Primary key
+
+            // Foreign key to the users table (the user requesting verification)
             $table->foreignId('user_id')
                   ->constrained('users')
-                  ->onDelete('cascade');
-            $table->foreignId('verified_by')
+                  ->onDelete('cascade'); 
+            $table->string('id_type');
+            $table->string('selfie_with_id'); 
+            $table->string('status')->default('pending'); 
+            $table->foreignId('reviewed_by')
                   ->nullable()
                   ->constrained('users')
-                  ->onDelete('set null');
-            $table->string('title');
-            $table->decimal('goal_amount', 10, 2); 
-            $table->string('status')->default('pending');
-            $table->text('description'); 
-            $table->decimal('collected_amount', 10, 2)->default(0.00);
+                  ->onDelete('set null'); 
+
             $table->timestamps();
         });
     }
@@ -34,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaigns');
+        Schema::dropIfExists('verification_requests');
     }
 };
