@@ -8,12 +8,16 @@ use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 class UserController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Login/Login');
+        $users = User::all();
+        return Inertia::render('Admin/User/User_List', [
+            'users' => $users,
+        ]);
     }
 
     public function create()
@@ -41,11 +45,10 @@ class UserController extends Controller
         $user = User::create($validated);
 
         if ($validated['status'] === 'inactive') {
-        return Inertia::location(route('users.activate', ['user' => $user->id]));
-    } else {
-        return Inertia::location(route('users.index')); // login page
-    }
-
+            return Inertia::location(route('users.activate', ['user' => $user->id]));
+        } else {
+            return Inertia::location(route('users.index')); // login page
+        }
     }
 
     public function show(User $user)
@@ -96,6 +99,13 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            if ($user->role === 'admin') {
+                return Inertia::location(route('admin.dashboard'));
+            }
+
             return Inertia::location('/');
         }
 
@@ -142,7 +152,18 @@ class UserController extends Controller
         return Inertia::location('/');
     }
 
+    public function dashboard()
+    {
+        if (Auth::user()->role !== 'admin') {
+            return redirect('/');
+        }
 
+        return Inertia::render('Admin/Dashboard');
+    }
 
+    public function showLogin()
+    {
+        return Inertia::render('Login/Login');
+    }
 
 }

@@ -9,20 +9,25 @@ use Inertia\Inertia;
 
 
 Route::get('/', [CampaignController::class, 'index']);
+Route::get('/admin/users/list', [UserController::class, 'index'])->name('users.index');
 
 Route::resource('campaigns', CampaignController::class)->except('index');
 
 Route::resource('users', UserController::class)->except('index');
 
-Route::get('/login', [UserController::class, 'index'])
+Route::get('/login', [UserController::class, 'showLogin'])
     ->middleware(RedirectIfAuthenticated::class)
-    ->name('users.index');
+    ->name('users.showLogin');
 
 Route::get('/users/create', [UserController::class, 'create'])
     ->middleware(RedirectIfAuthenticated::class);
 
 Route::post('/login', [UserController::class, 'login'])->name('users.login');
 Route::post('/users/verify-otp', [UserController::class, 'verifyOtp']);
+
+Route::get('/admin/dashboard', [UserController::class, 'dashboard'])
+    ->middleware(['auth']) 
+    ->name('admin.dashboard'); 
 
 
 

@@ -1,21 +1,52 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { Sidebar_Admin } from "@/components/Sidebar_Admin"
-export default function Layout_admin({ children }) {
+import { AppSidebar } from "@/Components/Sidebar_Admin_Item"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+    SidebarInset,
+    SidebarProvider,
+    SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { Link, usePage, router } from "@inertiajs/react";
+
+export default function Page({ children }) {
+    const handleLogout = () => {
+        router.post("/logout");
+    };
     return (
         <>
-            <div className="flex h-screen w-screen overflow-hidden">
-                <SidebarProvider>
-                    <Sidebar_Admin />
-                    <div className="flex flex-col flex-grow">
-                        <div className="flex justify-between items-center w-full p-4 bg-[#f9f9f9]">
-                            <SidebarTrigger />
+            <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset className="w-full max-w-full">
+                    <header
+                        className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                        <div className="flex items-center gap-2 px-5">
+                            <SidebarTrigger className="-ml-1" />
+                            <Separator orientation="vertical" className=" data-[orientation=vertical]:h-4" />
+                            <Breadcrumb>
+                                <BreadcrumbList>
+                                    <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbLink href="#">
+                                            Building Your Application
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator className="hidden md:block" />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                                    </BreadcrumbItem>
+                                </BreadcrumbList>
+                            </Breadcrumb>
                         </div>
-                        <main className="flex-grow overflow-auto"> 
-                            {children}
-                        </main>
-                    </div>
-                </SidebarProvider>
-            </div>
+                    </header>
+                    {children}
+                </SidebarInset>
+            </SidebarProvider>
         </>
-    )
+    );
 }

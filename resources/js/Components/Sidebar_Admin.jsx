@@ -1,74 +1,80 @@
-import { Calendar, Home, Inbox, Search, Settings, LogOut , Users, Megaphone, Receipt } from "lucide-react"
-import { router } from "@inertiajs/react";
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "@/components/ui/sidebar"
-const items = [
-    {
-        title: "Dashboard",
-        url: "#",
-        icon: Home,
-    },
-    {
-        title: "User",
-        url: "#",
-        icon: Users,
-    },
-    {
-        title: "Campaign",
-        url: "#",
-        icon: Megaphone,
-    },
-    {
-        title: "Transaction",
-        url: "#",
-        icon: Receipt,
-    },
-    {
-        title: "Settings",
-        url: "#",
-        icon: Settings,
-    },
-]
+"use client"
 
-export function Sidebar_Admin() {
-    const handleLogout = () => {
-        router.post("/logout");
-    };
-    return (
-        <Sidebar className="w-64">
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel className="text-base mb-4">Application</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title} className="mb-4">
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon className="scale-140"/>
-                                            <span className="text-base">{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                            <SidebarMenuItem>
-                                <SidebarMenuButton onClick={handleLogout}>
-                                    <LogOut /> 
-                                    <span className="text-base">Logout</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
-        </Sidebar>
-    )
+import { ChevronRight } from "lucide-react";
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from "@/components/ui/sidebar"
+
+export function NavMain({
+  items
+}) {
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>Menus</SidebarGroupLabel>
+      <SidebarMenu>
+        {items.map((item) => {
+          // Check if the item has sub-items
+          const hasSubItems = item.items && item.items.length > 0;
+
+          return hasSubItems ? (
+            // If it has sub-items, render the collapsible dropdown
+            <Collapsible
+              key={item.title}
+              asChild
+              defaultOpen={item.isActive}
+              className="group/collapsible">
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip={item.title}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                    <ChevronRight
+                      className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {item.items?.map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton asChild>
+                          {/* Using <a> tag for links */}
+                          <a href={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          ) : (
+            // If it does NOT have sub-items, render a simple link
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild tooltip={item.title}>
+                {/* The button itself is the link */}
+                <a href={item.url}>
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+        })}
+      </SidebarMenu>
+    </SidebarGroup>
+  );
 }
