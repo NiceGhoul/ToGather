@@ -24,7 +24,7 @@ import {
 const sidebarNavItems = [ 
   { 
     title: "Dashboard", 
-    url: "#", 
+    url: "/admin/dashboard", 
     icon: LayoutDashboard, 
     isActive: true, 
   }, 
@@ -39,7 +39,7 @@ const sidebarNavItems = [
       }, 
       { 
         title: "Verification Request", 
-        url: "#", 
+        url: "/admin/users/verification", 
       }, 
     ], 
   }, 
@@ -50,11 +50,11 @@ const sidebarNavItems = [
     items: [ 
       { 
         title: "Campaign List", 
-        url: "#", 
+        url: "/admin/campaigns/list", 
       }, 
       { 
         title: "Campaign Verification", 
-        url: "#", 
+        url: "/admin/campaigns/verification", 
       }, 
     ], 
   }, 

@@ -52,40 +52,58 @@ export const columns = [
         cell: ({ row }) => <div>{row.getValue("id")}</div>,
     },
     {
-        accessorKey: "user.email",
+        accessorKey: "user.nickname", // Access the user's nickname
         header: ({ column }) => (
             <Button
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Email
+                Creator
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.original.user.email}</div>,
+        cell: ({ row }) => <div>{row.original.user?.nickname || 'N/A'}</div>
     },
     {
-        accessorKey: "id_type",
+        accessorKey: "verifier.nickname", // Access the verifier's nickname
         header: ({ column }) => (
             <Button
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
-                Id Type
+                Verifier
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
+        cell: ({ row }) => <div>{row.original.verifier?.nickname || 'N/A'}</div>
     },
     {
-        accessorKey: "selfie_with_id",
-        header: "Selfie",
-        cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue("address")}</div>,
+        accessorKey: "title",
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+                title
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => <div className="capitalize">{row.getValue("title")}</div>,
     },
     {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => <div className="capitalize">{row.getValue("status")}</div>,
+    },
+    {
+        accessorKey: "goal_amount",
+        header: "Goal Amount",
+        cell: ({ row }) => <div className="capitalize">{row.getValue("goal_amount")}</div>,
+    },
+    {
+        accessorKey: "collected_amount",
+        header: "Collected",
+        cell: ({ row }) => <div className="capitalize">{row.getValue("collected_amount")}</div>,
     },
     {
         accessorKey: "created_at",
@@ -135,11 +153,11 @@ export const columns = [
 ]
 
 // The page component is now much cleaner.
-export default function Verification({ requests }) {
+export default function Campaign_List({ campaigns }) {
     return (
-        <Layout_Admin title="User Verification List">
+        <Layout_Admin title="Campaign Verification List">
             <div className="p-9">
-                <Data_Table columns={columns} data={requests} />
+                <Data_Table columns={columns} data={campaigns} />
             </div>
         </Layout_Admin>
     );

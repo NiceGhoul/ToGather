@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Models\Campaign;
+use Inertia\Inertia;
 
 class CampaignController extends Controller
 {
@@ -14,6 +15,23 @@ class CampaignController extends Controller
     public function index()
     {
         return inertia('Home');
+    }
+
+    public function AdminCampaign()
+    {
+        $campaigns = Campaign::with(['user', 'verifier'])
+            ->where('status', 'active')
+            ->orWhere('status', 'completed')->get();
+        return Inertia::render('Admin/Campaign/Campaign_List', [
+            'campaigns' => $campaigns,
+        ]);
+    }
+    public function AdminVerification()
+    {
+        $campaigns = Campaign::with(['user', 'verifier'])->where('status', 'pending')->get();
+        return Inertia::render('Admin/Campaign/Campaign_Verification', [
+            'campaigns' => $campaigns,
+        ]);
     }
 
     /**

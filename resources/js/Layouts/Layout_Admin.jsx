@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Link, usePage, router } from "@inertiajs/react";
 
-export default function Page({ children }) {
+export default function Page({ children, title }) {
     const handleLogout = () => {
         router.post("/logout");
     };
@@ -29,19 +29,7 @@ export default function Page({ children }) {
                         <div className="flex items-center gap-2 px-5">
                             <SidebarTrigger className="-ml-1" />
                             <Separator orientation="vertical" className=" data-[orientation=vertical]:h-4" />
-                            <Breadcrumb>
-                                <BreadcrumbList>
-                                    <BreadcrumbItem className="hidden md:block">
-                                        <BreadcrumbLink href="#">
-                                            Building Your Application
-                                        </BreadcrumbLink>
-                                    </BreadcrumbItem>
-                                    <BreadcrumbSeparator className="hidden md:block" />
-                                    <BreadcrumbItem>
-                                        <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                                    </BreadcrumbItem>
-                                </BreadcrumbList>
-                            </Breadcrumb>
+                            <h1 className="text-lg font-semibold">{title}</h1>
                         </div>
                     </header>
                     {children}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\VerificationRequest;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class VerificationRequestController extends Controller
 {
@@ -12,7 +13,10 @@ class VerificationRequestController extends Controller
      */
     public function index()
     {
-        //
+        $requests = VerificationRequest::with('user')->latest()->get();
+        return Inertia::render('Admin/User/Verification', [
+            'requests' => $requests,
+        ]);
     }
 
     /**
