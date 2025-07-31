@@ -18,21 +18,22 @@ Route::get('/admin/campaigns/verification', [CampaignController::class, 'AdminVe
 
 Route::resource('campaigns', CampaignController::class)->except('index');
 
+Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
 Route::resource('users', UserController::class)->except('index');
 
 Route::get('/login', [UserController::class, 'showLogin'])
-    ->middleware(RedirectIfAuthenticated::class)
-    ->name('users.showLogin');
+->middleware(RedirectIfAuthenticated::class)
+->name('users.showLogin');
 
 Route::get('/users/create', [UserController::class, 'create'])
-    ->middleware(RedirectIfAuthenticated::class);
+->middleware(RedirectIfAuthenticated::class);
 
 Route::post('/login', [UserController::class, 'login'])->name('users.login');
 Route::post('/users/verify-otp', [UserController::class, 'verifyOtp']);
 
 Route::get('/admin/dashboard', [UserController::class, 'dashboard'])
-    ->middleware(['auth']) 
-    ->name('admin.dashboard'); 
+->middleware(['auth']) 
+->name('admin.dashboard'); 
 
 
 Route::get('/check-email', [UserController::class, 'checkEmail']);

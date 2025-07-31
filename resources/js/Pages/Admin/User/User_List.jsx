@@ -49,7 +49,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
+        cell: ({ row }) => <div className="ml-4">{row.getValue("id")}</div>,
     },
     {
         accessorKey: "nickname",
@@ -62,7 +62,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.getValue("nickname")}</div>,
+        cell: ({ row }) => <div className="capitalize ml-1">{row.getValue("nickname")}</div>,
     },
     {
         accessorKey: "email",
@@ -75,7 +75,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.getValue("email")}</div>,
+        cell: ({ row }) => <div className="ml-1">{row.getValue("email")}</div>,
     },
     {
         accessorKey: "address",
@@ -88,7 +88,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue("address")}</div>,
+        cell: ({ row }) => <div className="truncate max-w-xs ml-1">{row.getValue("address")}</div>,
     },
     {
         accessorKey: "role",
@@ -114,7 +114,7 @@ export const columns = [
         cell: ({ row }) => {
             const date = new Date(row.getValue("created_at"));
             const formatted = date.toLocaleDateString("en-US");
-            return <div>{formatted}</div>;
+            return <div className="ml-5">{formatted}</div>;
         },
     },
     {

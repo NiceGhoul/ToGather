@@ -49,7 +49,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
+        cell: ({ row }) => <div className="ml-4">{row.getValue("id")}</div>,
     },
     {
         accessorKey: "user.nickname", // Access the user's nickname
@@ -62,7 +62,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.original.user?.nickname || 'N/A'}</div>
+        cell: ({ row }) => <div className="capitalize ml-1">{row.original.user?.nickname || 'N/A'}</div>
     },
     {
         accessorKey: "verifier.nickname", // Access the verifier's nickname
@@ -75,7 +75,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.original.verifier?.nickname || 'N/A'}</div>
+        cell: ({ row }) => <div className="capitalize ml-1">{row.original.verifier?.nickname || 'N/A'}</div>
     },
     {
         accessorKey: "title",
@@ -88,7 +88,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="capitalize">{row.getValue("title")}</div>,
+        cell: ({ row }) => <div className="capitalize ml-1">{row.getValue("title")}</div>,
     },
     {
         accessorKey: "status",
@@ -119,7 +119,7 @@ export const columns = [
         cell: ({ row }) => {
             const date = new Date(row.getValue("created_at"));
             const formatted = date.toLocaleDateString("en-US");
-            return <div>{formatted}</div>;
+            return <div className="ml-5">{formatted}</div>;
         },
     },
     {

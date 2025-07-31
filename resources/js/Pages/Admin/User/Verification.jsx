@@ -12,9 +12,59 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-// Define the columns specifically for the UserList page.
-// This could also be in its own file if it gets very large.
+const handleVerification = async (user, action) => {
+    try {
+        const url = `/users/${user}/verify`;
+        console.log("Requesting URL:", url); 
+        const response = await fetch(`/users/${user}/verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ acceptance: action })
+        });
+
+        if (!response.ok) {
+            // Check for 404 specifically
+            if (response.status === 404) {
+                throw new Error('API route not found. Check the URL.');
+            }
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Verification failed');
+        }
+
+        const result = await response.json();
+        console.log('Verification successful:', result);
+        alert(`User has been ${action}.`);
+
+        window.location.reload();
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert(`An error occurred: ${error.message}`);
+    }
+};
+
 export const columns = [
     {
         id: "select",
@@ -49,7 +99,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
+        cell: ({ row }) => <div className="ml-4">{row.getValue("id")}</div>,
     },
     {
         accessorKey: "user.email",
@@ -62,7 +112,7 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.original.user.email}</div>,
+        cell: ({ row }) => <div className="ml-1">{row.original.user.email}</div>,
     },
     {
         accessorKey: "id_type",
@@ -75,12 +125,35 @@ export const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
+        cell: ({ row }) => <div className="ml-1">{row.getValue("id_type")}</div>,
     },
     {
         accessorKey: "selfie_with_id",
         header: "Selfie",
-        cell: ({ row }) => <div className="truncate max-w-xs">{row.getValue("address")}</div>,
+        cell: ({ row }) => {
+
+            const imageUrl = row.original.selfie_with_id;
+            return (
+                <div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline">Open Selfie</Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                            {imageUrl ? (
+                                <img
+                                    src={imageUrl}
+                                    alt="Selfie with ID"
+                                    className="w-full h-auto rounded-md object-cover"
+                                />
+                            ) : (
+                                <p>No image available.</p>
+                            )}
+                        </PopoverContent>
+                    </Popover>
+                </div>
+            );
+        }
     },
     {
         accessorKey: "status",
@@ -101,7 +174,7 @@ export const columns = [
         cell: ({ row }) => {
             const date = new Date(row.getValue("created_at"));
             const formatted = date.toLocaleDateString("en-US");
-            return <div>{formatted}</div>;
+            return <div className="ml-5">{formatted}</div>;
         },
     },
     {
@@ -120,13 +193,56 @@ export const columns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(user.id.toString())}
+                            onClick={() => navigator.clipboard.writeText(user.user.id.toString())}
                         >
                             Copy user ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View user details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit user</DropdownMenuItem>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    Approved
+                                </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Approve Verification?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Are you sure you want to approve this user's verification? They will be notified.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleVerification(user.user.id, 'accepted')}>
+                                        Approve
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600">
+                                    Reject
+                                </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Reject Verification?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Are you sure you want to reject this user's verification? This action cannot be undone easily.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={() => handleVerification(user.user.id, 'rejected')}
+                                        className="bg-red-600 hover:bg-red-700"
+                                    >
+                                        Reject
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
