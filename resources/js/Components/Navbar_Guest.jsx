@@ -21,7 +21,7 @@ export default function Navbar_Guest() {
                         <Link className="nav-link" href="/users/create">
                             SignUp
                         </Link>
-                        <Link className="nav-link" href="/login">
+                        <Link className="nav-link" href="/Login">
                             Login
                         </Link>
                     </div>

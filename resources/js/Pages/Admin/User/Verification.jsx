@@ -34,7 +34,7 @@ import {
 const handleVerification = async (user, action) => {
     try {
         const url = `/users/${user}/verify`;
-        console.log("Requesting URL:", url); 
+        console.log("Requesting URL:", url);
         const response = await fetch(`/users/${user}/verify`, {
             method: 'POST',
             headers: {
@@ -115,39 +115,58 @@ export const columns = [
         cell: ({ row }) => <div className="ml-1">{row.original.user.email}</div>,
     },
     {
-        accessorKey: "id_type",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-                Id Type
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => <div className="ml-1">{row.getValue("id_type")}</div>,
-    },
-    {
-        accessorKey: "selfie_with_id",
-        header: "Selfie",
+        accessorKey: "id_photo",
+        header: "ID Photo",
         cell: ({ row }) => {
+            const imageUrl = row.original.images?.id_photo_path;
 
-            const imageUrl = row.original.selfie_with_id;
             return (
                 <div>
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant="outline">Open Selfie</Button>
+                            <Button variant="outline" disabled={!imageUrl}>
+                                View ID Photo
+                            </Button>
                         </PopoverTrigger>
-                        <PopoverContent>
+                        <PopoverContent className="w-80 p-4">
+                            {imageUrl ? (
+                                <img
+                                    src={imageUrl}
+                                    alt="ID Photo"
+                                    className="w-full h-auto rounded-md object-cover border"
+                                />
+                            ) : (
+                                <p className="text-sm text-gray-500">No ID photo provided.</p>
+                            )}
+                        </PopoverContent>
+                    </Popover>
+                </div>
+            );
+        }
+    },
+    {
+        accessorKey: "selfie_with_id",
+        header: "Selfie with ID",
+        cell: ({ row }) => {
+            const imageUrl = row.original.images?.selfie_with_id_path;
+
+            return (
+                <div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" disabled={!imageUrl}>
+                                View Selfie
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-4">
                             {imageUrl ? (
                                 <img
                                     src={imageUrl}
                                     alt="Selfie with ID"
-                                    className="w-full h-auto rounded-md object-cover"
+                                    className="w-full h-auto rounded-md object-cover border"
                                 />
                             ) : (
-                                <p>No image available.</p>
+                                <p className="text-sm text-gray-500">No selfie provided.</p>
                             )}
                         </PopoverContent>
                     </Popover>

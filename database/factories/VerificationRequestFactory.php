@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Enums\VerificationStatus;
 use App\Models\User;
+use App\Models\VerificationImage;
+use App\Models\VerificationRequest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,34 +20,35 @@ class VerificationRequestFactory extends Factory
      */
     public function definition(): array
     {
-        $userId = User::inRandomOrder()->first()->id ?? User::factory()->create()->id;
-        // 50% chance of being reviewed
-        $reviewedBy = $this->faker->boolean(50) ? (User::inRandomOrder()->first()->id ?? User::factory()->create()->id) : null;
-
         return [
-            'user_id' => $userId,
-            'id_type' => $this->faker->randomElement(['KTP', 'Passport', 'Driving License']),
-            'selfie_with_id' => $this->faker->imageUrl(400, 300, 'id', true, 'selfie'),
-            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
-            'reviewed_by' => $reviewedBy,
+            'user_id' => User::inRandomOrder()->first()->id,
+            'status' => $this->faker->randomElement(VerificationStatus::cases()), // Use Enum cases
+            'reviewed_by' => null,
         ];
     }
     public function approved(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'approved',
-            'reviewed_by' => User::inRandomOrder()->first()->id ?? User::factory()->create()->id, // Ensure it has a reviewer
+            'status' => VerificationStatus::Approved,
+            'reviewed_by' => User::factory(),
         ]);
     }
 
-    /**
-     * Indicate that the request is rejected.
-     */
     public function rejected(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'rejected',
-            'reviewed_by' => User::inRandomOrder()->first()->id ?? User::factory()->create()->id, // Ensure it has a reviewer
+            'status' => VerificationStatus::Rejected,
+            'reviewed_by' => User::factory(),
         ]);
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (VerificationRequest $request) {
+            // Create the associated verification images
+            VerificationImage::factory()->create([
+                'verification_request_id' => $request->id,
+            ]);
+        });
     }
 }

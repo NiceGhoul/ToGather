@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\CampaignStatus;
 use App\Models\User;
 use App\Models\Campaign;
 use App\Models\Article;
@@ -9,6 +10,7 @@ use App\Models\CampaignComment;
 use App\Models\CampaignReply;
 use App\Models\ArticleComment;
 use App\Models\ArticleReply;
+use App\Models\Comment;
 use App\Models\Image;
 use App\Models\Donation;
 use App\Models\VerificationRequest;
@@ -23,51 +25,40 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Create exactly 20 Users first. This is now the only place users are created.
+        User::factory(15)->create();
+        User::factory(5)->admin()->create();
 
-        User::factory()->count(10)->create(); 
-        $users = User::all();
-        Image::factory()->count(20)->create();
-        $images = Image::all();
-        Campaign::factory()->count(10)->create();
-        Campaign::factory()->count(5)->active()->create();
-        Campaign::factory()->count(5)->completed()->create();
-        $campaigns = Campaign::all();
-        Article::factory()->count(15)->create();
-        $articles = Article::all();
-        $campaigns->each(function ($campaign) use ($images) {
-            // Attach 1 to 3 random images to each campaign
-            $campaign->images()->attach(
-                $images->random(rand(1, min(3, $images->count())))->pluck('id')->toArray()
-            );
-        });
-        $articles->each(function ($article) use ($images) {
-            // Attach 1 to 2 random images to each article
-            $article->images()->attach(
-                $images->random(rand(1, min(2, $images->count())))->pluck('id')->toArray()
-            );
-        });
-        $profileImages = Image::factory()->count(5)->profile()->create(); // Create 5 specific profile images
-        $users->take(5)->each(function ($user, $index) use ($profileImages) {
-            if (isset($profileImages[$index])) {
-                $user->profileImagePivot()->create(['image_id' => $profileImages[$index]->id]);
+        // 2. Create Articles and Campaigns.
+        // Their factories will now automatically pick from the 20 existing users.
+        $articles = Article::factory(20)->create();
+        $campaigns = Campaign::factory(20)->create();
+
+        // 3. Create Comments and Replies Polymorphically
+        $commentable = $articles->merge($campaigns);
+
+        foreach ($commentable as $model) {
+            Comment::factory(rand(2, 5))->create([
+                'commentable_id' => $model->id,
+                'commentable_type' => get_class($model),
+            ]);
+        }
+
+        $comments = Comment::all();
+        foreach ($comments as $comment) {
+            if (rand(0, 1)) {
+                Comment::factory(rand(1, 3))->create([
+                    'commentable_id' => $comment->commentable_id,
+                    'commentable_type' => $comment->commentable_type,
+                    'parent_id' => $comment->id,
+                ]);
             }
-        });
-        CampaignComment::factory()->count(50)->create();
-        $campaignComments = CampaignComment::all();
+        }
 
-        CampaignReply::factory()->count(100)->create(); 
+        // 4. Create Donations
+        Donation::factory(100)->create();
 
-        ArticleComment::factory()->count(40)->create();
-        $articleComments = ArticleComment::all();
-
-        ArticleReply::factory()->count(80)->create();
-
-        Donation::factory()->count(70)->create();
-        Donation::factory()->count(10)->anonymous()->create(); 
-        Donation::factory()->count(20)->completed()->create();
-        VerificationRequest::factory()->count(15)->create();
-        VerificationRequest::factory()->count(5)->approved()->create();
-        VerificationRequest::factory()->count(3)->rejected()->create();
+        // 5. Create Verification Requests
+        VerificationRequest::factory(15)->create();
     }
 }

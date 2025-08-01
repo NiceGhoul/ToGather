@@ -64,7 +64,7 @@ export default function Login() {
             }
             return;
         }
-        post("/login", {
+        post("/user/login", {
             preserveScroll: true,
             replace: true,
             onError: (err) => {

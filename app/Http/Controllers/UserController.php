@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
@@ -14,7 +17,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::with('profileImage')->get();
         return Inertia::render('Admin/User/User_List', [
             'users' => $users,
         ]);
@@ -36,8 +39,8 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'address' => 'required|string',
             'password' => 'required|string|min:3',
-            'role' => 'required|string',
-            'status' => 'required|string',
+            'role' => ['required' , Rule::in(array_column(UserRole::cases(), 'value'))],
+            'status' => ['required', Rule::in(array_column(UserStatus::cases(), 'value'))],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -47,7 +50,7 @@ class UserController extends Controller
         if ($validated['status'] === 'inactive') {
             return Inertia::location(route('users.activate', ['user' => $user->id]));
         } else {
-            return Inertia::location(route('users.index')); // login page
+            return Inertia::location(route('login')); // login page
         }
     }
 
@@ -102,7 +105,7 @@ class UserController extends Controller
 
             $user = Auth::user();
 
-            if ($user->role === 'admin') {
+            if ($user->role === UserRole::Admin) {
                 return Inertia::location(route('admin.dashboard'));
             }
 
@@ -154,7 +157,7 @@ class UserController extends Controller
 
     public function dashboard()
     {
-        if (Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== UserRole::Admin) {
             return redirect('/');
         }
 

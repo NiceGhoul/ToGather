@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\DonationStatus;
 use App\Models\Campaign;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -18,22 +19,18 @@ class DonationFactory extends Factory
      */
     public function definition(): array
     {
-        $campaignId = Campaign::inRandomOrder()->first()->id ?? Campaign::factory()->create()->id;
-
-        // 70% chance of having a user_id, 30% chance of being anonymous (null user_id)
         $isAnonymous = $this->faker->boolean(30);
-        $userId = $isAnonymous ? null : (User::inRandomOrder()->first()->id ?? User::factory()->create()->id);
 
         return [
-            'user_id' => $userId,
-            'campaign_id' => $campaignId,
-            'amount' => $this->faker->randomFloat(2, 10, 1000), // Donation amount between 10 and 1000
-            'message' => $this->faker->boolean(70) ? $this->faker->sentence(rand(5, 15)) : null, // 70% chance of a message
+            'user_id' => $isAnonymous ? null : User::inRandomOrder()->first()->id,
+            'campaign_id' => Campaign::factory(),
+            'amount' => $this->faker->randomFloat(2, 5, 500),
+            'message' => $this->faker->boolean(70) ? $this->faker->sentence() : null,
             'anonymous' => $isAnonymous,
-            'status' => $this->faker->randomElement(['completed', 'pending', 'failed']),
+            'status' => $this->faker->randomElement(DonationStatus::cases()),
         ];
     }
-    public function anonymous(): static
+     public function anonymous(): static
     {
         return $this->state(fn (array $attributes) => [
             'user_id' => null,
@@ -42,12 +39,12 @@ class DonationFactory extends Factory
     }
 
     /**
-     * Indicate that the donation is completed.
+     * Indicate that the donation is completed/successful.
      */
     public function completed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'completed',
+            'status' => DonationStatus::Successful, // Use the correct Enum case
         ]);
     }
 }

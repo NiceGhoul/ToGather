@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Article;
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,12 +19,20 @@ class ArticleFactory extends Factory
      */
     public function definition(): array
     {
-        $userId = User::inRandomOrder()->first()->id ?? User::factory()->create()->id;
-
         return [
-            'user_id' => $userId,
+            'user_id' => User::inRandomOrder()->first()->id,
             'title' => $this->faker->sentence(rand(5, 10)),
-            'content' => $this->faker->paragraphs(rand(5, 15), true), // 5-15 paragraphs of content
+            'content' => $this->faker->paragraphs(rand(5, 15), true),
         ];
+    }
+    
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Article $article) {
+            Image::factory(rand(1,3))->create([
+                'imageable_id' => $article->id,
+                'imageable_type' => Article::class,
+            ]);
+        });
     }
 }

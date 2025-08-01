@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\VerificationStatus;
 use App\Models\User;
 use App\Models\VerificationRequest;
 use Illuminate\Http\Request;
@@ -15,8 +16,8 @@ class VerificationRequestController extends Controller
      */
     public function index()
     {
-        $requests = VerificationRequest::with('user')
-            ->where('status', 'pending')->latest()->get();
+        $requests = VerificationRequest::with(['user', 'images'])
+            ->where('status', VerificationStatus::Pending)->latest()->get();
         return Inertia::render('Admin/User/Verification', [
             'requests' => $requests,
         ]);
@@ -31,14 +32,14 @@ class VerificationRequestController extends Controller
         $adminId = Auth::id();
         $verification = VerificationRequest::where('user_id', $user->id)->firstOrFail();
 
-        $verification->status = ($validated['acceptance'] === 'accepted') ? 'approved' : 'rejected';
+        $verification->status = ($validated['acceptance'] === 'accepted') ? VerificationStatus::Approved : VerificationStatus::Rejected;
 
         $verification->reviewed_by = $adminId;
 
         $verification->save();
 
         return response()->json([
-            'message' => "User status successfully updated to '{$verification->status}'."
+            'message' => "User status successfully updated to '{$verification->status->value}'."
         ], 200);
     }
 

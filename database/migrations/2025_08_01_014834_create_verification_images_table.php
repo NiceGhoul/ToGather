@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('article_comments', function (Blueprint $table) {
+        Schema::create('verification_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('article_id')
-                  ->constrained('articles')
-                  ->onDelete('cascade'); 
-            $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->onDelete('cascade'); 
-            $table->text('content'); 
+            $table->foreignId('verification_request_id')
+                ->constrained('verification_requests')
+                ->onDelete('cascade');
+            $table->string('id_photo_path');
+            $table->string('selfie_with_id_path');
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('article_comments');
+        Schema::dropIfExists('verification_images');
     }
 };

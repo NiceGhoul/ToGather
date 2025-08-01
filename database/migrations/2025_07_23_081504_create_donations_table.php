@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->text('message')->nullable();
             $table->boolean('anonymous')->default(false);
-            $table->string('status')->default('pending');
+            $table->enum('status', ['pending', 'successful', 'failed'])->default('pending');
 
             $table->timestamps();
         });

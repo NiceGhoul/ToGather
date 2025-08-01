@@ -10,36 +10,41 @@ use Inertia\Inertia;
 
 
 
-Route::get('/', [CampaignController::class, 'index']);
-Route::get('/admin/users/list', [UserController::class, 'index'])->name('users.index');
-Route::get('/admin/users/verification', [VerificationRequestController::class, 'index'])->name('verification.index');
-Route::get('/admin/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('admin.campaign');
-Route::get('/admin/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('admin.campaign.verification');
-
-Route::resource('campaigns', CampaignController::class)->except('index');
-
-Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
-Route::resource('users', UserController::class)->except('index');
-
-Route::get('/login', [UserController::class, 'showLogin'])
-->middleware(RedirectIfAuthenticated::class)
-->name('users.showLogin');
-
-Route::get('/users/create', [UserController::class, 'create'])
-->middleware(RedirectIfAuthenticated::class);
-
-Route::post('/login', [UserController::class, 'login'])->name('users.login');
-Route::post('/users/verify-otp', [UserController::class, 'verifyOtp']);
-
-Route::get('/admin/dashboard', [UserController::class, 'dashboard'])
-->middleware(['auth']) 
-->name('admin.dashboard'); 
-
-
+Route::get('/', [CampaignController::class, 'index'])->name('home');
 Route::get('/check-email', [UserController::class, 'checkEmail']);
 
+// --- Guest Routes ---
+// Only accessible by users who are NOT logged in.
+Route::middleware(RedirectIfAuthenticated::class)->group(function () {
+    Route::get('/Login', [UserController::class, 'showLogin'])->name('login');
+    Route::post('/user/login', [UserController::class, 'login']); 
 
-Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+    Route::get('/users/create', [UserController::class, 'create'])->name('register');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::post('/users/verify-otp', [UserController::class, 'verifyOtp']);
+});
+
+// --- Authenticated Routes ---
+// Must be logged in to access.
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+    
+    Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
+
+});
+
+
+// --- Admin Routes ---
+// Must be logged in AND have the 'admin' role.
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/users/list', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/verification', [VerificationRequestController::class, 'index'])->name('verification.index');
+
+    Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
+    Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');
+});
 
 
 

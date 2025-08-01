@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DonationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,4 +29,7 @@ class Donation extends Model
     {
         return $this->belongsTo(Campaign::class, 'campaign_id');
     }
+    protected $casts = [
+        'status' => DonationStatus::class, // 2. Add the cast
+    ];
 }

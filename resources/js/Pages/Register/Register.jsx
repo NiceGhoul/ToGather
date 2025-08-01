@@ -240,7 +240,7 @@ export default function Register() {
                 status: "active",
             },
             {
-                onSuccess: () => Inertia.visit("/login"),
+                onSuccess: () => Inertia.visit("/Login"),
             }
         );
     };
@@ -701,7 +701,7 @@ export default function Register() {
                         <p className="text-sm mt-6 text-center">
                             Already have an account?{" "}
                             <Link
-                                href="/login"
+                                href="/Login"
                                 className="font-semibold text-back hover:underline"
                             >
                                 Login Now

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use \Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Article extends Model
 {
@@ -20,15 +21,14 @@ class Article extends Model
     }
 
     // An Article can have many Comments
-    public function comments()
+    public function comments(): MorphMany
     {
-        return $this->hasMany(ArticleComment::class, 'article_id');
+        return $this->morphMany(Comment::class, 'commentable')->whereNull('parent_id');
     }
 
-    // An Article can have many Images (many-to-many relationship)
-    public function images()
+
+    public function images(): MorphMany
     {
-        return $this->belongsToMany(Image::class, 'article_images', 'article_id', 'image_id')
-                    ->withTimestamps(); // If your pivot table has created_at/updated_at
+        return $this->morphMany(Image::class, 'imageable');
     }
 }

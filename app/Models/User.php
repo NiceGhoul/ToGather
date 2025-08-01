@@ -3,9 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Enums\UserRole;
 
 class User extends Authenticatable
 {
@@ -54,28 +57,9 @@ class User extends Authenticatable
         return $this->hasMany(Article::class, 'user_id');
     }
 
-    // A User can make many Campaign Comments
-    public function campaignComments()
+    public function comments()
     {
-        return $this->hasMany(CampaignComment::class, 'user_id');
-    }
-
-    // A User can make many Campaign Replies
-    public function campaignReplies()
-    {
-        return $this->hasMany(CampaignReply::class, 'user_id');
-    }
-
-    // A User can make many Article Comments
-    public function articleComments()
-    {
-        return $this->hasMany(ArticleComment::class, 'user_id');
-    }
-
-    // A User can make many Article Replies
-    public function articleReplies()
-    {
-        return $this->hasMany(ArticleReply::class, 'user_id');
+        return $this->hasMany(Comment::class);
     }
 
     // A User can have many Donations
@@ -84,16 +68,10 @@ class User extends Authenticatable
         return $this->hasMany(Donation::class, 'user_id');
     }
 
-    // A User has one ProfileImage pivot record
-    public function profileImagePivot()
+    // Add to User.php
+    public function profileImage(): MorphOne
     {
-        return $this->hasOne(ProfileImage::class, 'user_id');
-    }
-
-    // A User has one actual Image as a profile picture (through the pivot)
-    public function profilePicture()
-    {
-        return $this->hasOneThrough(Image::class, ProfileImage::class, 'user_id', 'id', 'id', 'image_id');
+        return $this->morphOne(Image::class, 'imageable');
     }
 
     // A User can have many Verification Requests
@@ -119,6 +97,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
+            'status' => UserStatus::class,
         ];
     }
 }

@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign_comments', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('campaign_id')
-                  ->constrained('campaigns')
-                  ->onDelete('cascade'); 
-            $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->onDelete('cascade'); 
-            $table->text('content'); 
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('commentable_id');
+            $table->string('commentable_type');
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->cascadeOnDelete();
+            $table->text('content');
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign_comments');
+        Schema::dropIfExists('comments');
     }
 };
