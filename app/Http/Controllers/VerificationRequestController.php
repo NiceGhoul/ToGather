@@ -14,12 +14,17 @@ class VerificationRequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $baseStatuses = ['accepted', 'pending', 'rejected'];
         $requests = VerificationRequest::with(['user', 'images'])
-            ->where('status', VerificationStatus::Pending)->latest()->get();
+            ->whereIn('status', $baseStatuses)->when($request->input('status'), function ($query, $status) {
+                return $query->where('status', $status);
+            })
+            ->get();;
         return Inertia::render('Admin/User/Verification', [
             'requests' => $requests,
+            'filters' => $request->only(['status'])
         ]);
     }
 
@@ -32,7 +37,7 @@ class VerificationRequestController extends Controller
         $adminId = Auth::id();
         $verification = VerificationRequest::where('user_id', $user->id)->firstOrFail();
 
-        $verification->status = ($validated['acceptance'] === 'accepted') ? VerificationStatus::Approved : VerificationStatus::Rejected;
+        $verification->status = ($validated['acceptance'] === 'accepted') ? VerificationStatus::Accepted : VerificationStatus::Rejected;
 
         $verification->reviewed_by = $adminId;
 

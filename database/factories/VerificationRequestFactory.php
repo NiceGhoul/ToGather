@@ -29,7 +29,7 @@ class VerificationRequestFactory extends Factory
     public function approved(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => VerificationStatus::Approved,
+            'status' => VerificationStatus::Accepted,
             'reviewed_by' => User::factory(),
         ]);
     }

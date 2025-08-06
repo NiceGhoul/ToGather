@@ -15,12 +15,30 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('profileImage')->get();
+        $users = User::query()
+            ->with('profileImage')
+            ->when($request->input('status'), function ($query, $status) {
+                return $query->where('status', 'like', $status);
+            })
+            ->get();
+
         return Inertia::render('Admin/User/User_List', [
             'users' => $users,
+            'filters' => $request->only(['status'])
         ]);
+    }
+    public function block(User $user)
+    {
+        $user->update(['status' => 'banned']);
+        return back()->with('success', 'User has been banned.');
+    }
+
+    public function unblock(User $user)
+    {
+        $user->update(['status' => 'active']);
+        return back()->with('success', 'User has been unblocked.');
     }
 
     public function create()
@@ -39,7 +57,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'address' => 'required|string',
             'password' => 'required|string|min:3',
-            'role' => ['required' , Rule::in(array_column(UserRole::cases(), 'value'))],
+            'role' => ['required', Rule::in(array_column(UserRole::cases(), 'value'))],
             'status' => ['required', Rule::in(array_column(UserStatus::cases(), 'value'))],
         ]);
 
@@ -87,10 +105,7 @@ class UserController extends Controller
         return redirect('/');
     }
 
-    public function destroy(User $campaign)
-    {
-
-    }
+    public function destroy(User $campaign) {}
 
 
     public function login(Request $request)
@@ -168,5 +183,4 @@ class UserController extends Controller
     {
         return Inertia::render('Login/Login');
     }
-
 }

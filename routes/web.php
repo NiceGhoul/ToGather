@@ -17,7 +17,7 @@ Route::get('/check-email', [UserController::class, 'checkEmail']);
 // Only accessible by users who are NOT logged in.
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('/Login', [UserController::class, 'showLogin'])->name('login');
-    Route::post('/user/login', [UserController::class, 'login']); 
+    Route::post('/user/login', [UserController::class, 'login']);
 
     Route::get('/users/create', [UserController::class, 'create'])->name('register');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
@@ -28,9 +28,8 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 // Must be logged in to access.
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
-    
-    Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
 
+    Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
 });
 
 
@@ -40,11 +39,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/users/list', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users/{user}/block', [UserController::class, 'block'])->name('admin.users.block');
+    Route::post('/users/{user}/unblock', [UserController::class, 'unblock'])->name('admin.users.unblock');
     Route::get('/users/verification', [VerificationRequestController::class, 'index'])->name('verification.index');
 
     Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
     Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');
 });
-
-
-

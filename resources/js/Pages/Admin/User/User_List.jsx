@@ -1,7 +1,7 @@
 import * as React from "react"
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Data_Table from "@/Components/Data_Table"; // Import the reusable component
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal, Ban, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -12,9 +12,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { router } from '@inertiajs/react';
+import { Badge } from "@/components/ui/badge";
+import { usePage } from '@inertiajs/react';
 
-// Define the columns specifically for the UserList page.
-// This could also be in its own file if it gets very large.
+
 export const columns = [
     {
         id: "select",
@@ -98,7 +100,15 @@ export const columns = [
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("status")}</div>,
+        cell: ({ row }) => {
+            const status = row.getValue("status");
+            // Use a Badge for better visual feedback
+            return (
+                <Badge variant={status === 'banned' ? 'destructive' : 'default'}>
+                    {status}
+                </Badge>
+            );
+        },
     },
     {
         accessorKey: "created_at",
@@ -121,6 +131,12 @@ export const columns = [
         id: "actions",
         cell: ({ row }) => {
             const user = row.original
+            const handleBlockToggle = () => {
+                const url = `/admin/users/${user.id}/${user.status === 'banned' ? 'unblock' : 'block'}`;
+                router.post(url, {}, {
+                    preserveScroll: true, // Keep the user's scroll position after the action
+                });
+            };
 
             return (
                 <DropdownMenu>
@@ -132,14 +148,16 @@ export const columns = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(user.id.toString())}
-                        >
-                            Copy user ID
-                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View user details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit user</DropdownMenuItem>
+                        {/* Add the dynamic Block/Unblock option */}
+                        <DropdownMenuItem onClick={handleBlockToggle}>
+                            {user.status === 'banned' ? (
+                                <CheckCircle className="mr-1 h-4 w-4 text-black focus:text-black" />
+                            ) : (
+                                <Ban className="mr-1 h-4 w-4 text-red-600 focus:text-red-600" />
+                            )}
+                            {user.status === 'banned' ? 'Unban user' : 'Ban user'}
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
@@ -149,9 +167,38 @@ export const columns = [
 
 // The page component is now much cleaner.
 export default function User_List({ users }) {
+    const { filters } = usePage().props;
+
+    // Handler to change filter status
+    const handleFilterChange = (status) => {
+        router.get('/admin/users/list', { status }, {
+        preserveState: true,
+        replace: true,
+    });
+    };
     return (
         <Layout_Admin title="User List">
             <div className="p-9">
+                <div className="flex items-center gap-2 mb-4">
+                    <Button
+                        variant={!filters.status ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange(null)}
+                    >
+                        All
+                    </Button>
+                    <Button
+                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('active')}
+                    >
+                        Active
+                    </Button>
+                    <Button
+                        variant={filters.status === 'banned' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('banned')}
+                    >
+                        banned
+                    </Button>
+                </div>
                 <Data_Table columns={columns} data={users} />
             </div>
         </Layout_Admin>

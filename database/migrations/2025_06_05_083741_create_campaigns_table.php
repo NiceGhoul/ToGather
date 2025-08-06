@@ -22,7 +22,7 @@ return new class extends Migration
                   ->onDelete('set null');
             $table->string('title');
             $table->decimal('goal_amount', 10, 2); 
-            $table->enum('status', ['pending', 'active', 'completed', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'active', 'completed', 'rejected', 'banned'])->default('pending');
             $table->text('description'); 
             $table->decimal('collected_amount', 10, 2)->default(0.00);
             $table->timestamps();

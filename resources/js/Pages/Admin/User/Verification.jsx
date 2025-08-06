@@ -30,6 +30,9 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { router } from '@inertiajs/react';
+import { Badge } from "@/components/ui/badge";
+import { usePage } from '@inertiajs/react';
 
 const handleVerification = async (user, action) => {
     try {
@@ -63,6 +66,11 @@ const handleVerification = async (user, action) => {
         console.error('Error:', error);
         alert(`An error occurred: ${error.message}`);
     }
+};
+const statusVariantMap = {
+    accepted: 'default',
+    pending: 'secondary',
+    rejected: 'destructive',
 };
 
 export const columns = [
@@ -177,7 +185,14 @@ export const columns = [
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("status")}</div>,
+        cell: ({ row }) => {
+            const status = row.getValue("status");
+            return (
+                <Badge variant={statusVariantMap[status] || 'default'}>
+                    {status}
+                </Badge>
+            );
+        },
     },
     {
         accessorKey: "created_at",
@@ -199,7 +214,8 @@ export const columns = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const user = row.original
+            const request = row.original;
+            const status = request.status;
 
             return (
                 <DropdownMenu>
@@ -212,56 +228,66 @@ export const columns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(user.user.id.toString())}
+                            onClick={() => navigator.clipboard.writeText(request.user.id.toString())}
                         >
                             Copy user ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                    Approved
-                                </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Approve Verification?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Are you sure you want to approve this user's verification? They will be notified.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleVerification(user.user.id, 'accepted')}>
+
+                        {/* --- Conditional Actions Start Here --- */}
+
+                        {/* Show "Approve" button ONLY if status is 'pending' */}
+                        {status === 'pending' && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                         Approve
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600">
-                                    Reject
-                                </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Reject Verification?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Are you sure you want to reject this user's verification? This action cannot be undone easily.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={() => handleVerification(user.user.id, 'rejected')}
-                                        className="bg-red-600 hover:bg-red-700"
-                                    >
+                                    </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Approve Verification?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure you want to approve this user's verification?
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleVerification(request.user.id, 'accepted')}>
+                                            Approve
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        )}
+
+                        {/* Show "Reject" button if status is 'pending' OR 'accepted' */}
+                        {(status === 'pending' || status === 'accepted') && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600 focus:text-red-600">
                                         Reject
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                                    </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Reject Verification?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure you want to reject this user's verification?
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={() => handleVerification(request.user.id, 'rejected')}
+                                            className="bg-red-600 hover:bg-red-700"
+                                        >
+                                            Reject
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
@@ -271,9 +297,43 @@ export const columns = [
 
 // The page component is now much cleaner.
 export default function Verification({ requests }) {
+    const { filters } = usePage().props;
+    const handleFilterChange = (status) => {
+        router.get('/admin/users/verification', { status }, {
+            preserveState: true,
+            replace: true,
+        });
+    }
     return (
         <Layout_Admin title="User Verification List">
             <div className="p-9">
+                <div className="flex items-center gap-2 mb-4">
+
+                    <Button
+                        variant={!filters.status ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange(null)}
+                    >
+                        All
+                    </Button>
+                    <Button
+                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('Accepted')}
+                    >
+                        Accepted
+                    </Button>
+                    <Button
+                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('pending')}
+                    >
+                        Pending
+                    </Button>
+                    <Button
+                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('rejected')}
+                    >
+                        Rejected
+                    </Button>
+                </div>
                 <Data_Table columns={columns} data={requests} />
             </div>
         </Layout_Admin>

@@ -12,9 +12,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { router } from '@inertiajs/react';
+import { Badge } from "@/components/ui/badge";
+import { usePage } from '@inertiajs/react';
 
-// Define the columns specifically for the UserList page.
-// This could also be in its own file if it gets very large.
+const statusVariantMap = {
+    active: 'default',
+    completed: 'secondary',
+    rejected: 'destructive',
+    banned: 'destructive',
+};
 export const columns = [
     {
         id: "select",
@@ -93,7 +100,14 @@ export const columns = [
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("status")}</div>,
+        cell: ({ row }) => {
+            const status = row.getValue("status");
+            return (
+                <Badge variant={statusVariantMap[status] || 'default'}>
+                    {status}
+                </Badge>
+            );
+        },
     },
     {
         accessorKey: "goal_amount",
@@ -154,9 +168,48 @@ export const columns = [
 
 // The page component is now much cleaner.
 export default function Campaign_List({ campaigns }) {
+    const { filters } = usePage().props;
+    const handleFilterChange = (status) => {
+            router.get('/admin/campaigns/list', { status }, {
+            preserveState: true,
+            replace: true,
+        });
+    }
     return (
         <Layout_Admin title="Campaign List">
             <div className="p-9">
+                <div className="flex items-center gap-2 mb-4">
+                    <Button
+                        variant={!filters.status ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange(null)}
+                    >
+                        All
+                    </Button>
+                    <Button
+                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('active')}
+                    >
+                        Active
+                    </Button>
+                    <Button
+                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('completed')}
+                    >
+                        Completed
+                    </Button>
+                    <Button
+                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('rejected')}
+                    >
+                        Rejected
+                    </Button>
+                    <Button
+                        variant={filters.status === 'banned' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('banned')}
+                    >
+                        banned
+                    </Button>
+                </div>
                 <Data_Table columns={columns} data={campaigns} />
             </div>
         </Layout_Admin>

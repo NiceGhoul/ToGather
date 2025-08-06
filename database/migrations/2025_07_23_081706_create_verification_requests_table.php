@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('verification_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });

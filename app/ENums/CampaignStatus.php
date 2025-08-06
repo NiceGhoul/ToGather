@@ -8,4 +8,5 @@ enum CampaignStatus: string
     case Active = 'active';
     case Completed = 'completed';
     case Rejected = 'rejected';
+    case Banned = 'banned';
 }
