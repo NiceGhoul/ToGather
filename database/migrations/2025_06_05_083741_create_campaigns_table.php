@@ -12,7 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('campaigns', function (Blueprint $table) {
-            $table->id();
+            $table->id(); 
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+            $table->foreignId('verified_by')
+                  ->nullable()
+                  ->constrained('users')
+                  ->onDelete('set null');
+            $table->string('title');
+            $table->decimal('goal_amount', 10, 2); 
+            $table->enum('status', ['pending', 'active', 'completed', 'rejected', 'banned'])->default('pending');
+            $table->text('description'); 
+            $table->decimal('collected_amount', 10, 2)->default(0.00);
             $table->timestamps();
         });
     }

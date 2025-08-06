@@ -1,8 +1,20 @@
+import { usePage } from "@inertiajs/react";
 import Layout_User from "../Layouts/Layout_User";
-export default function Home(){
+import Layout_Guest from "../Layouts/Layout_Guest";
+
+export default function Home() {
+    const { auth } = usePage().props;
+    let Layout;
+
+    if (!auth.user) {
+        Layout = Layout_Guest;
+    } else {
+        Layout = Layout_User;
+    }
+
     return (
-        <Layout_User>
-            <h1 className="title">This is Home</h1>
-        </Layout_User>
+        <Layout>
+            
+        </Layout>
     );
 }
