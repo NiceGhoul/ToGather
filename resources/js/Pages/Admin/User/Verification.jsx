@@ -316,19 +316,19 @@ export default function Verification({ requests }) {
                         All
                     </Button>
                     <Button
-                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
-                        onClick={() => handleFilterChange('Accepted')}
+                        variant={filters.status === 'accepted' ? 'secondary' : 'outline'}
+                        onClick={() => handleFilterChange('accepted')}
                     >
                         Accepted
                     </Button>
                     <Button
-                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        variant={filters.status === 'pending' ? 'secondary' : 'outline'}
                         onClick={() => handleFilterChange('pending')}
                     >
                         Pending
                     </Button>
                     <Button
-                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        variant={filters.status === 'rejected' ? 'secondary' : 'outline'}
                         onClick={() => handleFilterChange('rejected')}
                     >
                         Rejected

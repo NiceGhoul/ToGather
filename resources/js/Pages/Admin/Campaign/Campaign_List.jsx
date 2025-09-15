@@ -192,13 +192,13 @@ export default function Campaign_List({ campaigns }) {
                         Active
                     </Button>
                     <Button
-                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        variant={filters.status === 'completed' ? 'secondary' : 'outline'}
                         onClick={() => handleFilterChange('completed')}
                     >
                         Completed
                     </Button>
                     <Button
-                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
+                        variant={filters.status === 'rejected' ? 'secondary' : 'outline'}
                         onClick={() => handleFilterChange('rejected')}
                     >
                         Rejected
