@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationRequestController;
 use App\Models\VerificationRequest;
@@ -29,6 +31,12 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
+    Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
+    Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
+    Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
+    Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
+    Route::post('/api/upload-image', [ImageController::class, 'uploadImage'])->name('images.upload');
+    
     Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
 });
 

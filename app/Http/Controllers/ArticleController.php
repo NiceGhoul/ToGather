@@ -20,7 +20,31 @@ class ArticleController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+        
+        $verificationRequest = $user->verificationRequests()->latest()->first();
+        
+        if (!$verificationRequest) {
+            // No verification request - show verification form
+            return inertia('Verification/Create');
+        }
+        
+        if ($verificationRequest->status->value === 'pending') {
+            // Pending verification - show pending status
+            return inertia('Verification/Pending');
+        }
+        
+        if ($verificationRequest->status->value === 'rejected') {
+            // Rejected verification - show rejection message
+            return inertia('Verification/Rejected');
+        }
+        
+        if ($verificationRequest->status->value === 'accepted') {
+            // Accepted verification - show article create form
+            return inertia('Article/Create');
+        }
+        
+        return inertia('Verification/Create');
     }
 
     /**

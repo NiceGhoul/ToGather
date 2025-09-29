@@ -62,4 +62,23 @@ class ImageController extends Controller
     {
         //
     }
+
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|max:2048'
+        ]);
+        
+        $path = $request->file('image')->store('article-images', 'public');
+        
+        $image = Image::create([
+            'path' => $path,
+            'imageable_id' => null,
+            'imageable_type' => null
+        ]);
+        
+        return response()->json([
+            'location' => '/storage/' . $path
+        ]);
+    }
 }

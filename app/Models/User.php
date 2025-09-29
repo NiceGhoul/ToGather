@@ -86,6 +86,12 @@ class User extends Authenticatable
         return $this->hasMany(VerificationRequest::class, 'reviewed_by');
     }
 
+    // A User can have many Notifications
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
 
     /**
      * Get the attributes that should be cast.

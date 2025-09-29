@@ -50,7 +50,31 @@ class CampaignController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+        
+        $verificationRequest = $user->verificationRequests()->latest()->first();
+        
+        if (!$verificationRequest) {
+            // No verification request - show verification form
+            return inertia('Verification/Create');
+        }
+        
+        if ($verificationRequest->status->value === 'pending') {
+            // Pending verification - show pending status
+            return inertia('Verification/Pending');
+        }
+        
+        if ($verificationRequest->status->value === 'rejected') {
+            // Rejected verification - show rejection message
+            return inertia('Verification/Rejected');
+        }
+        
+        if ($verificationRequest->status->value === 'accepted') {
+            // Accepted verification - show campaign create form
+            return inertia('Campaign/Create');
+        }
+        
+        return inertia('Verification/Create');
     }
 
     /**

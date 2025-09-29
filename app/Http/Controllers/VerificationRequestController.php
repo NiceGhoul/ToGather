@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\VerificationStatus;
 use App\Models\User;
 use App\Models\VerificationRequest;
+use App\Models\VerificationImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -55,7 +56,7 @@ class VerificationRequestController extends Controller
      */
     public function create()
     {
-        //
+        return inertia('Verification/Create');
     }
 
     /**
@@ -63,7 +64,44 @@ class VerificationRequestController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $user = auth()->user();
+            
+            // Check if user already has a pending or accepted request
+            $existingRequest = $user->verificationRequests()
+                ->whereIn('status', ['pending', 'accepted'])
+                ->first();
+                
+            if ($existingRequest) {
+                return back()->with('error', 'You already have a verification request.');
+            }
+            
+            $validated = $request->validate([
+                'id_photo' => 'required|image|max:2048',
+                'selfie_with_id' => 'required|image|max:2048',
+            ]);
+            
+            // Store files
+            $idPhotoPath = $request->file('id_photo')->store('verification/id_photos', 'public');
+            $selfieWithIdPath = $request->file('selfie_with_id')->store('verification/selfies', 'public');
+            
+            // Create verification request
+            $verificationRequest = VerificationRequest::create([
+                'user_id' => $user->id,
+                'status' => 'pending'
+            ]);
+            
+            // Create verification images
+            $verificationRequest->images()->create([
+                'id_photo_path' => $idPhotoPath,
+                'selfie_with_id_path' => $selfieWithIdPath,
+            ]);
+            
+            return redirect()->route('home')->with('success', 'Verification request submitted successfully.');
+        } catch (\Exception $e) {
+            Log::error('Verification request error: ' . $e->getMessage());
+            return back()->with('error', 'Something went wrong. Please try again.');
+        }
     }
 
     /**

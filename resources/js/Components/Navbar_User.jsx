@@ -60,8 +60,12 @@ export default function Navbar_User() {
                             <DropdownMenuItem disabled>My Campaign</DropdownMenuItem>
                             <DropdownMenuItem disabled>My Article</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem disabled>Create Campaign</DropdownMenuItem>
-                            <DropdownMenuItem disabled>Create Article</DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/campaigns/create">Create Campaign</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/articles/create">Create Article</Link>
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
