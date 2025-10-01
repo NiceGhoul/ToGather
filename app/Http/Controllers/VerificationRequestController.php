@@ -8,6 +8,8 @@ use App\Models\VerificationRequest;
 use App\Models\VerificationImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class VerificationRequestController extends Controller
@@ -74,6 +76,22 @@ class VerificationRequestController extends Controller
                 
             if ($existingRequest) {
                 return back()->with('error', 'You already have a verification request.');
+            }
+            
+            // Delete previous rejected requests and their images
+            $rejectedRequests = $user->verificationRequests()
+                ->where('status', 'rejected')
+                ->get();
+                
+            foreach ($rejectedRequests as $request) {
+                if ($request->images) {
+                    // Delete image files
+                    Storage::disk('public')->delete($request->images->id_photo_path);
+                    Storage::disk('public')->delete($request->images->selfie_with_id_path);
+                    // Delete image record
+                    $request->images->delete();
+                }
+                $request->delete();
             }
             
             $validated = $request->validate([

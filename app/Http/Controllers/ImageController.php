@@ -65,20 +65,41 @@ class ImageController extends Controller
 
     public function uploadImage(Request $request)
     {
-        $request->validate([
-            'image' => 'required|image|max:2048'
-        ]);
-        
-        $path = $request->file('image')->store('article-images', 'public');
-        
-        $image = Image::create([
-            'path' => $path,
-            'imageable_id' => null,
-            'imageable_type' => null
-        ]);
-        
-        return response()->json([
-            'location' => '/storage/' . $path
-        ]);
+        try {
+            // Handle both 'image' and 'files' field names for different editors
+            $file = null;
+            
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+            } elseif ($request->hasFile('files') && is_array($request->file('files'))) {
+                $file = $request->file('files')[0];
+            } elseif ($request->hasFile('files')) {
+                $file = $request->file('files');
+            }
+            
+            if (!$file || !$file->isValid()) {
+                return response()->json(['error' => 'No valid file uploaded'], 400);
+            }
+            
+            $path = $file->store('article-images', 'public');
+            
+            $image = Image::create([
+                'path' => $path,
+                'imageable_id' => null,
+                'imageable_type' => null
+            ]);
+            
+            $imageUrl = url('/storage/' . $path);
+            
+            return response()->json([
+                'success' => 1,
+                'data' => [
+                    'files' => [$imageUrl]
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Image upload error: ' . $e->getMessage());
+            return response()->json(['error' => 'Upload failed'], 500);
+        }
     }
 }

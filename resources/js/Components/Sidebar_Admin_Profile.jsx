@@ -36,7 +36,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const handleLogout = () => {
-          router.post("/logout");
+    router.post("/logout");
   };
   return (
     <SidebarMenu>

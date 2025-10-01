@@ -1,4 +1,4 @@
-import * as React from "react"
+import React from "react"
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Data_Table from "@/Components/Data_Table"; // Import the reusable component
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
@@ -38,7 +38,7 @@ const handleVerification = async (user, action) => {
     try {
         const url = `/users/${user}/verify`;
         console.log("Requesting URL:", url);
-        const response = await fetch(`/users/${user}/verify`, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -126,7 +126,8 @@ export const columns = [
         accessorKey: "id_photo",
         header: "ID Photo",
         cell: ({ row }) => {
-            const imageUrl = row.original.images?.id_photo_path;
+            const imagePath = row.original.images?.id_photo_path;
+            const imageUrl = imagePath ? `/storage/${imagePath}` : null;
 
             return (
                 <div>
@@ -156,7 +157,8 @@ export const columns = [
         accessorKey: "selfie_with_id",
         header: "Selfie with ID",
         cell: ({ row }) => {
-            const imageUrl = row.original.images?.selfie_with_id_path;
+            const imagePath = row.original.images?.selfie_with_id_path;
+            const imageUrl = imagePath ? `/storage/${imagePath}` : null;
 
             return (
                 <div>

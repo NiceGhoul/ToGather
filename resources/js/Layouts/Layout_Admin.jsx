@@ -23,7 +23,7 @@ export default function Page({ children, title }) {
         <>
             <SidebarProvider>
                 <AppSidebar />
-                <SidebarInset className="w-full max-w-full">
+                <SidebarInset className="w-full max-w-full h-screen overflow-hidden">
                     <header
                         className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                         <div className="flex items-center gap-2 px-5">
@@ -32,7 +32,9 @@ export default function Page({ children, title }) {
                             <h1 className="text-lg font-semibold">{title}</h1>
                         </div>
                     </header>
-                    {children}
+                    <div className="flex-1 overflow-auto">
+                        {children}
+                    </div>
                 </SidebarInset>
             </SidebarProvider>
         </>

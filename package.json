@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "@inertiajs/inertia": "^0.11.1",
+        "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/react": "^2.0.11",
         "@radix-ui/react-alert-dialog": "^1.1.14",
         "@radix-ui/react-avatar": "^1.1.10",
@@ -37,11 +38,10 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "framer-motion": "^12.16.0",
+        "jodit-react": "^5.2.26",
         "lucide-react": "^0.513.0",
-        "quill": "^2.0.3",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "react-quill": "^2.0.0",
         "tailwind-merge": "^3.3.0"
     }
 }

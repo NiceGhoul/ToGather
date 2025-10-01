@@ -16,4 +16,10 @@ export default defineConfig({
             '@': path.resolve(__dirname, './resources/js'),
         },
     },
+    esbuild: {
+        logOverride: { 'this-is-undefined-in-esm': 'silent' }
+    },
+    define: {
+        __DEV__: JSON.stringify(process.env.NODE_ENV === 'development')
+    }
 });

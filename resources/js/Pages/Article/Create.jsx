@@ -3,10 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import JoditEditor from 'jodit-react';
 import { useForm } from "@inertiajs/react";
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
@@ -14,58 +13,51 @@ export default function Create() {
         content: '',
     });
     
-    const quillRef = useRef();
+    const editor = useRef(null);
+    const [content, setContent] = useState('');
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setData('content', content);
         post('/articles');
     };
 
-    const imageHandler = () => {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
-        input.click();
-
-        input.onchange = async () => {
-            const file = input.files[0];
-            const formData = new FormData();
-            formData.append('image', file);
-
-            try {
-                const response = await fetch('/api/upload-image', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                });
-                const result = await response.json();
-                
-                const quill = quillRef.current.getEditor();
-                const range = quill.getSelection();
-                quill.insertEmbed(range.index, 'image', result.location);
-            } catch (error) {
-                console.error('Image upload failed:', error);
+    const config = {
+        readonly: false,
+        height: 400,
+        uploader: {
+            insertImageAsBase64URI: false,
+            url: '/api/upload-image',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            },
+            format: 'json',
+            isSuccess: function (resp) {
+                return resp.success === 1;
+            },
+            defaultHandlerSuccess: function (data) {
+                const files = data.files || [];
+                if (files.length) {
+                    const selection = this.s.sel;
+                    const range = selection.range;
+                    const img = this.createInside.element('img');
+                    img.setAttribute('src', files[0]);
+                    img.setAttribute('style', 'max-width: 100%; height: auto;');
+                    this.s.insertNode(img, false, false);
+                }
+            },
+            process: function (resp) {
+                return resp.data;
             }
-        };
-    };
-
-    const modules = {
-        toolbar: {
-            container: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ 'color': [] }, { 'background': [] }],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                [{ 'align': [] }],
-                ['link', 'image'],
-                ['clean']
-            ],
-            handlers: {
-                image: imageHandler
-            }
-        }
+        },
+        buttons: [
+            'bold', 'italic', 'underline', '|',
+            'ul', 'ol', '|',
+            'font', 'fontsize', '|',
+            'image', 'link', '|',
+            'align', '|',
+            'undo', 'redo'
+        ]
     };
 
     return (
@@ -95,13 +87,13 @@ export default function Create() {
                             
                             <div>
                                 <Label htmlFor="content">Content</Label>
-                                <ReactQuill
-                                    ref={quillRef}
-                                    theme="snow"
-                                    value={data.content}
-                                    onChange={(content) => setData('content', content)}
-                                    modules={modules}
-                                    style={{ height: '400px', marginBottom: '50px' }}
+                                <JoditEditor
+                                    ref={editor}
+                                    value={content}
+                                    config={config}
+                                    tabIndex={1}
+                                    onBlur={newContent => setContent(newContent)}
+                                    onChange={newContent => {}}
                                 />
                                 {errors.content && (
                                     <p className="text-sm text-red-600 mt-1">{errors.content}</p>
