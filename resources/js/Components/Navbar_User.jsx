@@ -30,7 +30,7 @@ export default function Navbar_User() {
                     <Link className="nav-link" href="/">
                         Home for User
                     </Link>
-                    <Link className="nav-link" href="/">
+                    <Link className="nav-link" href="/campaigns/list">
                         Campaign
                     </Link>
                     <Link className="nav-link" href="/">

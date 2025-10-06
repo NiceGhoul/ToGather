@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Models\Campaign;
+// use Illuminate\Container\Attributes\Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,7 +28,7 @@ class CampaignController extends Controller
     {
         $baseStatuses = ['active', 'completed', 'rejected', 'banned'];
         $campaigns = Campaign::with(['user', 'verifier'])
-            ->whereIn('status', $baseStatuses) 
+            ->whereIn('status', $baseStatuses)
             ->when($request->input('status'), function ($query, $status) {
                 return $query->where('status', $status);
             })
@@ -34,7 +36,7 @@ class CampaignController extends Controller
 
         return Inertia::render('Admin/Campaign/Campaign_List', [
             'campaigns' => $campaigns,
-            'filters' => $request->only(['status']) 
+            'filters' => $request->only(['status'])
         ]);
     }
     public function AdminVerification()
@@ -51,30 +53,62 @@ class CampaignController extends Controller
     public function create()
     {
         $user = auth()->user();
-        
+
         $verificationRequest = $user->verificationRequests()->latest()->first();
-        
+
         if (!$verificationRequest) {
             // No verification request - show verification form
             return inertia('Verification/Create');
         }
-        
+
         if ($verificationRequest->status->value === 'pending') {
             // Pending verification - show pending status
             return inertia('Verification/Pending');
         }
-        
+
         if ($verificationRequest->status->value === 'rejected') {
             // Rejected verification - show rejection message
             return inertia('Verification/Rejected');
         }
-        
+
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
             return inertia('Campaign/Create');
         }
-        
+
         return inertia('Verification/Create');
+    }
+
+    public function showList()
+    {
+
+        return inertia('Campaign/CampaignList');
+    }
+
+    public function showCreate()
+    {
+        return inertia::render('Campaign/Create', [
+            'user_Id' => Auth::user()->id,
+        ]);
+    }
+
+    public function createNewCampaign(Request $request) {
+         $data = $request->validate([
+        'title' => 'required|string',
+        'description' => 'required|string',
+        'goal_amount' => 'required|numeric',
+        'start_date' => 'required|date',
+        'end_date' => 'required|date',
+        // ...other fields
+    ]);
+
+        $data['user_id'] = Auth::id();
+        $data['status'] = 'pending';
+
+    Campaign::create($data);
+    dd($data);
+    // return redirect()->route('campaigns.showList');
+    return redirect()->back()->with('success', 'Campaign created successfully!');
     }
 
     /**

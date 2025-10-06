@@ -31,12 +31,18 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
-    Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
+    // campaigns routing
+    Route::get('/campaigns/create', [CampaignController::class, 'showCreate'])->name('campaigns.showCreate');
+    Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
+    Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
+
+
+    //===========
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
     Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
     Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
     Route::post('/api/upload-image', [ImageController::class, 'uploadImage'])->name('images.upload');
-    
+
     Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
 });
 
