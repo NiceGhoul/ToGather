@@ -62,14 +62,20 @@ export default function Register() {
     }, [step, isCounting, otpTimer]);
 
     //Handler untuk resend OTP
-    const handleResendOtp = () => {
-        setOtpTimer(60);
-        setIsCounting(true);
-        setFormData((prev) => ({ ...prev, otp: "" }));
-        setTouched((prev) => ({ ...prev, otp: false }));
-        setTimeout(() => {
-            otpRefs[0]?.current?.focus();
-        }, 0);
+    const handleResendOtp = async () => {
+        try {
+            await axios.post('/users/send-otp', { email: formData.email });
+            setOtpTimer(60);
+            setIsCounting(true);
+            setFormData((prev) => ({ ...prev, otp: "" }));
+            setTouched((prev) => ({ ...prev, otp: false }));
+            setErrors({});
+            setTimeout(() => {
+                otpRefs[0]?.current?.focus();
+            }, 0);
+        } catch (error) {
+            setErrors({ otp: 'Failed to resend OTP. Please try again.' });
+        }
     };
 
     //Handler perubahan input form
@@ -217,16 +223,37 @@ export default function Register() {
     };
 
     //Handler tombol next
-    const handleNext = () => {
+    const handleNext = async () => {
         if (step === 1 && !validateStep1()) return;
         if (step === 2 && !validateStep2()) return;
 
         if (step === 1) {
-            setFormData((prev) => ({ ...prev, otp: "" }));
-            setTouched((prev) => ({ ...prev, otp: false }));
+            // Send OTP
+            try {
+                await axios.post('/users/send-otp', { email: formData.email });
+                setFormData((prev) => ({ ...prev, otp: "" }));
+                setTouched((prev) => ({ ...prev, otp: false }));
+                setOtpTimer(60);
+                setIsCounting(true);
+                setStep(step + 1);
+            } catch (error) {
+                setErrors({ otp: 'Failed to send OTP. Please try again.' });
+            }
+        } else if (step === 2) {
+            // Verify OTP
+            try {
+                await axios.post('/users/verify-otp', { 
+                    email: formData.email, 
+                    otp: formData.otp 
+                });
+                setStep(step + 1);
+            } catch (error) {
+                setErrors({ otp: 'Invalid OTP. Please try again.' });
+                setTouched({ otp: true });
+            }
+        } else {
+            setStep(step + 1);
         }
-
-        setStep(step + 1);
     };
 
     //Handler tombol submit di akhir
