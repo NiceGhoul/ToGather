@@ -7,6 +7,7 @@ use App\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -144,6 +145,32 @@ class UserController extends Controller
         return response()->json(['exists' => $exists]);
     }
 
+    public function sendOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        
+        // Store OTP in session
+        session([
+            'otp_' . $request->email => $otp,
+            'otp_expires_' . $request->email => now()->addMinutes(5)
+        ]);
+
+        // Send OTP via email
+        Mail::raw("Your OTP code is: {$otp}\n\nThis code will expire in 5 minutes.", function ($message) use ($request) {
+            $message->to($request->email)
+                    ->subject('Your OTP Code - ToGather');
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP sent to your email'
+        ]);
+    }
+
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -151,11 +178,19 @@ class UserController extends Controller
             'otp' => 'required|string|size:6',
         ]);
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $sessionOtp = session('otp_' . $request->email);
+        $otpExpires = session('otp_expires_' . $request->email);
 
-        // if ($user->otp !== $request->otp) {
-        //     return response()->json(['message' => 'Invalid OTP'], 422);
-        // }
+        if (!$sessionOtp || !$otpExpires || now()->gt($otpExpires)) {
+            return response()->json(['message' => 'OTP expired or not found'], 422);
+        }
+
+        if ($sessionOtp !== $request->otp) {
+            return response()->json(['message' => 'Invalid OTP'], 422);
+        }
+
+        // Clear OTP from session
+        session()->forget(['otp_' . $request->email, 'otp_expires_' . $request->email]);
 
         return response()->json(['success' => true]);
     }

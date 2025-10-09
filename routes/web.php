@@ -23,6 +23,7 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
 
     Route::get('/users/create', [UserController::class, 'create'])->name('register');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::post('/users/send-otp', [UserController::class, 'sendOtp']);
     Route::post('/users/verify-otp', [UserController::class, 'verifyOtp']);
 });
 
