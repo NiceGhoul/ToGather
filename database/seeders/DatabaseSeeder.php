@@ -14,6 +14,9 @@ use App\Models\Comment;
 use App\Models\Image;
 use App\Models\Donation;
 use App\Models\VerificationRequest;
+use App\Models\Lookup;
+use Database\Seeders\LookupSeeder;
+use Database\Seeders\UserSeeder;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -25,16 +28,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create exactly 20 Users first. This is now the only place users are created.
+        // 1. Creata Lookup Data
+        $this->call(LookupSeeder::class);
+
+        // 2. Create exactly 20 Users first. This is now the only place users are created.
         User::factory(15)->create();
         User::factory(5)->admin()->create();
+        $this->call(UserSeeder::class);
 
-        // 2. Create Articles and Campaigns.
+        // 3. Create Articles and Campaigns.
         // Their factories will now automatically pick from the 20 existing users.
         $articles = Article::factory(20)->create();
         $campaigns = Campaign::factory(20)->create();
 
-        // 3. Create Comments and Replies Polymorphically
+        // 4. Create Comments and Replies Polymorphically
         $commentable = $articles->merge($campaigns);
 
         foreach ($commentable as $model) {
@@ -55,10 +62,13 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 4. Create Donations
+        // 5. Create Donations
         Donation::factory(100)->create();
 
-        // 5. Create Verification Requests
+        // 6. Create Verification Requests
         VerificationRequest::factory(15)->create();
+
+
+
     }
 }

@@ -1,9 +1,9 @@
-import * as React from "react"
+import * as React from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Data_Table from "@/Components/Data_Table"; // Import the reusable component
-import { ArrowUpDown, MoreHorizontal, Ban, CheckCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { ArrowUpDown, MoreHorizontal, Ban, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,11 +11,10 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { router } from '@inertiajs/react';
+} from "@/components/ui/dropdown-menu";
+import { router } from "@inertiajs/react";
 import { Badge } from "@/components/ui/badge";
-import { usePage } from '@inertiajs/react';
-
+import { usePage } from "@inertiajs/react";
 
 export const columns = [
     {
@@ -26,7 +25,9 @@ export const columns = [
                     table.getIsAllPageRowsSelected() ||
                     (table.getIsSomePageRowsSelected() && "indeterminate")
                 }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                onCheckedChange={(value) =>
+                    table.toggleAllPageRowsSelected(!!value)
+                }
                 aria-label="Select all"
             />
         ),
@@ -45,7 +46,9 @@ export const columns = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
                 ID
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -58,20 +61,26 @@ export const columns = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
                 Nickname
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="capitalize ml-1">{row.getValue("nickname")}</div>,
+        cell: ({ row }) => (
+            <div className="capitalize ml-1">{row.getValue("nickname")}</div>
+        ),
     },
     {
         accessorKey: "email",
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
                 Email
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -84,18 +93,26 @@ export const columns = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
                 Address
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="truncate max-w-xs ml-1">{row.getValue("address")}</div>,
+        cell: ({ row }) => (
+            <div className="truncate max-w-xs ml-1">
+                {row.getValue("address")}
+            </div>
+        ),
     },
     {
         accessorKey: "role",
         header: "Role",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
+        cell: ({ row }) => (
+            <div className="capitalize">{row.getValue("role")}</div>
+        ),
     },
     {
         accessorKey: "status",
@@ -104,7 +121,9 @@ export const columns = [
             const status = row.getValue("status");
             // Use a Badge for better visual feedback
             return (
-                <Badge variant={status === 'banned' ? 'destructive' : 'default'}>
+                <Badge
+                    variant={status === "banned" ? "destructive" : "default"}
+                >
                     {status}
                 </Badge>
             );
@@ -115,9 +134,11 @@ export const columns = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
-                Created_At
+                Created At
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
@@ -130,12 +151,18 @@ export const columns = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const user = row.original
+            const user = row.original;
             const handleBlockToggle = () => {
-                const url = `/admin/users/${user.id}/${user.status === 'banned' ? 'unblock' : 'block'}`;
-                router.post(url, {}, {
-                    preserveScroll: true, // Keep the user's scroll position after the action
-                });
+                const url = `/admin/users/${user.id}/${
+                    user.status === "banned" ? "unblock" : "block"
+                }`;
+                router.post(
+                    url,
+                    {},
+                    {
+                        preserveScroll: true, // Keep the user's scroll position after the action
+                    }
+                );
             };
 
             return (
@@ -151,19 +178,21 @@ export const columns = [
                         <DropdownMenuSeparator />
                         {/* Add the dynamic Block/Unblock option */}
                         <DropdownMenuItem onClick={handleBlockToggle}>
-                            {user.status === 'banned' ? (
+                            {user.status === "banned" ? (
                                 <CheckCircle className="mr-1 h-4 w-4 text-black focus:text-black" />
                             ) : (
                                 <Ban className="mr-1 h-4 w-4 text-red-600 focus:text-red-600" />
                             )}
-                            {user.status === 'banned' ? 'Unban user' : 'Ban user'}
+                            {user.status === "banned"
+                                ? "Unban user"
+                                : "Ban user"}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-            )
+            );
         },
     },
-]
+];
 
 // The page component is now much cleaner.
 export default function User_List({ users }) {
@@ -171,32 +200,44 @@ export default function User_List({ users }) {
 
     // Handler to change filter status
     const handleFilterChange = (status) => {
-        router.get('/admin/users/list', { status }, {
-        preserveState: true,
-        replace: true,
-    });
+        router.get(
+            "/admin/users/list",
+            { status },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
     };
     return (
         <Layout_Admin title="User List">
             <div className="p-9">
                 <div className="flex items-center gap-2 mb-4">
                     <Button
-                        variant={!filters.status ? 'secondary' : 'outline'}
+                        variant={!filters.status ? "secondary" : "outline"}
                         onClick={() => handleFilterChange(null)}
                     >
                         All
                     </Button>
                     <Button
-                        variant={filters.status === 'active' ? 'secondary' : 'outline'}
-                        onClick={() => handleFilterChange('active')}
+                        variant={
+                            filters.status === "active"
+                                ? "secondary"
+                                : "outline"
+                        }
+                        onClick={() => handleFilterChange("active")}
                     >
                         Active
                     </Button>
                     <Button
-                        variant={filters.status === 'banned' ? 'secondary' : 'outline'}
-                        onClick={() => handleFilterChange('banned')}
+                        variant={
+                            filters.status === "banned"
+                                ? "secondary"
+                                : "outline"
+                        }
+                        onClick={() => handleFilterChange("banned")}
                     >
-                        banned
+                        Banned
                     </Button>
                 </div>
                 <Data_Table columns={columns} data={users} />
