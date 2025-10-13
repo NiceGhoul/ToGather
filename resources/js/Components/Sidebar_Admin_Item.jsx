@@ -3,6 +3,7 @@ import {
     LayoutDashboard,
     Users,
     Volume2,
+    List,
     ArrowLeftRight,
     GalleryVerticalEnd,
     AudioWaveform,
@@ -56,6 +57,21 @@ const sidebarNavItems = [
             {
                 title: "Campaign Verification",
                 url: "/admin/campaigns/verification",
+            },
+        ],
+    },
+    {
+        title: "Article",
+        url: "#",
+        icon: List,
+        items: [
+            {
+                title: "Article List",
+                url: "/admin/articles/list",
+            },
+            {
+                title: "Article Verification",
+                url: "/admin/articles/requests",
             },
         ],
     },

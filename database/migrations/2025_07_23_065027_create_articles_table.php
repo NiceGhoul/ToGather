@@ -17,10 +17,11 @@ return new class extends Migration
                   ->constrained('users')
                   ->onDelete('cascade');
             $table->string('title');
-            $table->longText('content');
+            $table->longText('content')->nullable();
             $table->string('thumbnail')->nullable();
             $table->string('category');
             $table->string('attachment')->nullable();
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }

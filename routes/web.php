@@ -63,6 +63,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
     Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');
 
+    Route::get('/articles/list', [ArticleController::class, 'adminApprovedIndex'])->name('articles.index');
+    Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');
+    Route::get('/articles/{id}/view', [ArticleController::class, 'adminViewArticle'])->name('articles.view');
+    Route::post('/articles/{id}/approve', [ArticleController::class, 'adminApprove'])->name('articles.approve');
+    Route::post('/articles/{id}/disable', [ArticleController::class, 'adminDisable'])->name('articles.disable');
+    Route::post('/articles/{id}/reject', [ArticleController::class, 'adminReject'])->name('articles.reject');
+    Route::post('/articles/{id}/delete', [ArticleController::class, 'adminDelete'])->name('articles.delete');
+
+
 
     Route::get('/lookups', [LookupController::class, 'index'])->name('lookups.index');
     Route::post('/lookups/store', [LookupController::class, 'store'])->name('lookups.store');

@@ -20,6 +20,7 @@ class ArticleController extends Controller
 
 
         $articles = Article::with('user')
+            ->where('status', 'approved')
             ->when($filterCategory, fn($query) => $query->where('category', $filterCategory))
             ->when($searchQuery, fn($query) =>
                 $query->where(function ($q) use ($searchQuery) {
@@ -82,20 +83,22 @@ class ArticleController extends Controller
     // Validate Title n Content
     $validated = $request->validate([
         'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'category' => 'required|string|max:100',
-        'attachment' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+        'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'content' => 'required_without:attachment|string|nullable',
+        'attachment' => 'required_without:content|nullable|file|mimes:pdf|max:5120',
+
+
     ]);
     $filePath = null;
     if ($request->hasFile('attachment')) {
-        $filePath = $request->file('attachment')->store('article', 'public');
+        $filePath = $request->file('attachment')->store('articleAttachment', 'public');
     }
 
     $thumbnailPath = null;
 
     if ($request->hasFile('thumbnail')) {
-        $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+        $thumbnailPath = $request->file('thumbnail')->store('articleThumbnail', 'public');
     }
 
     $article = Article::create([
@@ -105,6 +108,7 @@ class ArticleController extends Controller
         'thumbnail' => $thumbnailPath,
         'category' => $validated['category'],
         'attachment' => $filePath,
+        'status' => 'pending',
     ]);
 
     return redirect()
@@ -166,4 +170,73 @@ class ArticleController extends Controller
         }
         return response()->json(['error' => 'No file uploaded'], 400);
     }
+
+    public function adminApprovedIndex()
+    {
+    $articles = Article::with('user')
+        ->whereIn('status', ['approved', 'disabled'])
+        ->orderByDesc('created_at')
+        ->get();
+
+    return inertia('Admin/Article/Article_List', [
+        'articles' => $articles,
+        'viewType' => 'active',
+    ]);
+    }
+
+    public function adminRequestIndex()
+    {
+    $articles = Article::with('user')
+        ->where('status', 'pending')
+        ->orderByDesc('created_at')
+        ->get();
+
+    return inertia('Admin/Article/Article_Verification', [
+        'articles' => $articles,
+        'viewType' => 'requests',
+    ]);
+    }
+
+    public function adminViewArticle($id)
+    {
+    $article = Article::with('user')->findOrFail($id);
+    return inertia('Admin/Article/Article_View', [
+        'article' => $article,
+    ]);
+    }
+
+    public function adminApprove($id)
+    {
+    $article = Article::findOrFail($id);
+    $article->update(['status' => 'approved']);
+
+    return back()->with('success', 'Article approved!');
+    }
+
+    public function adminDisable($id)
+    {
+    $article = Article::findOrFail($id);
+    $article->update(['status' => 'disabled']);
+
+    return back()->with('success', 'Article disabled!');
+    }
+
+    public function adminReject($id)
+    {
+    $article = Article::findOrFail($id);
+    $article->update(['status' => 'rejected']);
+
+    return back()->with('success', 'Article rejected!');
+    }
+
+    public function adminDelete($id)
+    {
+        $article = Article::findOrFail($id);
+        $article->delete();
+
+        return redirect()
+        ->route('admin.articles.index')
+        ->with('success', 'Article deleted!');
+    }
+
 }

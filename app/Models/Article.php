@@ -16,6 +16,7 @@ class Article extends Model
         'thumbnail',
         'category',
         'attachment',
+        'status',
     ];
 
     public function user()
