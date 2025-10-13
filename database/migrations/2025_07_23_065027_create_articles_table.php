@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('thumbnail')->nullable();
             $table->string('category');
             $table->string('attachment')->nullable();
-            $table->string('status')->default('pending');
+            $table->enum('status', ['pending', 'approved', 'disabled'])->default('pending');
             $table->timestamps();
         });
     }

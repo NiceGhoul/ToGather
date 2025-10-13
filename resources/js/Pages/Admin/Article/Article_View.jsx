@@ -33,7 +33,7 @@ export default function ArticleView() {
             <div className="p-6 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-purple-700">
+                    <h1 className="text-2xl font-bold text-black-700">
                         {article.title}
                     </h1>
                     <Button

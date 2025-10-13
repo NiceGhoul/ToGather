@@ -14,7 +14,7 @@ class LookupSeeder extends Seeder
             [
                 'lookup_type' => 'ArticleCategory',
                 'lookup_code' => 'BUSINESS',
-                'lookup_description' => 'Article Category Business',
+                'lookup_description' => 'Article Category Dropdown Business',
                 'lookup_value' => 'Business',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -22,7 +22,7 @@ class LookupSeeder extends Seeder
             [
                 'lookup_type' => 'ArticleCategory',
                 'lookup_code' => 'TECH',
-                'lookup_description' => 'Article Category Technology',
+                'lookup_description' => 'Article Category Dropdown Technology',
                 'lookup_value' => 'Technology',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -30,7 +30,7 @@ class LookupSeeder extends Seeder
             [
                 'lookup_type' => 'ArticleCategory',
                 'lookup_code' => 'EDU',
-                'lookup_description' => 'Article Category Education',
+                'lookup_description' => 'Article Category Dropdown Education',
                 'lookup_value' => 'Education',
                 'created_at' => now(),
                 'updated_at' => now(),
