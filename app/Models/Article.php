@@ -13,6 +13,10 @@ class Article extends Model
         'user_id',
         'title',
         'content',
+        'thumbnail',
+        'category',
+        'attachment',
+        'status',
     ];
 
     public function user()

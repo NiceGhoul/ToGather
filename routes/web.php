@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\LookupController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ImageController;
@@ -38,9 +38,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaigns/getlist', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
 
+    // Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
 
     //===========
+
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
+    Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
+    Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
+
+
+
+
     Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
     Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
     Route::post('/api/upload-image', [ImageController::class, 'uploadImage'])->name('images.upload');
@@ -61,4 +70,19 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
     Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');
+
+    Route::get('/articles/list', [ArticleController::class, 'adminApprovedIndex'])->name('articles.index');
+    Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');
+    Route::get('/articles/{id}/view', [ArticleController::class, 'adminViewArticle'])->name('articles.view');
+    Route::post('/articles/{id}/approve', [ArticleController::class, 'adminApprove'])->name('articles.approve');
+    Route::post('/articles/{id}/disable', [ArticleController::class, 'adminDisable'])->name('articles.disable');
+    Route::post('/articles/{id}/reject', [ArticleController::class, 'adminReject'])->name('articles.reject');
+    Route::post('/articles/{id}/delete', [ArticleController::class, 'adminDelete'])->name('articles.delete');
+
+
+
+    Route::get('/lookups', [LookupController::class, 'index'])->name('lookups.index');
+    Route::post('/lookups/store', [LookupController::class, 'store'])->name('lookups.store');
+    Route::post('/lookups/update/{id}', [LookupController::class, 'update'])->name('lookups.update');
+    Route::post('/lookups/delete/{id}', [LookupController::class, 'destroy'])->name('lookups.destroy');
 });

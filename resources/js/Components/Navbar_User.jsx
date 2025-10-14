@@ -7,7 +7,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 export default function Navbar_User() {
     const [open, setOpen] = useState(false);
@@ -33,7 +33,7 @@ export default function Navbar_User() {
                     <Link className="nav-link" href="/campaigns/list">
                         Campaign
                     </Link>
-                    <Link className="nav-link" href="/">
+                    <Link className="nav-link" href="/articles/list">
                         Article
                     </Link>
                 </div>
@@ -46,7 +46,10 @@ export default function Navbar_User() {
                     <DropdownMenu>
                         <DropdownMenuTrigger className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
                             <img
-                                src={auth?.user?.profile_url ?? "https://via.placeholder.com/40"}
+                                src={
+                                    auth?.user?.profile_url ??
+                                    "https://via.placeholder.com/40"
+                                }
                                 alt="Profile"
                                 className="w-full h-full object-cover"
                             />
@@ -57,17 +60,27 @@ export default function Navbar_User() {
                             <DropdownMenuItem asChild>
                                 <Link href="/profile">Profile</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem disabled>My Campaign</DropdownMenuItem>
-                            <DropdownMenuItem disabled>My Article</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/campaigns/create">Create Campaign</Link>
+                            <DropdownMenuItem disabled>
+                                My Campaign
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/articles/create">Create Article</Link>
+                            <DropdownMenuItem disabled>
+                                My Article
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/campaigns/create">
+                                    Create Campaign
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href="/articles/create">
+                                    Create Article
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={handleLogout}>
+                                Logout
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
