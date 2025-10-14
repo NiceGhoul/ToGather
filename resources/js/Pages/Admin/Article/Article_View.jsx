@@ -1,6 +1,7 @@
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import { usePage, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
+import Popup from "@/Components/Popup";
 
 export default function ArticleView() {
     const { article } = usePage().props;
@@ -33,7 +34,7 @@ export default function ArticleView() {
             <div className="p-6 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-purple-700">
+                    <h1 className="text-2xl font-bold text-black-700">
                         {article.title}
                     </h1>
                     <Button
@@ -56,9 +57,16 @@ export default function ArticleView() {
                         </p>
                         <p>
                             <strong>Status:</strong>{" "}
-                            <span className="capitalize text-green-600">
-                                {article.status}
-                            </span>
+                            {article.status === "disabled" && (
+                                <span className="capitalize text-yellow-600">
+                                    {article.status}
+                                </span>
+                            )}
+                            {article.status === "approved" && (
+                                <span className="capitalize text-green-600">
+                                    {article.status}
+                                </span>
+                            )}
                         </p>
                         <p>
                             <strong>Created At:</strong>{" "}
@@ -74,13 +82,13 @@ export default function ArticleView() {
                         <div className="btnContainer flex flex-col justify-center space-y-2">
                             <Button
                                 onClick={() => handleDisable(article.id)}
-                                className="bg-purple-800 hover:bg-purple-700 text-white"
+                                className="bg-purple-800 hover:bg-purple-700 text-white w-20"
                             >
                                 Disable
                             </Button>
                             <Button
                                 onClick={() => handleDelete(article.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white"
+                                className="bg-red-600 hover:bg-red-700 text-white w-20"
                             >
                                 Delete
                             </Button>
@@ -91,16 +99,19 @@ export default function ArticleView() {
                         <div className="btnContainer flex flex-col justify-center space-y-2">
                             <Button
                                 onClick={() => handleEnable(article.id)}
-                                className="bg-purple-800 hover:bg-purple-700 text-white"
+                                className="bg-purple-800 hover:bg-purple-700 text-white w-20"
                             >
                                 Enable
                             </Button>
-                            <Button
-                                onClick={() => handleDelete(article.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                                Delete
-                            </Button>
+                            <Popup
+                                triggerText="Delete"
+                                title="Delete Article?"
+                                description="This action cannot be undone. The article will be removed permanently."
+                                confirmText="Yes, Delete"
+                                confirmColor="bg-red-600 hover:bg-red-700text-white"
+                                triggerClass="bg-red-600 hover:bg-red-700 text-white w-20"
+                                onConfirm={() => handleDelete(a.id)}
+                            />
                         </div>
                     )}
 
@@ -112,12 +123,15 @@ export default function ArticleView() {
                             >
                                 Approve
                             </Button>
-                            <Button
-                                onClick={() => handleReject(article.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                            >
-                                Reject
-                            </Button>
+                            <Popup
+                                triggerText="Reject"
+                                title="Reject Article?"
+                                description="This action cannot be undone. The article will be rejected"
+                                confirmText="Yes, Reject"
+                                confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                triggerClass="bg-red-600 hover:bg-red-700 text-white w-18"
+                                onConfirm={() => handleReject(a.id)}
+                            />
                         </div>
                     )}
                 </div>

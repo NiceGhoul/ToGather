@@ -2,17 +2,16 @@ import React, { useState } from "react";
 import { usePage, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
+import Popup from "@/Components/Popup";
 
 export default function Lookup() {
     const { lookups } = usePage().props;
     const [showModal, setShowModal] = useState(false);
     const [editData, setEditData] = useState(null);
-    const [popup, setPopup] = useState({
+    const [successPopup, setSuccessPopup] = useState(false);
+    const [errorPopup, setErrorPopup] = useState({
         show: false,
         message: "",
-        type: "",
-        action: null,
-        id: null,
     });
 
     const handleEdit = (lookup) => {
@@ -20,15 +19,20 @@ export default function Lookup() {
         setShowModal(true);
     };
 
-    // show delete popup
     const handleDelete = (id) => {
-        setPopup({
-            show: true,
-            message: "Are you sure want to delete this lookup?",
-            type: "confirm",
-            action: "delete",
-            id: id,
-        });
+        router.post(
+            `/admin/lookups/delete/${id}`,
+            {},
+            {
+                onSuccess: () => {
+                    // opsional: bisa tambahkan notifikasi kalau kamu pakai toast
+                    console.log("Lookup deleted successfully.");
+                },
+                onError: (err) => {
+                    console.error("Error deleting lookup:", err);
+                },
+            }
+        );
     };
 
     const handleModalClose = () => {
@@ -45,19 +49,18 @@ export default function Lookup() {
 
         router.post(url, editData, {
             onSuccess: () => {
-                setPopup({
-                    show: true,
-                    message: editData.id
-                        ? "Lookup updated successfully."
-                        : "Lookup added successfully.",
-                    type: "success",
-                });
+                // ✅ Save berhasil → tutup modal + tampilkan popup success
+                setShowModal(false);
+                setEditData(null);
+                setSuccessPopup(true);
             },
             onError: (err) => {
-                setPopup({
+                // ❌ Validasi error → tampilkan popup error
+                const firstError =
+                    err[Object.keys(err)[0]] || "An error occurred.";
+                setErrorPopup({
                     show: true,
-                    message: err[Object.keys(err)[0]],
-                    type: "error",
+                    message: firstError,
                 });
             },
         });
@@ -67,67 +70,6 @@ export default function Lookup() {
         setEditData({
             ...editData,
             [e.target.name]: e.target.value,
-        });
-    };
-
-    const handlePopupOk = () => {
-        if (popup.type === "confirm" && popup.action === "delete") {
-            // delete action
-            router.post(
-                `/admin/lookups/delete/${popup.id}`,
-                {},
-                {
-                    onSuccess: () => {
-                        setPopup({
-                            show: true,
-                            message: "Lookup deleted successfully.",
-                            type: "success",
-                            action: null,
-                            id: null,
-                        });
-                    },
-                    onError: (err) => {
-                        setPopup({
-                            show: true,
-                            message: err[Object.keys(err)[0]],
-                            type: "error",
-                            action: null,
-                            id: null,
-                        });
-                    },
-                }
-            );
-        } else if (popup.type === "error") {
-            // error action, popup stays open
-            setPopup({
-                show: false,
-                message: "",
-                type: "",
-                action: null,
-                id: null,
-            });
-        } else {
-            // success action, close popup
-            setPopup({
-                show: false,
-                message: "",
-                type: "",
-                action: null,
-                id: null,
-            });
-            setShowModal(false);
-            setEditData(null);
-        }
-    };
-
-    // cancel popup
-    const handlePopupCancel = () => {
-        setPopup({
-            show: false,
-            message: "",
-            type: "",
-            action: null,
-            id: null,
         });
     };
 
@@ -192,13 +134,18 @@ export default function Lookup() {
                                     >
                                         Edit
                                     </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDelete(lookup.id)}
-                                    >
-                                        Delete
-                                    </Button>
+
+                                    <Popup
+                                        triggerText="Delete"
+                                        title="Delete Lookup?"
+                                        description="This action cannot be undone. The Lookup will be removed permanently."
+                                        confirmText="Yes, Delete"
+                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                        triggerClass="bg-red-600 hover:bg-red-700 text-white"
+                                        onConfirm={() =>
+                                            handleDelete(lookup.id)
+                                        }
+                                    />
                                 </td>
                             </tr>
                         ))}
@@ -289,40 +236,29 @@ export default function Lookup() {
                     </div>
                 </div>
             )}
-
-            {/* Popup */}
-            {popup.show && (
-                <div className="fixed inset-0 flex items-center justify-center z-[100]">
-                    <div className="bg-white border rounded shadow-lg p-6 text-center min-w-[300px]">
-                        <div
-                            className={`mb-4 font-bold ${
-                                popup.type === "success"
-                                    ? "text-green-600"
-                                    : popup.type === "error"
-                                    ? "text-red-600"
-                                    : "text-gray-800"
-                            }`}
-                        >
-                            {popup.type === "success"
-                                ? "Success"
-                                : popup.type === "error"
-                                ? "Error"
-                                : "Confirmation"}
-                        </div>
-                        <div className="mb-4">{popup.message}</div>
-                        <div className="flex justify-center gap-2">
-                            <Button onClick={handlePopupOk}>OK</Button>
-                            {popup.type === "confirm" && (
-                                <Button
-                                    variant="outline"
-                                    onClick={handlePopupCancel}
-                                >
-                                    Cancel
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                </div>
+            {successPopup && (
+                <Popup
+                    triggerText=""
+                    title="Success!"
+                    description="Lookup saved successfully."
+                    confirmText="OK"
+                    showCancel={false}
+                    confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                    onConfirm={() => setSuccessPopup(false)}
+                />
+            )}
+            {errorPopup.show && (
+                <Popup
+                    triggerText=""
+                    title="Error"
+                    description={errorPopup.message}
+                    confirmText="OK"
+                    showCancel={false}
+                    confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                    onConfirm={() =>
+                        setErrorPopup({ show: false, message: "" })
+                    }
+                />
             )}
         </AdminLayout>
     );
