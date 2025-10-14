@@ -16,9 +16,10 @@ class Campaign extends Model
         'user_id',
         'verified_by',
         'title',
-        'goal_amount',
-        'status',
         'description',
+        'category',
+        'status',
+        'goal_amount',
         'collected_amount',
     ];
 

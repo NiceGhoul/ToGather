@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Models\Campaign;
+use Illuminate\Container\Attributes\Log;
 // use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log as FacadesLog;
 use Inertia\Inertia;
 
 /*Bakal tambah 1 table untuk yg campaign sma verification request yaitu rejection reason
@@ -81,7 +83,6 @@ class CampaignController extends Controller
 
     public function showList()
     {
-
         return inertia('Campaign/CampaignList');
     }
 
@@ -93,22 +94,38 @@ class CampaignController extends Controller
     }
 
     public function createNewCampaign(Request $request) {
-         $data = $request->validate([
-        'title' => 'required|string',
-        'description' => 'required|string',
-        'goal_amount' => 'required|numeric',
-        'start_date' => 'required|date',
-        'end_date' => 'required|date',
-        // ...other fields
-    ]);
-
+    //      $data = $request->validate([
+    //     'title' => 'required|string',
+    //     'description' => 'required|string',
+    //     'goal_amount' => 'required|numeric',
+    //     'start_date' => 'required|date',
+    //     'end_date' => 'required|date',
+    //     // ...other fields
+    // ]);
+        $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
 
     Campaign::create($data);
-    dd($data);
-    // return redirect()->route('campaigns.showList');
     return redirect()->back()->with('success', 'Campaign created successfully!');
+    }
+
+    public function getCampaignListData(Request $request)
+    {
+        $category = $request->input('category');
+
+        // get campaigns where they are not banned or rejected and is still pending
+        if(!$category){
+            return response()->json(['error' => 'Category parameter is required'], 400);
+        }
+        if ($category === 'All') {
+            $campaigns = Campaign::where('status', ['active'])->get();
+            // dd($campaigns);
+        }else{
+            $campaigns = Campaign::where('category', $request->input('category'))->where('status', ['active'])->get();
+
+        }
+        return response()->json($campaigns);
     }
 
     /**

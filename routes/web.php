@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     // campaigns routing
     Route::get('/campaigns/create', [CampaignController::class, 'showCreate'])->name('campaigns.showCreate');
     Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
+    Route::get('/campaigns/getlist', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
 
 

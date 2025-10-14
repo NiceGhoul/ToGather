@@ -7,21 +7,31 @@ import { CalendarIcon, ChevronDownIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Link } from "@inertiajs/react";
 import { Inertia } from "@inertiajs/inertia";
+import { Textarea } from "@/Components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
 const parameterData = {
     title: "",
     description: "",
     goal_amount: 0,
     collected_amount: 0,
+    category:"",
     start_date: null,
     end_date: null,
     status: "pending",
     user_id: null,
 };
+
+const categories = [
+        "Foods & Beverage",
+        "Beauty & Cosmetic",
+        "Clothes & Fashion",
+        "Services",
+        "Lifesyle",
+        "Logistics",
+    ];
 
 function create () {
 const [campaignData, setCampaignData] = useState(parameterData);
@@ -69,35 +79,48 @@ const handleSave = () => {
                             Please fill out the form below to create a new campaign.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex flex-col gap-4">
                         <div>
-                        <h1>Campaign Title:</h1>
-                        <Input value={campaignData.title} onChange={(e) => setCampaignData({...campaignData, title: e.target.value})} />
+                            <h1>Campaign Title</h1>
+                            <Input placeholder="Enter your title" value={campaignData.title} onChange={(e) => setCampaignData({...campaignData, title: e.target.value})} />
                         </div>
 
                         <div>
-                        <h1>Description:</h1>
-                        <Input value={campaignData.description} onChange={(e) => setCampaignData({...campaignData, description: e.target.value})} />
+                            <h1>Description</h1>
+                            <Textarea placeholder="Enter your Description" value={campaignData.description} onChange={(e) => setCampaignData({...campaignData, description: e.target.value})} className="min-h-36"/>
                         </div>
 
                         <div>
-                        <h1>Goal Amount:</h1>
-                        <Input value={campaignData.goal_amount} onChange={(e) => setCampaignData({...campaignData, goal_amount: e.target.value})} />
+                            <h1>Category</h1>
+                            <Select>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map((category) => (
+                                        <SelectItem key={category} value={category} onClick={(e) => setCampaignData({...campaignData, category: e.target.value})}>
+                                            {category}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div>
+                            <h1>Goal Amount</h1>
+                            <Input value={campaignData.goal_amount} onChange={(e) => setCampaignData({...campaignData, goal_amount: e.target.value})} />
                         </div>
 
                         <div className="flex mt-6 flex-row gap-4 align-center items-center">
-                        <h1>Start Date:</h1>
-                        <DatePicker open={openStart} date={campaignData.start_date} setOpen={setOpenStart} setDate={date => {setCampaignData({...campaignData, start_date: date}); setOpenStart(false)}}/>
+                            <h1>Start Date:</h1>
+                            <DatePicker open={openStart} date={campaignData.start_date} setOpen={setOpenStart} setDate={date => {setCampaignData({...campaignData, start_date: date}); setOpenStart(false)}}/>
 
-                        <h1>End Date:</h1>
-                        <DatePicker open={openEnd} date={campaignData.end_date} setOpen={setOpenEnd} setDate={date => {setCampaignData({...campaignData, end_date: date}); setOpenEnd(false)}}/>
+                            <h1>End Date:</h1>
+                            <DatePicker open={openEnd} date={campaignData.end_date} setOpen={setOpenEnd} setDate={date => {setCampaignData({...campaignData, end_date: date}); setOpenEnd(false)}}/>
                         </div>
                     </CardContent>
                     <CardFooter>
                         <Button className="ml-auto" onClick={handleSave}>Submit</Button>
-                        <Button className="ml-5" onClick={Inertia.visit('/campaigns/list')}>
-                            Back
-                        </Button>
                     </CardFooter>
                 </Card>
             </div>
