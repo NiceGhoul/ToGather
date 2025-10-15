@@ -123,7 +123,7 @@ class ArticleController extends Controller
     public function show($id)
     {
     $article = Article::with('user')
-        ->findOrFail($id, ['id', 'title', 'content', 'thumbnail', 'user_id', 'created_at']);
+        ->findOrFail($id, ['id', 'title', 'content', 'thumbnail', 'attachment','user_id', 'created_at']);
 
     return inertia('Article/Details', [
         'article' => $article,
@@ -171,17 +171,33 @@ class ArticleController extends Controller
         return response()->json(['error' => 'No file uploaded'], 400);
     }
 
-    public function adminApprovedIndex()
+    public function adminApprovedIndex(Request $request)
     {
-    $articles = Article::with('user')
+        $category = $request->query('category');
+        $status = $request->query('status');
+        $search = $request->query('search');
+
+        $articles = Article::with('user')
         ->whereIn('status', ['approved', 'disabled'])
+        ->when($category, fn($q) => $q->where('category', $category))
+        ->when($status, fn($q) => $q->where('status', $status))
+        ->when($search, fn($q) =>
+            $q->where('title', 'like', "%{$search}%")
+        )
         ->orderByDesc('created_at')
         ->get();
 
-    return inertia('Admin/Article/Article_List', [
+        $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
+
+        return inertia('Admin/Article/Article_List', [
         'articles' => $articles,
-        'viewType' => 'active',
-    ]);
+        'categories' => $categories,
+        'filters' => [
+            'category' => $category,
+            'status' => $status,
+            'search' => $search,
+            ],
+        ]);
     }
 
     public function adminRequestIndex()
