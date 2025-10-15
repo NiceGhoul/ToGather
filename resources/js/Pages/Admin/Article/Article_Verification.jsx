@@ -1,20 +1,17 @@
 import { usePage, router } from "@inertiajs/react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
+import Popup from "@/Components/Popup";
 
 export default function ArticleRequestList() {
     const { articles } = usePage().props;
 
     const handleApprove = (id) => {
-        if (confirm("Approve this article?")) {
-            router.post(`/admin/articles/${id}/approve`);
-        }
+        router.post(`/admin/articles/${id}/approve`);
     };
 
     const handleReject = (id) => {
-        if (confirm("Reject this article?")) {
-            router.post(`/admin/articles/${id}/reject`);
-        }
+        router.post(`/admin/articles/${id}/reject`);
     };
 
     const handleView = (id) => {
@@ -31,7 +28,7 @@ export default function ArticleRequestList() {
                 <table className="min-w-full border text-sm">
                     <thead>
                         <tr className="bg-gray-100 text-left">
-                            <th className="border px-4 py-2">#</th>
+                            <th className="border px-4 py-2 hidden">#</th>
                             <th className="border px-4 py-2">Title</th>
                             <th className="border px-4 py-2">Author</th>
                             <th className="border px-4 py-2">Category</th>
@@ -43,7 +40,7 @@ export default function ArticleRequestList() {
                         {articles.length > 0 ? (
                             articles.map((a, index) => (
                                 <tr key={a.id} className="hover:bg-gray-50">
-                                    <td className="border px-4 py-2 text-gray-600">
+                                    <td className="border px-4 py-2 hidden text-gray-600">
                                         {index + 1}
                                     </td>
                                     <td className="border px-4 py-2 font-medium text-black">
@@ -61,24 +58,36 @@ export default function ArticleRequestList() {
                                         ).toLocaleString()}
                                     </td>
                                     <td className="border px-4 py-2 space-x-2">
-                                        <Button
-                                            onClick={() => handleView(a.id)}
-                                            className="bg-purple-800 hover:bg-purple-700"
-                                        >
-                                            View
-                                        </Button>
-                                        <Button
-                                            onClick={() => handleApprove(a.id)}
-                                            className="bg-green-600 hover:bg-green-700"
-                                        >
-                                            Approve
-                                        </Button>
-                                        <Button
-                                            onClick={() => handleReject(a.id)}
-                                            className="bg-red-600 hover:bg-red-700"
-                                        >
-                                            Reject
-                                        </Button>
+                                        <div className="actionBtnContainer flex flex-row justify-center gap-3">
+                                            <Button
+                                                onClick={() => handleView(a.id)}
+                                                className="bg-purple-800 hover:bg-purple-700"
+                                            >
+                                                View
+                                            </Button>
+                                            <Popup
+                                                triggerText="Approve"
+                                                title="Approve Article?"
+                                                description="This action cannot be undone. The article will be approved and be shown on public"
+                                                confirmText="Yes, Approve"
+                                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                                triggerClass="bg-green-600 hover:bg-green-700 text-white w-18"
+                                                onConfirm={() =>
+                                                    handleApprove(a.id)
+                                                }
+                                            />
+                                            <Popup
+                                                triggerText="Reject"
+                                                title="Reject Article?"
+                                                description="This action cannot be undone. The article will be rejected"
+                                                confirmText="Yes, Reject"
+                                                confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                                triggerClass="bg-red-600 hover:bg-red-700 text-white w-18"
+                                                onConfirm={() =>
+                                                    handleReject(a.id)
+                                                }
+                                            />
+                                        </div>
                                     </td>
                                 </tr>
                             ))

@@ -71,7 +71,7 @@ export default function Index() {
                         </select>
                     </div>
                     {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="flex">
+                    <form onSubmit={handleSearch} className="flex gap-4">
                         <input
                             type="text"
                             value={searchQuery}
@@ -99,7 +99,7 @@ export default function Index() {
                     </span>
                 </div>
 
-                {/* List Articles */}
+                {/* Article List */}
                 {articles.length === 0 ? (
                     <p className="text-gray-500">No articles found.</p>
                 ) : (
@@ -109,6 +109,7 @@ export default function Index() {
                                 key={article.id}
                                 className="hover:shadow-md transition overflow-hidden"
                             >
+                                {/* Thumbnail */}
                                 {article.thumbnail && (
                                     <img
                                         src={`/storage/${article.thumbnail}`}
@@ -116,6 +117,16 @@ export default function Index() {
                                         className="w-full h-48 object-cover"
                                     />
                                 )}
+
+                                {/* PDF Preview (kalau ada attachment) */}
+                                {article.attachment && (
+                                    <iframe
+                                        src={`/storage/${article.attachment}`}
+                                        className="w-full h-64 border-t"
+                                        title={`Preview ${article.title}`}
+                                    ></iframe>
+                                )}
+
                                 <CardHeader>
                                     <CardTitle className="text-lg font-semibold">
                                         {article.title}
@@ -133,13 +144,20 @@ export default function Index() {
                                 </CardHeader>
 
                                 <CardContent>
-                                    <p className="text-gray-700 line-clamp-3">
-                                        {article.content
-                                            .replace(/(<([^>]+)>)/gi, "")
-                                            .slice(0, 150)}
-                                        ...
-                                    </p>
+                                    {article.content ? (
+                                        <p className="text-gray-700 line-clamp-3">
+                                            {article.content
+                                                .replace(/(<([^>]+)>)/gi, "")
+                                                .slice(0, 150)}
+                                            ...
+                                        </p>
+                                    ) : (
+                                        <p className="text-gray-500 italic">
+                                            PDF-only article
+                                        </p>
+                                    )}
 
+                                    {/* Link ke detail */}
                                     <Link
                                         href={`/articles/${article.id}`}
                                         className="text-blue-600 hover:underline mt-2 inline-block"

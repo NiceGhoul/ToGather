@@ -233,6 +233,20 @@ export default function Create() {
                                         </p>
                                     )}
                                 </div>
+                                <div>
+                                    <Label htmlFor="thumbnail">Thumbnail</Label>
+                                    <Input
+                                        id="thumbnail"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleThumbnailChange}
+                                    />
+                                    {errors.thumbnail && (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.thumbnail}
+                                        </p>
+                                    )}
+                                </div>
 
                                 {/* Upload Attachment */}
                                 <div>
