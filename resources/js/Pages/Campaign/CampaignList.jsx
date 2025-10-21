@@ -1,48 +1,56 @@
 
-import { Inertia } from "@inertiajs/inertia";
 import { Button } from "@/Components/ui/button";
 import Layout_User from "@/Layouts/Layout_User";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@/Components/ui/separator";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { use, useEffect, useState } from "react";
 import { ButtonGroup } from "@/Components/ui/button-group";
 import { Input } from "@/Components/ui/input";
 import { SearchIcon } from "lucide-react";
 
 
 const CampaignList = () => {
-    const [campaignList, setCampaignList] = useState([]);
+    const { campaigns, lookups } = usePage().props;
     const [visibleCampaign, setVisibleCampaign] = useState(8);
+    const [campaignList, setCampaignList] = useState(campaigns || []);
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
-    const categories = [
-        "All",
-        "Foods & Beverage",
-        "Beauty & Cosmetic",
-        "Clothes & Fashion",
-        "Services",
-        "Lifesyle",
-        "Logistics",
-    ];
 
-useEffect(() => {
-    setVisibleCampaign(8);
-},[chosenCategory]);
+    useEffect(() => {
+        if (campaigns?.length) {
+            setCampaignList(campaigns);
+        }
+    }, [campaigns]);
 
- useEffect(() => {
-     if (searchTerm === "") {
-         axios
-             .get("/campaigns/getlist?category=" + encodeURIComponent(chosenCategory))
-             .then((response) => setCampaignList(response.data))
-             .catch((error) =>console.error("There was an error fetching the campaign list!", error));
-     }
-     else {
-         const filteredCampaigns = campaignList.filter((campaign) => campaign.title.toLowerCase().includes(searchTerm.toLowerCase()));
-         setCampaignList(filteredCampaigns);
-     }
- }, [visibleCampaign, chosenCategory, searchTerm]);
+    useEffect(() => {
+        setVisibleCampaign(8);
+    },[chosenCategory,searchTerm]);
+
+    useEffect(() => {
+        if (!searchTerm) {
+            setCampaignList(campaigns);
+        } else {
+            handleSearch();
+        }
+    }, [searchTerm]);
+
+    const handleCategoryChange = (activeCategory) => {
+
+            router.get("/campaigns/getList", { category: activeCategory }, {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {setCampaignList(page.props.campaigns); setChosenCategory(activeCategory); setVisibleCampaign(8); }
+            });
+    };
+
+    const handleSearch = () => {
+        let temp = campaigns?.filter((campaign) =>
+            campaign.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setCampaignList(temp);
+    };
+
 
 
  const randomizePicture = () => {
@@ -62,7 +70,8 @@ useEffect(() => {
                     <div key={idx} className="border rounded-lg p-4 shadow-md">
                         <div>
                             <img
-                                src={randomizePicture()}
+                                // src={randomizePicture()}
+                                src="http://127.0.0.1:8000/images/boat.jpg"
                                 alt="Campaign"
                                 className="w-full h-64 object-cover mb-4 rounded"
                             />
@@ -75,8 +84,8 @@ useEffect(() => {
                                 ? dat.description.substring(0, 200) + "..."
                                 : dat.description}
                         </p>
-                        <Link href="/campaigns/1">
-                            <Button variant="primary" className="w-full">
+                        <Link  href={`/campaigns/details/${dat.id.toString()}`}>
+                            <Button variant="primary" className="w-b justify-center mx-auto flex">
                                 View Details
                             </Button>
                         </Link>
@@ -111,14 +120,28 @@ useEffect(() => {
                     className="flex flex-row space-x-4 h-[75px] bg-gray-300 bg-cover bg-center w-full items-center justify-center"
                     style={{ background: "#7A338C" }}
                 >
-                    {categories.map((category, idx) => (
+                    {lookups?.length > 0 &&
                         <Button
-                            key={idx}
-                            onClick={() => setChosenCategory(category)}
-                        >
-                            {category}
-                        </Button>
-                    ))}
+                        key={999}
+                        onClick={() => handleCategoryChange("All")}
+                    >
+                        All
+                    </Button>
+                    }
+                    {lookups
+                        ?.filter(
+                            (dat) => dat.lookup_type === "CampaignCategory"
+                        )
+                        .map((item, idx) => (
+                            <Button
+                                key={idx}
+                                onClick={() =>
+                                    handleCategoryChange(item.lookup_value)
+                                }
+                            >
+                                {item.lookup_value}
+                            </Button>
+                        ))}
                 </div>
             </div>
 
@@ -147,24 +170,23 @@ useEffect(() => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {campaignList.length > 0 ? (
+                    {campaigns?.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {cardRepeater(campaignList)}
                         </div>
                     ) : (
                         <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20">
-                            Loading...
+                            No campaigns found.
                         </p>
                     )}
-                    {visibleCampaign < campaignList.length && (
+                    {visibleCampaign < campaigns?.length && (
                         <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                             <p
                                 onClick={handleShowMore}
                                 className="text-sm text-gray-400 font-thin"
                             >
-                                {" "}
-                                show more{" "}
+                                show more
                             </p>
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                         </div>

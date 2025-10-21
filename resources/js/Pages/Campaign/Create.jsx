@@ -65,7 +65,6 @@ const DatePicker = ({open, date, setOpen, setDate}) => {
 }
 
 const handleSave = () => {
-  console.log("curr submit data", campaignData)
   Inertia.post("/campaigns/newCampaign", campaignData);
 }
 

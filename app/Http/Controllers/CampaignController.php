@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Models\Campaign;
+use App\Models\Donation;
+use App\Models\Lookup;
+use App\Models\User;
 use Illuminate\Container\Attributes\Log;
 // use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Auth;
@@ -83,13 +86,30 @@ class CampaignController extends Controller
 
     public function showList()
     {
-        return inertia('Campaign/CampaignList');
+        $campaigns = Campaign::all();
+        $lookups = Lookup::all();
+
+        return inertia('Campaign/CampaignList', [
+            'campaigns' => $campaigns,
+            'lookups' => $lookups,
+        ]);
     }
 
     public function showCreate()
     {
         return inertia::render('Campaign/Create', [
             'user_Id' => Auth::user()->id,
+        ]);
+    }
+
+    public function getCampaignDetails($id)
+    {
+        $donations = Donation::with([ 'user' ])->where('campaign_id', $id)->where('status', 'successful')->get();
+        $campaignData = Campaign::findOrFail($id);
+
+        return inertia::render('Campaign/CampaignDetails', [
+            'campaign' => $campaignData,
+            'donations' => $donations,
         ]);
     }
 
@@ -112,20 +132,24 @@ class CampaignController extends Controller
 
     public function getCampaignListData(Request $request)
     {
+        $lookups = Lookup::all();
         $category = $request->input('category');
 
         // get campaigns where they are not banned or rejected and is still pending
         if(!$category){
             return response()->json(['error' => 'Category parameter is required'], 400);
         }
-        if ($category === 'All') {
+        if ($category === 'All' || $category === null) {
             $campaigns = Campaign::where('status', ['active'])->get();
-            // dd($campaigns);
+
         }else{
             $campaigns = Campaign::where('category', $request->input('category'))->where('status', ['active'])->get();
 
         }
-        return response()->json($campaigns);
+        return inertia::render('Campaign/CampaignList', [
+            'campaigns' => $campaigns,
+            'lookups' => $lookups,
+        ]);
     }
 
     /**
