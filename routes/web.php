@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
     Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
+    Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
+
 
 
 

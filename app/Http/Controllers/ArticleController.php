@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\ArticleContent;
+
 use App\Models\Lookup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ArticleController extends Controller
 {
@@ -13,32 +17,42 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
-        $filterCategory = $request->query('category');
-        $sortOrder = $request->query('sort', 'desc');
-        $searchQuery = $request->query('search');
+    $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
+    //Get Query Params
+    $filterCategory = $request->query('category');
+    $sortOrder      = $request->query('sort', 'desc');
+    $searchQuery    = $request->query('search');
 
-
-        $articles = Article::with('user')
-            ->where('status', 'approved')
-            ->when($filterCategory, fn($query) => $query->where('category', $filterCategory))
-            ->when($searchQuery, fn($query) =>
-                $query->where(function ($q) use ($searchQuery) {
-                    $q->where('title', 'like', "%{$searchQuery}%")
-                      ->orWhere('content', 'like', "%{$searchQuery}%");
-                })
-            )
-            ->orderBy('created_at', $sortOrder)
-            ->get();
-
-        return inertia('Article/Index', [
-        'articles' => $articles,
-        'categories' => $categories,
+    // Main Query
+    $articles = Article::with(['user', 'contents'])
+        ->where('status', 'approved')
+        // Filter Category
+        ->when($filterCategory, function ($q) use ($filterCategory) {
+            $q->where('category', $filterCategory);
+        })
+        // Filter Search Qeuery
+        ->when($searchQuery, function ($q) use ($searchQuery) {
+            $q->where(function ($qq) use ($searchQuery) {
+                $qq->where('title', 'like', "%{$searchQuery}%")
+                   ->orWhereHas('contents', function ($qc) use ($searchQuery) {
+                       $qc->where('type', 'text')
+                          ->where('content', 'like', "%{$searchQuery}%");
+                   });
+            });
+        })
+        // Sort Order
+        ->orderBy('created_at', $sortOrder)
+        ->get();
+    return inertia('Article/Index', [
+        'articles'         => $articles,
+        'categories'       => $categories,
         'selectedCategory' => $filterCategory,
-        'sortOrder' => $sortOrder,
-        'searchQuery' => $searchQuery,
+        'sortOrder'        => $sortOrder,
+        'searchQuery'      => $searchQuery,
     ]);
-    }
+}
+
+
 
 
     /**
@@ -49,7 +63,6 @@ class ArticleController extends Controller
         $user = auth()->user();
 
         $verificationRequest = $user->verificationRequests()->latest()->first();
-
         if (!$verificationRequest) {
             // No verification request - show verification form
             return inertia('Verification/Create');
@@ -65,6 +78,7 @@ class ArticleController extends Controller
             return inertia('Verification/Rejected');
         }
 
+
         if ($verificationRequest->status->value === 'accepted') {
         $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
         return inertia('Article/Create', [
@@ -77,44 +91,88 @@ class ArticleController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-    // Validate Title n Content
+    */
+
+public function store(Request $request)
+{
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'category' => 'required|string|max:100',
-        'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'content' => 'required_without:attachment|string|nullable',
-        'attachment' => 'required_without:content|nullable|file|mimes:pdf|max:5120',
-
-
+        'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
+        'contents' => 'required|array|min:1',
+        'contents.*.type' => 'required|in:text,image',
+        'contents.*.content' => 'nullable', //teks or image path
+        'contents.*.order_x' => 'required|integer',
+        'contents.*.order_y' => 'required|integer',
     ]);
-    $filePath = null;
-    if ($request->hasFile('attachment')) {
-        $filePath = $request->file('attachment')->store('articleAttachment', 'public');
-    }
 
+    // Save Thumbnail
     $thumbnailPath = null;
-
     if ($request->hasFile('thumbnail')) {
         $thumbnailPath = $request->file('thumbnail')->store('articleThumbnail', 'public');
     }
 
+    // Create Article
     $article = Article::create([
         'user_id' => auth()->id(),
         'title' => $validated['title'],
-        'content' => $validated['content'],
-        'thumbnail' => $thumbnailPath,
         'category' => $validated['category'],
-        'attachment' => $filePath,
+        'thumbnail' => $thumbnailPath,
         'status' => 'pending',
     ]);
+
+   // Iterate every grid for content
+    foreach ($request->input('contents') as $i => $block) {
+        $type = $block['type'];
+
+        $contentValue = null;
+
+        // find image path, if type is image
+        if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+            $file = $request->file("contents.$i.content");
+            $path = $file->store('articleImageContent', 'public');
+            $contentValue = $path;
+        } else {
+            $contentValue = $block['content'] ?? null;
+        }
+
+        ArticleContent::create([
+            'article_id' => $article->id,
+            'type' => $type,
+            'content' => $contentValue,
+            'order_x' => $block['order_x'],
+            'order_y' => $block['order_y'],
+        ]);
+    }
 
     return redirect()
         ->route('articles.create')
         ->with('success', 'Article created successfully!');
+}
+
+public function uploadContentImage(Request $request)
+{
+    $request->validate([
+        'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
+        'old_path' => 'nullable|string',
+    ]);
+
+    // Delete Old File if exists
+    if ($request->old_path) {
+        $relativePath = str_replace(asset('storage') . '/', '', $request->old_path);
+        $fullPath = storage_path('app/public/' . $relativePath);
+
+        if (file_exists($fullPath)) {
+            @unlink($fullPath);
+        }
     }
+    $path = $request->file('file')->store('articleImageContent', 'public');
+    return response()->json([
+        'url' => asset('storage/' . $path),
+    ]);
+}
+
+
 
 
     /**
@@ -122,13 +180,14 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-    $article = Article::with('user')
-        ->findOrFail($id, ['id', 'title', 'content', 'thumbnail', 'attachment','user_id', 'created_at']);
+        $article = Article::with(['user', 'contents'])
+            ->findOrFail($id, ['id', 'title', 'thumbnail', 'user_id', 'category', 'created_at']);
 
-    return inertia('Article/Details', [
-        'article' => $article,
-    ]);
+        return inertia('Article/Details', [
+            'article' => $article,
+        ]);
     }
+
 
 
     /**

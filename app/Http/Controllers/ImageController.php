@@ -68,7 +68,7 @@ class ImageController extends Controller
         try {
             // Handle both 'image' and 'files' field names for different editors
             $file = null;
-            
+
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
             } elseif ($request->hasFile('files') && is_array($request->file('files'))) {
@@ -76,21 +76,21 @@ class ImageController extends Controller
             } elseif ($request->hasFile('files')) {
                 $file = $request->file('files');
             }
-            
+
             if (!$file || !$file->isValid()) {
                 return response()->json(['error' => 'No valid file uploaded'], 400);
             }
-            
+
             $path = $file->store('article-images', 'public');
-            
+
             $image = Image::create([
                 'path' => $path,
                 'imageable_id' => null,
                 'imageable_type' => null
             ]);
-            
+
             $imageUrl = url('/storage/' . $path);
-            
+
             return response()->json([
                 'success' => 1,
                 'data' => [

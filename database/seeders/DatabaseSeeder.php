@@ -6,6 +6,7 @@ use App\Enums\CampaignStatus;
 use App\Models\User;
 use App\Models\Campaign;
 use App\Models\Article;
+use App\Models\ArticleContent;
 use App\Models\CampaignComment;
 use App\Models\CampaignReply;
 use App\Models\ArticleComment;
@@ -38,7 +39,20 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create Articles and Campaigns.
         // Their factories will now automatically pick from the 20 existing users.
-        $articles = Article::factory(20)->create();
+        $articles = Article::factory(20)->create()->each(function ($article) {
+            // blok pertama wajib teks (1,1)
+            ArticleContent::factory()
+                ->firstTextBlock()
+                ->create(['article_id' => $article->id]);
+
+            // 3 blok tambahan acak
+            ArticleContent::factory()
+                ->count(3)
+                ->create([
+                    'article_id' => $article->id,
+                    // order_x dan order_y akan diacak
+                ]);
+        });
         $campaigns = Campaign::factory(20)->create();
 
         // 4. Create Comments and Replies Polymorphically
