@@ -2,11 +2,14 @@
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationRequestController;
 use App\Models\VerificationRequest;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Inertia\Inertia;
 
@@ -53,10 +56,25 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
     Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
-    Route::post('/api/upload-image', [ImageController::class, 'uploadImage'])->name('images.upload');
+    Route::post('/upload-image', [ImageController::class, 'upload'])->name('image.upload');
+
+    // MinIO file uploads
+    Route::post('/api/upload-image', [ImageController::class, 'uploadImage'])->name('api.upload.image');
+    Route::post('/api/upload-document', [FileController::class, 'uploadDocument'])->name('api.upload.document');
+    Route::delete('/api/delete-file', [FileController::class, 'deleteFile'])->name('api.delete.file');
+
 
     Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
+
+    // Donations
+    Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
+    Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
+    Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
 });
+
+// Video upload and retrieval
+Route::post('/api/upload-video', [FileController::class, 'uploadVideo'])->name('api.upload.video');
+Route::get('/api/get-video', [FileController::class, 'getVideo'])->name('api.get.video');
 
 
 // --- Admin Routes ---
