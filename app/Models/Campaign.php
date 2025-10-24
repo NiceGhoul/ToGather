@@ -18,6 +18,8 @@ class Campaign extends Model
         'title',
         'description',
         'category',
+        'start_campaign',
+        'end_campaign',
         'status',
         'goal_amount',
         'collected_amount',
@@ -52,6 +54,12 @@ class Campaign extends Model
     {
         return $this->morphMany(Image::class, 'imageable');
     }
+
+    // 1 campaign can have many likes
+    public function likes(){
+        return $this->morphMany(Likes::class, 'likes');
+    }
+
     protected $casts = [
         'status' => CampaignStatus::class, // 2. Add the cast
     ];
