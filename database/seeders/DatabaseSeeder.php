@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create Articles and Campaigns.
         // Their factories will now automatically pick from the 20 existing users.
-        $articles = Article::factory(20)->create()->each(function ($article) {
+        $articles = Article::factory(40)->create()->each(function ($article) {
             // blok pertama wajib teks (1,1)
             ArticleContent::factory()
                 ->firstTextBlock()
@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
 
             // 3 blok tambahan acak
             ArticleContent::factory()
-                ->count(3)
+                ->count(rand(3, 8))
                 ->create([
                     'article_id' => $article->id,
                     // order_x dan order_y akan diacak

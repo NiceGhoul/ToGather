@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('thumbnail')->nullable();
             $table->string('category');
-            $table->enum('status', ['pending', 'approved', 'disabled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'disabled', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

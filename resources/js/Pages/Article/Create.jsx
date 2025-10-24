@@ -176,7 +176,6 @@ export default function Create() {
     return (
         <Layout_User>
             <div className="container mx-auto px-4 py-8">
-                {/* LEFT: CREATE FORM */}
                 <Card className="w-full my-5">
                     <CardHeader>
                         <CardTitle>Create New Article</CardTitle>
@@ -370,7 +369,7 @@ export default function Create() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    ➕ Text
+                                                                    + Text
                                                                 </Button>
                                                                 <Button
                                                                     type="button"
@@ -384,7 +383,7 @@ export default function Create() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    🖼️ Image
+                                                                    + Image
                                                                 </Button>
                                                             </div>
                                                         )}
