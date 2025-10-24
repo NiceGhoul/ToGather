@@ -1,9 +1,9 @@
-import React from "react"
+import React from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Data_Table from "@/Components/Data_Table"; // Import the reusable component
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,66 +11,57 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { router } from '@inertiajs/react';
+} from "@/components/ui/popover";
+import Popup from "@/Components/Popup";
+import { router } from "@inertiajs/react";
 import { Badge } from "@/components/ui/badge";
-import { usePage } from '@inertiajs/react';
+import { usePage } from "@inertiajs/react";
 
 const handleVerification = async (user, action) => {
     try {
         const url = `/users/${user}/verify`;
         console.log("Requesting URL:", url);
         const response = await fetch(url, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
             },
-            body: JSON.stringify({ acceptance: action })
+            body: JSON.stringify({ acceptance: action }),
         });
 
         if (!response.ok) {
             // Check for 404 specifically
             if (response.status === 404) {
-                throw new Error('API route not found. Check the URL.');
+                throw new Error("API route not found. Check the URL.");
             }
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Verification failed');
+            throw new Error(errorData.message || "Verification failed");
         }
 
         const result = await response.json();
-        console.log('Verification successful:', result);
+        console.log("Verification successful:", result);
         alert(`User has been ${action}.`);
 
         window.location.reload();
-
     } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
         alert(`An error occurred: ${error.message}`);
     }
 };
 const statusVariantMap = {
-    accepted: 'default',
-    pending: 'secondary',
-    rejected: 'destructive',
+    accepted: "default",
+    pending: "secondary",
+    rejected: "destructive",
 };
 
 export const columns = [
@@ -82,7 +73,9 @@ export const columns = [
                     table.getIsAllPageRowsSelected() ||
                     (table.getIsSomePageRowsSelected() && "indeterminate")
                 }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                onCheckedChange={(value) =>
+                    table.toggleAllPageRowsSelected(!!value)
+                }
                 aria-label="Select all"
             />
         ),
@@ -101,7 +94,9 @@ export const columns = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
                 ID
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -114,13 +109,17 @@ export const columns = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
                 Email
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="ml-1">{row.original.user.email}</div>,
+        cell: ({ row }) => (
+            <div className="ml-1">{row.original.user.email}</div>
+        ),
     },
     {
         accessorKey: "id_photo",
@@ -145,13 +144,15 @@ export const columns = [
                                     className="w-full h-auto rounded-md object-cover border"
                                 />
                             ) : (
-                                <p className="text-sm text-gray-500">No ID photo provided.</p>
+                                <p className="text-sm text-gray-500">
+                                    No ID photo provided.
+                                </p>
                             )}
                         </PopoverContent>
                     </Popover>
                 </div>
             );
-        }
+        },
     },
     {
         accessorKey: "selfie_with_id",
@@ -176,13 +177,15 @@ export const columns = [
                                     className="w-full h-auto rounded-md object-cover border"
                                 />
                             ) : (
-                                <p className="text-sm text-gray-500">No selfie provided.</p>
+                                <p className="text-sm text-gray-500">
+                                    No selfie provided.
+                                </p>
                             )}
                         </PopoverContent>
                     </Popover>
                 </div>
             );
-        }
+        },
     },
     {
         accessorKey: "status",
@@ -190,7 +193,7 @@ export const columns = [
         cell: ({ row }) => {
             const status = row.getValue("status");
             return (
-                <Badge variant={statusVariantMap[status] || 'default'}>
+                <Badge variant={statusVariantMap[status] || "default"}>
                     {status}
                 </Badge>
             );
@@ -201,7 +204,9 @@ export const columns = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                }
             >
                 Created_At
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -230,7 +235,11 @@ export const columns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(request.user.id.toString())}
+                            onClick={() =>
+                                navigator.clipboard.writeText(
+                                    request.user.id.toString()
+                                )
+                            }
                         >
                             Copy user ID
                         </DropdownMenuItem>
@@ -239,99 +248,97 @@ export const columns = [
                         {/* --- Conditional Actions Start Here --- */}
 
                         {/* Show "Approve" button ONLY if status is 'pending' */}
-                        {status === 'pending' && (
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                        Approve
-                                    </DropdownMenuItem>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Approve Verification?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Are you sure you want to approve this user's verification?
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleVerification(request.user.id, 'accepted')}>
-                                            Approve
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                        {status === "pending" && (
+                            <Popup
+                                triggerText="Approve"
+                                title="Approve User Verification?"
+                                description="Are you sure you want to approve this user's verification?"
+                                confirmText="Approve"
+                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                triggerClass="w-full justify-start bg-transparent hover:bg-gray-100 text-green-600 hover:text-green-700 px-2 py-1 text-sm font-normal"
+                                onConfirm={() =>
+                                    handleVerification(
+                                        request.user.id,
+                                        "accepted"
+                                    )
+                                }
+                            />
                         )}
 
                         {/* Show "Reject" button if status is 'pending' OR 'accepted' */}
-                        {(status === 'pending' || status === 'accepted') && (
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600 focus:text-red-600">
-                                        Reject
-                                    </DropdownMenuItem>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Reject Verification?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Are you sure you want to reject this user's verification?
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
-                                            onClick={() => handleVerification(request.user.id, 'rejected')}
-                                            className="bg-red-600 hover:bg-red-700"
-                                        >
-                                            Reject
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                        {(status === "pending" || status === "accepted") && (
+                            <Popup
+                                triggerText="Reject"
+                                title="Reject User?"
+                                description="Are you sure you want to reject this user's verification?"
+                                confirmText="Reject"
+                                confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                triggerClass="w-full justify-start bg-transparent hover:bg-gray-100 text-red-600 hover:text-red-700 px-2 py-1 text-sm font-normal"
+                                onConfirm={() =>
+                                    handleVerification(
+                                        request.user.id,
+                                        "rejected"
+                                    )
+                                }
+                            />
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
-            )
+            );
         },
     },
-]
+];
 
 // The page component is now much cleaner.
 export default function Verification({ requests }) {
     const { filters } = usePage().props;
     const handleFilterChange = (status) => {
-        router.get('/admin/users/verification', { status }, {
-            preserveState: true,
-            replace: true,
-        });
-    }
+        router.get(
+            "/admin/users/verification",
+            { status },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
+    };
     return (
         <Layout_Admin title="User Verification List">
             <div className="p-9">
                 <div className="flex items-center gap-2 mb-4">
-
                     <Button
-                        variant={!filters.status ? 'secondary' : 'outline'}
+                        variant={!filters.status ? "secondary" : "outline"}
                         onClick={() => handleFilterChange(null)}
                     >
                         All
                     </Button>
                     <Button
-                        variant={filters.status === 'accepted' ? 'secondary' : 'outline'}
-                        onClick={() => handleFilterChange('accepted')}
+                        variant={
+                            filters.status === "accepted"
+                                ? "secondary"
+                                : "outline"
+                        }
+                        onClick={() => handleFilterChange("accepted")}
                     >
                         Accepted
                     </Button>
                     <Button
-                        variant={filters.status === 'pending' ? 'secondary' : 'outline'}
-                        onClick={() => handleFilterChange('pending')}
+                        variant={
+                            filters.status === "pending"
+                                ? "secondary"
+                                : "outline"
+                        }
+                        onClick={() => handleFilterChange("pending")}
                     >
                         Pending
                     </Button>
                     <Button
-                        variant={filters.status === 'rejected' ? 'secondary' : 'outline'}
-                        onClick={() => handleFilterChange('rejected')}
+                        variant={
+                            filters.status === "rejected"
+                                ? "secondary"
+                                : "outline"
+                        }
+                        onClick={() => handleFilterChange("rejected")}
                     >
                         Rejected
                     </Button>

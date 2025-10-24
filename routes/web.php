@@ -50,6 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
     Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
+    Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
+
 
 
 
@@ -90,14 +92,20 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
     Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');
 
-    Route::get('/articles/list', [ArticleController::class, 'adminApprovedIndex'])->name('articles.index');
+    Route::get('/articles/list', [ArticleController::class, 'adminIndex'])->name('articles.index');
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');
     Route::get('/articles/{id}/view', [ArticleController::class, 'adminViewArticle'])->name('articles.view');
     Route::post('/articles/{id}/approve', [ArticleController::class, 'adminApprove'])->name('articles.approve');
     Route::post('/articles/{id}/disable', [ArticleController::class, 'adminDisable'])->name('articles.disable');
     Route::post('/articles/{id}/reject', [ArticleController::class, 'adminReject'])->name('articles.reject');
     Route::post('/articles/{id}/delete', [ArticleController::class, 'adminDelete'])->name('articles.delete');
+    Route::get('/articles/{id}/edit', [ArticleController::class, 'adminEdit'])->name('articles.edit');
+    Route::post('/articles/{id}/update', [ArticleController::class, 'adminUpdate'])->name('articles.update');
 
+    // Bulk routes
+    Route::post('/articles/bulk-approve', [ArticleController::class, 'adminBulkApprove'])->name('articles.bulk.approve');
+    Route::post('/articles/bulk-disable', [ArticleController::class, 'adminBulkDisable'])->name('articles.bulk.disable');
+    Route::post('/articles/bulk-delete', [ArticleController::class, 'adminBulkDelete'])->name('articles.bulk.delete');
 
 
     Route::get('/lookups', [LookupController::class, 'index'])->name('lookups.index');

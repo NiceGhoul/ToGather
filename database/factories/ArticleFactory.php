@@ -31,12 +31,10 @@ class ArticleFactory extends Factory
         return [
             'user_id' => User::inRandomOrder()->first()->id,
             'title' => $this->faker->sentence(rand(5, 10)),
-            'content' => $this->faker->paragraphs(rand(5, 15), true),
             'thumbnail' => $randomThumbnail,
             'category' => $this->faker->randomElement($categories),
-            'attachment' => null,
             'status' => $this->faker->randomElement(ArticleStatus::cases()),
-            'created_at' => $this->faker->dateTimeBetween('-1 years', endDate: 'now'),
+            'created_at' => $this->faker->dateTimeBetween('-1 years', 'now'),
             'updated_at' => now(),
         ];
     }
@@ -44,7 +42,7 @@ class ArticleFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Article $article) {
-            Image::factory(rand(1,3))->create([
+            Image::factory(rand(1, 3))->create([
                 'imageable_id' => $article->id,
                 'imageable_type' => Article::class,
             ]);
