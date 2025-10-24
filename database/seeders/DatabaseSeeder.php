@@ -13,6 +13,7 @@ use App\Models\ArticleReply;
 use App\Models\Comment;
 use App\Models\Image;
 use App\Models\Donation;
+use App\Models\Likes;
 use App\Models\VerificationRequest;
 use App\Models\Lookup;
 use Database\Seeders\LookupSeeder;
@@ -40,6 +41,7 @@ class DatabaseSeeder extends Seeder
         // Their factories will now automatically pick from the 20 existing users.
         $articles = Article::factory(20)->create();
         $campaigns = Campaign::factory(20)->create();
+        Likes::factory(20) -> create();
 
         // 4. Create Comments and Replies Polymorphically
         $commentable = $articles->merge($campaigns);

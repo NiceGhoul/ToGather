@@ -36,7 +36,6 @@ class LookupSeeder extends Seeder
                 'updated_at' => now(),
             ],
             // campaigns
-            ,
             [
                 'lookup_type' => 'CampaignCategory',
                 'lookup_code' => 'F&B',

@@ -28,8 +28,8 @@ class UserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'user@email.com'],
             [
-                'nickname' => 'bas',
-                'address' => 'bas home',
+                'nickname' => 'user',
+                'address' => 'user home',
                 'password' => Hash::make('User123123'),
                 'role' => 'user',
                 'status' => 'active',
