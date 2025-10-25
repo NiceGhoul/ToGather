@@ -70,7 +70,6 @@ const CampaignList = () => {
                     <div key={idx} className="border rounded-lg p-4 shadow-md">
                         <div>
                             <img
-                                // src={randomizePicture()}
                                 src="http://127.0.0.1:8000/images/boat.jpg"
                                 alt="Campaign"
                                 className="w-full h-64 object-cover mb-4 rounded"

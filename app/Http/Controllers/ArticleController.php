@@ -52,6 +52,23 @@ class ArticleController extends Controller
         ]);
     }
 
+    public function ToggleLike(Request $request)
+    {
+        $user = auth()->user();
+        $campaignId = $request->campaign_id;
+
+        $existing = $user->likedItems()->where('likes_id', $campaignId)->where('likes_type', Article::class)->first();
+
+        if ($existing) {
+            $existing->delete();
+        } else {
+            $user->likedItems()->create([
+                'likes_id' => $campaignId,
+                'likes_type' => Article::class,
+            ]);
+        }
+    }
+
 
 
 

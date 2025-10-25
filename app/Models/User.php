@@ -93,7 +93,7 @@ class User extends Authenticatable
     }
 
     // user can likes many campaigns
-    public function likedCampaign(){
+    public function likedItems(){
         return $this->hasMany(Likes:: class);
     }
 
