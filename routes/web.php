@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaigns/getList', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
     Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
-
+    Route::post('/campaigns/toggleLike',[CampaignController::class, 'ToggleLike'])->name('campaigns.toggleLikes');
     // Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
 
     //===========

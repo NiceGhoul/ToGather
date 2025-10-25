@@ -6,8 +6,10 @@ use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Models\Campaign;
 use App\Models\Donation;
+use App\Models\Likes;
 use App\Models\Lookup;
 use App\Models\User;
+use COM;
 use Illuminate\Container\Attributes\Log;
 // use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Auth;
@@ -104,12 +106,14 @@ class CampaignController extends Controller
 
     public function getCampaignDetails($id)
     {
+        $user = auth()->user();
         $donations = Donation::with([ 'user' ])->where('campaign_id', $id)->where('status', 'successful')->get();
+        $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
         $campaignData = Campaign::findOrFail($id);
-
         return inertia::render('Campaign/CampaignDetails', [
             'campaign' => $campaignData,
             'donations' => $donations,
+            'liked' => $likes,
         ]);
     }
 
@@ -120,7 +124,7 @@ class CampaignController extends Controller
     //     'goal_amount' => 'required|numeric',
     //     'start_date' => 'required|date',
     //     'end_date' => 'required|date',
-    //     // ...other fields
+
     // ]);
         $data = $request->all();
         $data['user_id'] = Auth::id();
@@ -128,6 +132,23 @@ class CampaignController extends Controller
 
     Campaign::create($data);
     return redirect()->back()->with('success', 'Campaign created successfully!');
+    }
+
+    public function ToggleLike(Request $request)
+    {
+        $user = auth()->user();
+        $campaignId = $request->campaign_id;
+
+        $existing = $user->likedItems()->where('likes_id', $campaignId)->where('likes_type', Campaign::class)->first();
+
+        if ($existing) {
+            $existing->delete();
+        } else {
+            $user->likedItems()->create([
+                'likes_id' => $campaignId,
+                'likes_type' => Campaign::class,
+            ]);
+        }
     }
 
     public function getCampaignListData(Request $request)
@@ -143,9 +164,12 @@ class CampaignController extends Controller
             $campaigns = Campaign::where('status', ['active'])->get();
 
         }else{
-            $campaigns = Campaign::where('category', $request->input('category'))->where('status', ['active'])->get();
+            $campaigns = Campaign::where('category', $category)->where('status', ['active'])->get();
 
         }
+
+        // dd($testCampaign);
+
         return inertia::render('Campaign/CampaignList', [
             'campaigns' => $campaigns,
             'lookups' => $lookups,

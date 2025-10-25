@@ -18,8 +18,8 @@ const parameterData = {
     goal_amount: 0,
     collected_amount: 0,
     category:"",
-    start_date: null,
-    end_date: null,
+    start_campaign: null,
+    end_campaign: null,
     status: "pending",
     user_id: null,
 };
@@ -112,10 +112,10 @@ const handleSave = () => {
 
                         <div className="flex mt-6 flex-row gap-4 align-center items-center">
                             <h1>Start Date:</h1>
-                            <DatePicker open={openStart} date={campaignData.start_date} setOpen={setOpenStart} setDate={date => {setCampaignData({...campaignData, start_date: date}); setOpenStart(false)}}/>
+                            <DatePicker open={openStart} date={campaignData.start_date} setOpen={setOpenStart} setDate={date => {setCampaignData({...campaignData, start_campaign: date}); setOpenStart(false)}}/>
 
                             <h1>End Date:</h1>
-                            <DatePicker open={openEnd} date={campaignData.end_date} setOpen={setOpenEnd} setDate={date => {setCampaignData({...campaignData, end_date: date}); setOpenEnd(false)}}/>
+                            <DatePicker open={openEnd} date={campaignData.end_date} setOpen={setOpenEnd} setDate={date => {setCampaignData({...campaignData, end_campaign: date}); setOpenEnd(false)}}/>
                         </div>
                     </CardContent>
                     <CardFooter>
