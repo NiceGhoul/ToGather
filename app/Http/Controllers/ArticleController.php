@@ -285,28 +285,6 @@ class ArticleController extends Controller
         ]);
     }
 
-        // tambahkan properti baru untuk status like user
-        $article->is_liked_by_user = auth()->check()
-            ? $article->likes()->where('user_id', auth()->id())->exists()
-            : false;
->>>>>>> main
-
-        // Transform article to include image URLs
-        if ($article->thumbnailImage) {
-            $article->thumbnail_url = $article->thumbnailImage->url;
-        }
-        $article->contents->transform(function ($content) {
-            if ($content->type === 'image' && $content->image) {
-                $content->image_url = $content->image->url;
-            }
-            return $content;
-        });
-
-        return inertia('Article/Details', [
-            'article' => $article,
-        ]);
-    }
-
     public function showMyArticles(Request $request)
     {
         $user = auth()->user();
