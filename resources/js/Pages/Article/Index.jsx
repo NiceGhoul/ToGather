@@ -2,6 +2,8 @@ import Layout_User from "@/Layouts/Layout_User";
 import { Link, usePage, router } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
+import { Toggle } from "@/components/ui/toggle";
+import { Heart } from "lucide-react";
 
 export default function Index() {
     const { props } = usePage();
@@ -12,24 +14,56 @@ export default function Index() {
     const initialSearch = props.searchQuery || "";
     const [searchQuery, setSearchQuery] = useState(initialSearch);
 
-    // --- Handlers ---
-    const handleFilterChange = (e) => {
-        const newCategory = e.target.value;
+    // --- Like state untuk setiap artikel ---
+    const [likesState, setLikesState] = useState(
+        Object.fromEntries(
+            articles.map((a) => [a.id, a.is_liked_by_user ?? false])
+        )
+    );
+
+    // --- Handler LIKE / UNLIKE ---
+    const handleLike = async (articleId) => {
+        try {
+            const response = await fetch(`/articles/${articleId}/like`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                    Accept: "application/json",
+                },
+            });
+
+            const data = await response.json();
+
+            // Update state lokal
+            setLikesState((prev) => ({
+                ...prev,
+                [articleId]: data.isLiked,
+            }));
+
+            // Refresh hanya jumlah likes
+            router.reload({ only: ["articles"] });
+        } catch (error) {
+            console.error("Error liking article:", error);
+        }
+    };
+
+    // --- Filter & Search ---
+    const handleFilterChange = (e) =>
         router.get("/articles/list", {
-            category: newCategory,
+            category: e.target.value,
             sort: sortOrder,
             search: searchQuery,
         });
-    };
 
-    const handleSortChange = (e) => {
-        const newSort = e.target.value;
+    const handleSortChange = (e) =>
         router.get("/articles/list", {
             category: selectedCategory,
-            sort: newSort,
+            sort: e.target.value,
             search: searchQuery,
         });
-    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -48,7 +82,6 @@ export default function Index() {
                 {/* Filter & Search Bar */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex flex-wrap gap-3 items-center">
-                        {/* Category Filter */}
                         <select
                             value={selectedCategory}
                             onChange={handleFilterChange}
@@ -62,7 +95,6 @@ export default function Index() {
                             ))}
                         </select>
 
-                        {/* Sort Order */}
                         <select
                             value={sortOrder}
                             onChange={handleSortChange}
@@ -73,7 +105,6 @@ export default function Index() {
                         </select>
                     </div>
 
-                    {/* Search Bar */}
                     <form onSubmit={handleSearch} className="flex gap-2">
                         <input
                             type="text"
@@ -88,27 +119,12 @@ export default function Index() {
                     </form>
                 </div>
 
-                {/* Filter Label */}
-                <div className="mb-4">
-                    <span className="font-medium">
-                        Filter:{" "}
-                        {selectedCategory ? selectedCategory : "All Categories"}
-                        ,{" "}
-                        {sortOrder === "desc" ? "Newest First" : "Oldest First"}
-                    </span>
-                    <br />
-                    <span className="font-medium">
-                        {searchQuery && `Search: "${searchQuery}"`}
-                    </span>
-                </div>
-
                 {/* Article List */}
                 {articles.length === 0 ? (
                     <p className="text-gray-500">No articles found.</p>
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {articles.map((article) => {
-                            // Ambil teks preview dari blok (1,1)
                             const previewText =
                                 article.contents?.find(
                                     (c) =>
@@ -117,12 +133,13 @@ export default function Index() {
                                         c.order_y === 1
                                 )?.content || "";
 
+                            const liked = likesState[article.id] || false;
+
                             return (
                                 <Card
                                     key={article.id}
                                     className="hover:shadow-md transition overflow-hidden"
                                 >
-                                    {/* Thumbnail */}
                                     {article.thumbnail && (
                                         <img
                                             src={`/storage/${article.thumbnail}`}
@@ -150,29 +167,41 @@ export default function Index() {
                                     </CardHeader>
 
                                     <CardContent>
-                                        {previewText ? (
-                                            <p className="text-gray-700 line-clamp-3">
-                                                {previewText
-                                                    .replace(
-                                                        /(<([^>]+)>)/gi,
-                                                        ""
-                                                    )
-                                                    .slice(0, 150)}
-                                                ...
-                                            </p>
-                                        ) : (
-                                            <p className="text-gray-500 italic">
-                                                No preview text available
-                                            </p>
-                                        )}
+                                        <p className="text-gray-700 line-clamp-3">
+                                            {previewText
+                                                .replace(/(<([^>]+)>)/gi, "")
+                                                .slice(0, 150) ||
+                                                "No preview text."}
+                                            ...
+                                        </p>
 
-                                        {/* Link ke detail */}
                                         <Link
                                             href={`/articles/${article.id}`}
                                             className="text-blue-600 hover:underline mt-2 inline-block"
                                         >
                                             Read more →
                                         </Link>
+
+                                        {/* ❤️ Tombol Like */}
+                                        <div className="mt-3 flex items-center gap-3">
+                                            <Toggle
+                                                pressed={liked}
+                                                onPressedChange={() =>
+                                                    handleLike(article.id)
+                                                }
+                                                size="lg"
+                                                variant="outline"
+                                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
+                                            >
+                                                <Heart className="w-5 h-5" />
+                                            </Toggle>
+                                            <span className="text-sm text-gray-700">
+                                                {article.likes_count ?? 0}{" "}
+                                                {article.likes_count === 1
+                                                    ? "like"
+                                                    : "likes"}
+                                            </span>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             );

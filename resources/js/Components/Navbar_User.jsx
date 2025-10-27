@@ -63,12 +63,12 @@ export default function Navbar_User() {
                             <DropdownMenuItem disabled>
                                 My Campaign
                             </DropdownMenuItem>
-                            <DropdownMenuItem disabled>
-                                My Article
-                            </DropdownMenuItem>
                             <DropdownMenuItem>
-                                Liked Campaign
+                                <Link href="/articles/myArticles">
+                                    My Articles
+                                </Link>
                             </DropdownMenuItem>
+                            <DropdownMenuItem>Liked Campaign</DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                                 <Link href="/campaigns/create">

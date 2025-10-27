@@ -8,14 +8,16 @@ import { Inertia } from "@inertiajs/inertia";
 import { usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { inertia } from "framer-motion";
-import {  Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const scrollDonations = (data, idx) => {
     // maybe set the donation by the date
     return (
-        <Card key={idx} className="w-[300px] h-[100px] mx-auto flex flex-row items-center justify-between px-4" >
-
+        <Card
+            key={idx}
+            className="w-[300px] h-[100px] mx-auto flex flex-row items-center justify-between px-4"
+        >
             <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-800 shrink-0">
                 <img
                     src="http://127.0.0.1:8000/images/boat.jpg"
@@ -25,18 +27,20 @@ const scrollDonations = (data, idx) => {
             </div>
 
             <div className="flex flex-col items-center text-right gap-1 flex-1">
-            <CardHeader className="flex text-center justify-center">
-                <CardTitle className="text-xl font-bold">
-                    {data.anonymous === 1 ? data.user.nickname : "anonymous"}
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="text-lg font-normal">
-                {"$" + data.amount + ",00"}
-            </CardContent>
+                <CardHeader className="flex text-center justify-center">
+                    <CardTitle className="text-xl font-bold">
+                        {data.anonymous === 1
+                            ? data.user.nickname
+                            : "anonymous"}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="text-lg font-normal">
+                    {"$" + data.amount + ",00"}
+                </CardContent>
             </div>
         </Card>
     );
-}
+};
 
 const contentDivider = (data, campaign) => {
     if (data === "About") {
@@ -68,14 +72,14 @@ const contentDivider = (data, campaign) => {
                 <p>{data}</p>
             </div>
         );
-    }else if (data === "Updates") {
+    } else if (data === "Updates") {
         return (
             // navigation bar on the side, with the updates on the inside  (make new table in xampp)
             <div>
                 <p>{data}</p>
             </div>
         );
-    }else if (data === "Donations") {
+    } else if (data === "Donations") {
         return (
             // get all of the donation this project has received
             <div>
@@ -83,20 +87,20 @@ const contentDivider = (data, campaign) => {
             </div>
         );
     }
-
-}
+};
 
 const tabsRepeater = (data, index) => {
     return (
         <>
             <TabsTrigger
                 value={index + 1}
-                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200">
+                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
+            >
                 {data}
             </TabsTrigger>
         </>
     );
-}
+};
 
 const tabsContentRepeater = (data, campaign, index) => {
     return (
@@ -109,19 +113,23 @@ const tabsContentRepeater = (data, campaign, index) => {
     );
 };
 
-
 export default function Create() {
-    const data = ["About","FAQ", "Updates", "Donations"]
+    const data = ["About", "FAQ", "Updates", "Donations"];
 
     const { campaign, donations, liked } = usePage().props;
-    const [like, setLike] = useState(liked)
-    const percentage = Math.round((campaign.collected_amount / campaign.goal_amount) * 100);
-
+    const [like, setLike] = useState(liked);
+    const percentage = Math.round(
+        (campaign.collected_amount / campaign.goal_amount) * 100
+    );
 
     const handleLikes = (id) => {
         setLike(!like);
-        Inertia.post('/campaigns/toggleLike', {campaign_id: id}, { onError: () => setLike(like) });
-    }
+        Inertia.post(
+            "/campaigns/toggleLike",
+            { campaign_id: id },
+            { onError: () => setLike(like) }
+        );
+    };
 
     return (
         <Layout_User>
@@ -132,7 +140,7 @@ export default function Create() {
             </h1>
             <Separator className="flex-1 bg-gray-400 h-[1px]" />
             <div className="flex-col flex gap-2 m-8">
-                <div className="flex-row flex gap-2 flex justify-center items-center ">
+                <div className="flex-row gap-2 flex justify-center items-center ">
                     {donations.length > 0 ? (
                         donations.map((donation) => scrollDonations(donation))
                     ) : (
