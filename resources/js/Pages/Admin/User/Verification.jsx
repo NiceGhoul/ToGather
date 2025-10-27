@@ -125,8 +125,7 @@ export const columns = [
         accessorKey: "id_photo",
         header: "ID Photo",
         cell: ({ row }) => {
-            const imagePath = row.original.images?.id_photo_path;
-            const imageUrl = imagePath ? `/storage/${imagePath}` : null;
+            const imageUrl = row.original.id_photo_url;
 
             return (
                 <div>
@@ -158,8 +157,7 @@ export const columns = [
         accessorKey: "selfie_with_id",
         header: "Selfie with ID",
         cell: ({ row }) => {
-            const imagePath = row.original.images?.selfie_with_id_path;
-            const imageUrl = imagePath ? `/storage/${imagePath}` : null;
+            const imageUrl = row.original.selfie_url;
 
             return (
                 <div>

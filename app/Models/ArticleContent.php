@@ -22,4 +22,9 @@ class ArticleContent extends Model
     {
         return $this->belongsTo(Article::class);
     }
+
+    public function image()
+    {
+        return $this->belongsTo(Image::class, 'content');
+    }
 }

@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
+    Route::get('/minio/{path}', [ArticleController::class, 'serveImage'])->where('path', '.*')->name('minio.serve');
 
 
 

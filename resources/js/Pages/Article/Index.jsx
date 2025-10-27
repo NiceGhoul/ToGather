@@ -123,9 +123,9 @@ export default function Index() {
                                     className="hover:shadow-md transition overflow-hidden"
                                 >
                                     {/* Thumbnail */}
-                                    {article.thumbnail && (
+                                    {article.thumbnail_url && (
                                         <img
-                                            src={`/storage/${article.thumbnail}`}
+                                            src={article.thumbnail_url}
                                             alt={article.title}
                                             className="w-full h-48 object-cover"
                                         />

@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\VerificationStatus;
 use App\Models\User;
-use App\Models\VerificationImage;
+use App\Models\Image;
 use App\Models\VerificationRequest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -46,8 +46,19 @@ class VerificationRequestFactory extends Factory
     {
         return $this->afterCreating(function (VerificationRequest $request) {
             // Create the associated verification images
-            VerificationImage::factory()->create([
-                'verification_request_id' => $request->id,
+            $idPhoto = Image::factory()->create([
+                'imageable_type' => VerificationRequest::class,
+                'imageable_id' => $request->id,
+            ]);
+            
+            $selfiePhoto = Image::factory()->create([
+                'imageable_type' => VerificationRequest::class,
+                'imageable_id' => $request->id,
+            ]);
+            
+            $request->update([
+                'id_photo' => $idPhoto->id,
+                'selfie_with_id' => $selfiePhoto->id,
             ]);
         });
     }

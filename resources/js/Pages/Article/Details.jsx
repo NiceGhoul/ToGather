@@ -20,14 +20,14 @@ export default function Show() {
         <Layout_User>
             <div className="w-full flex flex-col items-center py-10">
                 {/*Thumbnail*/}
-                {article.thumbnail && (
+                {article.thumbnail_url && (
                     <div className="w-full max-w-4xl h-[300px] rounded-xl overflow-hidden bg-gray-100 shadow-sm mb-8">
                         <img
-                            src={`/storage/${article.thumbnail}`}
+                            src={article.thumbnail_url}
                             alt={article.title}
                             className="w-full h-full object-cover object-center cursor-pointer"
                             onClick={() => {
-                                setModalImage(`/storage/${article.thumbnail}`);
+                                setModalImage(article.thumbnail_url);
                                 setShowModal(true);
                             }}
                         />
@@ -92,14 +92,14 @@ export default function Show() {
                                                     <div className="flex items-center justify-center h-full">
                                                         <div className="w-full max-w-[420px]">
                                                             <img
-                                                                src={`/storage/${block.content}`}
+                                                                src={block.image_url}
                                                                 alt={`Block ${
                                                                     index + 1
                                                                 }`}
                                                                 className="w-full h-64 object-contain rounded-md shadow-sm hover:scale-[1.02] transition-transform cursor-pointer"
                                                                 onClick={() => {
                                                                     setModalImage(
-                                                                        `/storage/${block.content}`
+                                                                        block.image_url
                                                                     );
                                                                     setShowModal(
                                                                         true

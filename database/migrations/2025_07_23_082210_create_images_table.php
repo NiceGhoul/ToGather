@@ -18,6 +18,12 @@ return new class extends Migration
             $table->string('imageable_type')->nullable();
             $table->timestamps();
         });
+        
+        // Add foreign keys to verification_requests after images table is created
+        Schema::table('verification_requests', function (Blueprint $table) {
+            $table->foreign('id_photo')->references('id')->on('images')->onDelete('set null');
+            $table->foreign('selfie_with_id')->references('id')->on('images')->onDelete('set null');
+        });
     }
 
     /**

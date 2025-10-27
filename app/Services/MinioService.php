@@ -31,6 +31,16 @@ class MinioService
 
     public function uploadVideo(UploadedFile $file, string $directory = 'videos'): string
     {
+        // Validate video file (100MB = 102400KB)
+        if ($file->getSize() > 102400 * 1024) {
+            throw new \Exception('Video file size exceeds 100MB limit');
+        }
+        
+        $allowedMimes = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-ms-wmv', 'video/x-flv', 'video/webm'];
+        if (!in_array($file->getMimeType(), $allowedMimes)) {
+            throw new \Exception('Invalid video format');
+        }
+        
         return $this->uploadFile($file, $directory);
     }
 
