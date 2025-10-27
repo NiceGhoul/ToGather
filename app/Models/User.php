@@ -92,6 +92,11 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    // user can likes many campaigns
+    public function likedItems(){
+        return $this->hasMany(Likes:: class);
+    }
+
 
     /**
      * Get the attributes that should be cast.

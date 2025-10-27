@@ -12,6 +12,7 @@ export default function Index() {
     const initialSearch = props.searchQuery || "";
     const [searchQuery, setSearchQuery] = useState(initialSearch);
 
+    // --- Handlers ---
     const handleFilterChange = (e) => {
         const newCategory = e.target.value;
         router.get("/articles/list", {
@@ -43,10 +44,11 @@ export default function Index() {
         <Layout_User>
             <div className="container mx-auto px-4 py-8 space-y-6">
                 <h1 className="text-3xl font-bold">All Articles</h1>
-                {/* Filter Bar */}
+
+                {/* Filter & Search Bar */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex flex-wrap gap-3 items-center">
-                        {/* Category */}
+                        {/* Category Filter */}
                         <select
                             value={selectedCategory}
                             onChange={handleFilterChange}
@@ -60,7 +62,7 @@ export default function Index() {
                             ))}
                         </select>
 
-                        {/* Sort */}
+                        {/* Sort Order */}
                         <select
                             value={sortOrder}
                             onChange={handleSortChange}
@@ -70,8 +72,9 @@ export default function Index() {
                             <option value="asc">Oldest First</option>
                         </select>
                     </div>
+
                     {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="flex gap-4">
+                    <form onSubmit={handleSearch} className="flex gap-2">
                         <input
                             type="text"
                             value={searchQuery}
@@ -93,7 +96,7 @@ export default function Index() {
                         ,{" "}
                         {sortOrder === "desc" ? "Newest First" : "Oldest First"}
                     </span>
-                    <br></br>
+                    <br />
                     <span className="font-medium">
                         {searchQuery && `Search: "${searchQuery}"`}
                     </span>
@@ -104,69 +107,76 @@ export default function Index() {
                     <p className="text-gray-500">No articles found.</p>
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {articles.map((article) => (
-                            <Card
-                                key={article.id}
-                                className="hover:shadow-md transition overflow-hidden"
-                            >
-                                {/* Thumbnail */}
-                                {article.thumbnail && (
-                                    <img
-                                        src={`/storage/${article.thumbnail}`}
-                                        alt={article.title}
-                                        className="w-full h-48 object-cover"
-                                    />
-                                )}
+                        {articles.map((article) => {
+                            // Ambil teks preview dari blok (1,1)
+                            const previewText =
+                                article.contents?.find(
+                                    (c) =>
+                                        c.type === "text" &&
+                                        c.order_x === 1 &&
+                                        c.order_y === 1
+                                )?.content || "";
 
-                                {/* PDF Preview (kalau ada attachment) */}
-                                {article.attachment && (
-                                    <iframe
-                                        src={`/storage/${article.attachment}`}
-                                        className="w-full h-64 border-t"
-                                        title={`Preview ${article.title}`}
-                                    ></iframe>
-                                )}
-
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-semibold">
-                                        {article.title}
-                                    </CardTitle>
-                                    <p className="text-sm text-gray-500">
-                                        by {article.user?.nickname ?? "Unknown"}{" "}
-                                        ·{" "}
-                                        {new Date(
-                                            article.created_at
-                                        ).toLocaleDateString()}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        {article.category ?? "Unknown"}
-                                    </p>
-                                </CardHeader>
-
-                                <CardContent>
-                                    {article.content ? (
-                                        <p className="text-gray-700 line-clamp-3">
-                                            {article.content
-                                                .replace(/(<([^>]+)>)/gi, "")
-                                                .slice(0, 150)}
-                                            ...
-                                        </p>
-                                    ) : (
-                                        <p className="text-gray-500 italic">
-                                            PDF-only article
-                                        </p>
+                            return (
+                                <Card
+                                    key={article.id}
+                                    className="hover:shadow-md transition overflow-hidden"
+                                >
+                                    {/* Thumbnail */}
+                                    {article.thumbnail && (
+                                        <img
+                                            src={`/storage/${article.thumbnail}`}
+                                            alt={article.title}
+                                            className="w-full h-48 object-cover"
+                                        />
                                     )}
 
-                                    {/* Link ke detail */}
-                                    <Link
-                                        href={`/articles/${article.id}`}
-                                        className="text-blue-600 hover:underline mt-2 inline-block"
-                                    >
-                                        Read more →
-                                    </Link>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                    <CardHeader>
+                                        <CardTitle className="text-lg font-semibold">
+                                            {article.title}
+                                        </CardTitle>
+                                        <p className="text-sm text-gray-500">
+                                            by{" "}
+                                            {article.user?.nickname ??
+                                                "Unknown"}{" "}
+                                            ·{" "}
+                                            {new Date(
+                                                article.created_at
+                                            ).toLocaleDateString()}
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            {article.category ?? "Unknown"}
+                                        </p>
+                                    </CardHeader>
+
+                                    <CardContent>
+                                        {previewText ? (
+                                            <p className="text-gray-700 line-clamp-3">
+                                                {previewText
+                                                    .replace(
+                                                        /(<([^>]+)>)/gi,
+                                                        ""
+                                                    )
+                                                    .slice(0, 150)}
+                                                ...
+                                            </p>
+                                        ) : (
+                                            <p className="text-gray-500 italic">
+                                                No preview text available
+                                            </p>
+                                        )}
+
+                                        {/* Link ke detail */}
+                                        <Link
+                                            href={`/articles/${article.id}`}
+                                            className="text-blue-600 hover:underline mt-2 inline-block"
+                                        >
+                                            Read more →
+                                        </Link>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                 )}
             </div>

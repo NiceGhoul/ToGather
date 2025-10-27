@@ -2,9 +2,28 @@ import { usePage, router } from "@inertiajs/react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
 import Popup from "@/Components/Popup";
+import { useState, useEffect } from "react";
 
 export default function ArticleRequestList() {
     const { articles } = usePage().props;
+
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [successPopupOpen, setSuccessPopupOpen] = useState(false);
+    const [successPopupMessage, setSuccessPopupMessage] = useState("");
+
+    const handleToggle = (id) => {
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(articles.map((a) => a.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
 
     const handleApprove = (id) => {
         router.post(`/admin/articles/${id}/approve`);
@@ -14,21 +33,121 @@ export default function ArticleRequestList() {
         router.post(`/admin/articles/${id}/reject`);
     };
 
-    const handleView = (id) => {
-        router.get(`/admin/articles/${id}/view`);
+    const handleBulkApprove = () => {
+        if (selectedIds.length === 0) return;
+        router.post(
+            "/admin/articles/bulk-approve",
+            { ids: selectedIds },
+            {
+                preserveState: true,
+                onSuccess: () => {
+                    setSuccessPopupMessage("Selected articles approved");
+                    setSuccessPopupOpen(true);
+                    setSelectedIds([]);
+                },
+                onError: (errors) => {
+                    console.error("Bulk approve error:", errors);
+                    setSuccessPopupMessage("Bulk approve failed");
+                    setSuccessPopupOpen(true);
+                },
+            }
+        );
     };
+
+    const handleBulkReject = () => {
+        if (selectedIds.length === 0) return;
+        router.post(
+            "/admin/articles/bulk-reject",
+            { ids: selectedIds },
+            {
+                preserveState: true,
+                onSuccess: () => {
+                    setSuccessPopupMessage("Selected articles rejected");
+                    setSuccessPopupOpen(true);
+                    setSelectedIds([]);
+                },
+                onError: (errors) => {
+                    console.error("Bulk reject error:", errors);
+                    setSuccessPopupMessage("Bulk reject failed");
+                    setSuccessPopupOpen(true);
+                },
+            }
+        );
+    };
+
+    // close popup then refresh list so UI stays in sync
+    const handleSuccessClose = () => {
+        setSuccessPopupOpen(false);
+        router.reload();
+    };
+
+    // optional auto-close after X ms (keeps UX snappy)
+    useEffect(() => {
+        if (!successPopupOpen) return;
+        const t = setTimeout(() => handleSuccessClose(), 2500);
+        return () => clearTimeout(t);
+    }, [successPopupOpen]);
 
     return (
         <Layout_Admin title="Article Requests">
+            {/* success popup */}
+            <Popup
+                triggerText=""
+                title={successPopupMessage}
+                description=""
+                confirmText="OK"
+                open={successPopupOpen}
+                onConfirm={handleSuccessClose}
+                onClose={handleSuccessClose}
+                triggerClass=""
+            />
+
             <div className="p-6">
                 <h1 className="text-2xl font-bold mb-4">
                     Pending Article Requests
                 </h1>
 
+                <div className="mb-4 flex items-center gap-3">
+                    <div className="text-sm">{selectedIds.length} selected</div>
+
+                    <Popup
+                        triggerText="Approve Selected"
+                        title="Approve Selected Articles?"
+                        description="This will approve all selected articles."
+                        confirmText="Yes, Approve"
+                        confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                        triggerClass="bg-green-600 hover:bg-green-700 text-white"
+                        disabledValue={selectedIds.length === 0}
+                        onConfirm={() => handleBulkApprove()}
+                    />
+
+                    <Popup
+                        triggerText="Reject Selected"
+                        title="Reject Selected Articles?"
+                        description="This will reject all selected articles."
+                        confirmText="Yes, Reject"
+                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                        triggerClass="bg-red-600 hover:bg-red-700 text-white"
+                        disabledValue={selectedIds.length === 0}
+                        onConfirm={() => handleBulkReject()}
+                    />
+                </div>
+
                 <table className="min-w-full border text-sm">
                     <thead>
                         <tr className="bg-gray-100 text-left">
-                            <th className="border px-4 py-2 hidden">#</th>
+                            <th className="border px-4 py-2">
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        articles.length > 0 &&
+                                        selectedIds.length === articles.length
+                                    }
+                                    onChange={(e) =>
+                                        handleSelectAll(e.target.checked)
+                                    }
+                                />
+                            </th>
                             <th className="border px-4 py-2">Title</th>
                             <th className="border px-4 py-2">Author</th>
                             <th className="border px-4 py-2">Category</th>
@@ -40,8 +159,12 @@ export default function ArticleRequestList() {
                         {articles.length > 0 ? (
                             articles.map((a, index) => (
                                 <tr key={a.id} className="hover:bg-gray-50">
-                                    <td className="border px-4 py-2 hidden text-gray-600">
-                                        {index + 1}
+                                    <td className="border px-4 py-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedIds.includes(a.id)}
+                                            onChange={() => handleToggle(a.id)}
+                                        />
                                     </td>
                                     <td className="border px-4 py-2 font-medium text-black">
                                         {a.title}
@@ -60,11 +183,16 @@ export default function ArticleRequestList() {
                                     <td className="border px-4 py-2 space-x-2">
                                         <div className="actionBtnContainer flex flex-row justify-center gap-3">
                                             <Button
-                                                onClick={() => handleView(a.id)}
+                                                onClick={() =>
+                                                    router.get(
+                                                        `/admin/articles/${a.id}/view`
+                                                    )
+                                                }
                                                 className="bg-purple-800 hover:bg-purple-700"
                                             >
                                                 View
                                             </Button>
+
                                             <Popup
                                                 triggerText="Approve"
                                                 title="Approve Article?"

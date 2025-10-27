@@ -20,11 +20,18 @@ class CampaignFactory extends Factory
      */
     public function definition(): array
     {
+        $startDate = $this->faker->dateTimeBetween('-2 month', '+1 month');
+        $endDate = $this->faker->dateTimeBetween($startDate, '+2 months');
+
         return [
             'user_id' => User::inRandomOrder()->first()->id,
             'verified_by' => null,
             'title' => $this->faker->sentence(rand(3, 7)),
             'goal_amount' => $this->faker->randomFloat(2, 1000, 100000),
+            'category' => $this->faker->randomElement(['Foods & Beverage', 'Beauty & Cosmetic', 'Clothes & Fashion', 'Services', 'Lifestyle',
+            'Logistics']),
+            'start_campaign' => $startDate,
+            'end_campaign' => $endDate,
             'status' => $this->faker->randomElement(CampaignStatus::cases()), // Use Enum
             'description' => $this->faker->paragraphs(rand(2, 5), true),
             'collected_amount' => $this->faker->randomFloat(2, 0, 50000),

@@ -4,22 +4,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePage } from "@inertiajs/react";
 
 export default function Layout_User({ children }) {
-  const page = usePage();
+    const page = usePage();
 
     return (
         <>
             <Navbar_User />
             <AnimatePresence mode="wait">
                 <motion.main
-                key={page.url} 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
+                    key={page.url}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="w-full max-w-none !p-0 !m-0 overflow-x-hidden overflow-y-hidden"
                 >
-                {children}
+                    {children}
                 </motion.main>
             </AnimatePresence>
         </>
-    );    
+    );
 }

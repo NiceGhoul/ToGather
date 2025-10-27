@@ -35,6 +35,56 @@ class LookupSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            // campaigns
+            [
+                'lookup_type' => 'CampaignCategory',
+                'lookup_code' => 'F&B',
+                'lookup_description' => 'category for create or filter',
+                'lookup_value' => 'Foods & Beverage',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+             [
+                'lookup_type' => 'CampaignCategory',
+                'lookup_code' => 'B&C',
+                'lookup_description' => 'category for create or filter',
+                'lookup_value' => 'Beauty & Cosmetic',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+             [
+                'lookup_type' => 'CampaignCategory',
+                'lookup_code' => 'C&F',
+                'lookup_description' => 'category for create or filter',
+                'lookup_value' => 'Clothes & Fashion',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+             [
+                'lookup_type' => 'CampaignCategory',
+                'lookup_code' => 'SERVICE',
+                'lookup_description' => 'category for create or filter',
+                'lookup_value' => 'Services',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+             [
+                'lookup_type' => 'CampaignCategory',
+                'lookup_code' => 'LIFE',
+                'lookup_description' => 'category for create or filter',
+                'lookup_value' => 'Lifestyle',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+             [
+                'lookup_type' => 'CampaignCategory',
+                'lookup_code' => 'LOG',
+                'lookup_description' => 'category for create or filter',
+                'lookup_value' => 'Logistics',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
         ]);
     }
 }

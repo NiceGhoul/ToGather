@@ -17,11 +17,9 @@ return new class extends Migration
                   ->constrained('users')
                   ->onDelete('cascade');
             $table->string('title');
-            $table->longText('content')->nullable();
             $table->string('thumbnail')->nullable();
             $table->string('category');
-            $table->string('attachment')->nullable();
-            $table->enum('status', ['pending', 'approved', 'disabled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'disabled', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

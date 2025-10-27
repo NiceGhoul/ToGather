@@ -26,11 +26,11 @@ class UserSeeder extends Seeder
         );
         // Regular User
         User::updateOrCreate(
-            ['email' => 'bas@email.com'],
+            ['email' => 'user@email.com'],
             [
-                'nickname' => 'bas',
-                'address' => 'bas home',
-                'password' => Hash::make('Bas1234'),
+                'nickname' => 'user',
+                'address' => 'user home',
+                'password' => Hash::make('User123123'),
                 'role' => 'user',
                 'status' => 'active',
             ]

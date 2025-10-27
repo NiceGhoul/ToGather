@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\User;
+use App\Models\ArticleContent;
+use App\Models\Comment;
+use App\Models\Image;
 
 class Article extends Model
 {
@@ -12,16 +16,19 @@ class Article extends Model
     protected $fillable = [
         'user_id',
         'title',
-        'content',
         'thumbnail',
         'category',
-        'attachment',
         'status',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function contents()
+    {
+        return $this->hasMany(ArticleContent::class);
     }
 
     // An Article can have many Comments
@@ -34,5 +41,10 @@ class Article extends Model
     public function images(): MorphMany
     {
         return $this->morphMany(Image::class, 'imageable');
+    }
+
+    // 1 article can have many likes
+    public function likes(){
+        return $this->morphMany(Likes::class, 'likes');
     }
 }
