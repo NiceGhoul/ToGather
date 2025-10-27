@@ -77,7 +77,7 @@ const sidebarNavItems = [
     },
     {
         title: "Transaction",
-        url: "#",
+        url: "/admin/transactions",
         icon: ArrowLeftRight,
     },
     {

@@ -102,5 +102,57 @@ class DonationController extends Controller
         return response()->json($campaigns);
     }
 
+    public function adminIndex()
+    {
+        $donations = Donation::with(['user', 'campaign'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
+        $stats = [
+            'total_count' => Donation::count(),
+            'total_amount' => Donation::sum('amount'),
+            'successful_count' => Donation::where('status', 'successful')->count(),
+            'pending_count' => Donation::where('status', 'pending')->count(),
+        ];
+
+        return Inertia::render('Admin/Transaction', [
+            'donations' => $donations,
+            'stats' => $stats,
+        ]);
+    }
+
+    public function midtransCallback(Request $request)
+    {
+        \Log::info('Midtrans callback received', $request->all());
+        
+        $serverKey = env('MIDTRANS_SERVER_KEY');
+        $hashed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
+        
+        if ($hashed !== $request->signature_key) {
+            \Log::error('Invalid Midtrans signature');
+            return response()->json(['message' => 'Invalid signature'], 403);
+        }
+
+        $orderId = $request->order_id;
+        $donationId = explode('-', $orderId)[1];
+        $donation = Donation::find($donationId);
+
+        if (!$donation) {
+            return response()->json(['message' => 'Donation not found'], 404);
+        }
+
+        $transactionStatus = $request->transaction_status;
+        
+        if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
+            $donation->update(['status' => 'successful']);
+            
+            // Update campaign collected amount
+            $campaign = $donation->campaign;
+            $campaign->increment('collected_amount', $donation->amount);
+        } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'expire' || $transactionStatus == 'failure') {
+            $donation->update(['status' => 'failed']);
+        }
+
+        return response()->json(['message' => 'OK']);
+    }
 }
