@@ -42,17 +42,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaigns/getList', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
     Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
-    Route::post('/campaigns/toggleLike',[CampaignController::class, 'ToggleLike'])->name('campaigns.toggleLikes');
+    Route::post('/campaigns/toggleLike', [CampaignController::class, 'ToggleLike'])->name('campaigns.toggleLikes');
     // Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
 
-    //===========
 
+    //articles routing
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
     Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
     Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
     Route::get('/minio/{path}', [ArticleController::class, 'serveImage'])->where('path', '.*')->name('minio.serve');
+    Route::post('/articles/{id}/like', [ArticleController::class, 'toggleLike'])->name('articles.toggleLike');
+
 
 
 

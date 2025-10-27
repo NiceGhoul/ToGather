@@ -41,23 +41,29 @@ class ArticleController extends Controller
                         });
                 });
             })
-            // Sort Order
+            ->withCount('likes')
             ->orderBy('created_at', $sortOrder)
-            ->get();
-            
-        // Transform articles to include image URLs
-        $articles->transform(function ($article) {
-            if ($article->thumbnailImage) {
-                $article->thumbnail_url = $article->thumbnailImage->url;
-            }
-            $article->contents->transform(function ($content) {
-                if ($content->type === 'image' && $content->image) {
-                    $content->image_url = $content->image->url;
+            ->get()
+            // Transform articles to include image URLs and like status
+            ->map(function ($article) {
+                // Add image URLs
+                if ($article->thumbnailImage) {
+                    $article->thumbnail_url = $article->thumbnailImage->url;
                 }
-                return $content;
+                $article->contents->transform(function ($content) {
+                    if ($content->type === 'image' && $content->image) {
+                        $content->image_url = $content->image->url;
+                    }
+                    return $content;
+                });
+                
+                // Add like status
+                $article->is_liked_by_user = auth()->check()
+                    ? $article->likes()->where('user_id', auth()->id())->exists()
+                    : false;
+                    
+                return $article;
             });
-            return $article;
-        });
 
         return inertia('Article/Index', [
             'articles' => $articles,
@@ -68,22 +74,35 @@ class ArticleController extends Controller
         ]);
     }
 
-    public function ToggleLike(Request $request)
+
+
+    public function toggleLike($id)
     {
+        $article = Article::findOrFail($id);
         $user = auth()->user();
-        $campaignId = $request->campaign_id;
 
-        $existing = $user->likedItems()->where('likes_id', $campaignId)->where('likes_type', Article::class)->first();
+        // check if user already liked
+        $existingLike = $article->likes()->where('user_id', $user->id)->first();
 
-        if ($existing) {
-            $existing->delete();
+        if ($existingLike) {
+            // if already like
+            $existingLike->delete();
+            $isLiked = false;
         } else {
-            $user->likedItems()->create([
-                'likes_id' => $campaignId,
-                'likes_type' => Article::class,
-            ]);
+            // if havent like
+            $article->likes()->create(['user_id' => $user->id]);
+            $isLiked = true;
         }
+
+        // count all like
+        $likeCount = $article->likes()->count();
+
+        return response()->json([
+            'isLiked' => $isLiked,
+            'likeCount' => $likeCount,
+        ]);
     }
+
 
 
 
@@ -241,8 +260,36 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article = Article::with(['user', 'contents.image', 'thumbnailImage'])
-            ->findOrFail($id, ['id', 'title', 'thumbnail', 'user_id', 'category', 'created_at']);
+        $article = Article::with(['user', 'contents.image', 'thumbnailImage', 'likes'])
+            ->withCount('likes')
+            ->findOrFail($id);
+
+        // Transform article to include image URLs and like status
+        if ($article->thumbnailImage) {
+            $article->thumbnail_url = $article->thumbnailImage->url;
+        }
+        $article->contents->transform(function ($content) {
+            if ($content->type === 'image' && $content->image) {
+                $content->image_url = $content->image->url;
+            }
+            return $content;
+        });
+        
+        // Add like status
+        $article->is_liked_by_user = auth()->check()
+            ? $article->likes()->where('user_id', auth()->id())->exists()
+            : false;
+
+        return inertia('Article/Details', [
+            'article' => $article,
+        ]);
+    }
+
+        // tambahkan properti baru untuk status like user
+        $article->is_liked_by_user = auth()->check()
+            ? $article->likes()->where('user_id', auth()->id())->exists()
+            : false;
+>>>>>>> main
 
         // Transform article to include image URLs
         if ($article->thumbnailImage) {
@@ -259,6 +306,28 @@ class ArticleController extends Controller
             'article' => $article,
         ]);
     }
+
+    public function showMyArticles(Request $request)
+    {
+        $user = auth()->user();
+
+        $articles = Article::with(['user', 'contents'])
+            ->where('user_id', $user->id)
+            ->withCount('likes')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($article) use ($user) {
+                $article->is_liked_by_user = $article->likes()
+                    ->where('user_id', $user->id)
+                    ->exists();
+                return $article;
+            });
+
+        return inertia('Article/MyArticle', [
+            'articles' => $articles,
+        ]);
+    }
+
 
 
 

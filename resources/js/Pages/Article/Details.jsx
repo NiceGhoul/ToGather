@@ -1,12 +1,16 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { usePage } from "@inertiajs/react";
 import { useState } from "react";
+import { Toggle } from "@/components/ui/toggle";
+import { Heart } from "lucide-react";
 
 export default function Show() {
     const { props } = usePage();
     const article = props.article;
     const [showModal, setShowModal] = useState(false);
     const [modalImage, setModalImage] = useState(null);
+    const [liked, setLiked] = useState(article.is_liked_by_user ?? false);
+    const [likeCount, setLikeCount] = useState(article.likes_count ?? 0);
 
     // Sort content blocks
     const sortedContents = article.contents
@@ -15,6 +19,28 @@ export default function Show() {
               return a.order_x - b.order_x;
           })
         : [];
+    // handle like toggle
+    const handleLike = async () => {
+        try {
+            const response = await fetch(`/articles/${article.id}/like`, {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                    Accept: "application/json",
+                },
+            });
+
+            const data = await response.json();
+
+            setLiked(data.isLiked);
+            setLikeCount(data.likeCount);
+        } catch (error) {
+            console.error("Error liking article:", error);
+        }
+    };
 
     return (
         <Layout_User>
@@ -34,12 +60,36 @@ export default function Show() {
                     </div>
                 )}
                 {/*Title*/}
-                <div className="w-full max-w-4xl text-left">
+                {/* Title + Author */}
+                <div className="w-full max-w-4xl text-left mb-4">
                     <h1 className="text-3xl font-bold mb-2">{article.title}</h1>
-                    <p className="text-gray-500 mb-6">
-                        by {article.user.nickname ?? "Unknown"} ·{" "}
-                        {new Date(article.created_at).toLocaleDateString()}
-                    </p>
+
+                    {/* Author + Like row */}
+                    <div className="flex items-center gap-3 text-gray-500 mb-6">
+                        {/* Info penulis di kanan */}
+                        <p className="ml-4">
+                            by {article.user?.nickname ?? "Unknown"} ·{" "}
+                            {new Date(article.created_at).toLocaleDateString()}
+                        </p>
+                        <div className="like justify-left ml-auto">
+                            <div className="flex items-center gap-2">
+                                <Toggle
+                                    pressed={liked}
+                                    onPressedChange={handleLike}
+                                    size="lg"
+                                    variant="outline"
+                                    className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
+                                >
+                                    <Heart className="w-5 h-5" />
+                                </Toggle>
+                                <span className="text-sm text-gray-700">
+                                    {likeCount}{" "}
+                                    {likeCount === 1 ? "like" : "likes"}
+                                </span>
+                            </div>
+                        </div>
+                        {/* ❤️ Tombol Like di sisi kiri */}
+                    </div>
                 </div>
 
                 {/*Content*/}
