@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\ArticleContent;
-
-
+use App\Models\Image;
 use App\Models\Lookup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller
 {
@@ -25,13 +25,13 @@ class ArticleController extends Controller
         $searchQuery = $request->query('search');
 
         // Main Query
-        $articles = Article::with(['user', 'contents'])
+        $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
             ->where('status', 'approved')
             // Filter Category
             ->when($filterCategory, function ($q) use ($filterCategory) {
                 $q->where('category', $filterCategory);
             })
-            // Filter Search Qeuery
+            // Filter Search Query
             ->when($searchQuery, function ($q) use ($searchQuery) {
                 $q->where(function ($qq) use ($searchQuery) {
                     $qq->where('title', 'like', "%{$searchQuery}%")
@@ -44,11 +44,24 @@ class ArticleController extends Controller
             ->withCount('likes')
             ->orderBy('created_at', $sortOrder)
             ->get()
-            // Tambahkan informasi apakah user sudah like
+            // Transform articles to include image URLs and like status
             ->map(function ($article) {
+                // Add image URLs
+                if ($article->thumbnailImage) {
+                    $article->thumbnail_url = $article->thumbnailImage->url;
+                }
+                $article->contents->transform(function ($content) {
+                    if ($content->type === 'image' && $content->image) {
+                        $content->image_url = $content->image->url;
+                    }
+                    return $content;
+                });
+                
+                // Add like status
                 $article->is_liked_by_user = auth()->check()
                     ? $article->likes()->where('user_id', auth()->id())->exists()
                     : false;
+                    
                 return $article;
             });
 
@@ -140,15 +153,21 @@ class ArticleController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
             'contents' => 'required|array|min:1',
             'contents.*.type' => 'required|in:text,image',
-            'contents.*.content' => 'nullable', //teks or image path
+            'contents.*.content' => 'nullable', //text or image path
             'contents.*.order_x' => 'required|integer',
             'contents.*.order_y' => 'required|integer',
         ]);
 
-        // Save Thumbnail
-        $thumbnailPath = null;
+        // Save Thumbnail to images table
+        $thumbnailImageId = null;
         if ($request->hasFile('thumbnail')) {
-            $thumbnailPath = $request->file('thumbnail')->store('articleThumbnail', 'public');
+            $thumbnailPath = $request->file('thumbnail')->store('article/thumbnail', 'minio');
+            $thumbnailImage = Image::create([
+                'path' => $thumbnailPath,
+                'imageable_id' => null, // Will be set after article creation
+                'imageable_type' => Article::class,
+            ]);
+            $thumbnailImageId = $thumbnailImage->id;
         }
 
         // Create Article
@@ -156,9 +175,14 @@ class ArticleController extends Controller
             'user_id' => auth()->id(),
             'title' => $validated['title'],
             'category' => $validated['category'],
-            'thumbnail' => $thumbnailPath,
+            'thumbnail' => $thumbnailImageId,
             'status' => 'pending',
         ]);
+
+        // Update thumbnail image with article ID
+        if ($thumbnailImageId) {
+            Image::where('id', $thumbnailImageId)->update(['imageable_id' => $article->id]);
+        }
 
         // Iterate every grid for content
         foreach ($request->input('contents') as $i => $block) {
@@ -166,11 +190,19 @@ class ArticleController extends Controller
 
             $contentValue = null;
 
-            // find image path, if type is image
+            // find image, if type is image
             if ($type === 'image' && $request->hasFile("contents.$i.content")) {
                 $file = $request->file("contents.$i.content");
-                $path = $file->store('articleImageContent', 'public');
-                $contentValue = $path;
+                $path = $file->store('article/image', 'minio');
+                
+                // Create image record
+                $image = Image::create([
+                    'path' => $path,
+                    'imageable_id' => $article->id,
+                    'imageable_type' => Article::class,
+                ]);
+                
+                $contentValue = $image->id;
             } else {
                 $contentValue = $block['content'] ?? null;
             }
@@ -205,9 +237,18 @@ class ArticleController extends Controller
                 @unlink($fullPath);
             }
         }
-        $path = $request->file('file')->store('articleImageContent', 'public');
+        $path = $request->file('file')->store('article/image', 'minio');
+        
+        // Create image record
+        $image = Image::create([
+            'path' => $path,
+            'imageable_id' => null, // Will be set when article is created
+            'imageable_type' => Article::class,
+        ]);
+        
         return response()->json([
-            'url' => asset('storage/' . $path),
+            'url' => Storage::disk('minio')->url($path),
+            'image_id' => $image->id,
         ]);
     }
 
@@ -219,11 +260,22 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article = Article::with(['user', 'contents', 'likes'])
+        $article = Article::with(['user', 'contents.image', 'thumbnailImage', 'likes'])
             ->withCount('likes')
             ->findOrFail($id);
 
-        // tambahkan properti baru untuk status like user
+        // Transform article to include image URLs and like status
+        if ($article->thumbnailImage) {
+            $article->thumbnail_url = $article->thumbnailImage->url;
+        }
+        $article->contents->transform(function ($content) {
+            if ($content->type === 'image' && $content->image) {
+                $content->image_url = $content->image->url;
+            }
+            return $content;
+        });
+        
+        // Add like status
         $article->is_liked_by_user = auth()->check()
             ? $article->likes()->where('user_id', auth()->id())->exists()
             : false;
@@ -237,12 +289,23 @@ class ArticleController extends Controller
     {
         $user = auth()->user();
 
-        $articles = Article::with(['user', 'contents'])
+        $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
             ->where('user_id', $user->id)
             ->withCount('likes')
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($article) use ($user) {
+                // Transform article to include image URLs
+                if ($article->thumbnailImage) {
+                    $article->thumbnail_url = $article->thumbnailImage->url;
+                }
+                $article->contents->transform(function ($content) {
+                    if ($content->type === 'image' && $content->image) {
+                        $content->image_url = $content->image->url;
+                    }
+                    return $content;
+                });
+                
                 $article->is_liked_by_user = $article->likes()
                     ->where('user_id', $user->id)
                     ->exists();
@@ -340,6 +403,18 @@ class ArticleController extends Controller
         return response()->json(['error' => 'No file uploaded'], 400);
     }
 
+    public function serveImage($path)
+    {
+        if (!Storage::disk('minio')->exists($path)) {
+            abort(404);
+        }
+        
+        $file = Storage::disk('minio')->get($path);
+        $mimeType = Storage::disk('minio')->mimeType($path);
+        
+        return response($file, 200)->header('Content-Type', $mimeType);
+    }
+
     public function adminIndex(Request $request)
     {
 
@@ -347,7 +422,7 @@ class ArticleController extends Controller
         $status = $request->query('status');
         $search = $request->query('search');
         if ($status === 'rejected') {
-            $articles = Article::with('user')
+            $articles = Article::with(['user', 'thumbnailImage'])
                 ->whereIn('status', ['rejected',])
                 ->when($category, fn($q) => $q->where('category', $category))
                 ->when($status, fn($q) => $q->where('status', $status))
@@ -359,7 +434,7 @@ class ArticleController extends Controller
                 ->orderByDesc('created_at')
                 ->get();
         } else {
-            $articles = Article::with('user')
+            $articles = Article::with(['user', 'thumbnailImage'])
                 ->whereIn('status', ['approved', 'disabled'])
                 ->when($category, fn($q) => $q->where('category', $category))
                 ->when($status, fn($q) => $q->where('status', $status))
@@ -406,10 +481,23 @@ class ArticleController extends Controller
         // Also order contents by row (order_y) then column (order_x) for predictable layout.
         $article = Article::with([
             'user',
+            'contents.image',
+            'thumbnailImage',
             'contents' => function ($q) {
                 $q->orderBy('order_y')->orderBy('order_x');
             },
         ])->findOrFail($id);
+
+        // Transform article to include image URLs
+        if ($article->thumbnailImage) {
+            $article->thumbnail_url = $article->thumbnailImage->url;
+        }
+        $article->contents->transform(function ($content) {
+            if ($content->type === 'image' && $content->image) {
+                $content->image_url = $content->image->url;
+            }
+            return $content;
+        });
 
         return inertia('Admin/Article/Article_View', [
             'article' => $article,
@@ -543,7 +631,7 @@ class ArticleController extends Controller
         DB::transaction(function () use ($request, $article, $validated) {
             // update thumbnail if provided
             if ($request->hasFile('thumbnail')) {
-                $path = $request->file('thumbnail')->store('articleThumbnail', 'public');
+                $path = $request->file('thumbnail')->store('article/thumbnail', 'minio');
                 $article->thumbnail = $path;
             }
 
@@ -562,7 +650,7 @@ class ArticleController extends Controller
 
                 if ($type === 'image' && $request->hasFile("contents.$i.content")) {
                     $file = $request->file("contents.$i.content");
-                    $path = $file->store('articleImageContent', 'public');
+                    $path = $file->store('article/image', 'minio');
                     $contentValue = $path;
                 } else {
                     // content may be a path string (existing) or HTML string for text

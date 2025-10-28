@@ -19,11 +19,7 @@ export default function ArticleView() {
             order_x: Number(c.order_x),
             order_y: Number(c.order_y),
             newFile: null, // File when replaced/added image
-            preview: c.content
-                ? c.content.startsWith("http")
-                    ? c.content
-                    : `/storage/${c.content}`
-                : null,
+            preview: c.image_url || null,
         }))
     );
 
@@ -356,11 +352,7 @@ export default function ArticleView() {
                 order_x: Number(c.order_x),
                 order_y: Number(c.order_y),
                 newFile: null,
-                preview: c.content
-                    ? c.content.startsWith("http")
-                        ? c.content
-                        : `/storage/${c.content}`
-                    : null,
+                preview: c.image_url || null,
             }))
         );
         setEditingMode(false);
@@ -716,20 +708,18 @@ export default function ArticleView() {
                 </div>
 
                 {/* Thumbnail */}
-                {article.thumbnail && (
+                {article.thumbnail_url && (
                     <div>
                         <h2 className="text-lg font-semibold mb-2">
                             Thumbnail
                         </h2>
                         <div
                             onClick={() =>
-                                handleImageClick(
-                                    `/storage/${article.thumbnail}`
-                                )
+                                handleImageClick(article.thumbnail_url)
                             }
                         >
                             <img
-                                src={`/storage/${article.thumbnail}`}
+                                src={article.thumbnail_url}
                                 alt="Thumbnail"
                                 className="max-w-sm rounded-lg border shadow"
                             />
@@ -826,13 +816,7 @@ export default function ArticleView() {
                                                         className="w-full max-w-[320px] cursor-pointer"
                                                         onClick={() =>
                                                             handleImageClick(
-                                                                block.preview ||
-                                                                    (block.content &&
-                                                                        (block.content.startsWith(
-                                                                            "http"
-                                                                        )
-                                                                            ? block.content
-                                                                            : `/storage/${block.content}`))
+                                                                block.preview || block.image_url
                                                             )
                                                         }
                                                     >
@@ -844,15 +828,9 @@ export default function ArticleView() {
                                                                 alt={`Block ${x},${y}`}
                                                                 className="w-full h-48 object-cover rounded-md"
                                                             />
-                                                        ) : block.content ? (
+                                                        ) : block.image_url ? (
                                                             <img
-                                                                src={
-                                                                    block.content.startsWith(
-                                                                        "http"
-                                                                    )
-                                                                        ? block.content
-                                                                        : `/storage/${block.content}`
-                                                                }
+                                                                src={block.image_url}
                                                                 alt={`Block ${x},${y}`}
                                                                 className="w-full h-48 object-cover rounded-md"
                                                             />

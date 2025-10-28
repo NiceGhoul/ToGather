@@ -46,6 +46,11 @@ class Article extends Model
         return $this->morphMany(Image::class, 'imageable');
     }
 
+    public function thumbnailImage()
+    {
+        return $this->belongsTo(Image::class, 'thumbnail');
+    }
+
     // 1 article can have many likes
     public function likes()
     {

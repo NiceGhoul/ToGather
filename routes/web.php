@@ -5,6 +5,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationRequestController;
 use App\Models\VerificationRequest;
@@ -53,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
     Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
+    Route::get('/minio/{path}', [ArticleController::class, 'serveImage'])->where('path', '.*')->name('minio.serve');
     Route::post('/articles/{id}/like', [ArticleController::class, 'toggleLike'])->name('articles.toggleLike');
 
 
@@ -76,11 +78,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
     Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
     Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
+    
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Video upload and retrieval
 Route::post('/api/upload-video', [FileController::class, 'uploadVideo'])->name('api.upload.video');
 Route::get('/api/get-video', [FileController::class, 'getVideo'])->name('api.get.video');
+
+// Midtrans webhook
+Route::post('/midtrans/callback', [DonationController::class, 'midtransCallback'])->name('midtrans.callback');
 
 
 // --- Admin Routes ---
@@ -116,4 +126,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/lookups/store', [LookupController::class, 'store'])->name('lookups.store');
     Route::post('/lookups/update/{id}', [LookupController::class, 'update'])->name('lookups.update');
     Route::post('/lookups/delete/{id}', [LookupController::class, 'destroy'])->name('lookups.destroy');
+    
+    Route::get('/transactions', [DonationController::class, 'adminIndex'])->name('transactions.index');
 });

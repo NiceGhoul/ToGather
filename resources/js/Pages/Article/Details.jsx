@@ -470,12 +470,16 @@ export default function Details() {
                 </div>
 
                 {/* Thumbnail */}
-                {article.thumbnail && (
+                {article.thumbnail_url && (
                     <div className="w-full max-w-4xl h-[300px] rounded-xl overflow-hidden bg-gray-100 shadow-sm mb-8">
                         <img
-                            src={`/storage/${article.thumbnail}`}
+                            src={article.thumbnail_url}
                             alt={article.title}
-                            className="w-full h-full object-cover object-center"
+                            className="w-full h-full object-cover object-center cursor-pointer"
+                            onClick={() => {
+                                setModalImage(article.thumbnail_url);
+                                setShowModal(true);
+                            }}
                         />
                     </div>
                 )}
@@ -505,6 +509,85 @@ export default function Details() {
                                 {likeCount} {likeCount === 1 ? "like" : "likes"}
                             </span>
                         </div>
+                {/*Content*/}
+                <div className="w-full max-w-4xl">
+                    {sortedContents.length > 0 ? (
+                        (() => {
+                            const maxX = Math.max(
+                                ...sortedContents.map((b) => b.order_x)
+                            );
+                            const maxY = Math.max(
+                                ...sortedContents.map((b) => b.order_y)
+                            );
+                            const cells = [];
+
+                            for (let y = 1; y <= maxY; y++) {
+                                for (let x = 1; x <= maxX; x++) {
+                                    const block = sortedContents.find(
+                                        (b) =>
+                                            b.order_x === x && b.order_y === y
+                                    );
+                                    cells.push({ x, y, block });
+                                }
+                            }
+
+                            return (
+                                <div
+                                    className="grid w-full gap-6 mb-8"
+                                    style={{
+                                        gridTemplateColumns: `repeat(${maxX}, minmax(0, 1fr))`,
+                                    }}
+                                >
+                                    {cells.map(({ x, y, block }, index) => (
+                                        <div
+                                            key={`${y}-${x}`}
+                                            className="w-full rounded-md p-2 overflow-hidden break-words"
+                                            style={{
+                                                gridColumnStart: x,
+                                                gridRowStart: y,
+                                            }}
+                                        >
+                                            {block ? (
+                                                block.type === "text" ? (
+                                                    <div
+                                                        className="prose max-w-none text-justify"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: block.content,
+                                                        }}
+                                                    ></div>
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-full">
+                                                        <div className="w-full max-w-[420px]">
+                                                            <img
+                                                                src={block.image_url}
+                                                                alt={`Block ${
+                                                                    index + 1
+                                                                }`}
+                                                                className="w-full h-64 object-contain rounded-md shadow-sm hover:scale-[1.02] transition-transform cursor-pointer"
+                                                                onClick={() => {
+                                                                    setModalImage(
+                                                                        block.image_url
+                                                                    );
+                                                                    setShowModal(
+                                                                        true
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            ) : (
+                                                <div className="min-h-[100px]"></div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()
+                    ) : (
+                        <p className="text-gray-500 italic mb-6 text-center">
+                            This article has no content blocks.
+                        </p>
                     )}
                 </div>
 

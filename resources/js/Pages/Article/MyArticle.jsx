@@ -67,9 +67,9 @@ export default function MyArticle({ articles = [] }) {
                                 key={article.id}
                                 className="hover:shadow-md transition overflow-hidden flex flex-col h-full"
                             >
-                                {article.thumbnail && (
+                                {article.thumbnail_url && (
                                     <img
-                                        src={`/storage/${article.thumbnail}`}
+                                        src={article.thumbnail_url}
                                         alt={article.title}
                                         className="w-full h-48 object-cover"
                                     />

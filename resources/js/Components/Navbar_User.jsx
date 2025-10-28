@@ -1,5 +1,6 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -44,15 +45,13 @@ export default function Navbar_User() {
                     </span>
 
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 focus:outline-none">
-                            <img
-                                src={
-                                    auth?.user?.profile_url ??
-                                    "https://via.placeholder.com/40"
-                                }
-                                alt="Profile"
-                                className="w-full h-full object-cover"
-                            />
+                        <DropdownMenuTrigger className="focus:outline-none">
+                            <Avatar className="h-10 w-10">
+                                <AvatarImage src={auth?.user?.avatar} />
+                                <AvatarFallback>
+                                    {auth?.user?.nickname?.charAt(0)?.toUpperCase()}
+                                </AvatarFallback>
+                            </Avatar>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>

@@ -1,0 +1,336 @@
+import { Head, router, useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import Layout_User from '@/Layouts/Layout_User';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { 
+    User, 
+    Mail, 
+    Phone, 
+    MapPin, 
+    Calendar,
+    Heart,
+    Target,
+    DollarSign,
+    Edit,
+    Settings,
+    LogOut,
+    AlertCircle,
+    Shield
+} from 'lucide-react';
+
+export default function Show({ auth, user, stats, verificationStatus, verificationRequest }) {
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    
+    const { data, setData, put, processing, errors, reset } = useForm({
+        nickname: user.nickname || '',
+        current_password: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        }).format(amount);
+    };
+    
+    const handleLogout = () => {
+        router.post("/logout");
+    };
+
+    const handleEditSubmit = (e) => {
+        e.preventDefault();
+        put('/profile/update', {
+            onSuccess: () => {
+                setIsEditOpen(false);
+                reset();
+            }
+        });
+    };
+
+    return (
+        <Layout_User>
+            <Head title="Profile" />
+            
+            <div className="bg-gray-50 py-8">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    {/* Header Section */}
+                    <Card className="mb-8">
+                        <CardContent className="pt-6">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                                <Avatar className="h-24 w-24">
+                                    <AvatarImage src={user.avatar} />
+                                    <AvatarFallback className="text-2xl">
+                                        {user.nickname?.charAt(0)?.toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                
+                                <div className="flex-1 text-center sm:text-left">
+                                    <h1 className="text-3xl font-bold text-gray-900">{user.nickname}</h1>
+                                    <p className="text-gray-600 mt-1">{user.email}</p>
+                                    <div className="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start">
+                                        <Badge variant="secondary">{user.role}</Badge>
+                                        <Badge variant="outline">Member since {new Date(user.created_at).getFullYear()}</Badge>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        onClick={() => setIsEditOpen(true)}
+                                    >
+                                        <Edit className="h-4 w-4 mr-2" />
+                                        Edit Profile
+                                    </Button>
+                                    <Button variant="outline" size="sm">
+                                        <Settings className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Verification Notice */}
+                    {(!verificationRequest || verificationRequest?.status === 'rejected') && (
+                        <Card className="mb-8 border-amber-200 bg-amber-50">
+                            <CardContent>
+                                <div className="flex items-center gap-4">
+                                    <AlertCircle className="h-8 w-8 text-amber-600" />
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-amber-900">Verification Required</h3>
+                                        <p className="text-sm text-amber-700 mt-1">
+                                            You need to complete verification to create campaigns and articles.
+                                        </p>
+                                    </div>
+                                    <Button 
+                                        onClick={() => router.visit('/verification/create')}
+                                        className="bg-amber-600 hover:bg-amber-700"
+                                    >
+                                        <Shield className="h-4 w-4 mr-2" />
+                                        Get Verified
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
+                                <Heart className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats?.donations_count || 0}</div>
+                                <p className="text-xs text-muted-foreground">
+                                    {formatCurrency(stats?.total_donated || 0)} donated
+                                </p>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Campaigns Created</CardTitle>
+                                <Target className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats?.campaigns_count || 0}</div>
+                                <p className="text-xs text-muted-foreground">
+                                    {stats?.active_campaigns || 0} active
+                                </p>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Raised</CardTitle>
+                                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {formatCurrency(stats?.total_raised || 0)}
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    From your campaigns
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Profile Information */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Profile Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <User className="h-5 w-5 text-gray-400" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">Nickname</p>
+                                            <p className="text-sm text-gray-600">{user.nickname}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3">
+                                        <Mail className="h-5 w-5 text-gray-400" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">Email</p>
+                                            <p className="text-sm text-gray-600">{user.email}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3">
+                                        <Shield className="h-5 w-5 text-gray-400" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">Verification Status</p>
+                                            <div className="flex items-center gap-2">
+                                                {verificationRequest?.status === 'accepted' && (
+                                                    <Badge variant="default" className="bg-green-100 text-green-800 px-3 py-1 text-sm font-medium">Verified</Badge>
+                                                )}
+                                                {verificationRequest?.status === 'pending' && (
+                                                    <Badge variant="secondary" className="px-3 py-1 text-sm font-medium">Pending</Badge>
+                                                )}
+                                                {verificationRequest?.status === 'rejected' && (
+                                                    <Badge variant="destructive" className="px-3 py-1 text-sm font-medium">Rejected</Badge>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <MapPin className="h-5 w-5 text-gray-400" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">Location</p>
+                                            <p className="text-sm text-gray-600">{user.address || 'Not provided'}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3">
+                                        <Calendar className="h-5 w-5 text-gray-400" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-900">Member Since</p>
+                                            <p className="text-sm text-gray-600">
+                                                {new Date(user.created_at).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="flex justify-end gap-3">
+                                <Button variant="outline">
+                                    <Settings className="h-4 w-4 mr-2" />
+                                    Account Settings
+                                </Button>
+                                <Button variant="destructive" onClick={handleLogout}>
+                                    <LogOut className="h-4 w-4 mr-2" />
+                                    Logout
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+
+            {/* Edit Profile Dialog */}
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Edit Profile</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleEditSubmit} className="space-y-4">
+                        <div>
+                            <Label htmlFor="nickname">Nickname</Label>
+                            <Input
+                                id="nickname"
+                                value={data.nickname}
+                                onChange={(e) => setData('nickname', e.target.value)}
+                                className="mt-1"
+                            />
+                            {errors.nickname && (
+                                <p className="text-sm text-red-600 mt-1">{errors.nickname}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="current_password">Current Password</Label>
+                            <Input
+                                id="current_password"
+                                type="password"
+                                value={data.current_password}
+                                onChange={(e) => setData('current_password', e.target.value)}
+                                className="mt-1"
+                            />
+                            {errors.current_password && (
+                                <p className="text-sm text-red-600 mt-1">{errors.current_password}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="password">New Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                className="mt-1"
+                            />
+                            {errors.password && (
+                                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="password_confirmation">Confirm New Password</Label>
+                            <Input
+                                id="password_confirmation"
+                                type="password"
+                                value={data.password_confirmation}
+                                onChange={(e) => setData('password_confirmation', e.target.value)}
+                                className="mt-1"
+                            />
+                            {errors.password_confirmation && (
+                                <p className="text-sm text-red-600 mt-1">{errors.password_confirmation}</p>
+                            )}
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-4">
+                            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                {processing ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </Layout_User>
+    );
+}

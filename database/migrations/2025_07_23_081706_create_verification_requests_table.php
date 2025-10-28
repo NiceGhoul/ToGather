@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->unsignedBigInteger('id_photo')->nullable();
+            $table->unsignedBigInteger('selfie_with_id')->nullable();
             $table->timestamps();
         });
     }
