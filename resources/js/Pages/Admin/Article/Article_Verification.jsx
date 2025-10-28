@@ -185,7 +185,7 @@ export default function ArticleRequestList() {
                                             <Button
                                                 onClick={() =>
                                                     router.get(
-                                                        `/admin/articles/${a.id}/view`
+                                                        `/admin/articles/${a.id}/view?from=verification`
                                                     )
                                                 }
                                                 className="bg-purple-800 hover:bg-purple-700"

@@ -268,10 +268,53 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Article $article)
+    public function userUpdate(Request $request, $id)
     {
-        //
+        $article = Article::where('id', $id)
+            ->where('user_id', auth()->id()) // pastikan hanya owner
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'contents' => 'required|array|min:1',
+            'contents.*.type' => 'required|in:text,image',
+            'contents.*.content' => 'nullable',
+            'contents.*.order_x' => 'required|integer',
+            'contents.*.order_y' => 'required|integer',
+        ]);
+
+        DB::transaction(function () use ($request, $article, $validated) {
+            // reset status agar masuk review lagi
+            $article->update(['status' => 'pending']);
+
+            // hapus semua konten lama
+            $article->contents()->delete();
+
+            // simpan ulang konten baru
+            foreach ($request->input('contents', []) as $i => $block) {
+                $type = $block['type'];
+                $contentValue = null;
+
+                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+                    $file = $request->file("contents.$i.content");
+                    $path = $file->store('articleImageContent', 'public');
+                    $contentValue = $path;
+                } else {
+                    $contentValue = $block['content'] ?? null;
+                }
+
+                ArticleContent::create([
+                    'article_id' => $article->id,
+                    'type' => $type,
+                    'content' => $contentValue,
+                    'order_x' => $block['order_x'],
+                    'order_y' => $block['order_y'],
+                ]);
+            }
+        });
+
+        return back()->with('success', 'Your article has been updated and sent for review again!');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -389,10 +432,17 @@ class ArticleController extends Controller
         return back()->with('success', 'Article disabled!');
     }
 
-    public function adminReject($id)
+    public function adminReject(Request $request, $id)
     {
+        $request->validate([
+            'reason' => 'required|string|max:1000',
+        ]);
         $article = Article::findOrFail($id);
-        $article->update(['status' => 'rejected']);
+        $article->update([
+            'status' => 'rejected',
+            'rejected_reason' => $request->reason,
+            'rejected_at' => now(),
+        ]);
 
         return back()->with('success', 'Article rejected!');
     }

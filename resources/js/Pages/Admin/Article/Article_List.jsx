@@ -60,7 +60,7 @@ export default function Article_List() {
     };
 
     const handleView = (id) => {
-        router.get(`/admin/articles/${id}/view`);
+        router.get(`/admin/articles/${id}/view?from=list`);
     };
     const handleEnable = (id) => {
         router.post(`/admin/articles/${id}/approve`);

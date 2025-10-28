@@ -25,6 +25,7 @@ export default function Popup({
     showCancel = true,
     open: controlledOpen, // new prop for programmatic control
     onClose, // new callback when dialog is closed
+    children, // ✅ tambahkan ini!
 }) {
     const [open, setOpen] = useState(false);
 
@@ -85,9 +86,15 @@ export default function Popup({
                         {description}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
+
+                {/* ✅ Tambahan children agar konten custom (misalnya textarea) muncul */}
+                {typeof children !== "undefined" && (
+                    <div className="py-2">{children}</div>
+                )}
+
                 <AlertDialogFooter>
                     {showCancel && (
-                        <AlertDialogCancel> {cancelText} </AlertDialogCancel>
+                        <AlertDialogCancel>{cancelText}</AlertDialogCancel>
                     )}
                     <AlertDialogAction
                         onClick={handleConfirm}

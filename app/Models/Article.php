@@ -19,6 +19,9 @@ class Article extends Model
         'thumbnail',
         'category',
         'status',
+        'rejected_reason',
+        'rejected_at',
+        'resubmitted_at',
     ];
 
     public function user()
@@ -44,7 +47,8 @@ class Article extends Model
     }
 
     // 1 article can have many likes
-    public function likes(){
+    public function likes()
+    {
         return $this->morphMany(Likes::class, 'likes');
     }
 }

@@ -6,7 +6,8 @@ import Cropper from "react-easy-crop";
 import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 
 export default function ArticleView() {
-    const { article } = usePage().props;
+    const { article, url } = usePage().props;
+    const from = new URL(window.location.href).searchParams.get("from");
 
     // UI / control state
     const [editingMode, setEditingMode] = useState(false); // global edit toggle
@@ -49,9 +50,20 @@ export default function ArticleView() {
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
+    // reject modal state
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
+    const [rejectReason, setRejectReason] = useState("");
+
     const handleImageClick = (imageUrl) => setSelectedImage(imageUrl);
     const handleCloseModal = () => setSelectedImage(null);
-    const handleBack = () => window.history.back();
+
+    const handleBack = () => {
+        if (from === "verification") {
+            router.get("/admin/articles/requests");
+        } else {
+            router.get("/admin/articles/list");
+        }
+    };
 
     const handleEnable = (id) => router.post(`/admin/articles/${id}/approve`);
     const handleDisable = (id) => router.post(`/admin/articles/${id}/disable`);
@@ -76,7 +88,26 @@ export default function ArticleView() {
     };
 
     const handleApprove = (id) => router.post(`/admin/articles/${id}/approve`);
-    const handleReject = (id) => router.post(`/admin/articles/${id}/reject`);
+    const handleReject = (id, reason) => {
+        router.post(
+            `/admin/articles/${id}/reject`,
+            { reason },
+            {
+                onSuccess: () => {
+                    setRejectModalOpen(false);
+                    setRejectReason("");
+                    setSuccessPopupMessage("Article rejected successfully!");
+                    setPopupType("reject");
+                    setSuccessPopupOpen(true);
+                },
+                onError: () => {
+                    setSuccessPopupMessage("Failed to reject article");
+                    setPopupType("reject-fail");
+                    setSuccessPopupOpen(true);
+                },
+            }
+        );
+    };
 
     // caret helper (used when editing text block)
     const placeCaretAtEnd = (el) => {
@@ -485,6 +516,7 @@ export default function ArticleView() {
                         } else if (popupType === "update") {
                             setEditingMode(false);
                             router.reload(); // stay di halaman view
+                        } else if (popupType === "reject-fail") {
                         }
                     }}
                     onClose={() => {
@@ -494,6 +526,7 @@ export default function ArticleView() {
                         } else if (popupType === "update") {
                             setEditingMode(false);
                             router.reload();
+                        } else if (popupType === "reject-fail") {
                         }
                     }}
                 />
@@ -565,7 +598,38 @@ export default function ArticleView() {
                             <strong>Category:</strong> {article.category}
                         </p>
                         <p>
-                            <strong>Status:</strong> {article.status}
+                            {article.status === "approved" && (
+                                <>
+                                    <strong>Status:</strong>{" "}
+                                    <span className="text-green-600 font-semibold">
+                                        Approved and Enabled
+                                    </span>
+                                </>
+                            )}
+                            {article.status === "pending" && (
+                                <>
+                                    <strong>Status:</strong>{" "}
+                                    <span className="text-yellow-600 font-semibold">
+                                        Pending
+                                    </span>
+                                </>
+                            )}
+                            {article.status === "disabled" && (
+                                <>
+                                    <strong>Status:</strong>{" "}
+                                    <span className="text-yellow-600 font-semibold">
+                                        Disabled
+                                    </span>
+                                </>
+                            )}
+                            {article.status === "rejected" && (
+                                <>
+                                    <strong>Status:</strong>{" "}
+                                    <span className="text-red-600 font-semibold">
+                                        Rejected
+                                    </span>
+                                </>
+                            )}
                         </p>
                         <p>
                             <strong>Created At:</strong>{" "}
@@ -618,18 +682,34 @@ export default function ArticleView() {
                         )}
                         {article.status === "pending" && (
                             <>
+                                <Popup
+                                    triggerText="Approve"
+                                    title="Approve Article?"
+                                    description="This action cannot be undone. The article will be published and visible to users."
+                                    confirmText="Yes, Approve"
+                                    confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                    triggerClass="bg-green-600 hover:bg-green-700 text-white"
+                                    onConfirm={() => handleApprove(article.id)}
+                                />
                                 <Button
-                                    onClick={() => handleApprove(article.id)}
-                                    className="bg-green-600"
-                                >
-                                    Approve
-                                </Button>
-                                <Button
-                                    onClick={() => handleReject(article.id)}
-                                    className="bg-red-600"
+                                    onClick={() => setRejectModalOpen(true)}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
                                 >
                                     Reject
                                 </Button>
+                            </>
+                        )}
+                        {article.status === "rejected" && (
+                            <>
+                                <Popup
+                                    triggerText="Delete"
+                                    title="Delete Article?"
+                                    description="This action cannot be undone. The article will be permanently removed."
+                                    confirmText="Yes, Delete"
+                                    confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                    triggerClass="bg-red-600 hover:bg-red-700 text-white"
+                                    onConfirm={() => handleDelete(article.id)}
+                                />
                             </>
                         )}
                     </div>
@@ -872,6 +952,42 @@ export default function ArticleView() {
                     setPendingAction(null);
                 }}
             />
+            {rejectModalOpen && (
+                <Popup
+                    triggerText=""
+                    title="Reject Article"
+                    description=""
+                    confirmText="Submit Rejection"
+                    confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                    open={rejectModalOpen}
+                    onConfirm={() => {
+                        if (!rejectReason.trim()) {
+                            setSuccessPopupMessage("Please provide a reason.");
+                            setPopupType("reject-fail");
+                            setSuccessPopupOpen(true);
+                            return;
+                        }
+                        handleReject(article.id, rejectReason);
+                    }}
+                    onClose={() => {
+                        setRejectModalOpen(false);
+                        setRejectReason("");
+                    }}
+                >
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium mb-1">
+                            Reason for Rejection:
+                        </label>
+                        <textarea
+                            className="w-full border rounded-md p-2 text-sm"
+                            rows={4}
+                            placeholder="Write your reason here..."
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                        />
+                    </div>
+                </Popup>
+            )}
         </Layout_Admin>
     );
 }

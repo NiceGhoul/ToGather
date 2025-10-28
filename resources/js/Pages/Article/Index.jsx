@@ -176,7 +176,7 @@ export default function Index() {
                                         </p>
 
                                         <Link
-                                            href={`/articles/${article.id}`}
+                                            href={`/articles/${article.id}?from=articles_list`}
                                             className="text-blue-600 hover:underline mt-2 inline-block"
                                         >
                                             Read more →
