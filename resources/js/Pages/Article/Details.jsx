@@ -45,11 +45,7 @@ export default function Details() {
             order_x: Number(c.order_x),
             order_y: Number(c.order_y),
             newFile: null,
-            preview: c.content
-                ? c.content.startsWith("http")
-                    ? c.content
-                    : `/storage/${c.content}`
-                : null,
+            preview: c.image_url || null,
         }))
     );
     const [extraCols, setExtraCols] = useState(0);
@@ -64,6 +60,8 @@ export default function Details() {
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [modalImage, setModalImage] = useState(null);
 
     // ---------- TEXT EDIT ----------
     const [editingId, setEditingId] = useState(null);
@@ -293,11 +291,7 @@ export default function Details() {
                 order_x: Number(c.order_x),
                 order_y: Number(c.order_y),
                 newFile: null,
-                preview: c.content
-                    ? c.content.startsWith("http")
-                        ? c.content
-                        : `/storage/${c.content}`
-                    : null,
+                preview: c.image_url || null,
             }))
         );
         setEditingMode(false);
@@ -509,85 +503,6 @@ export default function Details() {
                                 {likeCount} {likeCount === 1 ? "like" : "likes"}
                             </span>
                         </div>
-                {/*Content*/}
-                <div className="w-full max-w-4xl">
-                    {sortedContents.length > 0 ? (
-                        (() => {
-                            const maxX = Math.max(
-                                ...sortedContents.map((b) => b.order_x)
-                            );
-                            const maxY = Math.max(
-                                ...sortedContents.map((b) => b.order_y)
-                            );
-                            const cells = [];
-
-                            for (let y = 1; y <= maxY; y++) {
-                                for (let x = 1; x <= maxX; x++) {
-                                    const block = sortedContents.find(
-                                        (b) =>
-                                            b.order_x === x && b.order_y === y
-                                    );
-                                    cells.push({ x, y, block });
-                                }
-                            }
-
-                            return (
-                                <div
-                                    className="grid w-full gap-6 mb-8"
-                                    style={{
-                                        gridTemplateColumns: `repeat(${maxX}, minmax(0, 1fr))`,
-                                    }}
-                                >
-                                    {cells.map(({ x, y, block }, index) => (
-                                        <div
-                                            key={`${y}-${x}`}
-                                            className="w-full rounded-md p-2 overflow-hidden break-words"
-                                            style={{
-                                                gridColumnStart: x,
-                                                gridRowStart: y,
-                                            }}
-                                        >
-                                            {block ? (
-                                                block.type === "text" ? (
-                                                    <div
-                                                        className="prose max-w-none text-justify"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: block.content,
-                                                        }}
-                                                    ></div>
-                                                ) : (
-                                                    <div className="flex items-center justify-center h-full">
-                                                        <div className="w-full max-w-[420px]">
-                                                            <img
-                                                                src={block.image_url}
-                                                                alt={`Block ${
-                                                                    index + 1
-                                                                }`}
-                                                                className="w-full h-64 object-contain rounded-md shadow-sm hover:scale-[1.02] transition-transform cursor-pointer"
-                                                                onClick={() => {
-                                                                    setModalImage(
-                                                                        block.image_url
-                                                                    );
-                                                                    setShowModal(
-                                                                        true
-                                                                    );
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )
-                                            ) : (
-                                                <div className="min-h-[100px]"></div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            );
-                        })()
-                    ) : (
-                        <p className="text-gray-500 italic mb-6 text-center">
-                            This article has no content blocks.
-                        </p>
                     )}
                 </div>
 
@@ -666,10 +581,7 @@ export default function Details() {
                                         )
                                     ) : (
                                         <img
-                                            src={
-                                                block.preview ||
-                                                `/storage/${block.content}`
-                                            }
+                                            src={block.preview}
                                             alt={`Block ${x},${y}`}
                                             className="w-full h-64 object-cover rounded-md"
                                         />
@@ -765,6 +677,27 @@ export default function Details() {
                     setPendingAction(null);
                 }}
             />
+
+            {/* Image Modal Viewer */}
+            {showModal && modalImage && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                    onClick={() => setShowModal(false)}
+                >
+                    <img
+                        src={modalImage}
+                        alt="Full View"
+                        className="max-w-[95vw] max-h-[90vh] object-contain rounded-lg shadow-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                    <button
+                        className="absolute top-6 right-6 text-white text-3xl font-bold"
+                        onClick={() => setShowModal(false)}
+                    >
+                        &times;
+                    </button>
+                </div>
+            )}
         </Layout_User>
     );
 }
