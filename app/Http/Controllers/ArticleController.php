@@ -289,12 +289,23 @@ class ArticleController extends Controller
     {
         $user = auth()->user();
 
-        $articles = Article::with(['user', 'contents'])
+        $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
             ->where('user_id', $user->id)
             ->withCount('likes')
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($article) use ($user) {
+                // Transform article to include image URLs
+                if ($article->thumbnailImage) {
+                    $article->thumbnail_url = $article->thumbnailImage->url;
+                }
+                $article->contents->transform(function ($content) {
+                    if ($content->type === 'image' && $content->image) {
+                        $content->image_url = $content->image->url;
+                    }
+                    return $content;
+                });
+                
                 $article->is_liked_by_user = $article->likes()
                     ->where('user_id', $user->id)
                     ->exists();
