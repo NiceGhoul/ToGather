@@ -616,6 +616,19 @@ class ArticleController extends Controller
             'ids.*' => 'integer|distinct|exists:articles,id',
         ]);
 
+        $articles = Article::whereIn('id', $validated['ids'])->get();
+        
+        // Notify each user about their article approval
+        foreach ($articles as $article) {
+            NotificationController::notifyUser(
+                $article->user_id,
+                'article_approved',
+                'Article Approved',
+                "Your article '{$article->title}' has been approved and is now published!",
+                ['article_id' => $article->id]
+            );
+        }
+        
         Article::whereIn('id', $validated['ids'])->update(['status' => 'approved']);
 
         return back()->with('success', 'Selected articles approved!');
@@ -628,6 +641,19 @@ class ArticleController extends Controller
             'ids.*' => 'integer|distinct|exists:articles,id',
         ]);
 
+        $articles = Article::whereIn('id', $validated['ids'])->get();
+        
+        // Notify each user about their article being disabled
+        foreach ($articles as $article) {
+            NotificationController::notifyUser(
+                $article->user_id,
+                'article_disabled',
+                'Article Disabled',
+                "Your article '{$article->title}' has been disabled and is no longer visible to the public.",
+                ['article_id' => $article->id]
+            );
+        }
+        
         Article::whereIn('id', $validated['ids'])->update(['status' => 'disabled']);
 
         return back()->with('success', 'Selected articles disabled!');
@@ -640,6 +666,19 @@ class ArticleController extends Controller
             'ids.*' => 'integer|distinct|exists:articles,id',
         ]);
 
+        $articles = Article::whereIn('id', $validated['ids'])->get();
+        
+        // Notify each user about their article being rejected
+        foreach ($articles as $article) {
+            NotificationController::notifyUser(
+                $article->user_id,
+                'article_rejected',
+                'Article Rejected',
+                "Your article '{$article->title}' has been rejected during bulk review.",
+                ['article_id' => $article->id]
+            );
+        }
+        
         Article::whereIn('id', $validated['ids'])->update(['status' => 'rejected']);
 
         return back()->with('success', 'Selected articles rejected!');
