@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Http\Controllers\NotificationController;
 
 class VerificationRequestController extends Controller
 {
@@ -52,6 +53,25 @@ class VerificationRequestController extends Controller
         $verification->reviewed_by = $adminId;
 
         $verification->save();
+        
+        // Notify user about verification result
+        if ($validated['acceptance'] === 'accepted') {
+            NotificationController::notifyUser(
+                $user->id,
+                'verification_accepted',
+                'Verification Approved',
+                'Your verification request has been approved! You can now create campaigns and articles.',
+                ['verification_request_id' => $verification->id]
+            );
+        } else {
+            NotificationController::notifyUser(
+                $user->id,
+                'verification_rejected',
+                'Verification Rejected',
+                'Your verification request has been rejected. Please contact support for more information.',
+                ['verification_request_id' => $verification->id]
+            );
+        }
 
         return response()->json([
             'message' => "User status successfully updated to '{$verification->status->value}'."
@@ -136,6 +156,14 @@ class VerificationRequestController extends Controller
             // Update image records with verification request ID
             $idPhotoImage->update(['imageable_id' => $verificationRequest->id]);
             $selfieImage->update(['imageable_id' => $verificationRequest->id]);
+            
+            // Notify admins about new verification request
+            NotificationController::notifyAdmins(
+                'verification_request_created',
+                'New Verification Request',
+                "New verification request has been submitted by {$user->nickname} and is pending review.",
+                ['verification_request_id' => $verificationRequest->id, 'user_id' => $user->id]
+            );
             
             return redirect()->route('home')->with('success', 'Verification request submitted successfully.');
         } catch (\Exception $e) {

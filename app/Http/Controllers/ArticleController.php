@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\NotificationController;
 
 class ArticleController extends Controller
 {
@@ -113,6 +114,11 @@ class ArticleController extends Controller
     public function create()
     {
         $user = auth()->user();
+        
+        // Check if user is banned first
+        if ($user->status->value === 'banned' || $user->status === 'banned') {
+            return inertia('Verification/Banned');
+        }
 
         $verificationRequest = $user->verificationRequests()->latest()->first();
         if (!$verificationRequest) {
@@ -147,6 +153,11 @@ class ArticleController extends Controller
 
     public function store(Request $request)
     {
+        // Check if user is banned
+        if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
+            return back()->with('error', 'Your account has been banned. You cannot create articles.');
+        }
+        
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
@@ -216,6 +227,14 @@ class ArticleController extends Controller
             ]);
         }
 
+        // Notify admins about new article
+        NotificationController::notifyAdmins(
+            'article_created',
+            'New Article Submitted',
+            "New article '{$article->title}' has been submitted by {$article->user->nickname} and is pending review.",
+            ['article_id' => $article->id, 'user_id' => $article->user_id]
+        );
+        
         return redirect()
             ->route('articles.create')
             ->with('success', 'Article created successfully!');
@@ -375,6 +394,23 @@ class ArticleController extends Controller
             }
         });
 
+        // Notify user about article update
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_resubmitted',
+            'Article Resubmitted',
+            "Your article '{$article->title}' has been updated and resubmitted for review. It is now pending admin approval.",
+            ['article_id' => $article->id]
+        );
+        
+        // Notify admins about article update
+        NotificationController::notifyAdmins(
+            'article_updated',
+            'Article Updated',
+            "Article '{$article->title}' has been updated by {$article->user->nickname} and is pending review again.",
+            ['article_id' => $article->id, 'user_id' => $article->user_id]
+        );
+        
         return back()->with('success', 'Your article has been updated and sent for review again!');
     }
 
@@ -508,6 +544,15 @@ class ArticleController extends Controller
     {
         $article = Article::findOrFail($id);
         $article->update(['status' => 'approved']);
+        
+        // Notify user about article approval
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_approved',
+            'Article Approved',
+            "Your article '{$article->title}' has been approved and is now published!",
+            ['article_id' => $article->id]
+        );
 
         return back()->with('success', 'Article approved!');
     }
@@ -516,6 +561,15 @@ class ArticleController extends Controller
     {
         $article = Article::findOrFail($id);
         $article->update(['status' => 'disabled']);
+        
+        // Notify user about article being disabled
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_disabled',
+            'Article Disabled',
+            "Your article '{$article->title}' has been disabled and is no longer visible to the public.",
+            ['article_id' => $article->id]
+        );
 
         return back()->with('success', 'Article disabled!');
     }
@@ -531,6 +585,15 @@ class ArticleController extends Controller
             'rejected_reason' => $request->reason,
             'rejected_at' => now(),
         ]);
+        
+        // Notify user about article rejection
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_rejected',
+            'Article Rejected',
+            "Your article '{$article->title}' has been rejected. Reason: {$request->reason}",
+            ['article_id' => $article->id, 'reason' => $request->reason]
+        );
 
         return back()->with('success', 'Article rejected!');
     }

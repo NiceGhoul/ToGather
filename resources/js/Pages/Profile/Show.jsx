@@ -1,5 +1,5 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Layout_User from '@/Layouts/Layout_User';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,20 +24,31 @@ import {
     Target,
     DollarSign,
     Edit,
-    Settings,
     LogOut,
     AlertCircle,
-    Shield
+    Shield,
+    Camera,
+    Upload
 } from 'lucide-react';
 
 export default function Show({ auth, user, stats, verificationStatus, verificationRequest }) {
-    const [isEditOpen, setIsEditOpen] = useState(false);
+    // Debug: Log user data
+    console.log('User data:', user);
+    console.log('Profile image URL:', user.profile_image_url);
     
-    const { data, setData, put, processing, errors, reset } = useForm({
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [detailsModal, setDetailsModal] = useState({ open: false, type: '', data: [] });
+    const [profileImage, setProfileImage] = useState(null);
+    const [profileImagePreview, setProfileImagePreview] = useState(user.profile_image || null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    
+    const { data, setData, post, processing, errors, reset } = useForm({
         nickname: user.nickname || '',
         current_password: '',
         password: '',
         password_confirmation: '',
+        profile_image: null,
+        _method: 'PUT',
     });
 
     const formatCurrency = (amount) => {
@@ -51,14 +62,36 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
         router.post("/logout");
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setProfileImage(file);
+        setProfileImagePreview(URL.createObjectURL(file));
+        setData('profile_image', file);
+    };
+
     const handleEditSubmit = (e) => {
         e.preventDefault();
-        put('/profile/update', {
+        post('/profile/update', {
             onSuccess: () => {
                 setIsEditOpen(false);
                 reset();
+                setProfileImage(null);
+                // Refresh the page to show updated profile image
+                window.location.reload();
             }
         });
+    };
+
+    const fetchDetails = async (type) => {
+        try {
+            const response = await fetch(`/profile/${type}-details`);
+            const data = await response.json();
+            setDetailsModal({ open: true, type, data });
+        } catch (error) {
+            console.error('Error fetching details:', error);
+        }
     };
 
     return (
@@ -73,7 +106,7 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                         <CardContent className="pt-6">
                             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                                 <Avatar className="h-24 w-24">
-                                    <AvatarImage src={user.avatar} />
+                                    <AvatarImage src={user.profile_image_url} />
                                     <AvatarFallback className="text-2xl">
                                         {user.nickname?.charAt(0)?.toUpperCase()}
                                     </AvatarFallback>
@@ -97,16 +130,13 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                                         <Edit className="h-4 w-4 mr-2" />
                                         Edit Profile
                                     </Button>
-                                    <Button variant="outline" size="sm">
-                                        <Settings className="h-4 w-4" />
-                                    </Button>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Verification Notice */}
-                    {(!verificationRequest || verificationRequest?.status === 'rejected') && (
+                    {(!verificationRequest || verificationRequest?.status === 'rejected') && user.status !== 'banned' && (
                         <Card className="mb-8 border-amber-200 bg-amber-50">
                             <CardContent>
                                 <div className="flex items-center gap-4">
@@ -131,7 +161,7 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <Card>
+                        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('donations')}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
                                 <Heart className="h-4 w-4 text-muted-foreground" />
@@ -144,7 +174,7 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                             </CardContent>
                         </Card>
                         
-                        <Card>
+                        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('campaigns')}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Campaigns Created</CardTitle>
                                 <Target className="h-4 w-4 text-muted-foreground" />
@@ -157,7 +187,7 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                             </CardContent>
                         </Card>
                         
-                        <Card>
+                        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('raised')}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Total Raised</CardTitle>
                                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -244,10 +274,6 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                             <Separator />
                             
                             <div className="flex justify-end gap-3">
-                                <Button variant="outline">
-                                    <Settings className="h-4 w-4 mr-2" />
-                                    Account Settings
-                                </Button>
                                 <Button variant="destructive" onClick={handleLogout}>
                                     <LogOut className="h-4 w-4 mr-2" />
                                     Logout
@@ -265,6 +291,40 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                         <DialogTitle>Edit Profile</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit} className="space-y-4">
+                        {/* Profile Image Upload */}
+                        <div className="flex flex-col items-center space-y-4">
+                            <div className="relative">
+                                <Avatar className="h-20 w-20">
+                                    <AvatarImage src={profileImagePreview || user.profile_image_url} />
+                                    <AvatarFallback className="text-xl">
+                                        {user.nickname?.charAt(0)?.toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="absolute -bottom-2 -right-2">
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-8 w-8 rounded-full p-0"
+                                        onClick={() => document.getElementById('profile-image').click()}
+                                        disabled={processing}
+                                    >
+                                        <Camera className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <input
+                                id="profile-image"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                            <p className="text-xs text-gray-500 text-center">
+                                Click the camera icon to change your profile picture
+                            </p>
+                        </div>
+
                         <div>
                             <Label htmlFor="nickname">Nickname</Label>
                             <Input
@@ -329,6 +389,68 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                             </Button>
                         </div>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Details Modal */}
+            <Dialog open={detailsModal.open} onOpenChange={(open) => setDetailsModal({ ...detailsModal, open })}>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {detailsModal.type === 'donations' && 'Your Donations'}
+                            {detailsModal.type === 'campaigns' && 'Your Campaigns'}
+                            {detailsModal.type === 'raised' && 'Funds Raised by Campaign'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        {detailsModal.data.length === 0 ? (
+                            <p className="text-gray-500 text-center py-8">No data available</p>
+                        ) : (
+                            detailsModal.data.map((item, index) => (
+                                <div key={index} className="border rounded-lg p-4">
+                                    {detailsModal.type === 'donations' && (
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h4 className="font-semibold">{item.campaign_title}</h4>
+                                                <p className="text-sm text-gray-600">{new Date(item.created_at).toLocaleDateString()}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="font-bold text-green-600">{formatCurrency(item.amount)}</p>
+                                                <p className="text-xs text-gray-500">{item.status}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {detailsModal.type === 'campaigns' && (
+                                        <div>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h4 className="font-semibold">{item.title}</h4>
+                                                <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>
+                                                    {item.status}
+                                                </Badge>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mb-2">{item.description?.substring(0, 100)}...</p>
+                                            <div className="flex justify-between text-sm">
+                                                <span>Target: {formatCurrency(item.target_amount)}</span>
+                                                <span>Raised: {formatCurrency(item.current_amount || 0)}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {detailsModal.type === 'raised' && (
+                                        <div>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h4 className="font-semibold">{item.title}</h4>
+                                                <p className="font-bold text-green-600">{formatCurrency(item.total_raised)}</p>
+                                            </div>
+                                            <div className="flex justify-between text-sm text-gray-600">
+                                                <span>{item.donors_count} donors</span>
+                                                <span>{((item.total_raised / item.target_amount) * 100).toFixed(1)}% of target</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </DialogContent>
             </Dialog>
         </Layout_User>

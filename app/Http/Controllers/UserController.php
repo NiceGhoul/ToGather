@@ -13,13 +13,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use App\Http\Controllers\NotificationController;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
         $users = User::query()
-            ->with('profileImage')
+            ->with('images')
             ->when($request->input('status'), function ($query, $status) {
                 return $query->where('status', 'like', $status);
             })
@@ -33,12 +34,32 @@ class UserController extends Controller
     public function block(User $user)
     {
         $user->update(['status' => 'banned']);
+        
+        // Notify user about ban
+        NotificationController::notifyUser(
+            $user->id,
+            'account_banned',
+            'Account Banned',
+            'Your account has been banned. You cannot create new articles or campaigns. Please contact support for more information.',
+            ['user_id' => $user->id]
+        );
+        
         return back()->with('success', 'User has been banned.');
     }
 
     public function unblock(User $user)
     {
         $user->update(['status' => 'active']);
+        
+        // Notify user about unban
+        NotificationController::notifyUser(
+            $user->id,
+            'account_unbanned',
+            'Account Restored',
+            'Your account has been restored. You can now create articles and campaigns again.',
+            ['user_id' => $user->id]
+        );
+        
         return back()->with('success', 'User has been unblocked.');
     }
 

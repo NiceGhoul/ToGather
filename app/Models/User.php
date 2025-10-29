@@ -40,6 +40,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'profile_image_url',
+    ];
+
     public function campaigns()
     {
         return $this->hasMany(Campaign::class, 'user_id');
@@ -68,10 +72,21 @@ class User extends Authenticatable
         return $this->hasMany(Donation::class, 'user_id');
     }
 
-    // Add to User.php
-    public function profileImage(): MorphOne
+    public function images()
     {
-        return $this->morphOne(Image::class, 'imageable');
+        return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function getProfileImageUrlAttribute()
+    {
+        if ($this->relationLoaded('images')) {
+            $profileImage = $this->images->filter(function($image) {
+                return str_starts_with($image->path, 'profile/');
+            })->first();
+        } else {
+            $profileImage = $this->images()->where('path', 'LIKE', 'profile/%')->first();
+        }
+        return $profileImage?->url;
     }
 
     // A User can have many Verification Requests

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Midtrans\Snap;
 use Midtrans\Config;
+use App\Http\Controllers\NotificationController;
 
 class DonationController extends Controller
 {
@@ -80,6 +81,15 @@ class DonationController extends Controller
 
         try {
             $snapToken = Snap::getSnapToken($params);
+            
+            // Notify user about donation initiation
+            NotificationController::notifyUser(
+                $user->id,
+                'donation_initiated',
+                'Donation Initiated',
+                "Your donation of Rp " . number_format($request->amount, 0, ',', '.') . " to '{$campaign->title}' has been initiated. Please complete the payment process.",
+                ['donation_id' => $donation->id, 'campaign_id' => $campaign->id]
+            );
             
             return response()->json([
                 'snap_token' => $snapToken,

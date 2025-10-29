@@ -4,7 +4,10 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Checkbox } from '@/Components/ui/checkbox';
+import { Textarea } from '@/Components/ui/textarea';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/Components/ui/card';
 import Layout_User from '@/Layouts/Layout_User';
+import { Heart, Search, Gift, Users, Target } from 'lucide-react';
 
 export default function Create({ campaign, campaigns }) {
     const [formData, setFormData] = useState({
@@ -83,114 +86,204 @@ export default function Create({ campaign, campaigns }) {
         setSearchResults([]);
     };
 
+    const presetAmounts = [25000, 50000, 100000, 250000, 500000, 1000000];
+
     return (
         <Layout_User>
-            <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-2xl mx-auto px-4">
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                    <h1 className="text-2xl font-bold text-center mb-6">Make a Donation</h1>
+            <div className="min-h-screen bg-gray-50 py-4">
+                <div className="max-w-4xl mx-auto px-4">
+                    {/* Header Section */}
+                    <div className="text-center mb-6">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1">Make a Donation</h1>
+                        <p className="text-gray-600">Your generosity can make a real difference in someone's life</p>
+                    </div>
+
+                    <Card className="shadow-lg border-0">
                     
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Campaign Selection */}
-                            <div>
-                                <Label className="mb-3 ml-1">Campaign</Label>
-                                {selectedCampaign ? (
-                                    <div className="p-3 bg-blue-50 rounded-lg border">
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-medium">{selectedCampaign.title}</span>
-                                            {!campaign && (
-                                                <Button 
-                                                    type="button" 
-                                                    variant="outline" 
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setSelectedCampaign(null);
-                                                        setFormData(prev => ({ ...prev, campaign_id: '' }));
-                                                    }}
-                                                >
-                                                    Change
-                                                </Button>
+                        <CardContent className="p-5">
+                            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Campaign Selection */}
+                                <div className="space-y-3 lg:col-span-2">
+                                    <Label className="text-base font-semibold flex items-center gap-2">
+                                        <Target className="w-4 h-4 text-gray-600" />
+                                        Select Campaign
+                                    </Label>
+                                    {selectedCampaign ? (
+                                        <Card className="bg-gray-50 border-gray-200">
+                                            <CardContent className="p-4">
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <h3 className="font-semibold text-gray-900">{selectedCampaign.title}</h3>
+                                                        <p className="text-sm text-gray-600 mt-1">Selected Campaign</p>
+                                                    </div>
+                                                    {!campaign && (
+                                                        <Button 
+                                                            type="button" 
+                                                            variant="outline" 
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setSelectedCampaign(null);
+                                                                setFormData(prev => ({ ...prev, campaign_id: '' }));
+                                                            }}
+                                                        >
+                                                            Change
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <div className="relative">
+                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                                <Input
+                                                    className="pl-10"
+                                                    placeholder="Search for a campaign to support..."
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                />
+                                            </div>
+                                            {searchResults.length > 0 && (
+                                                <Card className="max-h-48 overflow-y-auto">
+                                                    {searchResults.map((camp) => (
+                                                        <div
+                                                            key={camp.id}
+                                                            className="p-4 hover:bg-gray-50 cursor-pointer border-b last:border-b-0 transition-colors"
+                                                            onClick={() => selectCampaign(camp)}
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                                                <span className="font-medium">{camp.title}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </Card>
                                             )}
                                         </div>
+                                    )}
+                                </div>
+
+                                {/* Amount */}
+                                <div className="space-y-4">
+                                    <Label htmlFor="amount" className="text-base font-semibold flex items-center gap-2">
+                                        <Gift className="w-4 h-4 text-gray-600" />
+                                        Donation Amount
+                                    </Label>
+                                    
+                                    {/* Preset Amount Buttons */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {presetAmounts.map((amount) => (
+                                            <Button
+                                                key={amount}
+                                                type="button"
+                                                variant={formData.amount == amount ? "default" : "outline"}
+                                                className={`h-12 text-sm font-medium transition-all ${
+                                                    formData.amount == amount 
+                                                        ? 'bg-gray-900 text-white shadow-md' 
+                                                        : 'hover:border-gray-300 hover:bg-gray-50'
+                                                }`}
+                                                onClick={() => setFormData(prev => ({ ...prev, amount: amount.toString() }))}
+                                            >
+                                                {formatRupiah(amount)}
+                                            </Button>
+                                        ))}
                                     </div>
-                                ) : (
-                                    <div className="space-y-2">
+                                    
+                                    {/* Custom Amount Input */}
+                                    <div className="space-y-3">
+                                        <Label htmlFor="amount" className="text-sm text-gray-600">Or enter custom amount:</Label>
                                         <Input
-                                            placeholder="Search for a campaign..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            id="amount"
+                                            type="number"
+                                            min="1000"
+                                            step="1000"
+                                            placeholder="Enter amount in Rupiah"
+                                            value={formData.amount}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                                            className="text-lg font-medium"
+                                            required
                                         />
-                                        {searchResults.length > 0 && (
-                                            <div className="border rounded-lg max-h-48 overflow-y-auto">
-                                                {searchResults.map((camp) => (
-                                                    <div
-                                                        key={camp.id}
-                                                        className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
-                                                        onClick={() => selectCampaign(camp)}
-                                                    >
-                                                        {camp.title}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                                        <div className="p-2 bg-gray-100 rounded border border-gray-200">
+                                            <p className="text-gray-700 font-medium text-sm text-center">
+                                                You're donating: {formatRupiah(formData.amount || 0)}
+                                            </p>
+                                        </div>
                                     </div>
-                                )}
-                            </div>
+                                </div>
 
-                            {/* Amount */}
-                            <div>
-                                <Label htmlFor="amount" className="mb-3 ml-1">Donation Amount (Rp)</Label>
-                                <Input
-                                    id="amount"
-                                    type="number"
-                                    min="1000"
-                                    step="1000"
-                                    placeholder="50000"
-                                    value={formData.amount}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                                    required
-                                />
-                                {formData.amount && (
-                                    <p className="text-sm text-gray-600 mt-1">
-                                        {formatRupiah(formData.amount)}
-                                    </p>
-                                )}
-                            </div>
+                                {/* Message */}
+                                <div className="space-y-3">
+                                    <Label htmlFor="message" className="text-base font-semibold flex items-center gap-2">
+                                        <Users className="w-4 h-4 text-gray-600" />
+                                        Personal Message <span className="text-sm font-normal text-gray-500">(Optional)</span>
+                                    </Label>
+                                    <Textarea
+                                        id="message"
+                                        placeholder="Share why this cause matters to you or leave an encouraging message..."
+                                        value={formData.message}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                                        maxLength={500}
+                                        rows={9}
+                                        className="resize-none"
+                                    />
+                                    <div className="flex justify-between text-xs text-gray-500">
+                                        <span>Your message will be shared with the campaign organizer</span>
+                                        <span>{formData.message.length}/500</span>
+                                    </div>
+                                    
+                                    {/* Anonymous Option */}
+                                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded border mt-4">
+                                        <Checkbox
+                                            id="anonymous"
+                                            checked={formData.anonymous}
+                                            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, anonymous: checked }))}
+                                        />
+                                        <div>
+                                            <Label htmlFor="anonymous" className="text-sm cursor-pointer font-medium">
+                                                Donate anonymously
+                                            </Label>
+                                            <p className="text-xs text-gray-600 mt-1">
+                                                Your name won't be displayed publicly with this donation
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
 
-                            {/* Message */}
-                            <div>
-                                <Label htmlFor="message" className="mb-3 ml-1">Message (Optional)</Label>
-                                <textarea
-                                    id="message"
-                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    placeholder="Leave a message for the campaign..."
-                                    value={formData.message}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                                    maxLength={500}
-                                    rows={3}
-                                />
-                            </div>
 
-                            {/* Anonymous */}
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="anonymous"
-                                    checked={formData.anonymous}
-                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, anonymous: checked }))}
-                                />
-                                <Label htmlFor="anonymous">Donate anonymously</Label>
+                            </form>
+                        </CardContent>
+                        
+                        <CardFooter className="p-5">
+                            <Button 
+                                type="submit" 
+                                onClick={handleSubmit}
+                                className="w-full h-12 text-base font-semibold bg-gray-900 hover:bg-gray-800 shadow-md transition-all duration-200"
+                                disabled={!formData.campaign_id || !formData.amount}
+                            >
+                                <Heart className="w-4 h-4 mr-2" />
+                                Donate {formatRupiah(formData.amount || 0)}
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                    
+                    {/* Trust Indicators */}
+                    <div className="mt-6 text-center">
+                        <div className="flex items-center justify-center space-x-8 text-sm text-gray-600">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span>Secure Payment</span>
                             </div>
-
-                        <Button 
-                            type="submit" 
-                            className="w-full"
-                            disabled={!formData.campaign_id || !formData.amount}
-                        >
-                            Donate {formatRupiah(formData.amount || 0)}
-                        </Button>
-                    </form>
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span>100% Goes to Campaign</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                <span>Tax Deductible</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
             </div>
         </Layout_User>
     );

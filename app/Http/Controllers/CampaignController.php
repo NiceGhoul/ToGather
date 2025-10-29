@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Inertia\Inertia;
+use App\Http\Controllers\NotificationController;
 
 /*Bakal tambah 1 table untuk yg campaign sma verification request yaitu rejection reason
  tapi harus buat create untuk campaign dlu bru lanjut buat yang it */
@@ -60,6 +61,11 @@ class CampaignController extends Controller
     public function create()
     {
         $user = auth()->user();
+        
+        // Check if user is banned first
+        if ($user->status->value === 'banned' || $user->status === 'banned') {
+            return inertia('Verification/Banned');
+        }
 
         $verificationRequest = $user->verificationRequests()->latest()->first();
 
@@ -118,6 +124,11 @@ class CampaignController extends Controller
     }
 
     public function createNewCampaign(Request $request) {
+        // Check if user is banned
+        if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
+            return back()->with('error', 'Your account has been banned. You cannot create campaigns.');
+        }
+        
     //      $data = $request->validate([
     //     'title' => 'required|string',
     //     'description' => 'required|string',
@@ -130,7 +141,16 @@ class CampaignController extends Controller
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
 
-    Campaign::create($data);
+    $campaign = Campaign::create($data);
+    
+    // Notify admins about new campaign
+    NotificationController::notifyAdmins(
+        'campaign_created',
+        'New Campaign Submitted',
+        "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and is pending review.",
+        ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
+    );
+    
     return redirect()->back()->with('success', 'Campaign created successfully!');
     }
 
