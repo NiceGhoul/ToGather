@@ -3,6 +3,7 @@ import Layout_Admin from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
 import Popup from "@/Components/Popup";
 import { useState, useEffect } from "react";
+import { File, Check, X } from "lucide-react";
 
 export default function ArticleRequestList() {
     const { articles } = usePage().props;
@@ -111,7 +112,12 @@ export default function ArticleRequestList() {
                     <div className="text-sm">{selectedIds.length} selected</div>
 
                     <Popup
-                        triggerText="Approve Selected"
+                        triggerText={
+                            <div className="flex items-center gap-2 cursor-pointer">
+                                <Check className="w-4 h-4" />
+                                <span>Approve Selected</span>
+                            </div>
+                        }
                         title="Approve Selected Articles?"
                         description="This will approve all selected articles."
                         confirmText="Yes, Approve"
@@ -122,7 +128,12 @@ export default function ArticleRequestList() {
                     />
 
                     <Popup
-                        triggerText="Reject Selected"
+                        triggerText={
+                            <div className="flex items-center gap-2 cursor-pointer">
+                                <X className="w-4 h-4" />
+                                <span>Reject Selected</span>
+                            </div>
+                        }
                         title="Reject Selected Articles?"
                         description="This will reject all selected articles."
                         confirmText="Yes, Reject"
@@ -190,27 +201,27 @@ export default function ArticleRequestList() {
                                                 }
                                                 className="bg-purple-800 hover:bg-purple-700"
                                             >
-                                                View
+                                                <File />
                                             </Button>
 
                                             <Popup
-                                                triggerText="Approve"
+                                                triggerText={<Check />}
                                                 title="Approve Article?"
                                                 description="This action cannot be undone. The article will be approved and be shown on public"
                                                 confirmText="Yes, Approve"
                                                 confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                                triggerClass="bg-green-600 hover:bg-green-700 text-white w-18"
+                                                triggerClass="bg-green-600 hover:bg-green-700 text-white"
                                                 onConfirm={() =>
                                                     handleApprove(a.id)
                                                 }
                                             />
                                             <Popup
-                                                triggerText="Reject"
+                                                triggerText={<X />}
                                                 title="Reject Article?"
                                                 description="This action cannot be undone. The article will be rejected"
                                                 confirmText="Yes, Reject"
                                                 confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                triggerClass="bg-red-600 hover:bg-red-700 text-white w-18"
+                                                triggerClass="bg-red-600 hover:bg-red-700 text-white"
                                                 onConfirm={() =>
                                                     handleReject(a.id)
                                                 }

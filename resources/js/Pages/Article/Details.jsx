@@ -303,6 +303,13 @@ export default function Details() {
         setEditingMode(false);
         setEditingId(null);
     };
+    const sortedContents = useMemo(() => {
+        if (!article?.contents) return [];
+        return [...article.contents].sort((a, b) => {
+            if (a.order_y === b.order_y) return a.order_x - b.order_x;
+            return a.order_y - b.order_y;
+        });
+    }, [article]);
 
     // ---------- RENDER CONTROLS ----------
     const renderCellControls = (cell, idxInBlocks) => {
@@ -509,6 +516,8 @@ export default function Details() {
                                 {likeCount} {likeCount === 1 ? "like" : "likes"}
                             </span>
                         </div>
+                    )}
+                </div>
                 {/*Content*/}
                 <div className="w-full max-w-4xl">
                     {sortedContents.length > 0 ? (
@@ -559,7 +568,9 @@ export default function Details() {
                                                     <div className="flex items-center justify-center h-full">
                                                         <div className="w-full max-w-[420px]">
                                                             <img
-                                                                src={block.image_url}
+                                                                src={
+                                                                    block.image_url
+                                                                }
                                                                 alt={`Block ${
                                                                     index + 1
                                                                 }`}

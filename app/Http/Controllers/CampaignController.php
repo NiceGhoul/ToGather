@@ -107,7 +107,7 @@ class CampaignController extends Controller
     public function getCampaignDetails($id)
     {
         $user = auth()->user();
-        $donations = Donation::with([ 'user' ])->where('campaign_id', $id)->where('status', 'successful')->get();
+        $donations = Donation::with(['user'])->where('campaign_id', $id)->where('status', 'successful')->get();
         $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
         $campaignData = Campaign::findOrFail($id);
         return inertia::render('Campaign/CampaignDetails', [
@@ -117,21 +117,22 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function createNewCampaign(Request $request) {
-    //      $data = $request->validate([
-    //     'title' => 'required|string',
-    //     'description' => 'required|string',
-    //     'goal_amount' => 'required|numeric',
-    //     'start_date' => 'required|date',
-    //     'end_date' => 'required|date',
+    public function createNewCampaign(Request $request)
+    {
+        //      $data = $request->validate([
+        //     'title' => 'required|string',
+        //     'description' => 'required|string',
+        //     'goal_amount' => 'required|numeric',
+        //     'start_date' => 'required|date',
+        //     'end_date' => 'required|date',
 
-    // ]);
+        // ]);
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
 
-    Campaign::create($data);
-    return redirect()->back()->with('success', 'Campaign created successfully!');
+        Campaign::create($data);
+        return redirect()->back()->with('success', 'Campaign created successfully!');
     }
 
     public function ToggleLike(Request $request)
@@ -157,18 +158,18 @@ class CampaignController extends Controller
         $category = $request->input('category');
 
         // get campaigns where they are not banned or rejected and is still pending
-        if(!$category){
+        if (!$category) {
             return response()->json(['error' => 'Category parameter is required'], 400);
         }
         if ($category === 'All' || $category === null) {
             $campaigns = Campaign::where('status', ['active'])->get();
 
-        }else{
+        } else {
             $campaigns = Campaign::where('category', $category)->where('status', ['active'])->get();
 
         }
 
-        // dd($testCampaign);
+        // dd($campaigns);
 
         return inertia::render('Campaign/CampaignList', [
             'campaigns' => $campaigns,

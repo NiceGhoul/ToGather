@@ -25,13 +25,13 @@ class VerificationRequestController extends Controller
                 return $query->where('status', $status);
             })
             ->get();
-            
+
         // Transform data to include URLs
         $requests->each(function ($request) {
             $request->id_photo_url = $request->id_photo_url;
             $request->selfie_url = $request->selfie_url;
         });
-        
+
         return Inertia::render('Admin/User/Verification', [
             'requests' => $requests,
             'filters' => $request->only(['status'])
@@ -75,21 +75,21 @@ class VerificationRequestController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             // Check if user already has a pending or accepted request
             $existingRequest = $user->verificationRequests()
                 ->whereIn('status', ['pending', 'accepted'])
                 ->first();
-                
+
             if ($existingRequest) {
                 return back()->with('error', 'You already have a verification request.');
             }
-            
+
             // Delete previous rejected requests and their images
             $rejectedRequests = $user->verificationRequests()
                 ->where('status', 'rejected')
                 ->get();
-                
+
             foreach ($rejectedRequests as $request) {
                 // Delete image files from MinIO
                 if ($request->idPhotoImage) {
@@ -102,29 +102,29 @@ class VerificationRequestController extends Controller
                 }
                 $request->delete();
             }
-            
+
             $validated = $request->validate([
                 'id_photo' => 'required|image|max:2048',
                 'selfie_with_id' => 'required|image|max:2048',
             ]);
-            
+
             // Store files in MinIO
             $idPhotoPath = $request->file('id_photo')->store('verification/id_photos', 'minio');
             $selfieWithIdPath = $request->file('selfie_with_id')->store('verification/selfies', 'minio');
-            
+
             // Create image records
             $idPhotoImage = Image::create([
                 'path' => $idPhotoPath,
                 'imageable_type' => VerificationRequest::class,
                 'imageable_id' => null, // Will be set after verification request is created
             ]);
-            
+
             $selfieImage = Image::create([
                 'path' => $selfieWithIdPath,
                 'imageable_type' => VerificationRequest::class,
                 'imageable_id' => null, // Will be set after verification request is created
             ]);
-            
+
             // Create verification request with image IDs
             $verificationRequest = VerificationRequest::create([
                 'user_id' => $user->id,
@@ -132,11 +132,11 @@ class VerificationRequestController extends Controller
                 'id_photo' => $idPhotoImage->id,
                 'selfie_with_id' => $selfieImage->id,
             ]);
-            
+
             // Update image records with verification request ID
             $idPhotoImage->update(['imageable_id' => $verificationRequest->id]);
             $selfieImage->update(['imageable_id' => $verificationRequest->id]);
-            
+
             return redirect()->route('home')->with('success', 'Verification request submitted successfully.');
         } catch (\Exception $e) {
             Log::error('Verification request error: ' . $e->getMessage());

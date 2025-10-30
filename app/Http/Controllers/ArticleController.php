@@ -24,6 +24,10 @@ class ArticleController extends Controller
         $sortOrder = $request->query('sort', 'desc');
         $searchQuery = $request->query('search');
 
+        if ($filterCategory === 'All' || !$filterCategory || $filterCategory == '') {
+            $filterCategory = null;
+        }
+
         // Main Query
         $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
             ->where('status', 'approved')
@@ -56,12 +60,12 @@ class ArticleController extends Controller
                     }
                     return $content;
                 });
-                
+
                 // Add like status
                 $article->is_liked_by_user = auth()->check()
                     ? $article->likes()->where('user_id', auth()->id())->exists()
                     : false;
-                    
+
                 return $article;
             });
 
@@ -194,14 +198,14 @@ class ArticleController extends Controller
             if ($type === 'image' && $request->hasFile("contents.$i.content")) {
                 $file = $request->file("contents.$i.content");
                 $path = $file->store('article/image', 'minio');
-                
+
                 // Create image record
                 $image = Image::create([
                     'path' => $path,
                     'imageable_id' => $article->id,
                     'imageable_type' => Article::class,
                 ]);
-                
+
                 $contentValue = $image->id;
             } else {
                 $contentValue = $block['content'] ?? null;
@@ -238,14 +242,14 @@ class ArticleController extends Controller
             }
         }
         $path = $request->file('file')->store('article/image', 'minio');
-        
+
         // Create image record
         $image = Image::create([
             'path' => $path,
             'imageable_id' => null, // Will be set when article is created
             'imageable_type' => Article::class,
         ]);
-        
+
         return response()->json([
             'url' => Storage::disk('minio')->url($path),
             'image_id' => $image->id,
@@ -274,7 +278,7 @@ class ArticleController extends Controller
             }
             return $content;
         });
-        
+
         // Add like status
         $article->is_liked_by_user = auth()->check()
             ? $article->likes()->where('user_id', auth()->id())->exists()
@@ -305,7 +309,7 @@ class ArticleController extends Controller
                     }
                     return $content;
                 });
-                
+
                 $article->is_liked_by_user = $article->likes()
                     ->where('user_id', $user->id)
                     ->exists();
@@ -408,10 +412,10 @@ class ArticleController extends Controller
         if (!Storage::disk('minio')->exists($path)) {
             abort(404);
         }
-        
+
         $file = Storage::disk('minio')->get($path);
         $mimeType = Storage::disk('minio')->mimeType($path);
-        
+
         return response($file, 200)->header('Content-Type', $mimeType);
     }
 
