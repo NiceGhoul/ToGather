@@ -11,6 +11,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Navbar_User() {
     const [open, setOpen] = useState(false);
@@ -128,25 +129,27 @@ export default function Navbar_User() {
                         <DropdownMenuContent align="end" className="w-80">
                             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            {loading ? (
-                                <DropdownMenuItem disabled>
-                                    Loading...
-                                </DropdownMenuItem>
-                            ) : notifications.length === 0 ? (
-                                <DropdownMenuItem disabled>
-                                    No notifications
-                                </DropdownMenuItem>
-                            ) : (
-                                notifications.map((notification) => (
-                                    <DropdownMenuItem key={notification.id} className="flex-col items-start p-3">
-                                        <div className="font-medium">{notification.title}</div>
-                                        <div className="text-sm text-muted-foreground">{notification.message}</div>
-                                        <div className="text-xs text-muted-foreground mt-1">
-                                            {new Date(notification.created_at).toLocaleDateString()}
-                                        </div>
+                            <ScrollArea className="h-80">
+                                {loading ? (
+                                    <DropdownMenuItem disabled>
+                                        Loading...
                                     </DropdownMenuItem>
-                                ))
-                            )}
+                                ) : notifications.length === 0 ? (
+                                    <DropdownMenuItem disabled>
+                                        No notifications
+                                    </DropdownMenuItem>
+                                ) : (
+                                    notifications.map((notification) => (
+                                        <DropdownMenuItem key={notification.id} className="flex-col items-start p-3">
+                                            <div className="font-medium">{notification.title}</div>
+                                            <div className="text-sm text-muted-foreground">{notification.message}</div>
+                                            <div className="text-xs text-muted-foreground mt-1">
+                                                {new Date(notification.created_at).toLocaleDateString()}
+                                            </div>
+                                        </DropdownMenuItem>
+                                    ))
+                                )}
+                            </ScrollArea>
                         </DropdownMenuContent>
                     </DropdownMenu>
 

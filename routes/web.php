@@ -8,6 +8,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationRequestController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Models\VerificationRequest;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -106,7 +107,7 @@ Route::post('/midtrans/callback', [DonationController::class, 'midtransCallback'
 // --- Admin Routes ---
 // Must be logged in AND have the 'admin' role.
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/users/list', [UserController::class, 'index'])->name('users.index');
     Route::post('/users/{user}/block', [UserController::class, 'block'])->name('admin.users.block');
