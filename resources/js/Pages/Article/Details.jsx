@@ -297,6 +297,13 @@ export default function Details() {
         setEditingMode(false);
         setEditingId(null);
     };
+    const sortedContents = useMemo(() => {
+        if (!article?.contents) return [];
+        return [...article.contents].sort((a, b) => {
+            if (a.order_y === b.order_y) return a.order_x - b.order_x;
+            return a.order_y - b.order_y;
+        });
+    }, [article]);
 
     // ---------- RENDER CONTROLS ----------
     const renderCellControls = (cell, idxInBlocks) => {
@@ -503,6 +510,89 @@ export default function Details() {
                                 {likeCount} {likeCount === 1 ? "like" : "likes"}
                             </span>
                         </div>
+                    )}
+                </div>
+                {/*Content*/}
+                <div className="w-full max-w-4xl">
+                    {sortedContents.length > 0 ? (
+                        (() => {
+                            const maxX = Math.max(
+                                ...sortedContents.map((b) => b.order_x)
+                            );
+                            const maxY = Math.max(
+                                ...sortedContents.map((b) => b.order_y)
+                            );
+                            const cells = [];
+
+                            for (let y = 1; y <= maxY; y++) {
+                                for (let x = 1; x <= maxX; x++) {
+                                    const block = sortedContents.find(
+                                        (b) =>
+                                            b.order_x === x && b.order_y === y
+                                    );
+                                    cells.push({ x, y, block });
+                                }
+                            }
+
+                            return (
+                                <div
+                                    className="grid w-full gap-6 mb-8"
+                                    style={{
+                                        gridTemplateColumns: `repeat(${maxX}, minmax(0, 1fr))`,
+                                    }}
+                                >
+                                    {cells.map(({ x, y, block }, index) => (
+                                        <div
+                                            key={`${y}-${x}`}
+                                            className="w-full rounded-md p-2 overflow-hidden break-words"
+                                            style={{
+                                                gridColumnStart: x,
+                                                gridRowStart: y,
+                                            }}
+                                        >
+                                            {block ? (
+                                                block.type === "text" ? (
+                                                    <div
+                                                        className="prose max-w-none text-justify"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: block.content,
+                                                        }}
+                                                    ></div>
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-full">
+                                                        <div className="w-full max-w-[420px]">
+                                                            <img
+                                                                src={
+                                                                    block.image_url
+                                                                }
+                                                                alt={`Block ${
+                                                                    index + 1
+                                                                }`}
+                                                                className="w-full h-64 object-contain rounded-md shadow-sm hover:scale-[1.02] transition-transform cursor-pointer"
+                                                                onClick={() => {
+                                                                    setModalImage(
+                                                                        block.image_url
+                                                                    );
+                                                                    setShowModal(
+                                                                        true
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            ) : (
+                                                <div className="min-h-[100px]"></div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()
+                    ) : (
+                        <p className="text-gray-500 italic mb-6 text-center">
+                            This article has no content blocks.
+                        </p>
                     )}
                 </div>
 

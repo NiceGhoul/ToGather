@@ -60,20 +60,44 @@ export default function Navbar_User() {
         fetchNotifications();
     }, []);
 
-    const { props } = usePage();
+    const { url, props } = usePage();
     const auth = props.auth;
+    const isActive = (path) => url.startsWith(path);
 
     return (
         <header>
             <nav className="flex justify-between items-center px-6 py-4">
-                <div>
-                    <Link className="nav-link" href="/">
+                <div className="flex gap-4">
+                    <Link
+                        href="/home"
+                        className={`px-3 py-2 rounded-md transition-all duration-200 ${
+                            isActive("/home")
+                                ? "bg-white/20 font-semibold text-white"
+                                : "hover:bg-white/10 text-white font-semibold"
+                        }`}
+                    >
                         Home for User
                     </Link>
-                    <Link className="nav-link" href="/campaigns/list">
+
+                    <Link
+                        href="/campaigns/list"
+                        className={`px-3 py-2 rounded-md transition-all duration-200 ${
+                            isActive("/campaigns")
+                                ? "bg-white/20  text-white font-semibold"
+                                : "hover:bg-white/10 text-white font-semibold"
+                        }`}
+                    >
                         Campaign
                     </Link>
-                    <Link className="nav-link" href="/articles/list">
+
+                    <Link
+                        href="/articles/list"
+                        className={`px-3 py-2 rounded-md transition-all duration-200 ${
+                            isActive("/articles")
+                                ? "bg-white/20 text-white font-semibold"
+                                : "hover:bg-white/10 text-white font-semibold"
+                        }`}
+                    >
                         Article
                     </Link>
                 </div>
@@ -131,7 +155,9 @@ export default function Navbar_User() {
                             <Avatar className="h-10 w-10">
                                 <AvatarImage src={auth?.user?.profile_image_url} />
                                 <AvatarFallback>
-                                    {auth?.user?.nickname?.charAt(0)?.toUpperCase()}
+                                    {auth?.user?.nickname
+                                        ?.charAt(0)
+                                        ?.toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
                         </DropdownMenuTrigger>

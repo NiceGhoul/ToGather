@@ -1,4 +1,3 @@
-
 import { Button } from "@/Components/ui/button";
 import Layout_User from "@/Layouts/Layout_User";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +7,6 @@ import { use, useEffect, useState } from "react";
 import { ButtonGroup } from "@/Components/ui/button-group";
 import { Input } from "@/Components/ui/input";
 import { SearchIcon } from "lucide-react";
-
 
 const CampaignList = () => {
     const { campaigns, lookups } = usePage().props;
@@ -25,7 +23,7 @@ const CampaignList = () => {
 
     useEffect(() => {
         setVisibleCampaign(8);
-    },[chosenCategory,searchTerm]);
+    }, [chosenCategory, searchTerm]);
 
     useEffect(() => {
         if (!searchTerm) {
@@ -36,12 +34,19 @@ const CampaignList = () => {
     }, [searchTerm]);
 
     const handleCategoryChange = (activeCategory) => {
-
-            router.get("/campaigns/getList", { category: activeCategory }, {
+        router.get(
+            "/campaigns/getList",
+            { category: activeCategory },
+            {
                 preserveScroll: true,
                 preserveState: true,
-                onSuccess: (page) => {setCampaignList(page.props.campaigns); setChosenCategory(activeCategory); setVisibleCampaign(8); }
-            });
+                onSuccess: (page) => {
+                    setCampaignList(page.props.campaigns);
+                    setChosenCategory(activeCategory);
+                    setVisibleCampaign(8);
+                },
+            }
+        );
     };
 
     const handleSearch = () => {
@@ -51,15 +56,18 @@ const CampaignList = () => {
         setCampaignList(temp);
     };
 
-
-
- const randomizePicture = () => {
-    const images = ["boat.jpg", "huge.jpg", "king.jpg", "speeeed.jpg","sharks.jpg","nature.jpg"]
-    const randomNum = Math.floor(Math.random() * images.length);
-    return `http://127.0.0.1:8000/images/${images[randomNum]}`;
- }
-
-
+    const randomizePicture = () => {
+        const images = [
+            "boat.jpg",
+            "huge.jpg",
+            "king.jpg",
+            "speeeed.jpg",
+            "sharks.jpg",
+            "nature.jpg",
+        ];
+        const randomNum = Math.floor(Math.random() * images.length);
+        return `http://127.0.0.1:8000/images/${images[randomNum]}`;
+    };
 
     const cardRepeater = (data) => {
         if (!data) {
@@ -67,24 +75,29 @@ const CampaignList = () => {
         } else {
             return data.slice(0, visibleCampaign).map((dat, idx) => {
                 return (
-                    <div key={idx} className="border rounded-lg p-4 shadow-md">
+                    <div key={idx} className="border rounded-lg p-4 shadow-md ">
                         <div>
                             <img
                                 src="http://127.0.0.1:8000/images/boat.jpg"
                                 alt="Campaign"
-                                className="w-full h-64 object-cover mb-4 rounded"
+                                className="w-full h-64 object-cover mb-4 rounded "
                             />
                         </div>
                         <h2 className="text-lg font-semibold mb-2 min-h-12 max-h-16 overflow-hidden text-center items-center justify-center flex">
-                            {dat.title.length > 50 ? dat.title.substring(0, 50) + "..." : dat.title}
+                            {dat.title.length > 50
+                                ? dat.title.substring(0, 50) + "..."
+                                : dat.title}
                         </h2>
                         <p className="text-sm text-gray-600 mb-6 mt-6 text-justify">
                             {dat.description.length > 200
                                 ? dat.description.substring(0, 200) + "..."
                                 : dat.description}
                         </p>
-                        <Link  href={`/campaigns/details/${dat.id.toString()}`}>
-                            <Button variant="primary" className="w-b justify-center mx-auto flex">
+                        <Link href={`/campaigns/details/${dat.id.toString()}`}>
+                            <Button
+                                variant="primary"
+                                className="w-b justify-center mx-auto flex"
+                            >
                                 View Details
                             </Button>
                         </Link>
@@ -119,14 +132,19 @@ const CampaignList = () => {
                     className="flex flex-row space-x-4 h-[75px] bg-gray-300 bg-cover bg-center w-full items-center justify-center"
                     style={{ background: "#7A338C" }}
                 >
-                    {lookups?.length > 0 &&
+                    {lookups?.length > 0 && (
                         <Button
-                        key={999}
-                        onClick={() => handleCategoryChange("All")}
-                    >
-                        All
-                    </Button>
-                    }
+                            key={999}
+                            onClick={() => handleCategoryChange("All")}
+                            className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
+                                chosenCategory === "All"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md"
+                                    : " text-white hover:bg-purple-700"
+                            }`}
+                        >
+                            All
+                        </Button>
+                    )}
                     {lookups
                         ?.filter(
                             (dat) => dat.lookup_type === "CampaignCategory"
@@ -137,6 +155,11 @@ const CampaignList = () => {
                                 onClick={() =>
                                     handleCategoryChange(item.lookup_value)
                                 }
+                                className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
+                                    chosenCategory === item.lookup_value
+                                        ? "bg-white text-purple-700 font-semibold shadow-md"
+                                        : " text-white hover:bg-purple-700"
+                                }`}
                             >
                                 {item.lookup_value}
                             </Button>

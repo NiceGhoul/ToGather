@@ -1,27 +1,67 @@
+import { Button } from "@/components/ui/button";
 import Layout_User from "@/Layouts/Layout_User";
-import { Link, usePage, router } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link, router, usePage } from "@inertiajs/react";
+import { Separator } from "@/components/ui/separator";
+import { useEffect, useState } from "react";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { Input } from "@/components/ui/input";
+import { SearchIcon, Heart } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
-import { Heart } from "lucide-react";
 
-export default function Index() {
-    const { props } = usePage();
-    const articles = props.articles || [];
-    const categories = props.categories || [];
-    const selectedCategory = props.selectedCategory || "";
-    const sortOrder = props.sortOrder || "desc";
-    const initialSearch = props.searchQuery || "";
-    const [searchQuery, setSearchQuery] = useState(initialSearch);
+const ArticleList = () => {
+    // 🟣 Ambil props dari backend
+    const {
+        articles,
+        categories,
+        sortOrder: initialSortOrder,
+    } = usePage().props;
 
-    // --- Like state untuk setiap artikel ---
+    // 🟣 Inisialisasi state lokal
+    const [visibleArticles, setVisibleArticles] = useState(8);
+    const [articleList, setArticleList] = useState(articles || []);
+    const [chosenCategory, setChosenCategory] = useState("All");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
+
+    // 🟣 State untuk Like
     const [likesState, setLikesState] = useState(
         Object.fromEntries(
-            articles.map((a) => [a.id, a.is_liked_by_user ?? false])
+            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false])
         )
     );
 
-    // --- Handler LIKE / UNLIKE ---
+    useEffect(() => {
+        if (articles?.length) setArticleList(articles);
+    }, [articles]);
+
+    useEffect(() => {
+        setVisibleArticles(8);
+    }, [chosenCategory, searchTerm]);
+
+    const handleCategoryChange = (activeCategory) => {
+        router.get(
+            "/articles/list",
+            { category: activeCategory },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {
+                    setArticleList(page.props.articles);
+                    setChosenCategory(activeCategory);
+                    setVisibleArticles(8);
+                },
+            }
+        );
+    };
+
+    const handleSearch = () => {
+        let temp = articles?.filter((a) =>
+            a.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setArticleList(temp);
+    };
+
     const handleLike = async (articleId) => {
         try {
             const response = await fetch(`/articles/${articleId}/like`, {
@@ -34,182 +74,236 @@ export default function Index() {
                     Accept: "application/json",
                 },
             });
-
             const data = await response.json();
 
-            // Update state lokal
             setLikesState((prev) => ({
                 ...prev,
                 [articleId]: data.isLiked,
             }));
 
-            // Refresh hanya jumlah likes
             router.reload({ only: ["articles"] });
         } catch (error) {
             console.error("Error liking article:", error);
         }
     };
 
-    // --- Filter & Search ---
-    const handleFilterChange = (e) =>
-        router.get("/articles/list", {
-            category: e.target.value,
-            sort: sortOrder,
-            search: searchQuery,
-        });
+    const handleShowMore = () => {
+        setVisibleArticles((prev) => prev + 8);
+    };
 
-    const handleSortChange = (e) =>
-        router.get("/articles/list", {
-            category: selectedCategory,
-            sort: e.target.value,
-            search: searchQuery,
-        });
+    const cardRepeater = (data) => {
+        if (!data || data.length === 0) {
+            return <p>No articles available.</p>;
+        } else {
+            return data.slice(0, visibleArticles).map((article, idx) => {
+                const previewText =
+                    article.contents?.find(
+                        (c) =>
+                            c.type === "text" &&
+                            c.order_x === 1 &&
+                            c.order_y === 1
+                    )?.content || "";
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        router.get("/articles/list", {
-            category: selectedCategory,
-            sort: sortOrder,
-            search: searchQuery,
-        });
+                const liked = likesState[article.id] || false;
+
+                return (
+                    <div
+                        key={idx}
+                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
+                    >
+                        {article.thumbnail_url && (
+                            <img
+                                src={article.thumbnail_url}
+                                alt={article.title}
+                                className="w-full h-64 object-cover mb-4 rounded"
+                            />
+                        )}
+
+                        <h2 className="text-lg font-semibold mb-2 min-h-[2rem] max-h-[3rem] overflow-hidden text-center leading-snug">
+                            {article.title.length > 50
+                                ? article.title.substring(0, 50) + "..."
+                                : article.title}
+                        </h2>
+
+                        <p className="text-sm text-gray-600 text-center mb-2">
+                            by {article.user?.nickname ?? "Unknown"} ·{" "}
+                            {new Date(article.created_at).toLocaleDateString()}
+                        </p>
+
+                        <p className="text-sm text-gray-500 text-center mb-4">
+                            {article.category ?? "Uncategorized"}
+                        </p>
+
+                        <p className="text-sm text-gray-700 mb-6 text-justify">
+                            {previewText
+                                .replace(/(<([^>]+)>)/gi, "")
+                                .slice(0, 180) || "No preview text."}
+                            ...
+                        </p>
+
+                        <div className="flex justify-between items-center mt-auto">
+                            <Link
+                                href={`/articles/${article.id}?from=articles_list`}
+                                className="text-purple-700 hover:underline font-medium"
+                            >
+                                Read more →
+                            </Link>
+
+                            <div className="flex items-center gap-2">
+                                <Toggle
+                                    pressed={liked}
+                                    onPressedChange={() =>
+                                        handleLike(article.id)
+                                    }
+                                    size="lg"
+                                    variant="outline"
+                                    className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
+                                >
+                                    <Heart className="w-5 h-5" />
+                                </Toggle>
+                                <span className="text-sm text-gray-600">
+                                    {article.likes_count ?? 0}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            });
+        }
     };
 
     return (
         <Layout_User>
-            <div className="container mx-auto px-4 py-8 space-y-6">
-                <h1 className="text-3xl font-bold">All Articles</h1>
-
-                {/* Filter & Search Bar */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div className="flex flex-wrap gap-3 items-center">
-                        <select
-                            value={selectedCategory}
-                            onChange={handleFilterChange}
-                            className="border rounded p-2"
-                        >
-                            <option value="">All Categories</option>
-                            {categories.map((category, i) => (
-                                <option key={i} value={category}>
-                                    {category}
-                                </option>
-                            ))}
-                        </select>
-
-                        <select
-                            value={sortOrder}
-                            onChange={handleSortChange}
-                            className="border rounded p-2"
-                        >
-                            <option value="desc">Newest First</option>
-                            <option value="asc">Oldest First</option>
-                        </select>
+            {/* === Banner Section === */}
+            <div className="w-full flex flex-col">
+                <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
+                    <img
+                        src="http://127.0.0.1:8000/images/articleBook.jpg"
+                        alt="Article Banner"
+                        className="absolute inset-0 w-full h-full object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">
+                            Discover Stories, Insights & Ideas
+                        </h1>
+                        <p className="text-white/90 mt-2 text-sm md:text-base">
+                            Stay inspired with our latest articles and
+                            perspectives
+                        </p>
                     </div>
-
-                    <form onSubmit={handleSearch} className="flex gap-2">
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search articles..."
-                            className="border rounded-l p-2 w-48 md:w-64"
-                        />
-                        <button type="submit" className="register-btn rounded">
-                            Search
-                        </button>
-                    </form>
                 </div>
 
-                {/* Article List */}
-                {articles.length === 0 ? (
-                    <p className="text-gray-500">No articles found.</p>
-                ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {articles.map((article) => {
-                            const previewText =
-                                article.contents?.find(
-                                    (c) =>
-                                        c.type === "text" &&
-                                        c.order_x === 1 &&
-                                        c.order_y === 1
-                                )?.content || "";
+                {/* === Category Bar === */}
+                <div
+                    className="flex flex-row space-x-4 h-[75px] bg-gray-300 bg-cover bg-center w-full items-center justify-center"
+                    style={{ background: "#7A338C" }}
+                >
+                    {categories?.length > 0 && (
+                        <Button
+                            key={999}
+                            onClick={() => handleCategoryChange("All")}
+                            className={`${
+                                chosenCategory === "All"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md"
+                                    : " text-white hover:bg-purple-700"
+                            }`}
+                        >
+                            All
+                        </Button>
+                    )}
 
-                            const liked = likesState[article.id] || false;
+                    {categories?.map((item, idx) => (
+                        <Button
+                            key={idx}
+                            onClick={() => handleCategoryChange(item)}
+                            className={`${
+                                chosenCategory === item
+                                    ? "bg-white text-purple-700 font-semibold shadow-md"
+                                    : " text-white hover:bg-purple-700"
+                            }`}
+                        >
+                            {item}
+                        </Button>
+                    ))}
+                </div>
+            </div>
 
-                            return (
-                                <Card
-                                    key={article.id}
-                                    className="hover:shadow-md transition overflow-hidden"
-                                >
-                                    {/* Thumbnail */}
-                                    {article.thumbnail_url && (
-                                        <img
-                                            src={article.thumbnail_url}
-                                            alt={article.title}
-                                            className="w-full h-48 object-cover"
-                                        />
-                                    )}
+            {/* === Search Bar + Sort === */}
+            <div className="w-11/12 flex m-10 items-end justify-end gap-3">
+                {/* Dropdown Sort */}
+                <select
+                    value={sortOrder}
+                    onChange={(e) => {
+                        setSortOrder(e.target.value);
+                        router.get("/articles/list", {
+                            category: chosenCategory,
+                            sort: e.target.value,
+                            search: searchTerm,
+                        });
+                    }}
+                    className=" border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-3 focus:ring-purple-700 appearance-none bg-white"
+                >
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                </select>
 
-                                    <CardHeader>
-                                        <CardTitle className="text-lg font-semibold">
-                                            {article.title}
-                                        </CardTitle>
-                                        <p className="text-sm text-gray-500">
-                                            by{" "}
-                                            {article.user?.nickname ??
-                                                "Unknown"}{" "}
-                                            ·{" "}
-                                            {new Date(
-                                                article.created_at
-                                            ).toLocaleDateString()}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            {article.category ?? "Unknown"}
-                                        </p>
-                                    </CardHeader>
+                {/* Search Input */}
+                <ButtonGroup className="w-84">
+                    <Input
+                        placeholder="Search Articles"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="focus-visible:ring-purple-700 focus-visible:border-purple-700"
+                    />
+                    <Button
+                        variant="outline"
+                        aria-label="Search"
+                        onClick={handleSearch}
+                        className="hover:ring-3 hover:ring-purple-700"
+                    >
+                        <SearchIcon />
+                    </Button>
+                </ButtonGroup>
+            </div>
 
-                                    <CardContent>
-                                        <p className="text-gray-700 line-clamp-3">
-                                            {previewText
-                                                .replace(/(<([^>]+)>)/gi, "")
-                                                .slice(0, 150) ||
-                                                "No preview text."}
-                                            ...
-                                        </p>
+            {/* === Article Section === */}
+            <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
+                <CardHeader>
+                    <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4">
+                        <Separator className="flex-1" />
+                        {chosenCategory === "All"
+                            ? "All Articles"
+                            : chosenCategory}
+                        <Separator className="flex-1" />
+                    </CardTitle>
+                </CardHeader>
 
-                                        <Link
-                                            href={`/articles/${article.id}?from=articles_list`}
-                                            className="text-blue-600 hover:underline mt-2 inline-block"
-                                        >
-                                            Read more →
-                                        </Link>
+                <CardContent>
+                    {articleList?.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {cardRepeater(articleList)}
+                        </div>
+                    ) : (
+                        <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20">
+                            No articles found.
+                        </p>
+                    )}
 
-                                        {/* ❤️ Tombol Like */}
-                                        <div className="mt-3 flex items-center gap-3">
-                                            <Toggle
-                                                pressed={liked}
-                                                onPressedChange={() =>
-                                                    handleLike(article.id)
-                                                }
-                                                size="lg"
-                                                variant="outline"
-                                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
-                                            >
-                                                <Heart className="w-5 h-5" />
-                                            </Toggle>
-                                            <span className="text-sm text-gray-700">
-                                                {article.likes_count ?? 0}{" "}
-                                                {article.likes_count === 1
-                                                    ? "like"
-                                                    : "likes"}
-                                            </span>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
-                    </div>
-                )}
+                    {visibleArticles < articleList?.length && (
+                        <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
+                            <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                            <p
+                                onClick={handleShowMore}
+                                className="text-sm text-gray-400 font-thin cursor-pointer"
+                            >
+                                show more
+                            </p>
+                            <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                        </div>
+                    )}
+                </CardContent>
             </div>
         </Layout_User>
     );
-}
+};
+
+export default ArticleList;

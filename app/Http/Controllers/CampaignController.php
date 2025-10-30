@@ -61,7 +61,7 @@ class CampaignController extends Controller
     public function create()
     {
         $user = auth()->user();
-        
+
         // Check if user is banned first
         if ($user->status->value === 'banned' || $user->status === 'banned') {
             return inertia('Verification/Banned');
@@ -113,7 +113,7 @@ class CampaignController extends Controller
     public function getCampaignDetails($id)
     {
         $user = auth()->user();
-        $donations = Donation::with([ 'user' ])->where('campaign_id', $id)->where('status', 'successful')->get();
+        $donations = Donation::with(['user'])->where('campaign_id', $id)->where('status', 'successful')->get();
         $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
         $campaignData = Campaign::findOrFail($id);
         return inertia::render('Campaign/CampaignDetails', [
@@ -123,35 +123,36 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function createNewCampaign(Request $request) {
+    public function createNewCampaign(Request $request)
+    {
         // Check if user is banned
         if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
             return back()->with('error', 'Your account has been banned. You cannot create campaigns.');
         }
-        
-    //      $data = $request->validate([
-    //     'title' => 'required|string',
-    //     'description' => 'required|string',
-    //     'goal_amount' => 'required|numeric',
-    //     'start_date' => 'required|date',
-    //     'end_date' => 'required|date',
 
-    // ]);
+        //      $data = $request->validate([
+        //     'title' => 'required|string',
+        //     'description' => 'required|string',
+        //     'goal_amount' => 'required|numeric',
+        //     'start_date' => 'required|date',
+        //     'end_date' => 'required|date',
+
+        // ]);
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
 
-    $campaign = Campaign::create($data);
-    
-    // Notify admins about new campaign
-    NotificationController::notifyAdmins(
-        'campaign_created',
-        'New Campaign Submitted',
-        "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and is pending review.",
-        ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
-    );
-    
-    return redirect()->back()->with('success', 'Campaign created successfully!');
+        $campaign = Campaign::create($data);
+
+        // Notify admins about new campaign
+        NotificationController::notifyAdmins(
+            'campaign_created',
+            'New Campaign Submitted',
+            "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and is pending review.",
+            ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
+        );
+
+        return redirect()->back()->with('success', 'Campaign created successfully!');
     }
 
     public function ToggleLike(Request $request)
@@ -177,18 +178,18 @@ class CampaignController extends Controller
         $category = $request->input('category');
 
         // get campaigns where they are not banned or rejected and is still pending
-        if(!$category){
+        if (!$category) {
             return response()->json(['error' => 'Category parameter is required'], 400);
         }
         if ($category === 'All' || $category === null) {
             $campaigns = Campaign::where('status', ['active'])->get();
 
-        }else{
+        } else {
             $campaigns = Campaign::where('category', $category)->where('status', ['active'])->get();
 
         }
 
-        // dd($testCampaign);
+        // dd($campaigns);
 
         return inertia::render('Campaign/CampaignList', [
             'campaigns' => $campaigns,

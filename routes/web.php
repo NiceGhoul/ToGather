@@ -15,8 +15,10 @@ use App\Http\Middleware\RedirectIfAuthenticated;
 use Inertia\Inertia;
 
 
-
-Route::get('/', [CampaignController::class, 'index'])->name('home');
+Route::get('/', function () {
+    return redirect('/home');
+});
+Route::get('/home', [CampaignController::class, 'index'])->name('home');
 Route::get('/check-email', [UserController::class, 'checkEmail']);
 
 // --- Guest Routes ---
@@ -78,7 +80,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
     Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
     Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
-    
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -134,6 +136,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/lookups/store', [LookupController::class, 'store'])->name('lookups.store');
     Route::post('/lookups/update/{id}', [LookupController::class, 'update'])->name('lookups.update');
     Route::post('/lookups/delete/{id}', [LookupController::class, 'destroy'])->name('lookups.destroy');
-    
+
     Route::get('/transactions', [DonationController::class, 'adminIndex'])->name('transactions.index');
 });

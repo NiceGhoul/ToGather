@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Popup from "@/Components/Popup";
+import { Eye, EyeOff, Search, Trash, RotateCcw, File } from "lucide-react";
 
 export default function Article_List() {
     const { articles, categories, filters } = usePage().props;
@@ -155,7 +156,7 @@ export default function Article_List() {
                                 placeholder="Search by title..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="min-w-[200px]"
+                                className="min-w-[200px] focus-visible:ring-purple-700"
                             />
                         </div>
 
@@ -164,7 +165,7 @@ export default function Article_List() {
                             <select
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                className="border border-gray-300 rounded px-3 py-2 min-w-[160px]"
+                                className="border border-gray-300 rounded px-3 py-2 min-w-[160px] focus-visible:ring-purple-700 focus-visible:border-purple-700 focus-visible:ring-2"
                             >
                                 <option value="">All Categories</option>
                                 {categories.map((cat, i) => (
@@ -180,7 +181,7 @@ export default function Article_List() {
                             <select
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
-                                className="border border-gray-300 rounded px-3 py-2 min-w-[160px]"
+                                className="border border-gray-300 rounded px-3 py-2 min-w-[160px] focus-visible:ring-purple-700 focus-visible:border-purple-700 focus-visible:ring-2"
                             >
                                 <option value="">All Approved Article</option>
                                 <option value="approved">Enabled</option>
@@ -195,13 +196,13 @@ export default function Article_List() {
                                 onClick={handleFilter}
                                 className="bg-purple-800 hover:bg-purple-700 text-white rounded-md"
                             >
-                                Apply Filters
+                                <Search />
                             </Button>
                             <Button
                                 onClick={handleResetFilter}
                                 className="bg-purple-800 hover:bg-purple-700 text-white rounded-md"
                             >
-                                Reset Filters
+                                <RotateCcw />
                             </Button>
                         </div>
                     </div>
@@ -212,7 +213,12 @@ export default function Article_List() {
                             {selectedIds.length} selected
                         </div>
                         <Popup
-                            triggerText="Enable Selected"
+                            triggerText={
+                                <div className="flex items-center gap-2 cursor-pointer">
+                                    <Eye className="w-4 h-4" />
+                                    <span>Enable All</span>
+                                </div>
+                            }
                             title="Enable All Selected Article?"
                             description="All selected articles will be enabled and will be shown publicly."
                             confirmText="Yes, Enable All"
@@ -222,7 +228,12 @@ export default function Article_List() {
                             onConfirm={() => handleBulkEnable()}
                         />
                         <Popup
-                            triggerText="Disable Selected"
+                            triggerText={
+                                <div className="flex items-center gap-2 cursor-pointer">
+                                    <EyeOff className="w-4 h-4" />
+                                    <span>Disable All</span>
+                                </div>
+                            }
                             title="Disable All Selected Article?"
                             description="All selected articles will be disabled and will be hidden from public."
                             confirmText="Yes, Disable All"
@@ -232,7 +243,12 @@ export default function Article_List() {
                             onConfirm={() => handleBulkDisable()}
                         />
                         <Popup
-                            triggerText="Delete Selected"
+                            triggerText={
+                                <div className="flex items-center gap-2 cursor-pointer">
+                                    <Trash className="w-4 h-4" />
+                                    <span>Delete All</span>
+                                </div>
+                            }
                             title="Delete All Selected Article?"
                             description="This action cannot be undone. All selected articles will be deleted permanently."
                             confirmText="Yes, Delete All"
@@ -306,37 +322,39 @@ export default function Article_List() {
                                                     onClick={() =>
                                                         handleView(a.id)
                                                     }
-                                                    className="bg-purple-800 hover:bg-purple-700 text-white w-18"
+                                                    className="bg-purple-800 hover:bg-purple-700 text-white"
                                                 >
-                                                    View
+                                                    <File />
                                                 </Button>
                                                 {a.status === "approved" && (
                                                     <Button
-                                                        className="bg-yellow-600 hover:bg-yellow-700 w-18"
+                                                        className="bg-yellow-600 hover:bg-yellow-700"
                                                         onClick={() =>
                                                             handleDisable(a.id)
                                                         }
                                                     >
-                                                        Disable
+                                                        <EyeOff />
                                                     </Button>
                                                 )}
                                                 {a.status === "disabled" && (
                                                     <Button
-                                                        className="bg-green-600 hover:bg-green-700 w-18"
+                                                        className="bg-green-600 hover:bg-green-700"
                                                         onClick={() =>
                                                             handleEnable(a.id)
                                                         }
                                                     >
-                                                        Enable
+                                                        <Eye />
                                                     </Button>
                                                 )}
                                                 <Popup
-                                                    triggerText="Delete"
+                                                    triggerText={
+                                                        <Trash className="w-4 h-4" />
+                                                    }
                                                     title="Delete Article?"
                                                     description="This action cannot be undone. The article will be permanently removed."
                                                     confirmText="Yes, Delete"
                                                     confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                    triggerClass="bg-red-600 hover:bg-red-700 text-white w-18"
+                                                    triggerClass="bg-red-600 hover:bg-red-700 text-white"
                                                     onConfirm={() =>
                                                         handleDelete(a.id)
                                                     }

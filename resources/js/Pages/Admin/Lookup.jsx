@@ -3,6 +3,7 @@ import { usePage, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
 import Popup from "@/Components/Popup";
+import { Trash, Pencil } from "lucide-react";
 
 export default function Lookup() {
     const { lookups } = usePage().props;
@@ -127,16 +128,20 @@ export default function Lookup() {
                                     {lookup.lookup_description}
                                 </td>
                                 <td className="border px-4 py-2 text-center space-x-2">
+                                    {/* Tombol Edit */}
                                     <Button
                                         variant="outline"
-                                        size="sm"
+                                        size="icon"
                                         onClick={() => handleEdit(lookup)}
                                     >
-                                        Edit
+                                        <Pencil className="w-4 h-4" />
                                     </Button>
 
+                                    {/* Tombol Delete */}
                                     <Popup
-                                        triggerText="Delete"
+                                        triggerText={
+                                            <Trash className="w-4 h-4" />
+                                        }
                                         title="Delete Lookup?"
                                         description="This action cannot be undone. The Lookup will be removed permanently."
                                         confirmText="Yes, Delete"

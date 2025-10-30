@@ -4,6 +4,22 @@ import { Button } from "@/components/ui/button";
 import Popup from "@/Components/Popup";
 import Cropper from "react-easy-crop";
 import { useMemo, useState, useRef, useEffect, useCallback } from "react";
+import {
+    EyeOff,
+    Eye,
+    Trash,
+    Check,
+    X,
+    ArrowBigLeft,
+    Pencil,
+    PencilOff,
+    Save,
+    Ban,
+    Rows2,
+    Columns2,
+    CaseSensitive,
+} from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 
 export default function ArticleView() {
     const { article, url } = usePage().props;
@@ -243,7 +259,7 @@ export default function ArticleView() {
     // get cropped blob and attach to block as File
     const getCroppedBlob = (imageSrc, cropPixels) =>
         new Promise((resolve, reject) => {
-            const image = new Image();
+            const image = new window.Image();
             image.src = imageSrc;
             image.onload = () => {
                 const canvas = document.createElement("canvas");
@@ -371,11 +387,11 @@ export default function ArticleView() {
                             className=" text-white text-sm px-3 py-1 h-auto"
                             onClick={() => addBlockAt(cell.x, cell.y, "text")}
                         >
-                            + Text
+                            <CaseSensitive />
                         </Button>
 
                         <Button className="relative px-3 py-1 text-sm overflow-hidden h-auto">
-                            + Image
+                            <ImageIcon />
                             <input
                                 type="file"
                                 accept="image/*"
@@ -409,16 +425,16 @@ export default function ArticleView() {
                         {blocks[idxInBlocks].type === "text" ? (
                             <>
                                 <Button
-                                    className="text-white text-sm px-3 py-1 h-auto"
+                                    className="text-white text-sm px-3 py-1 h-auto bg-purple-800 hover:bg-purple-600"
                                     onClick={() => startEdit(idxInBlocks)}
                                 >
-                                    Edit Text
+                                    <Pencil className="w-4 h-4 inline-block" />
                                 </Button>
                                 <Button
                                     onClick={() => removeBlock(idxInBlocks)}
-                                    className="bg-red-600 text-white text-sm px-3 py-1 h-auto"
+                                    className="bg-red-600 hover:bg-red-700 text-white text-sm px-2 py-1 h-auto"
                                 >
-                                    Remove
+                                    <X className="w-4 h-4" />
                                 </Button>
                             </>
                         ) : (
@@ -428,7 +444,7 @@ export default function ArticleView() {
                                         type="button"
                                         className="bg-purple-800 hover:bg-purple-700 text-white text-sm px-3 py-1 h-auto"
                                     >
-                                        Replace Image
+                                        <ImageIcon />
                                     </Button>
                                     <input
                                         type="file"
@@ -449,7 +465,7 @@ export default function ArticleView() {
                                     onClick={() => removeBlock(idxInBlocks)}
                                     className="bg-red-600 text-white text-sm px-3 py-1 h-auto"
                                 >
-                                    Remove
+                                    <X />
                                 </Button>
                             </>
                         )}
@@ -523,9 +539,9 @@ export default function ArticleView() {
                     }}
                 />
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-col gap-3 items-start">
                     <h1 className="text-2xl font-bold">{article.title}</h1>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 justify-end w-full">
                         <Button
                             onClick={() => {
                                 if (editingMode) {
@@ -536,7 +552,18 @@ export default function ArticleView() {
                                 }
                             }}
                         >
-                            {editingMode ? "Exit Edit Mode" : "Enter Edit Mode"}
+                            {!editingMode && (
+                                <div className="flex items-center gap-2 cursor-pointer text-xs">
+                                    <Pencil className="w-4 h-4" />
+                                    <span>Edit</span>
+                                </div>
+                            )}
+                            {editingMode && (
+                                <div className="flex items-center gap-2 cursor-pointer text-xs">
+                                    <PencilOff className="w-4 h-4" />
+                                    <span>Exit Edit</span>
+                                </div>
+                            )}
                         </Button>
 
                         {editingMode && (
@@ -545,21 +572,35 @@ export default function ArticleView() {
                                     onClick={saveAllChanges}
                                     className="bg-green-600"
                                 >
-                                    Save Changes
+                                    <div className="flex items-center gap-2 cursor-pointer text-xs">
+                                        <Save className="w-4 h-4" />
+                                        <span>Save Changes</span>
+                                    </div>
                                 </Button>
                                 <Button
                                     onClick={cancelAll}
-                                    className="bg-gray-400"
+                                    className="bg-gray-400 hover:bg-red-600 text-white"
                                 >
-                                    Cancel
+                                    <div className="flex items-center gap-2 cursor-pointer text-xs">
+                                        <Ban className="w-4 h-4" />
+                                        <span>Cancel</span>
+                                    </div>
                                 </Button>
                                 {/* grid controls */}
-                                <Button onClick={addRow}>Add Row</Button>
+                                <Button onClick={addRow}>
+                                    <div className="flex items-center gap-2 cursor-pointer text-xs">
+                                        <Rows2 className="w-4 h-4" />
+                                        <span>Add Row</span>
+                                    </div>
+                                </Button>
                                 <Button
                                     onClick={addColumn}
                                     disabled={maxX >= 2}
                                 >
-                                    Add Column
+                                    <div className="flex items-center gap-2 cursor-pointer text-xs">
+                                        <Columns2 className="w-4 h-4" />
+                                        <span>Add Column</span>
+                                    </div>
                                 </Button>
                             </>
                         )}
@@ -572,9 +613,11 @@ export default function ArticleView() {
                                     handleBack();
                                 }
                             }}
-                            className="bg-gray-600"
+                            className="bg-purple-800 hover:bg-purple-700 text-white"
                         >
-                            ← Back
+                            <div className="flex items-center gap-2 cursor-pointer">
+                                <ArrowBigLeft className="w-4 h-4" />
+                            </div>
                         </Button>
                     </div>
                 </div>
@@ -634,16 +677,24 @@ export default function ArticleView() {
                     </div>
 
                     <div className="flex flex-col justify-center space-y-2">
-                        {article.status === "approved" && (
+                        {article.status === "approved" && !editingMode && (
                             <>
                                 <Button
                                     onClick={() => handleDisable(article.id)}
                                     className="bg-yellow-600 hover:bg-yellow-700"
                                 >
-                                    Disable
+                                    <div className="flex items-center gap-2 cursor-pointer">
+                                        <EyeOff className="w-4 h-4" />
+                                        <span>Disable</span>
+                                    </div>
                                 </Button>
                                 <Popup
-                                    triggerText="Delete"
+                                    triggerText={
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <Trash className="w-4 h-4" />
+                                            <span>Delete</span>
+                                        </div>
+                                    }
                                     title="Delete Article?"
                                     description="This action cannot be undone. The article will be permanently removed."
                                     confirmText="Yes, Delete"
@@ -653,16 +704,24 @@ export default function ArticleView() {
                                 />
                             </>
                         )}
-                        {article.status === "disabled" && (
+                        {article.status === "disabled" && !editingMode && (
                             <>
                                 <Button
                                     onClick={() => handleEnable(article.id)}
                                     className="bg-green-600 hover:bg-green-800"
                                 >
-                                    Enable
+                                    <div className="flex items-center gap-2 cursor-pointer">
+                                        <Eye className="w-4 h-4" />
+                                        <span>Enable</span>
+                                    </div>
                                 </Button>
                                 <Popup
-                                    triggerText="Delete"
+                                    triggerText={
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <Trash className="w-4 h-4" />
+                                            <span>Delete</span>
+                                        </div>
+                                    }
                                     title="Delete Article?"
                                     description="This action cannot be undone. The article will be permanently removed."
                                     confirmText="Yes, Delete"
@@ -672,10 +731,15 @@ export default function ArticleView() {
                                 />
                             </>
                         )}
-                        {article.status === "pending" && (
+                        {article.status === "pending" && !editingMode && (
                             <>
                                 <Popup
-                                    triggerText="Approve"
+                                    triggerText={
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <Check className="w-4 h-4" />
+                                            <span>Approve</span>
+                                        </div>
+                                    }
                                     title="Approve Article?"
                                     description="This action cannot be undone. The article will be published and visible to users."
                                     confirmText="Yes, Approve"
@@ -687,14 +751,22 @@ export default function ArticleView() {
                                     onClick={() => setRejectModalOpen(true)}
                                     className="bg-red-600 hover:bg-red-700 text-white"
                                 >
-                                    Reject
+                                    <div className="flex items-center gap-2 cursor-pointer">
+                                        <X className="w-4 h-4" />
+                                        <span>Reject</span>
+                                    </div>
                                 </Button>
                             </>
                         )}
-                        {article.status === "rejected" && (
+                        {article.status === "rejected" && !editingMode && (
                             <>
                                 <Popup
-                                    triggerText="Delete"
+                                    triggerText={
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <Trash className="w-4 h-4" />
+                                            <span>Delete</span>
+                                        </div>
+                                    }
                                     title="Delete Article?"
                                     description="This action cannot be undone. The article will be permanently removed."
                                     confirmText="Yes, Delete"
@@ -816,7 +888,8 @@ export default function ArticleView() {
                                                         className="w-full max-w-[320px] cursor-pointer"
                                                         onClick={() =>
                                                             handleImageClick(
-                                                                block.preview || block.image_url
+                                                                block.preview ||
+                                                                    block.image_url
                                                             )
                                                         }
                                                     >
@@ -830,7 +903,9 @@ export default function ArticleView() {
                                                             />
                                                         ) : block.image_url ? (
                                                             <img
-                                                                src={block.image_url}
+                                                                src={
+                                                                    block.image_url
+                                                                }
                                                                 alt={`Block ${x},${y}`}
                                                                 className="w-full h-48 object-cover rounded-md"
                                                             />
