@@ -123,7 +123,7 @@ export default function MyArticle({ articles = [] }) {
 
                                     <div className="mt-auto">
                                         <Link
-                                            href={`/articles/${article.id}`}
+                                            href={`/articles/${article.id}/details`}
                                             className="text-blue-600 hover:underline inline-block mb-2"
                                         >
                                             View details →

@@ -54,6 +54,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
     Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
+    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
+
+    Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
     Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
@@ -89,7 +92,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/donations-details', [ProfileController::class, 'donationsDetails']);
     Route::get('/profile/campaigns-details', [ProfileController::class, 'campaignsDetails']);
     Route::get('/profile/raised-details', [ProfileController::class, 'raisedDetails']);
-    
+    Route::get('/profile/articles-details', [ProfileController::class, 'articlesDetails']);
+
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');

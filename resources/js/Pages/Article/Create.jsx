@@ -10,31 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm, usePage, router } from "@inertiajs/react";
-import { useState, useCallback, useEffect, useRef } from "react";
-import Cropper from "react-easy-crop";
+import { useState, useRef } from "react";
 import Popup from "@/Components/Popup";
-
-const getCroppedImg = (imageSrc, cropPixels) =>
-    new Promise((resolve, reject) => {
-        const image = new Image();
-        image.src = imageSrc;
-        image.onload = () => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const { width, height, x, y } = cropPixels;
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(image, x, y, width, height, 0, 0, width, height);
-
-            canvas.toBlob((blob) => {
-                const file = new File([blob], "cropped.jpg", {
-                    type: "image/jpeg",
-                });
-                resolve(file);
-            }, "image/jpeg");
-        };
-        image.onerror = (err) => reject(err);
-    });
 
 export default function Create() {
     const thumbInputRef = useRef(null);
@@ -56,45 +33,17 @@ export default function Create() {
     const [showTitleError, setShowTitleError] = useState(false);
     const [showCategoryError, setShowCategoryError] = useState(false);
 
-    // thumbnail cropper
-    const [thumbCropFile, setThumbCropFile] = useState(null);
-    const [thumbCrop, setThumbCrop] = useState({ x: 0, y: 0 });
-    const [thumbZoom, setThumbZoom] = useState(1);
-    const [thumbCroppedAreaPixels, setThumbCroppedAreaPixels] = useState(null);
+    // 🟣 Thumbnail Preview
     const [thumbPreview, setThumbPreview] = useState(null);
-    const onThumbCropComplete = useCallback((_, croppedPixels) => {
-        setThumbCroppedAreaPixels(croppedPixels);
-    }, []);
-
-    // image block cropper
-    const [aspect, setAspect] = useState(16 / 9);
-    const [cropFile, setCropFile] = useState(null);
-    const [cropTargetIdx, setCropTargetIdx] = useState(null);
-    const [crop, setCrop] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-    const onCropComplete = useCallback((_, croppedPixels) => {
-        setCroppedAreaPixels(croppedPixels);
-    }, []);
-
-    // thumbnail change
     const handleThumbnailChange = (e) => {
         const file = e.target.files[0];
-        if (file) setThumbCropFile(file);
+        if (file) {
+            setData("thumbnail", file);
+            setThumbPreview(URL.createObjectURL(file));
+        }
     };
 
-    const handleThumbCropDone = async () => {
-        if (!thumbCropFile || !thumbCroppedAreaPixels) return;
-        const croppedFile = await getCroppedImg(
-            URL.createObjectURL(thumbCropFile),
-            thumbCroppedAreaPixels
-        );
-        setData("thumbnail", croppedFile);
-        setThumbPreview(URL.createObjectURL(croppedFile));
-        setThumbCropFile(null);
-    };
-
-    // grid handlers
+    // 🟣 Grid Handlers
     const removeBlock = (index) => {
         const updated = [...blocks];
         updated.splice(index, 1);
@@ -113,20 +62,27 @@ export default function Create() {
         setBlocks([...blocks, { type, content: "", order_x, order_y }]);
     };
 
-    // submit
+    // 🟣 Image Change Handler
+    const handleImageChange = (idx, e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const updated = [...blocks];
+            updated[idx].content = file;
+            setBlocks(updated);
+        }
+    };
+
+    // 🟣 Submit
     const handleSubmit = (e) => {
         e.preventDefault();
-
         if (!data.title.trim() && !data.category) {
             setShowError(true);
             return;
         }
-
         if (!data.title.trim()) {
             setShowTitleError(true);
             return;
         }
-
         if (!data.category) {
             setShowCategoryError(true);
             return;
@@ -160,22 +116,10 @@ export default function Create() {
         });
     };
 
-    const handleCropDone = async () => {
-        if (!cropFile || !croppedAreaPixels) return;
-        const croppedFile = await getCroppedImg(
-            URL.createObjectURL(cropFile),
-            croppedAreaPixels
-        );
-        const updated = [...blocks];
-        updated[cropTargetIdx].content = croppedFile;
-        setBlocks(updated);
-        setCropFile(null);
-        setCropTargetIdx(null);
-    };
-
     return (
         <Layout_User>
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8 space-y-8">
+                {/* LEFT: FORM */}
                 <Card className="w-full my-5">
                     <CardHeader>
                         <CardTitle>Create New Article</CardTitle>
@@ -221,7 +165,7 @@ export default function Create() {
                             {/* THUMBNAIL */}
                             <div>
                                 <Label htmlFor="thumbnail">
-                                    Thumbnail (16:9)
+                                    Thumbnail (auto-scaled)
                                 </Label>
                                 <Input
                                     id="thumbnail"
@@ -231,11 +175,11 @@ export default function Create() {
                                     onChange={handleThumbnailChange}
                                 />
                                 {thumbPreview && (
-                                    <div className="w-full max-w-md aspect-video mt-3 rounded-lg overflow-hidden border mx-auto">
+                                    <div className="w-full max-w-md mt-3 rounded-lg overflow-hidden border mx-auto bg-white flex justify-center">
                                         <img
                                             src={thumbPreview}
                                             alt="Thumbnail Preview"
-                                            className="w-full h-full object-cover"
+                                            className="max-h-[300px] object-contain rounded-md"
                                         />
                                     </div>
                                 )}
@@ -327,31 +271,23 @@ export default function Create() {
                                                                         accept="image/*"
                                                                         onChange={(
                                                                             e
-                                                                        ) => {
-                                                                            const file =
+                                                                        ) =>
+                                                                            handleImageChange(
+                                                                                idx,
                                                                                 e
-                                                                                    .target
-                                                                                    .files[0];
-                                                                            if (
-                                                                                file
-                                                                            ) {
-                                                                                setCropFile(
-                                                                                    file
-                                                                                );
-                                                                                setCropTargetIdx(
-                                                                                    idx
-                                                                                );
-                                                                            }
-                                                                        }}
+                                                                            )
+                                                                        }
                                                                     />
                                                                     {block.content && (
-                                                                        <img
-                                                                            src={URL.createObjectURL(
-                                                                                block.content
-                                                                            )}
-                                                                            alt="preview"
-                                                                            className="w-full h-60 object-cover rounded-md mt-2"
-                                                                        />
+                                                                        <div className="w-full mt-3 flex justify-center bg-white border rounded-md p-2">
+                                                                            <img
+                                                                                src={URL.createObjectURL(
+                                                                                    block.content
+                                                                                )}
+                                                                                alt="preview"
+                                                                                className="max-h-[250px] object-contain rounded-md"
+                                                                            />
+                                                                        </div>
                                                                     )}
                                                                 </>
                                                             )
@@ -434,17 +370,17 @@ export default function Create() {
                     </CardHeader>
                     <CardContent>
                         {/* Thumbnail */}
-                        <div className="mb-4">
+                        <div className="mb-4 flex justify-center">
                             {thumbPreview ? (
-                                <div className="w-full max-w-2xl aspect-video mt-3 rounded-lg overflow-hidden border mx-auto">
+                                <div className="w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-sm">
                                     <img
                                         src={thumbPreview}
                                         alt="preview thumb"
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover object-center"
                                     />
                                 </div>
                             ) : (
-                                <div className="w-full aspect-video rounded-md bg-gray-100 flex items-center justify-center text-gray-400">
+                                <div className="w-full max-w-4xl min-h-[180px] rounded-md bg-gray-100 flex items-center justify-center text-gray-400 shadow-sm">
                                     Thumbnail Preview
                                 </div>
                             )}
@@ -458,47 +394,39 @@ export default function Create() {
                             by Unknown · {new Date().toLocaleDateString()}
                         </p>
 
-                        {/* Content Grid Preview */}
-                        <div
-                            className="grid gap-4"
-                            style={{
-                                gridTemplateColumns: `repeat(${Math.max(
-                                    1,
-                                    ...blocks.map((b) => b.order_x)
-                                )}, minmax(0,1fr))`,
-                            }}
-                        >
-                            {(() => {
-                                const maxRow = Math.max(
-                                    1,
-                                    ...blocks.map((b) => b.order_y)
-                                );
-                                const maxCol = Math.max(
-                                    1,
-                                    ...blocks.map((b) => b.order_x)
-                                );
-                                const cells = [];
-                                for (let r = 1; r <= maxRow; r++) {
-                                    for (let c = 1; c <= maxCol; c++) {
-                                        cells.push({
-                                            order_x: c,
-                                            order_y: r,
-                                        });
-                                    }
-                                }
+                        {/* Content Preview */}
+                        {(() => {
+                            const maxRow = Math.max(
+                                1,
+                                ...blocks.map((b) => b.order_y)
+                            );
+                            const maxCol = Math.max(
+                                1,
+                                ...blocks.map((b) => b.order_x)
+                            );
+                            const cells = [];
 
-                                return cells.map((cell, i) => {
-                                    const idx = blocks.findIndex(
+                            for (let y = 1; y <= maxRow; y++) {
+                                for (let x = 1; x <= maxCol; x++) {
+                                    const block = blocks.find(
                                         (b) =>
-                                            b.order_x === cell.order_x &&
-                                            b.order_y === cell.order_y
+                                            b.order_x === x && b.order_y === y
                                     );
-                                    const block =
-                                        idx !== -1 ? blocks[idx] : null;
-                                    return (
+                                    cells.push({ x, y, block });
+                                }
+                            }
+
+                            return (
+                                <div
+                                    className="grid gap-4"
+                                    style={{
+                                        gridTemplateColumns: `repeat(${maxCol}, minmax(0,1fr))`,
+                                    }}
+                                >
+                                    {cells.map(({ x, y, block }, i) => (
                                         <div
-                                            key={i}
-                                            className=" rounded flex flex-col"
+                                            key={`${y}-${x}`}
+                                            className="rounded flex flex-col"
                                         >
                                             {block ? (
                                                 block.type === "text" ? (
@@ -507,35 +435,34 @@ export default function Create() {
                                                             "Empty Text"}
                                                     </p>
                                                 ) : (
-                                                    <div className="w-full max-w-md mx-auto mt-2 rounded-lg overflow-hidden shadow-sm">
-                                                        <img
-                                                            src={
-                                                                block.content instanceof
-                                                                File
-                                                                    ? URL.createObjectURL(
-                                                                          block.content
-                                                                      )
-                                                                    : block.content
-                                                            }
-                                                            alt="grid image"
-                                                            className="w-full aspect-video object-cover rounded-md transition-transform duration-200 hover:scale-[1.02]"
-                                                        />
-                                                    </div>
+                                                    block.content && (
+                                                        <div className="w-full max-w-md mx-auto mt-2 rounded-lg overflow-hidden shadow-sm bg-white">
+                                                            <img
+                                                                src={URL.createObjectURL(
+                                                                    block.content
+                                                                )}
+                                                                alt={`Block ${
+                                                                    i + 1
+                                                                }`}
+                                                                className="max-h-[300px] object-contain rounded-md"
+                                                            />
+                                                        </div>
+                                                    )
                                                 )
                                             ) : (
-                                                <p className="text-sm text-gray-400">
+                                                <div className="min-h-[100px] text-gray-400 text-sm">
                                                     Empty
-                                                </p>
+                                                </div>
                                             )}
                                         </div>
-                                    );
-                                });
-                            })()}
-                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()}
                     </CardContent>
                 </Card>
 
-                {/* POPUPS + CROPPERS */}
+                {/* POPUPS */}
                 {showConfirm && (
                     <Popup
                         triggerText={null}
@@ -547,7 +474,6 @@ export default function Create() {
                         onConfirm={confirmSubmit}
                     />
                 )}
-
                 {showSuccess && (
                     <Popup
                         triggerText={null}
@@ -573,12 +499,11 @@ export default function Create() {
                         onConfirm={() => setShowError(false)}
                     />
                 )}
-
                 {showTitleError && (
                     <Popup
                         triggerText={null}
                         title="Incomplete Form"
-                        description="Please fill in the title  before submitting."
+                        description="Please fill in the title before submitting."
                         confirmText="Okay"
                         showCancel={false}
                         confirmColor="bg-red-600 hover:bg-red-700 text-white"
@@ -595,80 +520,6 @@ export default function Create() {
                         confirmColor="bg-red-600 hover:bg-red-700 text-white"
                         onConfirm={() => setShowCategoryError(false)}
                     />
-                )}
-
-                {/* CROP MODALS */}
-                {cropFile && (
-                    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-                        <div className="bg-white p-5 rounded-lg shadow-lg w-[480px]">
-                            <div className="flex flex-col items-center gap-4">
-                                <Label className="font-medium">
-                                    Crop Image
-                                </Label>
-                                <div className="w-[420px] h-[300px] relative bg-gray-900 rounded-md overflow-hidden">
-                                    <Cropper
-                                        image={URL.createObjectURL(cropFile)}
-                                        crop={crop}
-                                        zoom={zoom}
-                                        aspect={aspect}
-                                        onCropChange={setCrop}
-                                        onZoomChange={setZoom}
-                                        onCropComplete={onCropComplete}
-                                    />
-                                </div>
-                                <div className="flex justify-between w-full mt-4">
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => {
-                                            setCropFile(null);
-                                            setCropTargetIdx(null);
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button onClick={handleCropDone}>
-                                        Crop
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {thumbCropFile && (
-                    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-                        <div className="bg-white p-5 rounded-lg shadow-lg w-[520px]">
-                            <div className="flex flex-col items-center gap-4">
-                                <Label className="font-medium">
-                                    Crop Thumbnail (16:9)
-                                </Label>
-                                <div className="w-[460px] h-[300px] relative bg-gray-900 rounded-md overflow-hidden">
-                                    <Cropper
-                                        image={URL.createObjectURL(
-                                            thumbCropFile
-                                        )}
-                                        crop={thumbCrop}
-                                        zoom={thumbZoom}
-                                        aspect={16 / 9}
-                                        onCropChange={setThumbCrop}
-                                        onZoomChange={setThumbZoom}
-                                        onCropComplete={onThumbCropComplete}
-                                    />
-                                </div>
-                                <div className="flex justify-between w-full mt-4">
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => setThumbCropFile(null)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button onClick={handleThumbCropDone}>
-                                        Crop
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 )}
             </div>
         </Layout_User>
