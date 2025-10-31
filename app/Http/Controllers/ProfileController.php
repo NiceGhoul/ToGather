@@ -29,6 +29,8 @@ class ProfileController extends Controller
             'campaigns_count' => $user->campaigns()->count(),
             'active_campaigns' => $user->campaigns()->where('status', 'active')->count(),
             'total_raised' => $user->campaigns()->sum('collected_amount'),
+            'articles_count' => $user->articles()->count(),
+            'approved_articles' => $user->articles()->where('status', 'approved')->count(),
         ];
 
         $verificationStatus = $user->verificationRequests()->where('status', 'accepted')->exists();
@@ -142,5 +144,25 @@ class ProfileController extends Controller
             });
 
         return response()->json($campaigns);
+    }
+
+    public function articlesDetails()
+    {
+        $articles = auth()->user()->articles()
+            ->withCount('likes')
+            ->select('id', 'title', 'status', 'category', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($article) {
+                return [
+                    'title' => $article->title,
+                    'category' => $article->category,
+                    'status' => $article->status,
+                    'likes_count' => $article->likes_count,
+                    'created_at' => $article->created_at
+                ];
+            });
+
+        return response()->json($articles);
     }
 }

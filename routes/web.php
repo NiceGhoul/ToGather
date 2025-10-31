@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/donations-details', [ProfileController::class, 'donationsDetails']);
     Route::get('/profile/campaigns-details', [ProfileController::class, 'campaignsDetails']);
     Route::get('/profile/raised-details', [ProfileController::class, 'raisedDetails']);
+    Route::get('/profile/articles-details', [ProfileController::class, 'articlesDetails']);
 
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
