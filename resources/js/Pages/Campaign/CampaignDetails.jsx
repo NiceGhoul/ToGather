@@ -1,4 +1,6 @@
+// import { Accordion, AccordionContent } from "@/Components/ui/accordion";
 import { Button } from "@/Components/ui/button";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/Components/ui/carousel";
 import { Progress } from "@/Components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Toggle } from "@/Components/ui/toggle";
@@ -52,16 +54,29 @@ const contentDivider = (data, campaign) => {
                 <h2 className="text-3xl font-bold text-[#7C4789] mb-4">
                     Media
                 </h2>
-
                 {/* should be scrollable */}
-                <div className="relative w-full max-w-3xl mx-auto overflow-hidden border border-gray-300 rounded-lg">
-                    <div className="flex transition-transform duration-500 ease-in-out">
-                        <img
-                            src="http://127.0.0.1:8000/images/king.jpg"
-                            alt="Food truck"
-                            className="w-full h-[300px] object-cover"
-                        />
-                    </div>
+                <div className="">
+                    <Carousel className="w-full">
+                        <CarouselContent>
+                            <CarouselItem>
+                                <img
+                                    src="http://127.0.0.1:8000/images/king.jpg"
+                                    alt="tes1"
+                                    className="w-full h-[300px] object-cover"
+                                />
+                            </CarouselItem>
+
+                            <CarouselItem>
+                                <img
+                                    src="http://127.0.0.1:8000/images/sharks.jpg"
+                                    alt="tes2"
+                                    className="w-full h-[300px] object-cover"
+                                />
+                            </CarouselItem>
+                        </CarouselContent>
+                        <CarouselNext/>
+                        <CarouselPrevious />
+                    </Carousel>
                 </div>
             </div>
         );
@@ -70,6 +85,9 @@ const contentDivider = (data, campaign) => {
             // has a dropdown box
             <div>
                 <p>{data}</p>
+                {/* <Accordion>
+                    <AccordionContent>Test</AccordionContent>
+                </Accordion> */}
             </div>
         );
     } else if (data === "Updates") {
@@ -106,7 +124,7 @@ const tabsContentRepeater = (data, campaign, index) => {
     return (
         <TabsContent
             value={index + 1}
-            className="w-[90%] text-lg text-center py-4"
+            className="w-[90%] h-[100%] text-lg text-center py-4"
         >
             {contentDivider(data, campaign)}
         </TabsContent>
@@ -139,12 +157,12 @@ export default function Create() {
                 Recent Donations
             </h1>
             <Separator className="flex-1 bg-gray-400 h-[1px]" />
-            <div className="flex-col flex gap-2 m-8">
-                <div className="flex-row gap-2 flex justify-center items-center ">
+            <div className="flex-col flex gap-2 m-4">
+                <div className="flex-row flex gap-2 flex justify-center items-center ">
                     {donations.length > 0 ? (
                         donations.map((donation) => scrollDonations(donation))
                     ) : (
-                        <p className="text-lg text-center">
+                        <p key={0} className="text-lg text-center">
                             No Donations, yet...
                         </p>
                     )}
@@ -162,12 +180,13 @@ export default function Create() {
                 </div>
 
                 <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
-                    <h1 className="text-2xl text-end font-semibold flex mb=5">
+                    <h1 className="text-4xl text-end font-semibold flex mb=5">
                         {campaign.title}
                     </h1>
+                    <h1 className="text-3xl text-end font-semibold flex my-10 text-[#7C4789]">{donations.length.toString() + " " + (donations.length > 1 ? " Donators" : " Donator")} </h1>
                     <div className="relative flex flex-col justify-end gap-4 mt-2">
                         <Progress
-                            className="h-6 rounded-sm bg-[#BCA3CA] [&>div]:bg-[#7C4789]"
+                            className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
                             value={
                                 (campaign.collected_amount /
                                     campaign.goal_amount) *
@@ -175,7 +194,7 @@ export default function Create() {
                             }
                         />
                         <span
-                            className="absolute inset-0 flex items-start justify-center text-md font-medium"
+                            className="absolute inset-0 flex items-start justify-center text-md font-medium "
                             style={{
                                 color: percentage > 50 ? "white" : "black",
                             }}

@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateCampaignRequest;
 use App\Models\Campaign;
 use App\Models\Donation;
 use App\Models\Likes;
+use App\Models\Location;
 use App\Models\Lookup;
 use App\Models\User;
 use COM;
@@ -80,7 +81,9 @@ class CampaignController extends Controller
 
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
-            return inertia('Campaign/Create');
+            return inertia::render('Campaign/Create', [
+            'user_Id' => Auth::user()->id,
+        ]);
         }
 
         return inertia('Verification/Create');
@@ -117,22 +120,21 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function createNewCampaign(Request $request) {
-    //      $data = $request->validate([
-    //     'title' => 'required|string',
-    //     'description' => 'required|string',
-    //     'goal_amount' => 'required|numeric',
-    //     'start_date' => 'required|date',
-    //     'end_date' => 'required|date',
-
-    // ]);
+    public function createNewCampaign(Request $request)
+    {
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
+        $campaign = Campaign::create($data);
 
-    Campaign::create($data);
-    return redirect()->back()->with('success', 'Campaign created successfully!');
+        if($campaign && $request->has('location')){
+            $location = $request->input('location');
+            $location['campaign_id'] = $campaign->id;
+        }
+        Location::create($location);
+        return redirect()->back()->with('success', 'Campaign created successfully!');
     }
+
 
     public function ToggleLike(Request $request)
     {
@@ -151,8 +153,15 @@ class CampaignController extends Controller
         }
     }
 
+    public function getCreateSupportingMediaData(Request $request){
+        $content = $request->all();
+
+        return inertia::render('Campaign/createSupportingMedia');
+    }
+
     public function getCampaignListData(Request $request)
     {
+        // inRandomOrder() -> to
         $lookups = Lookup::all();
         $category = $request->input('category');
 
@@ -167,8 +176,6 @@ class CampaignController extends Controller
             $campaigns = Campaign::where('category', $category)->where('status', ['active'])->get();
 
         }
-
-        // dd($testCampaign);
 
         return inertia::render('Campaign/CampaignList', [
             'campaigns' => $campaigns,

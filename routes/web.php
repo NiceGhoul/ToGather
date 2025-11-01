@@ -37,7 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
     // campaigns routing
-    Route::get('/campaigns/create', [CampaignController::class, 'showCreate'])->name('campaigns.showCreate');
+    Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
+    Route::get('/campaigns/create/supportingMedia', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.getSupportingMedia');
     Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
     Route::get('/campaigns/getList', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
     Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');

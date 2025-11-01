@@ -32,6 +32,7 @@ class CampaignFactory extends Factory
             'Logistics']),
             'start_campaign' => $startDate,
             'end_campaign' => $endDate,
+            'address' => $this->faker->address(),
             'status' => $this->faker->randomElement(CampaignStatus::cases()), // Use Enum
             'description' => $this->faker->paragraphs(rand(2, 5), true),
             'collected_amount' => $this->faker->randomFloat(2, 0, 50000),

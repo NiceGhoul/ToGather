@@ -20,6 +20,7 @@ class Campaign extends Model
         'category',
         'start_campaign',
         'end_campaign',
+        'address',
         'status',
         'goal_amount',
         'collected_amount',
@@ -59,6 +60,12 @@ class Campaign extends Model
     public function likes(){
         return $this->morphMany(Likes::class, 'likes');
     }
+
+    // a campaign has one location set
+    public function location()
+{
+    return $this->hasOne(Location::class);
+}
 
     protected $casts = [
         'status' => CampaignStatus::class, // 2. Add the cast
