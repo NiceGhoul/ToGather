@@ -124,16 +124,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');
     Route::get('/articles/{id}/view', [ArticleController::class, 'adminViewArticle'])->name('articles.view');
     Route::post('/articles/{id}/approve', [ArticleController::class, 'adminApprove'])->name('articles.approve');
+    Route::post('/articles/{id}/enable', [ArticleController::class, 'adminEnable'])->name('articles.enable');
     Route::post('/articles/{id}/disable', [ArticleController::class, 'adminDisable'])->name('articles.disable');
     Route::post('/articles/{id}/reject', [ArticleController::class, 'adminReject'])->name('articles.reject');
     Route::post('/articles/{id}/delete', [ArticleController::class, 'adminDelete'])->name('articles.delete');
     Route::get('/articles/{id}/edit', [ArticleController::class, 'adminEdit'])->name('articles.edit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'adminUpdate'])->name('articles.update');
 
-    // Bulk routes
+    // Article Bulk routes
     Route::post('/articles/bulk-approve', [ArticleController::class, 'adminBulkApprove'])->name('articles.bulk.approve');
     Route::post('/articles/bulk-disable', [ArticleController::class, 'adminBulkDisable'])->name('articles.bulk.disable');
     Route::post('/articles/bulk-delete', [ArticleController::class, 'adminBulkDelete'])->name('articles.bulk.delete');
+    Route::post('/articles/bulk-reject', [ArticleController::class, 'adminBulkReject'])->name('articles.bulk.reject');
 
 
     Route::get('/lookups', [LookupController::class, 'index'])->name('lookups.index');
