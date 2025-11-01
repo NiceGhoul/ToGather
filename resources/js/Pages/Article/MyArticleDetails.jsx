@@ -1,36 +1,11 @@
 import Layout_User from "@/Layouts/Layout_User";
-import { usePage } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
 import { Heart, ArrowLeft } from "lucide-react";
 
-export default function Details() {
+export default function MyArticleDetails() {
     const { article } = usePage().props;
-
-    // ---------- LIKE ----------
-    const [liked, setLiked] = useState(article.is_liked_by_user ?? false);
-    const [likeCount, setLikeCount] = useState(article.likes_count ?? 0);
-
-    const handleLike = async () => {
-        try {
-            const res = await fetch(`/articles/${article.id}/like`, {
-                method: "POST",
-                credentials: "same-origin",
-                headers: {
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
-                    Accept: "application/json",
-                },
-            });
-            const data = await res.json();
-            setLiked(data.isLiked);
-            setLikeCount(data.likeCount);
-        } catch (e) {
-            console.error(e);
-        }
-    };
 
     // ---------- MODAL ----------
     const [showModal, setShowModal] = useState(false);
@@ -42,11 +17,20 @@ export default function Details() {
         return a.order_y - b.order_y;
     });
 
+    // ---------- STATUS COLOR ----------
+    const statusColor =
+        {
+            approved: "bg-green-100 text-green-700 border-green-300",
+            pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
+            rejected: "bg-red-100 text-red-700 border-red-300",
+            disabled: "bg-gray-100 text-gray-700 border-gray-300",
+        }[article.status] || "bg-gray-100 text-gray-700 border-gray-300";
+
     return (
         <Layout_User>
             <div className="w-full flex flex-col items-center py-10">
                 {/* HEADER */}
-                <div className="w-full max-w-4xl flex items-center justify-start mb-6">
+                <div className="w-full max-w-4xl flex items-center justify-between mb-6">
                     <Button
                         variant="secondary"
                         className="flex items-center gap-2"
@@ -55,20 +39,48 @@ export default function Details() {
                         <ArrowLeft className="w-4 h-4" />
                         Back
                     </Button>
+
+                    <Button
+                        onClick={() =>
+                            router.visit(`/articles/${article.id}/edit`)
+                        }
+                        className="bg-purple-600 text-white"
+                    >
+                        Edit Article
+                    </Button>
                 </div>
+
+                {/* STATUS BADGE */}
+                <div className="w-full max-w-4xl mb-4">
+                    <div
+                        className={`inline-block px-4 py-2 rounded-md border font-medium capitalize ${statusColor}`}
+                    >
+                        Status: {article.status}
+                    </div>
+                </div>
+
+                {/* REJECTION MESSAGE */}
+                {article.status === "rejected" && article.rejected_reason && (
+                    <div className="w-full max-w-4xl mb-6">
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md">
+                            <p className="font-semibold mb-1">
+                                This article was rejected.
+                            </p>
+                            <p>{article.rejected_reason}</p>
+                        </div>
+                    </div>
+                )}
 
                 {/* THUMBNAIL */}
                 {article.thumbnail_url && (
-                    <div className="w-full max-w-4xl h-[300px] rounded-xl overflow-hidden bg-gray-100 shadow-sm mb-8">
-                        <img
-                            src={article.thumbnail_url}
-                            alt={article.title}
-                            className="w-full h-full object-cover object-center"
-                            onClick={() => {
-                                setModalImage(article.thumbnail_url);
-                                setShowModal(true);
-                            }}
-                        />
+                    <div className="flex justify-center mb-8 w-full">
+                        <div className="w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-sm">
+                            <img
+                                src={article.thumbnail_url}
+                                alt={article.title}
+                                className="w-full h-full object-cover object-center"
+                            />
+                        </div>
                     </div>
                 )}
 
@@ -77,27 +89,11 @@ export default function Details() {
                     <h1 className="text-3xl font-bold">{article.title}</h1>
                 </div>
 
-                <div className="w-full max-w-4xl flex items-center gap-3 text-gray-500 mb-6">
+                <div className="w-full max-w-4xl text-gray-500 mb-6">
                     <p>
                         by {article.user?.nickname ?? "Unknown"} ·{" "}
                         {new Date(article.created_at).toLocaleDateString()}
                     </p>
-
-                    {/* LIKE SECTION */}
-                    <div className="ml-auto flex items-center gap-2">
-                        <Toggle
-                            pressed={liked}
-                            onPressedChange={handleLike}
-                            size="lg"
-                            variant="outline"
-                            className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
-                        >
-                            <Heart className="w-5 h-5" />
-                        </Toggle>
-                        <span className="text-sm text-gray-700">
-                            {likeCount} {likeCount === 1 ? "like" : "likes"}
-                        </span>
-                    </div>
                 </div>
 
                 {/* CONTENT */}
@@ -164,7 +160,7 @@ export default function Details() {
                                                                 alt={`Block ${
                                                                     index + 1
                                                                 }`}
-                                                                className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform cursor-pointer"
+                                                                className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform duration-200 cursor-pointer"
                                                                 onClick={() => {
                                                                     setModalImage(
                                                                         block.image_url

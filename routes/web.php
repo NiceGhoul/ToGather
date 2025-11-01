@@ -54,6 +54,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
     Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
+    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
+
+    Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
     Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
@@ -89,7 +92,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/donations-details', [ProfileController::class, 'donationsDetails']);
     Route::get('/profile/campaigns-details', [ProfileController::class, 'campaignsDetails']);
     Route::get('/profile/raised-details', [ProfileController::class, 'raisedDetails']);
-    
+    Route::get('/profile/articles-details', [ProfileController::class, 'articlesDetails']);
+
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -121,16 +125,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');
     Route::get('/articles/{id}/view', [ArticleController::class, 'adminViewArticle'])->name('articles.view');
     Route::post('/articles/{id}/approve', [ArticleController::class, 'adminApprove'])->name('articles.approve');
+    Route::post('/articles/{id}/enable', [ArticleController::class, 'adminEnable'])->name('articles.enable');
     Route::post('/articles/{id}/disable', [ArticleController::class, 'adminDisable'])->name('articles.disable');
     Route::post('/articles/{id}/reject', [ArticleController::class, 'adminReject'])->name('articles.reject');
     Route::post('/articles/{id}/delete', [ArticleController::class, 'adminDelete'])->name('articles.delete');
     Route::get('/articles/{id}/edit', [ArticleController::class, 'adminEdit'])->name('articles.edit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'adminUpdate'])->name('articles.update');
 
-    // Bulk routes
+    // Article Bulk routes
     Route::post('/articles/bulk-approve', [ArticleController::class, 'adminBulkApprove'])->name('articles.bulk.approve');
     Route::post('/articles/bulk-disable', [ArticleController::class, 'adminBulkDisable'])->name('articles.bulk.disable');
     Route::post('/articles/bulk-delete', [ArticleController::class, 'adminBulkDelete'])->name('articles.bulk.delete');
+    Route::post('/articles/bulk-reject', [ArticleController::class, 'adminBulkReject'])->name('articles.bulk.reject');
 
 
     Route::get('/lookups', [LookupController::class, 'index'])->name('lookups.index');

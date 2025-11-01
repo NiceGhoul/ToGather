@@ -25,6 +25,6 @@ class ArticleContent extends Model
 
     public function image()
     {
-        return $this->belongsTo(Image::class, 'content');
+        return $this->morphOne(Image::class, 'imageable');
     }
 }

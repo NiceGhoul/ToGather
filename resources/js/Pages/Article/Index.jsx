@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
-import { SearchIcon, Heart } from "lucide-react";
+import { SearchIcon, Heart, RotateCcw } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
 
 const ArticleList = () => {
@@ -42,7 +42,11 @@ const ArticleList = () => {
     const handleCategoryChange = (activeCategory) => {
         router.get(
             "/articles/list",
-            { category: activeCategory },
+            {
+                category: activeCategory,
+                search: searchTerm, // ⬅️ ikutkan search
+                sort: sortOrder,
+            },
             {
                 preserveScroll: true,
                 preserveState: true,
@@ -56,10 +60,21 @@ const ArticleList = () => {
     };
 
     const handleSearch = () => {
-        let temp = articles?.filter((a) =>
-            a.title.toLowerCase().includes(searchTerm.toLowerCase())
+        router.get(
+            "/articles/list",
+            {
+                category: chosenCategory === "" ? "All" : chosenCategory,
+                sort: sortOrder,
+                search: searchTerm, // ⬅️ kirim ke backend
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {
+                    setArticleList(page.props.articles);
+                },
+            }
         );
-        setArticleList(temp);
     };
 
     const handleLike = async (articleId) => {
@@ -234,14 +249,28 @@ const ArticleList = () => {
                 <select
                     value={sortOrder}
                     onChange={(e) => {
-                        setSortOrder(e.target.value);
-                        router.get("/articles/list", {
-                            category: chosenCategory,
-                            sort: e.target.value,
-                            search: searchTerm,
-                        });
+                        const newSort = e.target.value;
+                        setSortOrder(newSort);
+                        router.get(
+                            "/articles/list",
+                            {
+                                category:
+                                    chosenCategory === ""
+                                        ? "All"
+                                        : chosenCategory, // ⬅️ pastikan tetap kirim kategori
+                                sort: newSort,
+                                search: searchTerm,
+                            },
+                            {
+                                preserveScroll: true,
+                                preserveState: true,
+                                onSuccess: (page) => {
+                                    setArticleList(page.props.articles);
+                                },
+                            }
+                        );
                     }}
-                    className=" border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-3 focus:ring-purple-700 appearance-none bg-white"
+                    className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none  bg-white hover:ring-1 hover:ring-purple-700"
                 >
                     <option value="desc">Newest First</option>
                     <option value="asc">Oldest First</option>
@@ -251,16 +280,41 @@ const ArticleList = () => {
                 <ButtonGroup className="w-84">
                     <Input
                         placeholder="Search Articles"
+                        value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="focus-visible:ring-purple-700 focus-visible:border-purple-700"
+                        className="focus-visible:ring-1 focus-visible:ring-purple-700 hover:ring-1 hover:ring-purple-700 focus-visible:bg-purple-100"
                     />
                     <Button
                         variant="outline"
                         aria-label="Search"
                         onClick={handleSearch}
-                        className="hover:ring-3 hover:ring-purple-700"
+                        className="ml-0.5 hover:ring-1 hover:ring-purple-700 hover:bg-purple-100"
                     >
                         <SearchIcon />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        aria-label="Reset"
+                        onClick={() => {
+                            setSearchTerm("");
+                            setSortOrder("desc");
+                            setChosenCategory("All");
+
+                            router.get(
+                                "/articles/list",
+                                { category: "All", sort: "desc", search: "" },
+                                {
+                                    preserveScroll: true,
+                                    preserveState: true,
+                                    onSuccess: (page) => {
+                                        setArticleList(page.props.articles);
+                                    },
+                                }
+                            );
+                        }}
+                        className="hover:ring-1 ml-0.5 hover:ring-red-500 text-red-600 hover:bg-red-100 hover:text-red-800"
+                    >
+                        <RotateCcw />
                     </Button>
                 </ButtonGroup>
             </div>

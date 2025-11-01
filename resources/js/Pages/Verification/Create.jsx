@@ -1,6 +1,12 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { usePage, useForm } from "@inertiajs/react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,21 +20,21 @@ export default function Create() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form data:', data);
-        
+        console.log("Form data:", data);
+
         if (!data.id_photo || !data.selfie_with_id) {
-            console.log('Missing files');
+            console.log("Missing files");
             return;
         }
-        
-        post('/verification', {
+
+        post("/verification", {
             forceFormData: true,
             onSuccess: () => {
-                console.log('Form submitted successfully');
+                console.log("Form submitted successfully");
             },
             onError: (errors) => {
-                console.log('Form errors:', errors);
-            }
+                console.log("Form errors:", errors);
+            },
         });
     };
 
@@ -58,7 +64,7 @@ export default function Create() {
                                 {flash.error}
                             </div>
                         )}
-                        
+
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <Label htmlFor="id_photo">ID Photo</Label>
@@ -66,30 +72,49 @@ export default function Create() {
                                     id="id_photo"
                                     type="file"
                                     accept="image/*"
-                                    onChange={(e) => setData('id_photo', e.target.files[0])}
+                                    onChange={(e) =>
+                                        setData("id_photo", e.target.files[0])
+                                    }
                                     required
                                 />
                                 {errors.id_photo && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.id_photo}</p>
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.id_photo}
+                                    </p>
                                 )}
                             </div>
-                            
+
                             <div>
-                                <Label htmlFor="selfie_with_id">Selfie with ID</Label>
+                                <Label htmlFor="selfie_with_id">
+                                    Selfie with ID
+                                </Label>
                                 <Input
                                     id="selfie_with_id"
                                     type="file"
                                     accept="image/*"
-                                    onChange={(e) => setData('selfie_with_id', e.target.files[0])}
+                                    onChange={(e) =>
+                                        setData(
+                                            "selfie_with_id",
+                                            e.target.files[0]
+                                        )
+                                    }
                                     required
                                 />
                                 {errors.selfie_with_id && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.selfie_with_id}</p>
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.selfie_with_id}
+                                    </p>
                                 )}
                             </div>
-                            
-                            <Button type="submit" className="w-full" disabled={processing}>
-                                {processing ? 'Submitting...' : 'Submit Verification Request'}
+
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={processing}
+                            >
+                                {processing
+                                    ? "Submitting..."
+                                    : "Submit Verification Request"}
                             </Button>
                         </form>
                     </CardContent>

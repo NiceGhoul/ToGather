@@ -14,11 +14,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { 
-    User, 
-    Mail, 
-    Phone, 
-    MapPin, 
+import {
+    User,
+    Mail,
+    Phone,
+    MapPin,
     Calendar,
     Heart,
     Target,
@@ -28,7 +28,8 @@ import {
     AlertCircle,
     Shield,
     Camera,
-    Upload
+    Upload,
+    FileText
 } from 'lucide-react';
 
 export default function Show({ auth, user, stats, verificationStatus, verificationRequest }) {
@@ -160,20 +161,7 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                     )}
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('donations')}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
-                                <Heart className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{stats?.donations_count || 0}</div>
-                                <p className="text-xs text-muted-foreground">
-                                    {formatCurrency(stats?.total_donated || 0)} donated
-                                </p>
-                            </CardContent>
-                        </Card>
-                        
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('campaigns')}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Campaigns Created</CardTitle>
@@ -186,7 +174,33 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                                 </p>
                             </CardContent>
                         </Card>
-                        
+
+                        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('articles')}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Articles Written</CardTitle>
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats?.articles_count || 0}</div>
+                                <p className="text-xs text-muted-foreground">
+                                    {stats?.approved_articles || 0} approved
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('donations')}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
+                                <Heart className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats?.donations_count || 0}</div>
+                                <p className="text-xs text-muted-foreground">
+                                    {formatCurrency(stats?.total_donated || 0)} donated
+                                </p>
+                            </CardContent>
+                        </Card>
+
                         <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => fetchDetails('raised')}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">Total Raised</CardTitle>
@@ -400,6 +414,7 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                             {detailsModal.type === 'donations' && 'Your Donations'}
                             {detailsModal.type === 'campaigns' && 'Your Campaigns'}
                             {detailsModal.type === 'raised' && 'Funds Raised by Campaign'}
+                            {detailsModal.type === 'articles' && 'Your Articles'}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
@@ -444,6 +459,24 @@ export default function Show({ auth, user, stats, verificationStatus, verificati
                                             <div className="flex justify-between text-sm text-gray-600">
                                                 <span>{item.donors_count} donors</span>
                                                 <span>{((item.total_raised / item.target_amount) * 100).toFixed(1)}% of target</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {detailsModal.type === 'articles' && (
+                                        <div>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h4 className="font-semibold">{item.title}</h4>
+                                                <Badge variant={item.status === 'approved' ? 'default' : item.status === 'pending' ? 'secondary' : 'destructive'}>
+                                                    {item.status}
+                                                </Badge>
+                                            </div>
+                                            <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                                <span>Category: {item.category}</span>
+                                                <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm">
+                                                <Heart className="w-4 h-4 text-gray-400" />
+                                                <span>{item.likes_count || 0} likes</span>
                                             </div>
                                         </div>
                                     )}

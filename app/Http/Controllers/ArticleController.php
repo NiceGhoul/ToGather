@@ -118,7 +118,7 @@ class ArticleController extends Controller
     public function create()
     {
         $user = auth()->user();
-        
+
         // Check if user is banned first
         if ($user->status->value === 'banned' || $user->status === 'banned') {
             return inertia('Verification/Banned');
@@ -155,94 +155,158 @@ class ArticleController extends Controller
      * Store a newly created resource in storage.
      */
 
+    // public function store(Request $request)
+    // {
+    //     // Check if user is banned
+    //     if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
+    //         return back()->with('error', 'Your account has been banned. You cannot create articles.');
+    //     }
+
+    //     $validated = $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'category' => 'required|string|max:100',
+    //         'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
+    //         'contents' => 'required|array|min:1',
+    //         'contents.*.type' => 'required|in:text,image',
+    //         'contents.*.content' => 'nullable', //text or image path
+    //         'contents.*.order_x' => 'required|integer',
+    //         'contents.*.order_y' => 'required|integer',
+    //     ]);
+
+    //     // Save Thumbnail to images table
+    //     $thumbnailImageId = null;
+    //     if ($request->hasFile('thumbnail')) {
+    //         $thumbnailPath = $request->file('thumbnail')->store('article/thumbnail', 'minio');
+    //         $thumbnailImage = Image::create([
+    //             'path' => $thumbnailPath,
+    //             'imageable_id' => null, // Will be set after article creation
+    //             'imageable_type' => Article::class,
+    //         ]);
+    //         $thumbnailImageId = $thumbnailImage->id;
+    //     }
+
+    //     // Create Article
+    //     $article = Article::create([
+    //         'user_id' => auth()->id(),
+    //         'title' => $validated['title'],
+    //         'category' => $validated['category'],
+    //         'thumbnail' => $thumbnailImageId,
+    //         'status' => 'pending',
+    //     ]);
+
+    //     // Update thumbnail image with article ID
+    //     if ($thumbnailImageId) {
+    //         Image::where('id', $thumbnailImageId)->update(['imageable_id' => $article->id]);
+    //     }
+
+    //     // Iterate every grid for content
+    //     foreach ($request->input('contents') as $i => $block) {
+    //         $type = $block['type'];
+
+    //         $contentValue = null;
+
+    //         // find image, if type is image
+    //         if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+    //             $file = $request->file("contents.$i.content");
+    //             $path = $file->store('article/image', 'minio');
+
+    //             // Create image record
+    //             $image = Image::create([
+    //                 'path' => $path,
+    //                 'imageable_id' => $article->id,
+    //                 'imageable_type' => Article::class,
+    //             ]);
+
+    //             $contentValue = $image->id;
+    //         } else {
+    //             $contentValue = $block['content'] ?? null;
+    //         }
+
+    //         ArticleContent::create([
+    //             'article_id' => $article->id,
+    //             'type' => $type,
+    //             'content' => $contentValue,
+    //             'order_x' => $block['order_x'],
+    //             'order_y' => $block['order_y'],
+    //         ]);
+    //     }
+
+    //     // Notify admins about new article
+    //     NotificationController::notifyAdmins(
+    //         'article_created',
+    //         'New Article Submitted',
+    //         "New article '{$article->title}' has been submitted by {$article->user->nickname} and is pending review.",
+    //         ['article_id' => $article->id, 'user_id' => $article->user_id]
+    //     );
+
+    //     return redirect()
+    //         ->route('articles.create')
+    //         ->with('success', 'Article created successfully!');
+    // }
     public function store(Request $request)
     {
-        // Check if user is banned
         if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
             return back()->with('error', 'Your account has been banned. You cannot create articles.');
         }
-        
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
             'contents' => 'required|array|min:1',
             'contents.*.type' => 'required|in:text,image',
-            'contents.*.content' => 'nullable', //text or image path
+            'contents.*.content' => 'nullable',
             'contents.*.order_x' => 'required|integer',
             'contents.*.order_y' => 'required|integer',
         ]);
 
-        // Save Thumbnail to images table
-        $thumbnailImageId = null;
-        if ($request->hasFile('thumbnail')) {
-            $thumbnailPath = $request->file('thumbnail')->store('article/thumbnail', 'minio');
-            $thumbnailImage = Image::create([
-                'path' => $thumbnailPath,
-                'imageable_id' => null, // Will be set after article creation
-                'imageable_type' => Article::class,
-            ]);
-            $thumbnailImageId = $thumbnailImage->id;
-        }
-
-        // Create Article
-        $article = Article::create([
-            'user_id' => auth()->id(),
-            'title' => $validated['title'],
-            'category' => $validated['category'],
-            'thumbnail' => $thumbnailImageId,
-            'status' => 'pending',
-        ]);
-
-        // Update thumbnail image with article ID
-        if ($thumbnailImageId) {
-            Image::where('id', $thumbnailImageId)->update(['imageable_id' => $article->id]);
-        }
-
-        // Iterate every grid for content
-        foreach ($request->input('contents') as $i => $block) {
-            $type = $block['type'];
-
-            $contentValue = null;
-
-            // find image, if type is image
-            if ($type === 'image' && $request->hasFile("contents.$i.content")) {
-                $file = $request->file("contents.$i.content");
-                $path = $file->store('article/image', 'minio');
-
-                // Create image record
-                $image = Image::create([
-                    'path' => $path,
-                    'imageable_id' => $article->id,
-                    'imageable_type' => Article::class,
-                ]);
-
-                $contentValue = $image->id;
-            } else {
-                $contentValue = $block['content'] ?? null;
+        DB::transaction(function () use ($request, $validated) {
+            // 🟣 1. Save thumbnail (optional)
+            $thumbnailImageId = null;
+            if ($request->hasFile('thumbnail')) {
+                $thumbnailPath = $request->file('thumbnail')->store('article/thumbnails', 'minio');
+                $thumbnailImage = Image::create(['path' => $thumbnailPath]);
+                $thumbnailImageId = $thumbnailImage->id;
             }
 
-            ArticleContent::create([
-                'article_id' => $article->id,
-                'type' => $type,
-                'content' => $contentValue,
-                'order_x' => $block['order_x'],
-                'order_y' => $block['order_y'],
+            // 🟣 2. Create article
+            $article = Article::create([
+                'user_id' => auth()->id(),
+                'title' => $validated['title'],
+                'category' => $validated['category'],
+                'thumbnail' => $thumbnailImageId,
+                'status' => 'pending',
             ]);
-        }
 
-        // Notify admins about new article
-        NotificationController::notifyAdmins(
-            'article_created',
-            'New Article Submitted',
-            "New article '{$article->title}' has been submitted by {$article->user->nickname} and is pending review.",
-            ['article_id' => $article->id, 'user_id' => $article->user_id]
-        );
-        
-        return redirect()
-            ->route('articles.create')
-            ->with('success', 'Article created successfully!');
+            // 🟣 3. Save contents
+            foreach ($request->input('contents') as $i => $block) {
+                $type = $block['type'];
+                $content = ArticleContent::create([
+                    'article_id' => $article->id,
+                    'type' => $type,
+                    'content' => $type === 'text' ? $block['content'] ?? null : null,
+                    'order_x' => $block['order_x'],
+                    'order_y' => $block['order_y'],
+                ]);
+
+                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+                    $path = $request->file("contents.$i.content")->store('article/content', 'minio');
+                    $content->image()->create(['path' => $path]);
+                }
+            }
+
+            // 🟣 4. Notify admins
+            NotificationController::notifyAdmins(
+                'article_created',
+                'New Article Submitted',
+                "New article '{$article->title}' has been submitted by {$article->user->nickname} and is pending review.",
+                ['article_id' => $article->id, 'user_id' => $article->user_id]
+            );
+        });
+
+        return redirect()->route('articles.create')->with('success', 'Article created successfully!');
     }
+
 
     public function uploadContentImage(Request $request)
     {
@@ -308,20 +372,49 @@ class ArticleController extends Controller
         ]);
     }
 
+
+
     public function showMyArticles(Request $request)
     {
         $user = auth()->user();
 
+        // --- ambil semua kategori (biar bisa muncul di dropdown MyArticle.jsx)
+        $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
+
+        // --- ambil query params
+        $filterCategory = $request->query('category');
+        $sortOrder = $request->query('sort', 'desc');
+        $searchQuery = $request->query('search');
+
+        if ($filterCategory === 'All' || !$filterCategory || $filterCategory == '') {
+            $filterCategory = null;
+        }
+
+        // --- query utama untuk artikel milik user
         $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
             ->where('user_id', $user->id)
+            ->when($filterCategory, function ($q) use ($filterCategory) {
+                $q->where('category', $filterCategory);
+            })
+            ->when($searchQuery, function ($q) use ($searchQuery) {
+                $q->where(function ($qq) use ($searchQuery) {
+                    $qq->where('title', 'like', "%{$searchQuery}%")
+                        ->orWhereHas('contents', function ($qc) use ($searchQuery) {
+                            $qc->where('type', 'text')
+                                ->where('content', 'like', "%{$searchQuery}%");
+                        });
+                });
+            })
             ->withCount('likes')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', $sortOrder)
             ->get()
             ->map(function ($article) use ($user) {
-                // Transform article to include image URLs
+                // tambah URL thumbnail
                 if ($article->thumbnailImage) {
                     $article->thumbnail_url = $article->thumbnailImage->url;
                 }
+
+                // transform content image URL
                 $article->contents->transform(function ($content) {
                     if ($content->type === 'image' && $content->image) {
                         $content->image_url = $content->image->url;
@@ -329,36 +422,149 @@ class ArticleController extends Controller
                     return $content;
                 });
 
+                // status like per user
                 $article->is_liked_by_user = $article->likes()
                     ->where('user_id', $user->id)
                     ->exists();
+
                 return $article;
             });
 
         return inertia('Article/MyArticle', [
             'articles' => $articles,
+            'categories' => $categories,
+            'selectedCategory' => $filterCategory,
+            'sortOrder' => $sortOrder,
+            'searchQuery' => $searchQuery,
+        ]);
+    }
+    public function showMyArticleDetails($id)
+    {
+        $article = Article::with(['user', 'contents.image', 'thumbnailImage', 'likes'])
+            ->withCount('likes')
+            ->findOrFail($id);
+
+        // Transform article to include image URLs and like status
+        if ($article->thumbnailImage) {
+            $article->thumbnail_url = $article->thumbnailImage->url;
+        }
+        $article->contents->transform(function ($content) {
+            if ($content->type === 'image' && $content->image) {
+                $content->image_url = $content->image->url;
+            }
+            return $content;
+        });
+
+        // Add like status
+        $article->is_liked_by_user = auth()->check()
+            ? $article->likes()->where('user_id', auth()->id())->exists()
+            : false;
+
+        return inertia('Article/MyArticleDetails', [
+            'article' => $article,
+        ]);
+    }
+
+    public function userEdit($id)
+    {
+        $article = Article::with(['user', 'contents.image', 'thumbnailImage'])
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // tambahkan URL gambar
+        if ($article->thumbnailImage) {
+            $article->thumbnail_url = $article->thumbnailImage->url;
+        }
+        $article->contents->transform(function ($content) {
+            if ($content->type === 'image' && $content->image) {
+                $content->image_url = $content->image->url;
+            }
+            return $content;
+        });
+
+        return inertia('Article/Edit', [
+            'article' => $article,
         ]);
     }
 
 
 
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Article $article)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
+    // public function userUpdate(Request $request, $id)
+    // {
+    //     $article = Article::where('id', $id)
+    //         ->where('user_id', auth()->id()) // pastikan hanya owner
+    //         ->firstOrFail();
+
+    //     $validated = $request->validate([
+    //         'contents' => 'required|array|min:1',
+    //         'contents.*.type' => 'required|in:text,image',
+    //         'contents.*.content' => 'nullable',
+    //         'contents.*.order_x' => 'required|integer',
+    //         'contents.*.order_y' => 'required|integer',
+    //     ]);
+
+    //     DB::transaction(function () use ($request, $article, $validated) {
+    //         // reset status agar masuk review lagi
+    //         $article->update(['status' => 'pending']);
+
+    //         // hapus semua konten lama
+    //         $article->contents()->delete();
+
+    //         // simpan ulang konten baru
+    //         foreach ($request->input('contents', []) as $i => $block) {
+    //             $type = $block['type'];
+    //             $contentValue = null;
+
+    //             if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+    //                 $file = $request->file("contents.$i.content");
+    //                 $path = $file->store('articleImageContent', 'public');
+    //                 $contentValue = $path;
+    //             } else {
+    //                 $contentValue = $block['content'] ?? null;
+    //             }
+
+    //             ArticleContent::create([
+    //                 'article_id' => $article->id,
+    //                 'type' => $type,
+    //                 'content' => $contentValue,
+    //                 'order_x' => $block['order_x'],
+    //                 'order_y' => $block['order_y'],
+    //             ]);
+    //         }
+    //     });
+
+    //     // Notify user about article update
+    //     NotificationController::notifyUser(
+    //         $article->user_id,
+    //         'article_resubmitted',
+    //         'Article Resubmitted',
+    //         "Your article '{$article->title}' has been updated and resubmitted for review. It is now pending admin approval.",
+    //         ['article_id' => $article->id]
+    //     );
+
+    //     // Notify admins about article update
+    //     NotificationController::notifyAdmins(
+    //         'article_updated',
+    //         'Article Updated',
+    //         "Article '{$article->title}' has been updated by {$article->user->nickname} and is pending review again.",
+    //         ['article_id' => $article->id, 'user_id' => $article->user_id]
+    //     );
+
+    //     return back()->with('success', 'Your article has been updated and sent for review again!');
+    // }
+
     public function userUpdate(Request $request, $id)
     {
         $article = Article::where('id', $id)
-            ->where('user_id', auth()->id()) // pastikan hanya owner
+            ->where('user_id', auth()->id())
             ->firstOrFail();
+        $wasRejected = $article->status === 'rejected';
 
         $validated = $request->validate([
             'contents' => 'required|array|min:1',
@@ -368,55 +574,44 @@ class ArticleController extends Controller
             'contents.*.order_y' => 'required|integer',
         ]);
 
-        DB::transaction(function () use ($request, $article, $validated) {
-            // reset status agar masuk review lagi
+        DB::transaction(function () use ($request, $article, $wasRejected) {
             $article->update(['status' => 'pending']);
-
-            // hapus semua konten lama
             $article->contents()->delete();
+            if ($wasRejected) {
+                $updateData['resubmitted_at'] = now();
+            }
+            $article->update($updateData);
 
-            // simpan ulang konten baru
+
+
             foreach ($request->input('contents', []) as $i => $block) {
                 $type = $block['type'];
-                $contentValue = null;
-
-                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
-                    $file = $request->file("contents.$i.content");
-                    $path = $file->store('articleImageContent', 'public');
-                    $contentValue = $path;
-                } else {
-                    $contentValue = $block['content'] ?? null;
-                }
-
-                ArticleContent::create([
+                $content = ArticleContent::create([
                     'article_id' => $article->id,
                     'type' => $type,
-                    'content' => $contentValue,
+                    'content' => $type === 'text' ? $block['content'] ?? null : null,
                     'order_x' => $block['order_x'],
                     'order_y' => $block['order_y'],
                 ]);
+
+                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+                    $path = $request->file("contents.$i.content")->store('article/content', 'minio');
+                    $content->image()->create(['path' => $path]);
+                }
             }
+
         });
 
-        // Notify user about article update
-        NotificationController::notifyUser(
-            $article->user_id,
-            'article_resubmitted',
-            'Article Resubmitted',
-            "Your article '{$article->title}' has been updated and resubmitted for review. It is now pending admin approval.",
-            ['article_id' => $article->id]
-        );
-        
-        // Notify admins about article update
         NotificationController::notifyAdmins(
             'article_updated',
             'Article Updated',
             "Article '{$article->title}' has been updated by {$article->user->nickname} and is pending review again.",
             ['article_id' => $article->id, 'user_id' => $article->user_id]
         );
-        
+
         return back()->with('success', 'Your article has been updated and sent for review again!');
     }
+
 
 
     /**
@@ -548,7 +743,7 @@ class ArticleController extends Controller
     {
         $article = Article::findOrFail($id);
         $article->update(['status' => 'approved']);
-        
+
         // Notify user about article approval
         NotificationController::notifyUser(
             $article->user_id,
@@ -561,17 +756,34 @@ class ArticleController extends Controller
         return back()->with('success', 'Article approved!');
     }
 
+    public function adminEnable($id)
+    {
+        $article = Article::findOrFail($id);
+        $article->update(['status' => 'approved']);
+
+        // Notify user about article approval
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_approved',
+            'Article Approved',
+            "Your article '{$article->title}' has been enabled by Admin and is now visible to the public!",
+            ['article_id' => $article->id]
+        );
+
+        return back()->with('success', 'Article Enabled!');
+    }
+
     public function adminDisable($id)
     {
         $article = Article::findOrFail($id);
         $article->update(['status' => 'disabled']);
-        
+
         // Notify user about article being disabled
         NotificationController::notifyUser(
             $article->user_id,
             'article_disabled',
             'Article Disabled',
-            "Your article '{$article->title}' has been disabled and is no longer visible to the public.",
+            "Your article '{$article->title}' has been disabled by Admin and is no longer visible to the public.",
             ['article_id' => $article->id]
         );
 
@@ -589,7 +801,7 @@ class ArticleController extends Controller
             'rejected_reason' => $request->reason,
             'rejected_at' => now(),
         ]);
-        
+
         // Notify user about article rejection
         NotificationController::notifyUser(
             $article->user_id,
@@ -602,10 +814,19 @@ class ArticleController extends Controller
         return back()->with('success', 'Article rejected!');
     }
 
-    public function adminDelete($id)
+    public function adminDelete($id, Request $request)
     {
         $article = Article::findOrFail($id);
         $article->delete();
+
+        // Notify user about article deletetion
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_deleted',
+            'Article Deleted',
+            "Your article '{$article->title}' has been deleted.",
+            ['article_id' => $article->id]
+        );
 
         return redirect()
             ->route('admin.articles.index')
@@ -621,7 +842,7 @@ class ArticleController extends Controller
         ]);
 
         $articles = Article::whereIn('id', $validated['ids'])->get();
-        
+
         // Notify each user about their article approval
         foreach ($articles as $article) {
             NotificationController::notifyUser(
@@ -632,7 +853,7 @@ class ArticleController extends Controller
                 ['article_id' => $article->id]
             );
         }
-        
+
         Article::whereIn('id', $validated['ids'])->update(['status' => 'approved']);
 
         return back()->with('success', 'Selected articles approved!');
@@ -646,7 +867,7 @@ class ArticleController extends Controller
         ]);
 
         $articles = Article::whereIn('id', $validated['ids'])->get();
-        
+
         // Notify each user about their article being disabled
         foreach ($articles as $article) {
             NotificationController::notifyUser(
@@ -657,7 +878,7 @@ class ArticleController extends Controller
                 ['article_id' => $article->id]
             );
         }
-        
+
         Article::whereIn('id', $validated['ids'])->update(['status' => 'disabled']);
 
         return back()->with('success', 'Selected articles disabled!');
@@ -668,25 +889,35 @@ class ArticleController extends Controller
         $validated = $request->validate([
             'ids' => 'required|array|min:1',
             'ids.*' => 'integer|distinct|exists:articles,id',
+            'reason' => 'nullable|string|max:500',
         ]);
-
+        // dd($validated);
         $articles = Article::whereIn('id', $validated['ids'])->get();
-        
-        // Notify each user about their article being rejected
+        // dd($articles);
+
         foreach ($articles as $article) {
+            // update status + simpan alasan
+            $article->update([
+                'status' => 'rejected',
+                'rejected_reason' => $validated['reason'] ?? null,
+            ]);
+
+            // kirim notifikasi ke user
             NotificationController::notifyUser(
                 $article->user_id,
                 'article_rejected',
                 'Article Rejected',
-                "Your article '{$article->title}' has been rejected during bulk review.",
+                "Your article '{$article->title}' has been rejected." .
+                ($validated['reason']
+                    ? " Reason: {$validated['reason']}"
+                    : ""),
                 ['article_id' => $article->id]
             );
         }
-        
-        Article::whereIn('id', $validated['ids'])->update(['status' => 'rejected']);
 
         return back()->with('success', 'Selected articles rejected!');
     }
+
 
     public function adminBulkDelete(Request $request)
     {
@@ -719,6 +950,64 @@ class ArticleController extends Controller
         ]);
     }
 
+    // public function adminUpdate(Request $request, $id)
+    // {
+    //     $article = Article::findOrFail($id);
+
+    //     $validated = $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'category' => 'required|string|max:100',
+    //         'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
+    //         'contents' => 'required|array|min:1',
+    //         'contents.*.type' => 'required|in:text,image',
+    //         'contents.*.content' => 'nullable',
+    //         'contents.*.order_x' => 'required|integer',
+    //         'contents.*.order_y' => 'required|integer',
+    //     ]);
+
+    //     DB::transaction(function () use ($request, $article, $validated) {
+    //         // update thumbnail if provided
+    //         if ($request->hasFile('thumbnail')) {
+    //             $path = $request->file('thumbnail')->store('article/thumbnail', 'minio');
+    //             $article->thumbnail = $path;
+    //         }
+
+    //         $article->title = $validated['title'];
+    //         $article->category = $validated['category'];
+    //         $article->save();
+
+    //         // Replace contents: remove old then create new blocks
+    //         $article->contents()->delete();
+
+    //         // Use $request->input('contents') for data and check $request->hasFile for each index to store image files
+    //         $incomingContents = $request->input('contents', []);
+    //         foreach ($incomingContents as $i => $block) {
+    //             $type = $block['type'];
+    //             $contentValue = null;
+
+    //             if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+    //                 $file = $request->file("contents.$i.content");
+    //                 $path = $file->store('article/image', 'minio');
+    //                 $contentValue = $path;
+    //             } else {
+    //                 // content may be a path string (existing) or HTML string for text
+    //                 $contentValue = $block['content'] ?? null;
+    //             }
+
+    //             ArticleContent::create([
+    //                 'article_id' => $article->id,
+    //                 'type' => $type,
+    //                 'content' => $contentValue,
+    //                 'order_x' => $block['order_x'],
+    //                 'order_y' => $block['order_y'],
+    //             ]);
+    //         }
+    //     });
+
+    //     return redirect()
+    //         ->route('admin.articles.view', ['id' => $article->id])
+    //         ->with('success', 'Article updated!');
+    // }
     public function adminUpdate(Request $request, $id)
     {
         $article = Article::findOrFail($id);
@@ -735,47 +1024,39 @@ class ArticleController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $article, $validated) {
-            // update thumbnail if provided
             if ($request->hasFile('thumbnail')) {
-                $path = $request->file('thumbnail')->store('article/thumbnail', 'minio');
-                $article->thumbnail = $path;
+                $path = $request->file('thumbnail')->store('article/thumbnails', 'minio');
+                $thumb = Image::create(['path' => $path]);
+                $article->thumbnail = $thumb->id;
             }
 
-            $article->title = $validated['title'];
-            $article->category = $validated['category'];
-            $article->save();
+            $article->update([
+                'title' => $validated['title'],
+                'category' => $validated['category'],
+            ]);
 
-            // Replace contents: remove old then create new blocks
             $article->contents()->delete();
 
-            // Use $request->input('contents') for data and check $request->hasFile for each index to store image files
-            $incomingContents = $request->input('contents', []);
-            foreach ($incomingContents as $i => $block) {
+            foreach ($request->input('contents', []) as $i => $block) {
                 $type = $block['type'];
-                $contentValue = null;
-
-                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
-                    $file = $request->file("contents.$i.content");
-                    $path = $file->store('article/image', 'minio');
-                    $contentValue = $path;
-                } else {
-                    // content may be a path string (existing) or HTML string for text
-                    $contentValue = $block['content'] ?? null;
-                }
-
-                ArticleContent::create([
+                $content = ArticleContent::create([
                     'article_id' => $article->id,
                     'type' => $type,
-                    'content' => $contentValue,
+                    'content' => $type === 'text' ? $block['content'] ?? null : null,
                     'order_x' => $block['order_x'],
                     'order_y' => $block['order_y'],
                 ]);
+
+                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
+                    $path = $request->file("contents.$i.content")->store('article/content', 'minio');
+                    $content->image()->create(['path' => $path]);
+                }
             }
         });
 
-        return redirect()
-            ->route('admin.articles.view', ['id' => $article->id])
+        return redirect()->route('admin.articles.view', ['id' => $article->id])
             ->with('success', 'Article updated!');
     }
+
 
 }
