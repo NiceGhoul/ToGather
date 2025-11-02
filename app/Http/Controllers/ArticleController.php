@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\NotificationController;
+use App\Models\Likes;
 
 class ArticleController extends Controller
 {
@@ -80,6 +81,18 @@ class ArticleController extends Controller
     }
 
 
+    public function showLiked(){
+        $user = auth()->user();
+        // $articles = Article::All();
+        // $likes = $articles->likes()->where('user_id', $user->id())->where('likes_id', $articles->id())->get();
+
+        $liked = Likes::where('likes_type', 'App\Models\Article')->where('user_id', $user->id)->pluck('likes_id');
+        $articles = Article::whereIn('id', $liked)->get();
+
+        return inertia('Article/LikedArticle', [
+            'likedArticles' => $articles,
+        ]);
+    }
 
     public function toggleLike($id)
     {

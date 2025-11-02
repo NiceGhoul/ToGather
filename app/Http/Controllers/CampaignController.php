@@ -103,12 +103,21 @@ class CampaignController extends Controller
 
     public function showList()
     {
-        $campaigns = Campaign::all();
+        $campaigns = Campaign::where('status', ['active'])->get();
         $lookups = Lookup::all();
 
         return inertia('Campaign/CampaignList', [
             'campaigns' => $campaigns,
             'lookups' => $lookups,
+        ]);
+    }
+
+    public function showLiked(){
+        $liked = Likes::where('likes_type', 'App\Models\Campaign')->where('user_id', Auth::id())->pluck('likes_id');
+        $campaigns = Campaign::whereIn('id', $liked)->get();
+
+        return inertia('Campaign/LikedCampaign', [
+            'likedCampaign' => $campaigns,
         ]);
     }
 
