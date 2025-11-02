@@ -138,8 +138,8 @@ const CampaignList = () => {
                             onClick={() => handleCategoryChange("All")}
                             className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
                                 chosenCategory === "All"
-                                    ? "bg-white text-purple-700 font-semibold shadow-md"
-                                    : " text-white hover:bg-purple-700"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                    : " text-white hover:bg-purple-700 bg-purple-800"
                             }`}
                         >
                             All
@@ -157,8 +157,8 @@ const CampaignList = () => {
                                 }
                                 className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
                                     chosenCategory === item.lookup_value
-                                        ? "bg-white text-purple-700 font-semibold shadow-md"
-                                        : " text-white hover:bg-purple-700"
+                                        ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                        : " text-white hover:bg-purple-700 bg-purple-800"
                                 }`}
                             >
                                 {item.lookup_value}

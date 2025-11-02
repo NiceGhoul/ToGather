@@ -21,7 +21,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'username',
         'nickname',
         'email',
         'address',
@@ -80,7 +79,7 @@ class User extends Authenticatable
     public function getProfileImageUrlAttribute()
     {
         if ($this->relationLoaded('images')) {
-            $profileImage = $this->images->filter(function($image) {
+            $profileImage = $this->images->filter(function ($image) {
                 return str_starts_with($image->path, 'profile/');
             })->first();
         } else {
@@ -108,8 +107,9 @@ class User extends Authenticatable
     }
 
     // user can likes many campaigns
-    public function likedItems(){
-        return $this->hasMany(Likes:: class);
+    public function likedItems()
+    {
+        return $this->hasMany(Likes::class);
     }
 
 
