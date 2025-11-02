@@ -35,6 +35,7 @@ class CampaignFactory extends Factory
             'address' => $this->faker->address(),
             'status' => $this->faker->randomElement(CampaignStatus::cases()), // Use Enum
             'description' => $this->faker->paragraphs(rand(2, 5), true),
+            'duration' => $this->faker->numberBetween(30, 90),
             'collected_amount' => $this->faker->randomFloat(2, 0, 50000),
         ];
     }

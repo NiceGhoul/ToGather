@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inertia } from "@inertiajs/inertia";
 import { usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { inertia } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -180,7 +179,7 @@ export default function Create() {
                 </div>
 
                 <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
-                    <h1 className="text-4xl text-end font-semibold flex mb=5">
+                    <h1 className="text-4xl text-start font-semibold flex mb=5">
                         {campaign.title}
                     </h1>
                     <h1 className="text-3xl text-end font-semibold flex my-10 text-[#7C4789]">{donations.length.toString() + " " + (donations.length > 1 ? " Donators" : " Donator")} </h1>

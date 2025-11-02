@@ -61,8 +61,10 @@ class CampaignController extends Controller
     public function create()
     {
         $user = auth()->user();
+        // $usersCampaign = Campaign::where('user_id', Auth::id())->where('status', 'pending')->get();
 
         $verificationRequest = $user->verificationRequests()->latest()->first();
+        $usersCampaign = $user->campaigns()->where('status', 'pending')->latest()->get();
 
         if (!$verificationRequest) {
             // No verification request - show verification form
@@ -81,9 +83,13 @@ class CampaignController extends Controller
 
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
-            return inertia::render('Campaign/Create', [
-            'user_Id' => Auth::user()->id,
-        ]);
+            if ($usersCampaign->isNotEmpty()) {
+                return inertia('Campaign/CampaignPending');
+            } else {
+                return inertia::render('Campaign/Create', [
+                    'user_Id' => Auth::user()->id,
+                ]);
+            }
         }
 
         return inertia('Verification/Create');
@@ -100,13 +106,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function showCreate()
-    {
-        return inertia::render('Campaign/Create', [
-            'user_Id' => Auth::user()->id,
-        ]);
-    }
-
     public function getCampaignDetails($id)
     {
         $user = auth()->user();
@@ -120,6 +119,7 @@ class CampaignController extends Controller
         ]);
     }
 
+
     public function createNewCampaign(Request $request)
     {
         $data = $request->all();
@@ -127,12 +127,16 @@ class CampaignController extends Controller
         $data['status'] = 'pending';
         $campaign = Campaign::create($data);
 
-        if($campaign && $request->has('location')){
+        if ($campaign && $request->has('location')) {
             $location = $request->input('location');
             $location['campaign_id'] = $campaign->id;
         }
-        Location::create($location);
-        return redirect()->back()->with('success', 'Campaign created successfully!');
+        if ($location) {
+            Location::create($location);
+        }
+        return inertia::render('Campaign/CampaignPending');
+        // return redirect()->route('campaigns.showList');
+
     }
 
 

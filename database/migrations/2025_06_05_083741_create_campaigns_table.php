@@ -25,8 +25,9 @@ return new class extends Migration
             $table->decimal('goal_amount', 10, 2);
             $table->enum('status', ['pending', 'active', 'completed', 'rejected', 'banned'])->default('pending');
             $table->dateTime('start_campaign')->nullable();
-            $table->dateTime('end_campaign');
+            $table->dateTime('end_campaign')->nullable();
             $table->string('address');
+            $table->string('duration');
             $table->text('description');
             $table->decimal('collected_amount', 10, 2)->default(0.00);
             $table->timestamps();

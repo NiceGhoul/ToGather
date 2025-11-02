@@ -24,6 +24,7 @@ class Campaign extends Model
         'status',
         'goal_amount',
         'collected_amount',
+        'duration',
     ];
 
     // A Campaign belongs to a User (creator)

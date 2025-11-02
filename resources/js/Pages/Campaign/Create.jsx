@@ -3,7 +3,7 @@ import Layout_User from "@/Layouts/Layout_User";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import * as React from "react"
-import { CalendarIcon, ChevronDownIcon, Map } from "lucide-react"
+import { CalendarDays, CalendarIcon, ChevronDownIcon, Map } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -12,6 +12,10 @@ import { Inertia } from "@inertiajs/inertia";
 import { Textarea } from "@/Components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import CampaignLocation from "./CampaignLocation";
+import Popup from "@/Components/Popup";
+import { Label } from "@/Components/ui/label";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/Components/ui/input-group";
+import { router } from "@inertiajs/react";
 
 const emptyCampaign = {
     title: "",
@@ -23,6 +27,7 @@ const emptyCampaign = {
     end_campaign: null,
     address: "",
     location: null,
+    duration:"",
     status: "pending",
     user_id: null,
 };
@@ -38,9 +43,8 @@ const categories = [
 
 function create () {
 const [campaignData, setCampaignData] = useState(emptyCampaign)
-const [openEnd, setOpenEnd] = useState(false)
 const [openLocation, setOpenLocation] = useState(false)
-const [isFilled, setIsFilled] = useState(false)
+const [description, setDescription] = useState([])
 const [openPop, setOpenPop] = useState(false)
 
 const DatePicker = ({open, date, setOpen, setDate}) => {
@@ -69,6 +73,25 @@ const DatePicker = ({open, date, setOpen, setDate}) => {
   )
 }
 
+const errorDescription = () => {
+    const errors = [];
+
+    if (!campaignData.title.trim()) errors.push("Title cannot be empty.");
+    if (!campaignData.description.trim())
+        errors.push("Description cannot be empty.");
+    if (!campaignData.category) errors.push("Please select a category.");
+    if (!campaignData.address.trim()) errors.push("Address cannot be empty.");
+    if (!campaignData.goal_amount || campaignData.goal_amount <= 0)
+        errors.push("Goal amount must be greater than 0.");
+    if (campaignData.goal_amount && campaignData.goal_amount > 50000000)
+        errors.push("Goal amount must be less than Rp. 50.000.000,00.");
+    if (!campaignData.duration) errors.push("Duration cannot be empty");
+    if (campaignData.duration && campaignData.duration < 30) errors.push("Duration must be greater than or equals to 30 days");
+    if (campaignData.duration && campaignData.duration > 90) errors.push("Duration must be less than or equals to 90 days");
+
+    return errors;
+};
+
 // useEffect(() => {
 //   const handleBeforeUnload = (event) => {
 //     event.preventDefault()
@@ -88,20 +111,32 @@ const handleCloseLocation = (locationData, addressData) => {
     setCampaignData((prev) => ({...prev, address: addressData}))
 }
 
+const handleClick = () => {
 
+    const warning = errorDescription()
+
+    if(errorDescription().length > 0){
+        setDescription(warning)
+        setOpenPop(true)
+
+        return
+    }else{
+        setDescription([]);
+        setOpenPop(true)
+    }
+}
 
 const handleSave = () => {
-  const formattedData = {
-    ...campaignData,
-    start_campaign: campaignData.start_campaign
-      ? new Date(campaignData.start_campaign).toISOString().slice(0, 19).replace("T", " ")
-      : null,
-    end_campaign: campaignData.end_campaign
-      ? new Date(campaignData.end_campaign).toISOString().slice(0, 19).replace("T", " ")
-      : null,
-  };
-
-  Inertia.post("/campaigns/newCampaign", formattedData);
+    const formattedData = {
+            ...campaignData,
+            start_campaign: campaignData.start_campaign
+            ? new Date(campaignData.start_campaign).toISOString().slice(0, 19).replace("T", " ")
+            : null,
+            end_campaign: campaignData.end_campaign
+            ? new Date(campaignData.end_campaign).toISOString().slice(0, 19).replace("T", " ")
+            : null,
+        };
+        router.post("/campaigns/newCampaign", formattedData);
 }
 
     return (
@@ -119,7 +154,7 @@ const handleSave = () => {
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4">
                         <div>
-                            <h1>Campaign Title</h1>
+                            <Label className="mb-1">Campaign Title</Label>
                             <Input
                                 placeholder="Enter your title"
                                 value={campaignData.title}
@@ -133,9 +168,10 @@ const handleSave = () => {
                         </div>
 
                         <div>
-                            <h1>Description</h1>
+                            <Label className="mb-1">Description</Label>
                             <Textarea
-                                placeholder="Give your campaign a brief description (what your product is, what your plan is for this campaign, or you can describe what your campaign is about)"
+                                placeholder={`Give your campaign a brief description:
+(what your product is, what your plan is for this campaign, or you can describe what your campaign is about)`}
                                 value={campaignData.description}
                                 onChange={(e) =>
                                     setCampaignData({
@@ -148,23 +184,30 @@ const handleSave = () => {
                         </div>
 
                         <div>
-                            <h1>Category</h1>
-                            <Select onValueChange={(dat) => setCampaignData({...campaignData,category: dat,})}>
+                            <Label className="mb-1">Category</Label>
+                            <Select
+                                onValueChange={(dat) =>
+                                    setCampaignData({
+                                        ...campaignData,
+                                        category: dat,
+                                    })
+                                }
+                            >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {
-                                    categories.map((dat) => (
-                                        <SelectItem key={dat} value={dat}> {dat} </SelectItem>
-                                    ))
-                                    }
+                                    {categories.map((dat) => (
+                                        <SelectItem key={dat} value={dat}>
+                                            {dat}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
 
                         <div>
-                            <h1>Location</h1>
+                            <Label>Location</Label>
                             <Button
                                 className="w-full gap-4"
                                 variant="outline"
@@ -183,13 +226,13 @@ const handleSave = () => {
                         <div className="flex justify-between items-start gap-4 mt-4">
                             <div className="w-3/6">
                                 <div className="flex flex-row items-center justify-between">
-                                    <h1>Goal Amount</h1>
+                                    <Label className="mb-1">Goal Amount</Label>
                                 </div>
                                 <div className="w-full">
                                     <Input
                                         type="number"
-                                        className="w-full"
-                                        placeholder={"max: Rp. 10.000.000, 00"}
+                                        className="w-full h-[40px]"
+                                        placeholder={"max: Rp. 50.000.000, 00"}
                                         value={
                                             campaignData.goal_amount === 0
                                                 ? ""
@@ -204,7 +247,7 @@ const handleSave = () => {
                                     />
                                 </div>
                                 <div className="flex items-center justify-center">
-                                    <label className="mt-2 text-gray-300 font-light">
+                                    <Label className="mt-2 text-gray-300 font-light">
                                         {campaignData.goal_amount
                                             ? parseInt(
                                                   campaignData.goal_amount
@@ -214,29 +257,38 @@ const handleSave = () => {
                                                   minimumFractionDigits: 2,
                                               })
                                             : "Rp. 0,00"}
-                                    </label>
+                                    </Label>
                                 </div>
                             </div>
 
-                            <div className="w-2/6 flex flex-col items-start justify-center">
-                                <h1>End Date</h1>
-                                <DatePicker
-                                    open={openEnd}
-                                    date={campaignData.end_campaign}
-                                    setOpen={setOpenEnd}
-                                    setDate={(date) => {
-                                        setCampaignData({
-                                            ...campaignData,
-                                            end_campaign: date,
-                                        });
-                                        setOpenEnd(false);
-                                    }}
-                                />
+                            <div className="w-3/6 flex flex-col items-start justify-center">
+                                <Label className="mb-1">
+                                    Campaign Duration
+                                </Label>
+                                <InputGroup>
+                                    <InputGroupInput
+                                        placeholder="range: 30 - 90 days"
+                                        value={campaignData.duration}
+                                        onChange={(e) =>
+                                            setCampaignData({
+                                                ...campaignData,
+                                                duration: e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <InputGroupAddon align="inline-end">
+                                        <Label>Days</Label>
+
+                                    </InputGroupAddon>
+                                    <InputGroupAddon>
+                                        <CalendarDays />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </div>
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button className="ml-auto" onClick={handleSave}>
+                        <Button className="ml-auto" onClick={handleClick}>
                             Next
                         </Button>
                     </CardFooter>
@@ -247,6 +299,30 @@ const handleSave = () => {
                 setCampaignLocation={handleCloseLocation}
                 onClose={() => setOpenLocation(false)}
             />
+            {openPop && (
+                <Popup
+                    triggerText={null}
+                    title={description.length > 0 ? "Warning" : "Submit data?"}
+                    description={
+                        description.length > 0
+                            ? description
+                            : "your campaign will be set as pending, please wait for admin approval before continuing."
+                    }
+                    confirmText={description.length > 0 ? "okay" : "Confirm"}
+                    cancelText="Cancel"
+                    showCancel={description.length > 0 ? false : true}
+                    confirmColor={
+                        description.length > 0
+                            ? "bg-red-600 hover:bg-red-700 text-white"
+                            : "bg-green-600 hover:bg-green-700 text-white"
+                    }
+                    onConfirm={
+                        description.length > 0
+                            ? () => setOpenPop(false)
+                            : handleSave
+                    }
+                />
+            )}
         </Layout_User>
     );
 }
