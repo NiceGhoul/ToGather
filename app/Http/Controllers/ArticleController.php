@@ -824,7 +824,7 @@ class ArticleController extends Controller
             $article->user_id,
             'article_deleted',
             'Article Deleted',
-            "Your article '{$article->title}' has been deleted.",
+            "Your article '{$article->title}' has been deleted by Admin.",
             ['article_id' => $article->id]
         );
 

@@ -106,7 +106,7 @@ export default function MyCampaign({
                         key={idx}
                         className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
                     >
-                        {!campaign.thumbnail_url && (
+                        {!campaign.thumbnail_url && ( //nanti perlu diganti
                             <img
                                 src="http://127.0.0.1:8000/images/boat.jpg"
                                 alt={campaign.title}
@@ -187,7 +187,7 @@ export default function MyCampaign({
             <div className="w-full flex flex-col">
                 <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
                     <img
-                        src="http://127.0.0.1:8000/images/campaignBanner.jpg"
+                        src="http://127.0.0.1:8000/images/celenganWang.jpg"
                         alt="Campaign Banner"
                         className="absolute inset-0 w-full h-full object-cover opacity-60"
                     />
@@ -298,7 +298,22 @@ export default function MyCampaign({
                                     preserveScroll: true,
                                     preserveState: true,
                                     onSuccess: (page) => {
-                                        setCampaignList(page.props.campaigns);
+                                        const sorted = [
+                                            ...page.props.campaigns,
+                                        ].sort((a, b) => {
+                                            const order = {
+                                                active: 1,
+                                                pending: 2,
+                                                approved: 3,
+                                                rejected: 4,
+                                                banned: 5,
+                                            };
+                                            return (
+                                                (order[a.status] || 99) -
+                                                (order[b.status] || 99)
+                                            );
+                                        });
+                                        setCampaignList(sorted);
                                     },
                                 }
                             );

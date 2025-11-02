@@ -189,8 +189,10 @@ export default function Navbar_User() {
                             <DropdownMenuItem asChild>
                                 <Link href="/profile">Profile</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem disabled>
-                                My Campaign
+                            <DropdownMenuItem>
+                                <Link href="/campaigns/myCampaigns">
+                                    My Campaign
+                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                                 <Link href="/articles/myArticles">
