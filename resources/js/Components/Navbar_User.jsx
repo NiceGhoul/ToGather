@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 export default function Navbar_User() {
     const [open, setOpen] = useState(false);
@@ -147,23 +148,27 @@ export default function Navbar_User() {
                                         No notifications
                                     </DropdownMenuItem>
                                 ) : (
-                                    notifications.map((notification) => (
-                                        <DropdownMenuItem
-                                            key={notification.id}
-                                            className="flex-col items-start p-3"
-                                        >
-                                            <div className="font-medium">
-                                                {notification.title}
-                                            </div>
-                                            <div className="text-sm text-muted-foreground">
-                                                {notification.message}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                                {new Date(
-                                                    notification.created_at
-                                                ).toLocaleDateString()}
-                                            </div>
-                                        </DropdownMenuItem>
+                                    notifications.map((notification, index) => (
+                                        <div key={notification.id}>
+                                            <DropdownMenuItem
+                                                className="flex-col items-start p-3"
+                                            >
+                                                <div className="font-medium">
+                                                    {notification.title}
+                                                </div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {notification.message}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    {new Date(
+                                                        notification.created_at
+                                                    ).toLocaleDateString()}
+                                                </div>
+                                            </DropdownMenuItem>
+                                            {index < notifications.length - 1 && (
+                                                <Separator />
+                                            )}
+                                        </div>
                                     ))
                                 )}
                             </ScrollArea>
