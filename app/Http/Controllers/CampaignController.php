@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateCampaignRequest;
 use App\Models\Campaign;
 use App\Models\Donation;
 use App\Models\Likes;
+use App\Models\Location;
 use App\Models\Lookup;
 use App\Models\User;
 use COM;
@@ -61,6 +62,7 @@ class CampaignController extends Controller
     public function create()
     {
         $user = auth()->user();
+        // $usersCampaign = Campaign::where('user_id', Auth::id())->where('status', 'pending')->get();
 
         // Check if user is banned first
         if ($user->status->value === 'banned' || $user->status === 'banned') {
@@ -68,6 +70,7 @@ class CampaignController extends Controller
         }
 
         $verificationRequest = $user->verificationRequests()->latest()->first();
+        $usersCampaign = $user->campaigns()->where('status', 'pending')->latest()->get();
 
         if (!$verificationRequest) {
             // No verification request - show verification form
@@ -86,7 +89,13 @@ class CampaignController extends Controller
 
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
-            return inertia('Campaign/Create');
+            if ($usersCampaign->isNotEmpty()) {
+                return inertia('Campaign/CampaignPending');
+            } else {
+                return inertia::render('Campaign/Create', [
+                    'user_Id' => Auth::user()->id,
+                ]);
+            }
         }
 
         return inertia('Verification/Create');
@@ -100,13 +109,6 @@ class CampaignController extends Controller
         return inertia('Campaign/CampaignList', [
             'campaigns' => $campaigns,
             'lookups' => $lookups,
-        ]);
-    }
-
-    public function showCreate()
-    {
-        return inertia::render('Campaign/Create', [
-            'user_Id' => Auth::user()->id,
         ]);
     }
 
@@ -130,17 +132,20 @@ class CampaignController extends Controller
             return back()->with('error', 'Your account has been banned. You cannot create campaigns.');
         }
 
-        //      $data = $request->validate([
-        //     'title' => 'required|string',
-        //     'description' => 'required|string',
-        //     'goal_amount' => 'required|numeric',
-        //     'start_date' => 'required|date',
-        //     'end_date' => 'required|date',
-
-        // ]);
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
+        $campaign = Campaign::create($data);
+
+        if ($campaign && $request->has('location')) {
+            $location = $request->input('location');
+            $location['campaign_id'] = $campaign->id;
+        }
+        if ($location) {
+            Location::create($location);
+        }
+
+        // return redirect()->route('campaigns.showList');
 
         $campaign = Campaign::create($data);
 
@@ -152,8 +157,9 @@ class CampaignController extends Controller
             ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
         );
 
-        return redirect()->back()->with('success', 'Campaign created successfully!');
+        return inertia::render('Campaign/CampaignPending');
     }
+
 
     public function ToggleLike(Request $request)
     {
@@ -172,8 +178,15 @@ class CampaignController extends Controller
         }
     }
 
+    public function getCreateSupportingMediaData(Request $request){
+        $content = $request->all();
+
+        return inertia::render('Campaign/createSupportingMedia');
+    }
+
     public function getCampaignListData(Request $request)
     {
+        // inRandomOrder() -> to
         $lookups = Lookup::all();
         $category = $request->input('category');
 
@@ -188,8 +201,6 @@ class CampaignController extends Controller
             $campaigns = Campaign::where('category', $category)->where('status', ['active'])->get();
 
         }
-
-        // dd($campaigns);
 
         return inertia::render('Campaign/CampaignList', [
             'campaigns' => $campaigns,
