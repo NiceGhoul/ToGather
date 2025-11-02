@@ -8,6 +8,7 @@ import {
     CardContent,
     CardFooter,
 } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import Layout_Register from "../../Layouts/Layout_Register";
 import { Link } from "@inertiajs/react";
 import axios from "axios";
@@ -44,6 +45,11 @@ export default function Register() {
     const [otpTimer, setOtpTimer] = useState(60);
     const [isCounting, setIsCounting] = useState(true);
 
+    // Loading states
+    const [isNextLoading, setIsNextLoading] = useState(false);
+    const [isResendLoading, setIsResendLoading] = useState(false);
+    const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+
     // Countdown OTP
     React.useEffect(() => {
         let interval;
@@ -57,6 +63,7 @@ export default function Register() {
 
     // Resend OTP
     const handleResendOtp = async () => {
+        setIsResendLoading(true);
         try {
             await axios.post("/users/send-otp", { email: formData.email });
             setOtpTimer(60);
@@ -67,6 +74,8 @@ export default function Register() {
             setTimeout(() => otpRefs[0]?.current?.focus(), 0);
         } catch (error) {
             setErrors({ otp: "Failed to resend OTP. Please try again." });
+        } finally {
+            setIsResendLoading(false);
         }
     };
 
@@ -200,6 +209,7 @@ export default function Register() {
         if (step === 1 && !validateStep1()) return;
         if (step === 2 && !validateStep2()) return;
 
+        setIsNextLoading(true);
         if (step === 1) {
             try {
                 await axios.post("/users/send-otp", { email: formData.email });
@@ -210,6 +220,8 @@ export default function Register() {
                 setStep(2);
             } catch (error) {
                 setErrors({ otp: "Failed to send OTP. Please try again." });
+            } finally {
+                setIsNextLoading(false);
             }
         } else if (step === 2) {
             try {
@@ -221,6 +233,8 @@ export default function Register() {
             } catch (error) {
                 setErrors({ otp: "Invalid OTP. Please try again." });
                 setTouched({ otp: true });
+            } finally {
+                setIsNextLoading(false);
             }
         }
     };
@@ -228,6 +242,7 @@ export default function Register() {
     // Submit terakhir
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitLoading(true);
         Inertia.post(
             "/users",
             {
@@ -237,6 +252,8 @@ export default function Register() {
             },
             {
                 onSuccess: () => Inertia.visit("/Login"),
+                onError: () => setIsSubmitLoading(false),
+                onFinish: () => setIsSubmitLoading(false),
             }
         );
     };
@@ -546,12 +563,14 @@ export default function Register() {
                                     </p>
                                 ) : (
                                     <p className="mt-2 text-sm text-gray-700">
-                                        Didn’t receive OTP?{" "}
+                                        Didn't receive OTP?{" "}
                                         <button
                                             type="button"
                                             onClick={handleResendOtp}
-                                            className="font-semibold text-blue-800 hover:underline"
+                                            disabled={isResendLoading}
+                                            className="font-semibold text-blue-800 hover:underline disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
                                         >
+                                            {isResendLoading && <Spinner className="w-4 h-4" />}
                                             Send Again
                                         </button>
                                     </p>
@@ -625,12 +644,19 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={handleNext}
-                                    className="register-btn"
+                                    disabled={isNextLoading}
+                                    className="register-btn disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                                 >
+                                    {isNextLoading && <Spinner className="w-4 h-4" />}
                                     {step === 2 ? "Submit" : "Next"}
                                 </button>
                             ) : (
-                                <button type="submit" className="register-btn">
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitLoading}
+                                    className="register-btn disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                                >
+                                    {isSubmitLoading && <Spinner className="w-4 h-4" />}
                                     Done
                                 </button>
                             )}

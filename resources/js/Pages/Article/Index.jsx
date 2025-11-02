@@ -3,11 +3,13 @@ import Layout_User from "@/Layouts/Layout_User";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { SearchIcon, Heart, RotateCcw } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
+import { Spinner } from "@/Components/ui/spinner";
 
 const ArticleList = () => {
     // 🟣 Ambil props dari backend
@@ -16,7 +18,8 @@ const ArticleList = () => {
         categories,
         sortOrder: initialSortOrder,
     } = usePage().props;
-
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true);
     // 🟣 Inisialisasi state lokal
     const [visibleArticles, setVisibleArticles] = useState(8);
     const [articleList, setArticleList] = useState(articles || []);
@@ -32,7 +35,14 @@ const ArticleList = () => {
     );
 
     useEffect(() => {
-        if (articles?.length) setArticleList(articles);
+        if (articles?.length) {
+            setArticleList(articles);
+            setIsLoading(false);
+        } else {
+            // Simulate loading for initial page load
+            const timer = setTimeout(() => setIsLoading(false), 500);
+            return () => clearTimeout(timer);
+        }
     }, [articles]);
 
     useEffect(() => {
@@ -40,6 +50,7 @@ const ArticleList = () => {
     }, [chosenCategory, searchTerm]);
 
     const handleCategoryChange = (activeCategory) => {
+        setIsLoading(true);
         router.get(
             "/articles/list",
             {
@@ -54,12 +65,15 @@ const ArticleList = () => {
                     setArticleList(page.props.articles);
                     setChosenCategory(activeCategory);
                     setVisibleArticles(8);
+                    setIsLoading(false);
                 },
+                onError: () => setIsLoading(false),
             }
         );
     };
 
     const handleSearch = () => {
+        setIsLoading(true);
         router.get(
             "/articles/list",
             {
@@ -72,7 +86,9 @@ const ArticleList = () => {
                 preserveState: true,
                 onSuccess: (page) => {
                     setArticleList(page.props.articles);
+                    setIsLoading(false);
                 },
+                onError: () => setIsLoading(false),
             }
         );
     };
@@ -103,8 +119,28 @@ const ArticleList = () => {
     };
 
     const handleShowMore = () => {
+        setIsShowMoreloading(true)
         setVisibleArticles((prev) => prev + 8);
+        setIsShowMoreloading(false)
     };
+
+    // Skeleton card component
+    const ArticleSkeleton = () => (
+        <div className="border rounded-lg p-4 shadow-md flex flex-col justify-between">
+            <Skeleton className="w-full h-64 mb-4 rounded" />
+            <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/2 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/3 mx-auto mb-4" />
+            <Skeleton className="h-16 w-full mb-6" />
+            <div className="flex justify-between items-center mt-auto">
+                <Skeleton className="h-4 w-24" />
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 rounded" />
+                    <Skeleton className="h-4 w-8" />
+                </div>
+            </div>
+        </div>
+    );
 
     const cardRepeater = (data) => {
         if (!data || data.length === 0) {
@@ -251,6 +287,7 @@ const ArticleList = () => {
                     onChange={(e) => {
                         const newSort = e.target.value;
                         setSortOrder(newSort);
+                        setIsLoading(true);
                         router.get(
                             "/articles/list",
                             {
@@ -266,7 +303,9 @@ const ArticleList = () => {
                                 preserveState: true,
                                 onSuccess: (page) => {
                                     setArticleList(page.props.articles);
+                                    setIsLoading(false);
                                 },
+                                onError: () => setIsLoading(false),
                             }
                         );
                     }}
@@ -299,6 +338,7 @@ const ArticleList = () => {
                             setSearchTerm("");
                             setSortOrder("desc");
                             setChosenCategory("All");
+                            setIsLoading(true);
 
                             router.get(
                                 "/articles/list",
@@ -308,7 +348,9 @@ const ArticleList = () => {
                                     preserveState: true,
                                     onSuccess: (page) => {
                                         setArticleList(page.props.articles);
+                                        setIsLoading(false);
                                     },
+                                    onError: () => setIsLoading(false),
                                 }
                             );
                         }}
@@ -332,7 +374,13 @@ const ArticleList = () => {
                 </CardHeader>
 
                 <CardContent>
-                    {articleList?.length > 0 ? (
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {[...Array(8)].map((_, idx) => (
+                                <ArticleSkeleton key={idx} />
+                            ))}
+                        </div>
+                    ) : articleList?.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {cardRepeater(articleList)}
                         </div>
@@ -342,13 +390,14 @@ const ArticleList = () => {
                         </p>
                     )}
 
-                    {visibleArticles < articleList?.length && (
+                    {!isLoading && visibleArticles < articleList?.length && (
                         <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                             <p
                                 onClick={handleShowMore}
-                                className="text-sm text-gray-400 font-thin cursor-pointer"
+                                className="text-sm text-gray-400 font-thin cursor-pointer inline-flex items-center gap-2"
                             >
+                                {isShowMoreLoading && <Spinner className="w-4 h-4" />}
                                 show more
                             </p>
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />

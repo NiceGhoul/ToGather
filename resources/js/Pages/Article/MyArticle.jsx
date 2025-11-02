@@ -4,6 +4,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { SearchIcon, Heart } from "lucide-react";
@@ -24,6 +25,7 @@ export default function MyArticle({
     categories = [],
     sortOrder: initialSortOrder,
 }) {
+    const [isLoading, setIsLoading] = useState(true);
     const [visibleArticles, setVisibleArticles] = useState(8);
     const [articleList, setArticleList] = useState(articles || []);
     const [chosenCategory, setChosenCategory] = useState("All");
@@ -37,10 +39,22 @@ export default function MyArticle({
     );
 
     useEffect(() => {
+        if (articles?.length) {
+            setArticleList(articles);
+            setIsLoading(false);
+        } else {
+            // Simulate loading for initial page load
+            const timer = setTimeout(() => setIsLoading(false), 500);
+            return () => clearTimeout(timer);
+        }
+    }, [articles]);
+
+    useEffect(() => {
         setVisibleArticles(8);
     }, [chosenCategory, searchTerm]);
 
     const handleCategoryChange = (activeCategory) => {
+        setIsLoading(true);
         router.get(
             "/articles/myArticles",
             {
@@ -55,12 +69,15 @@ export default function MyArticle({
                     setArticleList(page.props.articles);
                     setChosenCategory(activeCategory);
                     setVisibleArticles(8);
+                    setIsLoading(false);
                 },
+                onError: () => setIsLoading(false),
             }
         );
     };
 
     const handleSearch = () => {
+        setIsLoading(true);
         router.get(
             "/articles/myArticles",
             {
@@ -73,7 +90,9 @@ export default function MyArticle({
                 preserveState: true,
                 onSuccess: (page) => {
                     setArticleList(page.props.articles);
+                    setIsLoading(false);
                 },
+                onError: () => setIsLoading(false),
             }
         );
     };
@@ -115,6 +134,27 @@ export default function MyArticle({
             console.error("Error liking article:", error);
         }
     };
+
+    // Skeleton card component
+    const ArticleSkeleton = () => (
+        <div className="border rounded-lg p-4 shadow-md flex flex-col justify-between">
+            <Skeleton className="w-full h-64 mb-4 rounded" />
+            <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/2 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/3 mx-auto mb-2" />
+            <Skeleton className="h-16 w-full mb-4" />
+            <div className="flex justify-center gap-2 mb-4">
+                <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <div className="flex justify-between items-center mt-auto">
+                <Skeleton className="h-4 w-24" />
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 rounded" />
+                    <Skeleton className="h-4 w-8" />
+                </div>
+            </div>
+        </div>
+    );
 
     const cardRepeater = (data) => {
         if (!data || data.length === 0) {
@@ -276,6 +316,7 @@ export default function MyArticle({
                     onChange={(e) => {
                         const newSort = e.target.value;
                         setSortOrder(newSort);
+                        setIsLoading(true);
                         router.get(
                             "/articles/myArticles",
                             {
@@ -291,7 +332,9 @@ export default function MyArticle({
                                 preserveState: true,
                                 onSuccess: (page) => {
                                     setArticleList(page.props.articles);
+                                    setIsLoading(false);
                                 },
+                                onError: () => setIsLoading(false),
                             }
                         );
                     }}
@@ -324,6 +367,7 @@ export default function MyArticle({
                             setSearchTerm("");
                             setSortOrder("desc");
                             setChosenCategory("All");
+                            setIsLoading(true);
 
                             router.get(
                                 "/articles/myArticles",
@@ -333,7 +377,9 @@ export default function MyArticle({
                                     preserveState: true,
                                     onSuccess: (page) => {
                                         setArticleList(page.props.articles);
+                                        setIsLoading(false);
                                     },
+                                    onError: () => setIsLoading(false),
                                 }
                             );
                         }}
@@ -355,7 +401,13 @@ export default function MyArticle({
                 </CardHeader>
 
                 <CardContent>
-                    {articleList?.length > 0 ? (
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {[...Array(8)].map((_, idx) => (
+                                <ArticleSkeleton key={idx} />
+                            ))}
+                        </div>
+                    ) : articleList?.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {cardRepeater(articleList)}
                         </div>
