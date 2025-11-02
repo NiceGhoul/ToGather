@@ -8,10 +8,13 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/Components/ui/spinner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 export default function Create() {
+    const [isSubmitLoading, setIsSubmitLoading] = useState(false)
     const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         id_photo: null,
@@ -20,6 +23,7 @@ export default function Create() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitLoading(true)
         console.log("Form data:", data);
 
         if (!data.id_photo || !data.selfie_with_id) {
@@ -31,9 +35,11 @@ export default function Create() {
             forceFormData: true,
             onSuccess: () => {
                 console.log("Form submitted successfully");
+                setIsSubmitLoading(false)
             },
             onError: (errors) => {
                 console.log("Form errors:", errors);
+                setIsSubmitLoading(false)
             },
         });
     };
@@ -110,10 +116,14 @@ export default function Create() {
                             <Button
                                 type="submit"
                                 className="w-full"
-                                disabled={processing}
+                                disabled={isSubmitLoading}
                             >
-                                {processing
-                                    ? "Submitting..."
+                                {isSubmitLoading
+                                    ? (
+                                        <>
+                                            <Spinner className="w-4 h-4" /> Submitting...
+                                        </>
+                                    )
                                     : "Submit Verification Request"}
                             </Button>
                         </form>

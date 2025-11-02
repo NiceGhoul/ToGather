@@ -7,6 +7,7 @@ import { use, useEffect, useState } from "react";
 import { ButtonGroup } from "@/Components/ui/button-group";
 import { Input } from "@/Components/ui/input";
 import { SearchIcon } from "lucide-react";
+import { Spinner } from "@/Components/ui/spinner";
 
 const CampaignList = () => {
     const { campaigns, lookups } = usePage().props;
@@ -14,7 +15,7 @@ const CampaignList = () => {
     const [campaignList, setCampaignList] = useState(campaigns || []);
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
-
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
     useEffect(() => {
         if (campaigns?.length) {
             setCampaignList(campaigns);
@@ -108,7 +109,9 @@ const CampaignList = () => {
     };
 
     const handleShowMore = () => {
+        setIsShowMoreLoading(true)
         setVisibleCampaign((prev) => prev + 8);
+        setIsShowMoreloading(false)
     };
 
     return (
@@ -208,6 +211,7 @@ const CampaignList = () => {
                                 onClick={handleShowMore}
                                 className="text-sm text-gray-400 font-thin"
                             >
+                                {isShowMoreLoading && <Spinner className="w-4 h-4" />}
                                 show more
                             </p>
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />

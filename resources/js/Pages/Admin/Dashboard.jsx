@@ -13,7 +13,6 @@ export default function Dashboard() {
         weeklyDonations, 
         monthlyDonations, 
         yearlyDonations, 
-        recentDonations, 
         userStats, 
         campaignStats, 
         articleStats 
