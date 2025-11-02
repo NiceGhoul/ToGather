@@ -219,8 +219,8 @@ const ArticleList = () => {
                             onClick={() => handleCategoryChange("All")}
                             className={`${
                                 chosenCategory === "All"
-                                    ? "bg-white text-purple-700 font-semibold shadow-md"
-                                    : " text-white hover:bg-purple-700"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                    : " text-white hover:bg-purple-700 bg-purple-800"
                             }`}
                         >
                             All
@@ -233,8 +233,8 @@ const ArticleList = () => {
                             onClick={() => handleCategoryChange(item)}
                             className={`${
                                 chosenCategory === item
-                                    ? "bg-white text-purple-700 font-semibold shadow-md"
-                                    : " text-white hover:bg-purple-700"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                    : " text-white hover:bg-purple-700 bg-purple-800"
                             }`}
                         >
                             {item}
