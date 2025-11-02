@@ -13,162 +13,89 @@ import { Link } from "@inertiajs/react";
 import axios from "axios";
 
 export default function Register() {
-    //State buat step-step di form (1: Email, Password, Confirm Password, 2: OTP, 3: Fullname, Nickname, Address)
+    // State step form
     const [step, setStep] = useState(1);
 
-    //Ref untuk input OTP (6 digit)
+    // Ref input OTP (6 digit)
     const otpRefs = Array.from({ length: 6 }, () => useRef(null));
 
-    //Ref untuk input field lain (biar auto focus)
+    // Ref input field lain (untuk auto focus)
     const emailRef = useRef(null);
-    const fullNameRef = useRef(null);
     const passwordRef = useRef(null);
     const confirmPasswordRef = useRef(null);
     const nicknameRef = useRef(null);
     const addressRef = useRef(null);
 
-    //State untuk data form
+    // State data form
     const [formData, setFormData] = useState({
         email: "",
         password: "",
         confirmPassword: "",
-        fullName: "",
         nickname: "",
         address: "",
         otp: "",
     });
 
-    //State untuk error validasi
+    // Error dan touched
     const [errors, setErrors] = useState({});
-
-    //State untuk menandai field yang sudah disentuh
     const [touched, setTouched] = useState({});
 
-    //State untuk timer OTP
+    // Timer OTP
     const [otpTimer, setOtpTimer] = useState(60);
     const [isCounting, setIsCounting] = useState(true);
 
-    //Efek countdown timer OTP
+    // Countdown OTP
     React.useEffect(() => {
         let interval;
         if (step === 2 && isCounting && otpTimer > 0) {
-            interval = setInterval(() => {
-                setOtpTimer((prev) => prev - 1);
-            }, 1000);
+            interval = setInterval(() => setOtpTimer((prev) => prev - 1), 1000);
         } else if (otpTimer === 0) {
             setIsCounting(false);
         }
         return () => clearInterval(interval);
     }, [step, isCounting, otpTimer]);
 
-    //Handler untuk resend OTP
+    // Resend OTP
     const handleResendOtp = async () => {
         try {
-            await axios.post('/users/send-otp', { email: formData.email });
+            await axios.post("/users/send-otp", { email: formData.email });
             setOtpTimer(60);
             setIsCounting(true);
             setFormData((prev) => ({ ...prev, otp: "" }));
             setTouched((prev) => ({ ...prev, otp: false }));
             setErrors({});
-            setTimeout(() => {
-                otpRefs[0]?.current?.focus();
-            }, 0);
+            setTimeout(() => otpRefs[0]?.current?.focus(), 0);
         } catch (error) {
-            setErrors({ otp: 'Failed to resend OTP. Please try again.' });
+            setErrors({ otp: "Failed to resend OTP. Please try again." });
         }
     };
 
-    //Handler perubahan input form
+    // Handler input form
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
         setTouched({ ...touched, [name]: true });
 
         setErrors((prev) => {
-            const updatedErrors = { ...prev };
-            if (name === "password" && value) {
-                delete updatedErrors.password;
-            }
-            if (name === "confirmPassword" && value === formData.password) {
-                delete updatedErrors.confirmPassword;
-            }
-            if (name === "fullName" && value.trim()) {
-                delete updatedErrors.fullName;
-            }
-            if (name === "nickname" && value.trim()) {
-                delete updatedErrors.nickname;
-            }
-            if (name === "address" && value.trim()) {
-                delete updatedErrors.address;
-            }
-            return updatedErrors;
+            const updated = { ...prev };
+            if (name === "password" && value) delete updated.password;
+            if (name === "confirmPassword" && value === formData.password)
+                delete updated.confirmPassword;
+            if (name === "nickname" && value.trim()) delete updated.nickname;
+            if (name === "address" && value.trim()) delete updated.address;
+            return updated;
         });
     };
 
-    //Validasi step 1
-    const validateStep1 = () => {
-        const newErrors = {};
-        setTouched({
-            email: true,
-            password: true,
-            confirmPassword: true,
-        });
-
-        const password = formData.password;
-        //Cek email
-        if (!formData.email.trim()) {
-            newErrors.email = "Please fill in your email address.";
-        } else if (!emailRegex.test(formData.email)) {
-            newErrors.email =
-                "Invalid email format. Please enter a valid email.";
-        } else if (emailExists) {
-            newErrors.email =
-                "This email is already registered. Try a different one.";
-        }
-
-        //Cek password
-        if (!password) {
-            newErrors.password = "Password is required.";
-        } else {
-            if (password.length < 8) {
-                newErrors.password = "Password must be at least 8 characters.";
-            }
-            if (!/[A-Z]/.test(password)) {
-                newErrors.password =
-                    "Password must include at least one uppercase letter.";
-            }
-            if (!/[a-z]/.test(password)) {
-                newErrors.password =
-                    "Password must include at least one lowercase letter.";
-            }
-            if (!/\d/.test(password)) {
-                newErrors.password =
-                    "Password must include at least one number.";
-            }
-        }
-
-        //Cek confirm password
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = "Please confirm your password.";
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match.";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    //State & handler untuk mengecek apakah email sudah terdaftar
+    // Cek email ke backend
     const [emailExists, setEmailExists] = useState(false);
     const [emailChecked, setEmailChecked] = useState(false);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    //Handler untuk perubahan email (cek ke backend)
     const handleEmailChange = async (e) => {
         const value = e.target.value;
         setFormData({ ...formData, email: value });
         setTouched({ ...touched, email: true });
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!value.trim()) {
             setEmailExists(false);
@@ -197,66 +124,108 @@ export default function Register() {
             setEmailChecked(true);
 
             setErrors((prev) => {
-                const updatedErrors = { ...prev };
-                if (!exists) delete updatedErrors.email;
+                const updated = { ...prev };
+                if (!exists) delete updated.email;
                 else
-                    updatedErrors.email =
+                    updated.email =
                         "This email is already registered. Try a different one.";
-                return updatedErrors;
+                return updated;
             });
         } catch (error) {
             console.error("Fail To Check Email:", error);
         }
     };
 
-    //Validasi step 2
-    const validateStep2 = () => {
+    // Validasi step 1
+    const validateStep1 = () => {
         const newErrors = {};
-        setTouched((prev) => ({ ...prev, otp: true }));
+        setTouched({
+            email: true,
+            password: true,
+            confirmPassword: true,
+        });
 
-        if (!formData.otp || formData.otp.length !== 6) {
-            newErrors.otp = "OTP must be 6 digits.";
+        const password = formData.password;
+
+        if (!formData.email.trim()) {
+            newErrors.email = "Please fill in your email address.";
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email =
+                "Invalid email format. Please enter a valid email.";
+        } else if (emailExists) {
+            newErrors.email =
+                "This email is already registered. Try a different one.";
+        }
+
+        if (!password) {
+            newErrors.password = "Password is required.";
+        } else {
+            if (password.length < 8)
+                newErrors.password = "Password must be at least 8 characters.";
+            if (!/[A-Z]/.test(password))
+                newErrors.password =
+                    "Password must include at least one uppercase letter.";
+            if (!/[a-z]/.test(password))
+                newErrors.password =
+                    "Password must include at least one lowercase letter.";
+            if (!/\d/.test(password))
+                newErrors.password =
+                    "Password must include at least one number.";
+        }
+
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = "Please confirm your password.";
+        } else if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = "Passwords do not match.";
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    //Handler tombol next
+    // Validasi step 2
+    const validateStep2 = () => {
+        const newErrors = {};
+        setTouched((prev) => ({ ...prev, otp: true }));
+
+        if (!formData.otp || formData.otp.length !== 6)
+            newErrors.otp = "OTP must be 6 digits.";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    // Tombol next
     const handleNext = async () => {
         if (step === 1 && !validateStep1()) return;
         if (step === 2 && !validateStep2()) return;
 
         if (step === 1) {
-            // Send OTP
             try {
-                await axios.post('/users/send-otp', { email: formData.email });
+                await axios.post("/users/send-otp", { email: formData.email });
                 setFormData((prev) => ({ ...prev, otp: "" }));
                 setTouched((prev) => ({ ...prev, otp: false }));
                 setOtpTimer(60);
                 setIsCounting(true);
-                setStep(step + 1);
+                setStep(2);
             } catch (error) {
-                setErrors({ otp: 'Failed to send OTP. Please try again.' });
+                setErrors({ otp: "Failed to send OTP. Please try again." });
             }
         } else if (step === 2) {
-            // Verify OTP
             try {
-                await axios.post('/users/verify-otp', { 
-                    email: formData.email, 
-                    otp: formData.otp 
+                await axios.post("/users/verify-otp", {
+                    email: formData.email,
+                    otp: formData.otp,
                 });
-                setStep(step + 1);
+                setStep(3);
             } catch (error) {
-                setErrors({ otp: 'Invalid OTP. Please try again.' });
+                setErrors({ otp: "Invalid OTP. Please try again." });
                 setTouched({ otp: true });
             }
-        } else {
-            setStep(step + 1);
         }
     };
 
-    //Handler tombol submit di akhir
+    // Submit terakhir
     const handleSubmit = (e) => {
         e.preventDefault();
         Inertia.post(
@@ -272,51 +241,35 @@ export default function Register() {
         );
     };
 
-    //Handler tombol back
+    // Tombol back
     const handleBack = () => {
-        if (step === 1) {
-            window.location.href = "/";
-        } else {
-            setStep(1);
-        }
+        if (step === 1) window.location.href = "/";
+        else setStep(step - 1);
     };
 
     const isLongEnough = formData.password.length >= 8;
     const hasUpperLower =
         /[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password);
     const hasNumber = /\d/.test(formData.password);
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const emailValid = emailRegex.test(formData.email);
     const confirmValid =
         formData.confirmPassword &&
         formData.confirmPassword === formData.password;
 
-    //Untuk auto focus input
+    // Auto focus tiap step
     React.useEffect(() => {
-        if (step === 1) {
-            setTimeout(() => {
-                emailRef.current?.focus();
-            }, 0);
-        }
+        if (step === 1) setTimeout(() => emailRef.current?.focus(), 0);
         if (step === 2) {
             setFormData((prev) => ({ ...prev, otp: "" }));
             setTouched((prev) => ({ ...prev, otp: false }));
-            setTimeout(() => {
-                otpRefs[0]?.current?.focus();
-            }, 0);
+            setTimeout(() => otpRefs[0]?.current?.focus(), 0);
         }
-        if (step === 3) {
-            setTimeout(() => {
-                fullNameRef.current?.focus();
-            }, 0);
-        }
+        if (step === 3) setTimeout(() => nicknameRef.current?.focus(), 0);
     }, [step]);
 
-    //Auto refresh
+    // Auto reset 5 menit
     React.useEffect(() => {
-        const timeout = setTimeout(() => {
-            setStep(1);
-        }, 300000); // 5 menit
+        const timeout = setTimeout(() => setStep(1), 300000);
         return () => clearTimeout(timeout);
     }, [step, formData]);
 
@@ -350,7 +303,6 @@ export default function Register() {
                         className="space-y-4"
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
-                                // STEP 1: Email, Password, Confirm Password
                                 if (step === 1) {
                                     if (
                                         document.activeElement ===
@@ -371,33 +323,19 @@ export default function Register() {
                                         e.preventDefault();
                                         handleNext();
                                     }
-                                }
-                                // STEP 3: Fullname, Nickname, Address
-                                else if (step === 3) {
+                                } else if (step === 3) {
                                     if (
-                                        document.activeElement ===
-                                        fullNameRef.current
-                                    ) {
-                                        e.preventDefault();
-                                        nicknameRef.current?.focus();
-                                    } else if (
                                         document.activeElement ===
                                         nicknameRef.current
                                     ) {
                                         e.preventDefault();
                                         addressRef.current?.focus();
-                                    } else if (
-                                        document.activeElement ===
-                                        addressRef.current
-                                    ) {
-                                        // Submit form
-                                        // Jangan preventDefault agar form submit jalan
                                     }
                                 }
-                                // STEP 2: Sudah dihandle di input OTP
                             }
                         }}
                     >
+                        {/* STEP 1 */}
                         {step === 1 && (
                             <>
                                 <div>
@@ -424,13 +362,13 @@ export default function Register() {
                                         }`}
                                         placeholder="Example@gmail.com"
                                     />
-
                                     {touched.email && errors.email && (
                                         <p className="text-sm mt-1 text-red-600">
                                             ✖ {errors.email}
                                         </p>
                                     )}
                                 </div>
+
                                 <div>
                                     <label htmlFor="password">Password</label>
                                     <input
@@ -488,6 +426,7 @@ export default function Register() {
                                         </ul>
                                     )}
                                 </div>
+
                                 <div>
                                     <label htmlFor="confirmPassword">
                                         Confirm Password
@@ -535,6 +474,7 @@ export default function Register() {
                             </>
                         )}
 
+                        {/* STEP 2 */}
                         {step === 2 && (
                             <div className="text-center">
                                 <div className="flex justify-center gap-2">
@@ -559,32 +499,24 @@ export default function Register() {
                                                 const newOtp =
                                                     formData.otp.split("");
                                                 newOtp[i] = value;
-                                                const newOtpValue =
-                                                    newOtp.join("");
-
                                                 setFormData({
                                                     ...formData,
-                                                    otp: newOtpValue,
+                                                    otp: newOtp.join(""),
                                                 });
-
-                                                // Auto-focus ke next box jika ada value
-                                                if (value && i < 5) {
+                                                if (value && i < 5)
                                                     otpRefs[
                                                         i + 1
                                                     ].current?.focus();
-                                                }
                                             }}
                                             onKeyDown={(e) => {
                                                 if (
                                                     e.key === "Backspace" &&
                                                     !formData.otp[i] &&
                                                     i > 0
-                                                ) {
+                                                )
                                                     otpRefs[
                                                         i - 1
                                                     ].current?.focus();
-                                                }
-                                                // Enter langsung submit OTP (handleNext)
                                                 if (
                                                     e.key === "Enter" &&
                                                     formData.otp.length === 6 &&
@@ -604,7 +536,7 @@ export default function Register() {
                                 )}
                                 {isCounting ? (
                                     <p className="mt-2 text-sm text-gray-700">
-                                        Didn’t receive OTP ?{" "}
+                                        Didn’t receive OTP?{" "}
                                         <span className="font-semibold">
                                             Resend again in 00:
                                             {otpTimer
@@ -627,21 +559,9 @@ export default function Register() {
                             </div>
                         )}
 
+                        {/* STEP 3 */}
                         {step === 3 && (
                             <>
-                                <div>
-                                    <label htmlFor="fullName">Full Name</label>
-                                    <input
-                                        ref={fullNameRef}
-                                        value={formData.fullName}
-                                        onChange={handleChange}
-                                        id="fullName"
-                                        name="fullName"
-                                        className={input}
-                                        placeholder="Enter your full name"
-                                        required
-                                    />
-                                </div>
                                 <div>
                                     <label htmlFor="nickname">Nickname</label>
                                     <input
@@ -671,6 +591,7 @@ export default function Register() {
                             </>
                         )}
 
+                        {/* Step Indicator */}
                         <div className="flex items-center justify-center gap-24 mt-4 relative">
                             {[1, 2, 3].map((n, index) => (
                                 <div
@@ -714,6 +635,7 @@ export default function Register() {
                                 </button>
                             )}
                         </CardFooter>
+
                         <CardFooter className="flex justify-end p-0">
                             <button
                                 type="button"
@@ -724,6 +646,7 @@ export default function Register() {
                             </button>
                         </CardFooter>
                     </form>
+
                     {step === 1 && (
                         <p className="text-sm mt-6 text-center">
                             Already have an account?{" "}
