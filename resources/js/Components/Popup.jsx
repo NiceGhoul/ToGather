@@ -83,7 +83,17 @@ export default function Popup({
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {description}
+                        {Array.isArray(description) ? (
+                            <div className="text-sm text-muted-foreground text-left space-y-1">
+                                <ul className="list-disc list-inside space-y-1 text-left">
+                                    {description.map((msg, i) => (
+                                        <li key={i}>{msg}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ) : (
+                             description
+                        )}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

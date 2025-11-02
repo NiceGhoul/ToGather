@@ -1,13 +1,12 @@
-import * as React from "react"
+import * as React from "react";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-} from "lucide-react"
+} from "lucide-react";
 import { DayPicker, getDefaultClassNames } from "react-day-picker";
-
-import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 function Calendar({
   className,
@@ -19,15 +18,15 @@ function Calendar({
   components,
   ...props
 }) {
-  const defaultClassNames = getDefaultClassNames()
+  const defaultClassNames = getDefaultClassNames();
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+        String.raw`rtl:**:[.rdp-button_next>svg]:rotate-180`,
+        String.raw`rtl:**:[.rdp-button_previous>svg]:rotate-180`,
         className
       )}
       captionLayout={captionLayout}
@@ -67,9 +66,13 @@ function Calendar({
           defaultClassNames.dropdown_root
         ),
         dropdown: cn("bg-popover absolute inset-0 opacity-0", defaultClassNames.dropdown),
-        caption_label: cn("select-none font-medium", captionLayout === "label"
-          ? "text-sm"
-          : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5", defaultClassNames.caption_label),
+        caption_label: cn(
+          "select-none font-medium",
+          captionLayout === "label"
+            ? "text-sm"
+            : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5",
+          defaultClassNames.caption_label
+        ),
         table: "w-full border-collapse",
         weekdays: cn("flex", defaultClassNames.weekdays),
         weekday: cn(
@@ -102,53 +105,49 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
-          return (<div data-slot="calendar" ref={rootRef} className={cn(className)} {...props} />);
-        },
+        Root: ({ className, rootRef, ...props }) => (
+          <div data-slot="calendar" ref={rootRef} className={cn(className)} {...props} />
+        ),
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
-            return (<ChevronLeftIcon className={cn("size-4", className)} {...props} />);
+            return <ChevronLeftIcon className={cn("size-4", className)} {...props} />;
           }
-
           if (orientation === "right") {
-            return (<ChevronRightIcon className={cn("size-4", className)} {...props} />);
+            return <ChevronRightIcon className={cn("size-4", className)} {...props} />;
           }
-
-          return (<ChevronDownIcon className={cn("size-4", className)} {...props} />);
+          return <ChevronDownIcon className={cn("size-4", className)} {...props} />;
         },
-        DayButton: CalendarDayButton,
-        WeekNumber: ({ children, ...props }) => {
-          return (
-            <td {...props}>
-              <div
-                className="flex size-[--cell-size] items-center justify-center text-center">
-                {children}
-              </div>
-            </td>
-          );
-        },
+        DayButton: CalendarDayButton, // ✅ now wrapped with forwardRef below
+        WeekNumber: ({ children, ...props }) => (
+          <td {...props}>
+            <div className="flex size-[--cell-size] items-center justify-center text-center">
+              {children}
+            </div>
+          </td>
+        ),
         ...components,
       }}
-      {...props} />
+      {...props}
+    />
   );
 }
 
-function CalendarDayButton({
-  className,
-  day,
-  modifiers,
-  ...props
-}) {
-  const defaultClassNames = getDefaultClassNames()
+const CalendarDayButton = React.forwardRef(function CalendarDayButton(
+  { className, day, modifiers, ...props },
+  ref
+) {
+  const defaultClassNames = getDefaultClassNames();
 
-  const ref = React.useRef(null)
+  const innerRef = React.useRef(null);
+  React.useImperativeHandle(ref, () => innerRef.current);
+
   React.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus()
-  }, [modifiers.focused])
+    if (modifiers.focused) innerRef.current?.focus();
+  }, [modifiers.focused]);
 
   return (
     <Button
-      ref={ref}
+      ref={innerRef}
       variant="ghost"
       size="icon"
       data-day={day.date.toLocaleDateString()}
@@ -166,8 +165,9 @@ function CalendarDayButton({
         defaultClassNames.day,
         className
       )}
-      {...props} />
+      {...props}
+    />
   );
-}
+});
 
-export { Calendar, CalendarDayButton }
+export { Calendar, CalendarDayButton };
