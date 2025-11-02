@@ -12,6 +12,15 @@ export default function ArticleRequestList() {
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
 
+    // ===== Reject (per item) =====
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
+    const [rejectReason, setRejectReason] = useState("");
+    const [targetRejectId, setTargetRejectId] = useState(null);
+
+    // ===== Bulk Reject =====
+    const [bulkRejectModalOpen, setBulkRejectModalOpen] = useState(false);
+    const [bulkRejectReason, setBulkRejectReason] = useState("");
+
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -27,13 +36,46 @@ export default function ArticleRequestList() {
     };
 
     const handleApprove = (id) => {
-        router.post(`/admin/articles/${id}/approve`);
+        router.post(
+            `/admin/articles/${id}/approve`,
+            {},
+            {
+                onSuccess: () => {
+                    setSuccessPopupMessage("Article approved");
+                    setSuccessPopupOpen(true);
+                    router.reload();
+                },
+                onError: () => {
+                    setSuccessPopupMessage("Approve failed");
+                    setSuccessPopupOpen(true);
+                },
+            }
+        );
     };
 
-    const handleReject = (id) => {
-        router.post(`/admin/articles/${id}/reject`);
+    // ---- Per-item reject submit (dengan reason) ----
+    const submitReject = (id, reason) => {
+        router.post(
+            `/admin/articles/${id}/reject`,
+            { reason },
+            {
+                onSuccess: () => {
+                    setRejectModalOpen(false);
+                    setRejectReason("");
+                    setTargetRejectId(null);
+                    setSuccessPopupMessage("Article rejected successfully!");
+                    setSuccessPopupOpen(true);
+                    router.reload();
+                },
+                onError: () => {
+                    setSuccessPopupMessage("Failed to reject article");
+                    setSuccessPopupOpen(true);
+                },
+            }
+        );
     };
 
+    // ---- Bulk approve (tetap sama) ----
     const handleBulkApprove = () => {
         if (selectedIds.length === 0) return;
         router.post(
@@ -45,6 +87,7 @@ export default function ArticleRequestList() {
                     setSuccessPopupMessage("Selected articles approved");
                     setSuccessPopupOpen(true);
                     setSelectedIds([]);
+                    router.reload();
                 },
                 onError: (errors) => {
                     console.error("Bulk approve error:", errors);
@@ -55,17 +98,21 @@ export default function ArticleRequestList() {
         );
     };
 
-    const handleBulkReject = () => {
-        if (selectedIds.length === 0) return;
+    // ---- Bulk reject (minta reason dulu) ----
+    const submitBulkReject = (ids, reason) => {
+        if (ids.length === 0) return;
         router.post(
             "/admin/articles/bulk-reject",
-            { ids: selectedIds },
+            { ids, reason }, // pastikan backend menerima 'reason'
             {
                 preserveState: true,
                 onSuccess: () => {
                     setSuccessPopupMessage("Selected articles rejected");
                     setSuccessPopupOpen(true);
                     setSelectedIds([]);
+                    setBulkRejectModalOpen(false);
+                    setBulkRejectReason("");
+                    router.reload();
                 },
                 onError: (errors) => {
                     console.error("Bulk reject error:", errors);
@@ -82,7 +129,7 @@ export default function ArticleRequestList() {
         router.reload();
     };
 
-    // optional auto-close after X ms (keeps UX snappy)
+    // optional auto-close after X ms
     useEffect(() => {
         if (!successPopupOpen) return;
         const t = setTimeout(() => handleSuccessClose(), 2500);
@@ -127,21 +174,17 @@ export default function ArticleRequestList() {
                         onConfirm={() => handleBulkApprove()}
                     />
 
-                    <Popup
-                        triggerText={
-                            <div className="flex items-center gap-2 cursor-pointer">
-                                <X className="w-4 h-4" />
-                                <span>Reject Selected</span>
-                            </div>
-                        }
-                        title="Reject Selected Articles?"
-                        description="This will reject all selected articles."
-                        confirmText="Yes, Reject"
-                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                        triggerClass="bg-red-600 hover:bg-red-700 text-white"
-                        disabledValue={selectedIds.length === 0}
-                        onConfirm={() => handleBulkReject()}
-                    />
+                    {/* BUKAN kirim langsung — buka modal alasan dulu */}
+                    <Button
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        disabled={selectedIds.length === 0}
+                        onClick={() => setBulkRejectModalOpen(true)}
+                    >
+                        <div className="flex items-center gap-2">
+                            <X className="w-4 h-4" />
+                            <span>Reject Selected</span>
+                        </div>
+                    </Button>
                 </div>
 
                 <table className="min-w-full border text-sm">
@@ -168,7 +211,7 @@ export default function ArticleRequestList() {
                     </thead>
                     <tbody>
                         {articles.length > 0 ? (
-                            articles.map((a, index) => (
+                            articles.map((a) => (
                                 <tr key={a.id} className="hover:bg-gray-50">
                                     <td className="border px-4 py-2">
                                         <input
@@ -191,8 +234,8 @@ export default function ArticleRequestList() {
                                             a.created_at
                                         ).toLocaleString()}
                                     </td>
-                                    <td className="border px-4 py-2 space-x-2">
-                                        <div className="actionBtnContainer flex flex-row justify-center gap-3">
+                                    <td className="border px-4 py-2">
+                                        <div className="flex flex-row justify-center gap-3">
                                             <Button
                                                 onClick={() =>
                                                     router.get(
@@ -215,17 +258,17 @@ export default function ArticleRequestList() {
                                                     handleApprove(a.id)
                                                 }
                                             />
-                                            <Popup
-                                                triggerText={<X />}
-                                                title="Reject Article?"
-                                                description="This action cannot be undone. The article will be rejected"
-                                                confirmText="Yes, Reject"
-                                                confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                triggerClass="bg-red-600 hover:bg-red-700 text-white"
-                                                onConfirm={() =>
-                                                    handleReject(a.id)
-                                                }
-                                            />
+
+                                            {/* Per-item Reject: buka modal alasan */}
+                                            <Button
+                                                className="bg-red-600 hover:bg-red-700 text-white"
+                                                onClick={() => {
+                                                    setTargetRejectId(a.id);
+                                                    setRejectModalOpen(true);
+                                                }}
+                                            >
+                                                <X />
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
@@ -243,6 +286,88 @@ export default function ArticleRequestList() {
                     </tbody>
                 </table>
             </div>
+
+            {/* ==== MODAL: Per-item Reject reason ==== */}
+            {rejectModalOpen && (
+                <Popup
+                    triggerText=""
+                    title="Reject Article"
+                    description=""
+                    confirmText="Submit Rejection"
+                    confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                    open={rejectModalOpen}
+                    onConfirm={() => {
+                        if (!rejectReason.trim()) {
+                            setSuccessPopupMessage("Please provide a reason.");
+                            setSuccessPopupOpen(true);
+                            return;
+                        }
+                        submitReject(targetRejectId, rejectReason);
+                    }}
+                    onClose={() => {
+                        setRejectModalOpen(false);
+                        setRejectReason("");
+                        setTargetRejectId(null);
+                    }}
+                >
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium mb-1">
+                            Reason for Rejection:
+                        </label>
+                        <textarea
+                            className="w-full border rounded-md p-2 text-sm"
+                            rows={4}
+                            placeholder="Write your reason here..."
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                        />
+                    </div>
+                </Popup>
+            )}
+
+            {/* ==== MODAL: Bulk Reject reason ==== */}
+            {bulkRejectModalOpen && (
+                <Popup
+                    triggerText=""
+                    title="Reject Selected Articles"
+                    description=""
+                    confirmText="Submit Rejection"
+                    confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                    open={bulkRejectModalOpen}
+                    onConfirm={() => {
+                        if (selectedIds.length === 0) return;
+                        if (!bulkRejectReason.trim()) {
+                            setSuccessPopupMessage("Please provide a reason.");
+                            setSuccessPopupOpen(true);
+                            return;
+                        }
+                        submitBulkReject(selectedIds, bulkRejectReason);
+                    }}
+                    onClose={() => {
+                        setBulkRejectModalOpen(false);
+                        setBulkRejectReason("");
+                    }}
+                >
+                    <div className="mt-2">
+                        <p className="text-sm mb-2">
+                            You are rejecting <b>{selectedIds.length}</b>{" "}
+                            article(s).
+                        </p>
+                        <label className="block text-sm font-medium mb-1">
+                            Reason for Rejection:
+                        </label>
+                        <textarea
+                            className="w-full border rounded-md p-2 text-sm"
+                            rows={4}
+                            placeholder="Write your reason here..."
+                            value={bulkRejectReason}
+                            onChange={(e) =>
+                                setBulkRejectReason(e.target.value)
+                            }
+                        />
+                    </div>
+                </Popup>
+            )}
         </Layout_Admin>
     );
 }

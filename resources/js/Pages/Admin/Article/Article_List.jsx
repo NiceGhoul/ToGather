@@ -64,7 +64,7 @@ export default function Article_List() {
         router.get(`/admin/articles/${id}/view?from=list`);
     };
     const handleEnable = (id) => {
-        router.post(`/admin/articles/${id}/approve`);
+        router.post(`/admin/articles/${id}/enable`);
     };
 
     // Bulk handlers

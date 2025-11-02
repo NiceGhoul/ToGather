@@ -372,6 +372,72 @@ class ArticleController extends Controller
         ]);
     }
 
+
+
+    public function showMyArticles(Request $request)
+    {
+        $user = auth()->user();
+
+        // --- ambil semua kategori (biar bisa muncul di dropdown MyArticle.jsx)
+        $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
+
+        // --- ambil query params
+        $filterCategory = $request->query('category');
+        $sortOrder = $request->query('sort', 'desc');
+        $searchQuery = $request->query('search');
+
+        if ($filterCategory === 'All' || !$filterCategory || $filterCategory == '') {
+            $filterCategory = null;
+        }
+
+        // --- query utama untuk artikel milik user
+        $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
+            ->where('user_id', $user->id)
+            ->when($filterCategory, function ($q) use ($filterCategory) {
+                $q->where('category', $filterCategory);
+            })
+            ->when($searchQuery, function ($q) use ($searchQuery) {
+                $q->where(function ($qq) use ($searchQuery) {
+                    $qq->where('title', 'like', "%{$searchQuery}%")
+                        ->orWhereHas('contents', function ($qc) use ($searchQuery) {
+                            $qc->where('type', 'text')
+                                ->where('content', 'like', "%{$searchQuery}%");
+                        });
+                });
+            })
+            ->withCount('likes')
+            ->orderBy('created_at', $sortOrder)
+            ->get()
+            ->map(function ($article) use ($user) {
+                // tambah URL thumbnail
+                if ($article->thumbnailImage) {
+                    $article->thumbnail_url = $article->thumbnailImage->url;
+                }
+
+                // transform content image URL
+                $article->contents->transform(function ($content) {
+                    if ($content->type === 'image' && $content->image) {
+                        $content->image_url = $content->image->url;
+                    }
+                    return $content;
+                });
+
+                // status like per user
+                $article->is_liked_by_user = $article->likes()
+                    ->where('user_id', $user->id)
+                    ->exists();
+
+                return $article;
+            });
+
+        return inertia('Article/MyArticle', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'selectedCategory' => $filterCategory,
+            'sortOrder' => $sortOrder,
+            'searchQuery' => $searchQuery,
+        ]);
+    }
     public function showMyArticleDetails($id)
     {
         $article = Article::with(['user', 'contents.image', 'thumbnailImage', 'likes'])
@@ -396,38 +462,6 @@ class ArticleController extends Controller
 
         return inertia('Article/MyArticleDetails', [
             'article' => $article,
-        ]);
-    }
-
-    public function showMyArticles(Request $request)
-    {
-        $user = auth()->user();
-
-        $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
-            ->where('user_id', $user->id)
-            ->withCount('likes')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($article) use ($user) {
-                // Transform article to include image URLs
-                if ($article->thumbnailImage) {
-                    $article->thumbnail_url = $article->thumbnailImage->url;
-                }
-                $article->contents->transform(function ($content) {
-                    if ($content->type === 'image' && $content->image) {
-                        $content->image_url = $content->image->url;
-                    }
-                    return $content;
-                });
-
-                $article->is_liked_by_user = $article->likes()
-                    ->where('user_id', $user->id)
-                    ->exists();
-                return $article;
-            });
-
-        return inertia('Article/MyArticle', [
-            'articles' => $articles,
         ]);
     }
 
@@ -530,6 +564,7 @@ class ArticleController extends Controller
         $article = Article::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
+        $wasRejected = $article->status === 'rejected';
 
         $validated = $request->validate([
             'contents' => 'required|array|min:1',
@@ -539,9 +574,15 @@ class ArticleController extends Controller
             'contents.*.order_y' => 'required|integer',
         ]);
 
-        DB::transaction(function () use ($request, $article) {
+        DB::transaction(function () use ($request, $article, $wasRejected) {
             $article->update(['status' => 'pending']);
             $article->contents()->delete();
+            if ($wasRejected) {
+                $updateData['resubmitted_at'] = now();
+            }
+            $article->update($updateData);
+
+
 
             foreach ($request->input('contents', []) as $i => $block) {
                 $type = $block['type'];
@@ -558,6 +599,7 @@ class ArticleController extends Controller
                     $content->image()->create(['path' => $path]);
                 }
             }
+
         });
 
         NotificationController::notifyAdmins(
@@ -714,6 +756,23 @@ class ArticleController extends Controller
         return back()->with('success', 'Article approved!');
     }
 
+    public function adminEnable($id)
+    {
+        $article = Article::findOrFail($id);
+        $article->update(['status' => 'approved']);
+
+        // Notify user about article approval
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_approved',
+            'Article Approved',
+            "Your article '{$article->title}' has been enabled by Admin and is now visible to the public!",
+            ['article_id' => $article->id]
+        );
+
+        return back()->with('success', 'Article Enabled!');
+    }
+
     public function adminDisable($id)
     {
         $article = Article::findOrFail($id);
@@ -724,7 +783,7 @@ class ArticleController extends Controller
             $article->user_id,
             'article_disabled',
             'Article Disabled',
-            "Your article '{$article->title}' has been disabled and is no longer visible to the public.",
+            "Your article '{$article->title}' has been disabled by Admin and is no longer visible to the public.",
             ['article_id' => $article->id]
         );
 
@@ -755,10 +814,19 @@ class ArticleController extends Controller
         return back()->with('success', 'Article rejected!');
     }
 
-    public function adminDelete($id)
+    public function adminDelete($id, Request $request)
     {
         $article = Article::findOrFail($id);
         $article->delete();
+
+        // Notify user about article deletetion
+        NotificationController::notifyUser(
+            $article->user_id,
+            'article_deleted',
+            'Article Deleted',
+            "Your article '{$article->title}' has been deleted.",
+            ['article_id' => $article->id]
+        );
 
         return redirect()
             ->route('admin.articles.index')
@@ -821,25 +889,35 @@ class ArticleController extends Controller
         $validated = $request->validate([
             'ids' => 'required|array|min:1',
             'ids.*' => 'integer|distinct|exists:articles,id',
+            'reason' => 'nullable|string|max:500',
         ]);
-
+        // dd($validated);
         $articles = Article::whereIn('id', $validated['ids'])->get();
+        // dd($articles);
 
-        // Notify each user about their article being rejected
         foreach ($articles as $article) {
+            // update status + simpan alasan
+            $article->update([
+                'status' => 'rejected',
+                'rejected_reason' => $validated['reason'] ?? null,
+            ]);
+
+            // kirim notifikasi ke user
             NotificationController::notifyUser(
                 $article->user_id,
                 'article_rejected',
                 'Article Rejected',
-                "Your article '{$article->title}' has been rejected during bulk review.",
+                "Your article '{$article->title}' has been rejected." .
+                ($validated['reason']
+                    ? " Reason: {$validated['reason']}"
+                    : ""),
                 ['article_id' => $article->id]
             );
         }
 
-        Article::whereIn('id', $validated['ids'])->update(['status' => 'rejected']);
-
         return back()->with('success', 'Selected articles rejected!');
     }
+
 
     public function adminBulkDelete(Request $request)
     {

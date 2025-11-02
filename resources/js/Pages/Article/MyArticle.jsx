@@ -1,19 +1,82 @@
 import Layout_User from "@/Layouts/Layout_User";
-import { Link } from "@inertiajs/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link, router, usePage } from "@inertiajs/react";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
-import { Heart } from "lucide-react";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { Input } from "@/components/ui/input";
+import { SearchIcon, Heart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { IconFolderCode } from "@tabler/icons-react";
+import { ArrowUpRightIcon, RotateCcw } from "lucide-react";
+import {
+    Empty,
+    EmptyContent,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyMedia,
+    EmptyTitle,
+} from "@/components/ui/empty";
 
-export default function MyArticle({ articles = [] }) {
-    // 🟢 duplikasi data articles ke state supaya bisa diubah likes_count-nya
-    const [articlesState, setArticlesState] = useState(articles);
+export default function MyArticle({
+    articles = [],
+    categories = [],
+    sortOrder: initialSortOrder,
+}) {
+    const [visibleArticles, setVisibleArticles] = useState(8);
+    const [articleList, setArticleList] = useState(articles || []);
+    const [chosenCategory, setChosenCategory] = useState("All");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
 
     const [likesState, setLikesState] = useState(
         Object.fromEntries(
-            articles.map((a) => [a.id, a.is_liked_by_user ?? false])
+            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false])
         )
     );
+
+    useEffect(() => {
+        setVisibleArticles(8);
+    }, [chosenCategory, searchTerm]);
+
+    const handleCategoryChange = (activeCategory) => {
+        router.get(
+            "/articles/myArticles",
+            {
+                category: activeCategory,
+                search: searchTerm,
+                sort: sortOrder,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {
+                    setArticleList(page.props.articles);
+                    setChosenCategory(activeCategory);
+                    setVisibleArticles(8);
+                },
+            }
+        );
+    };
+
+    const handleSearch = () => {
+        router.get(
+            "/articles/myArticles",
+            {
+                category: chosenCategory === "" ? "All" : chosenCategory,
+                sort: sortOrder,
+                search: searchTerm, // ⬅️ kirim ke backend
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {
+                    setArticleList(page.props.articles);
+                },
+            }
+        );
+    };
 
     const handleLike = async (articleId) => {
         try {
@@ -27,133 +90,318 @@ export default function MyArticle({ articles = [] }) {
                     Accept: "application/json",
                 },
             });
+            const data = await response.json();
 
-            const data = await response.json(); // { isLiked: true/false }
+            // ubah status liked
+            setLikesState((prev) => ({
+                ...prev,
+                [articleId]: data.isLiked,
+            }));
 
-            // 🔁 update state likesState
-            setLikesState((prev) => ({ ...prev, [articleId]: data.isLiked }));
-
-            // 🟢 update juga jumlah likes di articlesState
-            setArticlesState((prev) =>
-                prev.map((article) =>
+            // 🔥 update juga jumlah likes di articleList supaya langsung kelihatan
+            setArticleList((prevList) =>
+                prevList.map((article) =>
                     article.id === articleId
                         ? {
                               ...article,
-                              likes_count: data.isLiked
-                                  ? (article.likes_count ?? 0) + 1
-                                  : Math.max((article.likes_count ?? 1) - 1, 0),
+                              likes_count:
+                                  data.likesCount ??
+                                  article.likes_count + (data.isLiked ? 1 : -1),
                           }
                         : article
                 )
             );
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error("Error liking article:", error);
+        }
+    };
+
+    const cardRepeater = (data) => {
+        if (!data || data.length === 0) {
+            return <p>No articles available.</p>;
+        } else {
+            return data.slice(0, visibleArticles).map((article, idx) => {
+                const previewText =
+                    article.contents?.find(
+                        (c) =>
+                            c.type === "text" &&
+                            c.order_x === 1 &&
+                            c.order_y === 1
+                    )?.content || "";
+
+                const liked = likesState[article.id] || false;
+
+                return (
+                    <div
+                        key={idx}
+                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
+                    >
+                        {article.thumbnail_url && (
+                            <img
+                                src={article.thumbnail_url}
+                                alt={article.title}
+                                className="w-full h-64 object-cover mb-4 rounded"
+                            />
+                        )}
+
+                        <h2 className="text-lg font-semibold mb-2 min-h-[2rem] max-h-[3rem] overflow-hidden text-center leading-snug">
+                            {article.title.length > 50
+                                ? article.title.substring(0, 50) + "..."
+                                : article.title}
+                        </h2>
+
+                        <p className="text-sm text-gray-600 text-center mb-2">
+                            {new Date(article.created_at).toLocaleDateString()}
+                        </p>
+
+                        <p className="text-sm text-gray-500 text-center mb-2">
+                            {article.category ?? "Uncategorized"}
+                        </p>
+
+                        <p className="text-sm text-gray-700 mb-4 text-justify">
+                            {previewText
+                                .replace(/(<([^>]+)>)/gi, "")
+                                .slice(0, 180) || "No preview text."}
+                            ...
+                        </p>
+
+                        <div className="flex justify-center gap-2 mb-4">
+                            <span
+                                className={`inline-block text-xs font-semibold px-2 py-1 rounded-full
+                            ${
+                                article.status === "approved"
+                                    ? "bg-green-100 text-green-700"
+                                    : article.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : article.status === "rejected"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-gray-200 text-gray-700"
+                            }`}
+                            >
+                                {article.status.toUpperCase()}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center mt-auto">
+                            <Link
+                                href={`/articles/${article.id}/details`}
+                                className="text-purple-700 hover:underline font-medium"
+                            >
+                                Read more →
+                            </Link>
+
+                            <div className="flex items-center gap-2">
+                                <Toggle
+                                    pressed={liked}
+                                    onPressedChange={() =>
+                                        handleLike(article.id)
+                                    }
+                                    size="lg"
+                                    variant="outline"
+                                    className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
+                                >
+                                    <Heart className="w-5 h-5" />
+                                </Toggle>
+                                <span className="text-sm text-gray-600">
+                                    {article.likes_count ?? 0}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            });
         }
     };
 
     return (
         <Layout_User>
-            <div className="container mx-auto px-4 py-8 space-y-6">
-                <h1 className="text-3xl font-bold">My Articles</h1>
-
-                {articlesState.length === 0 ? (
-                    <p className="text-gray-500">
-                        You haven't written any articles yet.
-                    </p>
-                ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {articlesState.map((article) => (
-                            <Card
-                                key={article.id}
-                                className="hover:shadow-md transition overflow-hidden flex flex-col h-full"
-                            >
-                                {article.thumbnail_url && (
-                                    <img
-                                        src={article.thumbnail_url}
-                                        alt={article.title}
-                                        className="w-full h-48 object-cover"
-                                    />
-                                )}
-
-                                <CardHeader>
-                                    <CardTitle className="text-lg font-semibold">
-                                        {article.title}
-                                    </CardTitle>
-                                    <p className="text-sm text-gray-500">
-                                        {new Date(
-                                            article.created_at
-                                        ).toLocaleDateString()}
-                                    </p>
-                                </CardHeader>
-
-                                <CardContent className="flex flex-col flex-grow">
-                                    <p className="text-gray-700 line-clamp-3 mb-3">
-                                        {article.contents?.[0]?.content
-                                            ?.replace(/(<([^>]+)>)/gi, "")
-                                            .slice(0, 95) || "No preview text."}
-                                        ...
-                                    </p>
-
-                                    <div className="flex flex-row items-center gap-2 mt-3 mb-2">
-                                        <span
-                                            className={`inline-block text-xs font-semibold px-2 py-1 rounded-full
-                ${
-                    article.status === "approved"
-                        ? "bg-green-100 text-green-700"
-                        : article.status === "pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : article.status === "rejected"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-gray-200 text-gray-700"
-                }`}
-                                        >
-                                            {article.status.toUpperCase()}
-                                        </span>
-
-                                        {article.status === "rejected" &&
-                                            article.rejected_reason && (
-                                                <p className="text-sm text-red-600">
-                                                    <strong>Reason:</strong>{" "}
-                                                    {article.rejected_reason}
-                                                </p>
-                                            )}
-                                    </div>
-
-                                    <div className="flex-grow" />
-
-                                    <div className="mt-auto">
-                                        <Link
-                                            href={`/articles/${article.id}/details`}
-                                            className="text-blue-600 hover:underline inline-block mb-2"
-                                        >
-                                            View details →
-                                        </Link>
-
-                                        <div className="flex items-center gap-3">
-                                            <Toggle
-                                                pressed={likesState[article.id]}
-                                                onPressedChange={() =>
-                                                    handleLike(article.id)
-                                                }
-                                                size="lg"
-                                                variant="outline"
-                                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
-                                            >
-                                                <Heart className="w-5 h-5" />
-                                            </Toggle>
-                                            <span className="text-sm text-gray-700">
-                                                {article.likes_count ?? 0}{" "}
-                                                {article.likes_count === 1
-                                                    ? "like"
-                                                    : "likes"}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+            {/* === Banner Section === */}
+            <div className="w-full flex flex-col">
+                <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
+                    <img
+                        src="http://127.0.0.1:8000/images/writingArticle.jpg"
+                        alt="Article Banner"
+                        className="absolute inset-0 w-full h-full object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">
+                            Manage & Review Your Own Articles
+                        </h1>
+                        <p className="text-white/90 mt-2 text-sm md:text-base">
+                            Track, edit, and see how readers respond to your
+                            creations
+                        </p>
                     </div>
-                )}
+                </div>
+
+                {/* === Category Bar === */}
+                <div
+                    className="flex flex-row space-x-4 h-[75px] bg-gray-300 bg-cover bg-center w-full items-center justify-center"
+                    style={{ background: "#7A338C" }}
+                >
+                    {categories?.length > 0 && (
+                        <Button
+                            key={999}
+                            onClick={() => handleCategoryChange("All")}
+                            className={`${
+                                chosenCategory === "All"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md"
+                                    : " text-white hover:bg-purple-700"
+                            }`}
+                        >
+                            All
+                        </Button>
+                    )}
+
+                    {categories?.map((item, idx) => (
+                        <Button
+                            key={idx}
+                            onClick={() => handleCategoryChange(item)}
+                            className={`${
+                                chosenCategory === item
+                                    ? "bg-white text-purple-700 font-semibold shadow-md"
+                                    : " text-white hover:bg-purple-700"
+                            }`}
+                        >
+                            {item}
+                        </Button>
+                    ))}
+                </div>
+            </div>
+
+            {/* === Search + Sort === */}
+            <div className="w-11/12 flex m-10 items-end justify-end gap-3">
+                <select
+                    value={sortOrder}
+                    onChange={(e) => {
+                        const newSort = e.target.value;
+                        setSortOrder(newSort);
+                        router.get(
+                            "/articles/myArticles",
+                            {
+                                category:
+                                    chosenCategory === ""
+                                        ? "All"
+                                        : chosenCategory,
+                                sort: newSort,
+                                search: searchTerm,
+                            },
+                            {
+                                preserveScroll: true,
+                                preserveState: true,
+                                onSuccess: (page) => {
+                                    setArticleList(page.props.articles);
+                                },
+                            }
+                        );
+                    }}
+                    className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none bg-white hover:ring-1 hover:ring-purple-700"
+                >
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                </select>
+
+                <ButtonGroup className="w-84">
+                    <Input
+                        placeholder="Search My Articles"
+                        value={searchTerm} // ⬅️ ini penting biar gak hilang
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className=" focus-visible:ring-1 focus-visible:ring-purple-700 hover:ring-1 hover:ring-purple-700 focus-visible:bg-purple-100"
+                    />
+
+                    <Button
+                        variant="outline"
+                        aria-label="Search"
+                        onClick={handleSearch}
+                        className="ml-0.5 hover:ring-1 hover:ring-purple-700 hover:bg-purple-100"
+                    >
+                        <SearchIcon />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        aria-label="Reset"
+                        onClick={() => {
+                            setSearchTerm("");
+                            setSortOrder("desc");
+                            setChosenCategory("All");
+
+                            router.get(
+                                "/articles/myArticles",
+                                { category: "All", sort: "desc", search: "" },
+                                {
+                                    preserveScroll: true,
+                                    preserveState: true,
+                                    onSuccess: (page) => {
+                                        setArticleList(page.props.articles);
+                                    },
+                                }
+                            );
+                        }}
+                        className="hover:ring-1 ml-0.5 hover:ring-red-500 text-red-600 hover:bg-red-100 hover:text-red-800"
+                    >
+                        <RotateCcw />
+                    </Button>
+                </ButtonGroup>
+            </div>
+
+            {/* === Article Grid === */}
+            <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
+                <CardHeader>
+                    <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4">
+                        <Separator className="flex-1" />
+                        My Articles
+                        <Separator className="flex-1" />
+                    </CardTitle>
+                </CardHeader>
+
+                <CardContent>
+                    {articleList?.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {cardRepeater(articleList)}
+                        </div>
+                    ) : (
+                        // ⬇️ Ganti bagian ini
+                        <Empty>
+                            <EmptyHeader>
+                                <EmptyMedia variant="icon">
+                                    <IconFolderCode className="w-10 h-10 text-purple-600" />
+                                </EmptyMedia>
+                                <EmptyTitle>No Articles Yet</EmptyTitle>
+                                <EmptyDescription>
+                                    You haven&apos;t written any articles yet.
+                                    Start by creating your first one below.
+                                </EmptyDescription>
+                            </EmptyHeader>
+
+                            <EmptyContent>
+                                <div className="flex gap-2 justify-center">
+                                    <Button asChild>
+                                        <Link href="/articles/create">
+                                            Create Article
+                                        </Link>
+                                    </Button>
+                                    <Button variant="outline" asChild>
+                                        <Link href="/articles/list">
+                                            Browse Articles
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </EmptyContent>
+
+                            <Button
+                                variant="link"
+                                asChild
+                                className="text-muted-foreground mt-2"
+                                size="sm"
+                            >
+                                <a href="/help/articles">
+                                    Learn More{" "}
+                                    <ArrowUpRightIcon className="w-4 h-4 ml-1" />
+                                </a>
+                            </Button>
+                        </Empty>
+                    )}
+                </CardContent>
             </div>
         </Layout_User>
     );
