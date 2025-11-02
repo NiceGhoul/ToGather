@@ -39,7 +39,7 @@ const LikedCampaign = () => {
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden leading-snug">
+                        <h2 className="h-[48px] flex justify-center items-center text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden leading-snug">
                             {campaign.title.length > 50
                                 ? campaign.title.substring(0, 50) + "..."
                                 : campaign.title}
@@ -53,7 +53,7 @@ const LikedCampaign = () => {
                             {campaign.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="text-sm text-gray-700 mb-3 text-justify">
+                        <p className="h-[80px] text-sm text-gray-700 mb-3 text-justify">
                             {campaign.description
                                 ?.replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 150) || "No description available."}

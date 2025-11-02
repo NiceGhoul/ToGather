@@ -62,7 +62,6 @@ class ArticleController extends Controller
                     }
                     return $content;
                 });
-
                 // Add like status
                 $article->is_liked_by_user = auth()->check()
                     ? $article->likes()->where('user_id', auth()->id())->exists()
@@ -86,9 +85,23 @@ class ArticleController extends Controller
         // $articles = Article::All();
         // $likes = $articles->likes()->where('user_id', $user->id())->where('likes_id', $articles->id())->get();
 
-        $liked = Likes::where('likes_type', 'App\Models\Article')->where('user_id', $user->id)->pluck('likes_id');
-        $articles = Article::whereIn('id', $liked)->get();
+        $liked = Likes::with(['user', 'contents.image', 'thumbnailImage', 'likes'])->where('likes_type', 'App\Models\Article')->where('user_id', $user->id)->pluck('likes_id');
+        $articles = Article::whereIn('id', $liked)->withCount('likes')->with('user')->get()->map(function ($articles) {
 
+            if ($articles->thumbnailImage) {
+                $articles->thumbnail_url = $articles->thumbnailImage->url;
+            }
+            if($articles->user->nickname){
+                $articles->nickname = $articles->user->nickname;
+            }
+            $articles->contents->transform(function ($content) {
+                if ($content->type === 'image' && $content->image) {
+                    $content->image_url = $content->image->url;
+                }
+                return $content;
+            });
+            return $articles;
+        });
         return inertia('Article/LikedArticle', [
             'likedArticles' => $articles,
         ]);
@@ -363,6 +376,7 @@ class ArticleController extends Controller
         $article = Article::with(['user', 'contents.image', 'thumbnailImage', 'likes'])
             ->withCount('likes')
             ->findOrFail($id);
+
 
         // Transform article to include image URLs and like status
         if ($article->thumbnailImage) {

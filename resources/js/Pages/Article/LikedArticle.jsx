@@ -48,6 +48,7 @@ const LikedArticle = () => {
                         </h2>
 
                         <p className="text-sm text-gray-600 text-center mb-2">
+                            by {article.user?.nickname ?? "Unknown"} ·{" "}
                             {new Date(article.created_at).toLocaleDateString()}
                         </p>
 
@@ -55,7 +56,7 @@ const LikedArticle = () => {
                             {article.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="text-sm text-gray-700 mb-4 text-justify">
+                        <p className="h-[80px] text-sm text-gray-700 mb-4 text-justify">
                             {previewText
                                 .replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 180) || "No preview text."}
