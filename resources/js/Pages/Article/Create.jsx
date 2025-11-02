@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useForm, usePage, router } from "@inertiajs/react";
 import { useState, useRef } from "react";
 import Popup from "@/Components/Popup";
+import { CaseSensitive, Image } from "lucide-react";
 
 export default function Create() {
     const thumbInputRef = useRef(null);
@@ -305,11 +306,11 @@ export default function Create() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    + Text
+                                                                    <CaseSensitive className="text-size-sm" />
                                                                 </Button>
                                                                 <Button
                                                                     type="button"
-                                                                    variant="secondary"
+                                                                    variant="outline"
                                                                     size="sm"
                                                                     onClick={() =>
                                                                         addBlockAt(
@@ -319,7 +320,7 @@ export default function Create() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    + Image
+                                                                    <Image />
                                                                 </Button>
                                                             </div>
                                                         )}
@@ -352,10 +353,13 @@ export default function Create() {
                                     );
                                 })()}
                             </div>
-
-                            <Button type="submit" disabled={processing}>
-                                {processing ? "Saving..." : "Submit Article"}
-                            </Button>
+                            <div className="buttonContainer flex justify-end">
+                                <Button type="submit" disabled={processing}>
+                                    {processing
+                                        ? "Saving..."
+                                        : "Submit Article"}
+                                </Button>
+                            </div>
                         </form>
                     </CardContent>
                 </Card>
@@ -372,15 +376,15 @@ export default function Create() {
                         {/* Thumbnail */}
                         <div className="mb-4 flex justify-center">
                             {thumbPreview ? (
-                                <div className="w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-sm">
+                                <div className="w-full max-w-4xl">
                                     <img
                                         src={thumbPreview}
-                                        alt="preview thumb"
-                                        className="w-full h-full object-cover object-center"
+                                        alt="Thumbnail Preview"
+                                        className="w-full h-64 object-cover mb-4 rounded"
                                     />
                                 </div>
                             ) : (
-                                <div className="w-full max-w-4xl min-h-[180px] rounded-md bg-gray-100 flex items-center justify-center text-gray-400 shadow-sm">
+                                <div className="w-full max-w-4xl h-64 rounded bg-gray-100 flex items-center justify-center text-gray-400 shadow-sm">
                                     Thumbnail Preview
                                 </div>
                             )}

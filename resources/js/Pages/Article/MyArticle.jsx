@@ -245,8 +245,8 @@ export default function MyArticle({
                             onClick={() => handleCategoryChange("All")}
                             className={`${
                                 chosenCategory === "All"
-                                    ? "bg-white text-purple-700 font-semibold shadow-md"
-                                    : " text-white hover:bg-purple-700"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                    : " text-white hover:bg-purple-700 bg-purple-800"
                             }`}
                         >
                             All
@@ -259,8 +259,8 @@ export default function MyArticle({
                             onClick={() => handleCategoryChange(item)}
                             className={`${
                                 chosenCategory === item
-                                    ? "bg-white text-purple-700 font-semibold shadow-md"
-                                    : " text-white hover:bg-purple-700"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                    : " text-white hover:bg-purple-70 bg-purple-800"
                             }`}
                         >
                             {item}
@@ -375,7 +375,10 @@ export default function MyArticle({
 
                             <EmptyContent>
                                 <div className="flex gap-2 justify-center">
-                                    <Button asChild>
+                                    <Button
+                                        asChild
+                                        className="bg-purple-700 hover:bg-purple-800 text-white"
+                                    >
                                         <Link href="/articles/create">
                                             Create Article
                                         </Link>
@@ -394,7 +397,7 @@ export default function MyArticle({
                                 className="text-muted-foreground mt-2"
                                 size="sm"
                             >
-                                <a href="/help/articles">
+                                <a href="#">
                                     Learn More{" "}
                                     <ArrowUpRightIcon className="w-4 h-4 ml-1" />
                                 </a>
