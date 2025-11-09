@@ -56,51 +56,105 @@ const CampaignList = () => {
         setCampaignList(temp);
     };
 
-    const randomizePicture = () => {
-        const images = [
-            "boat.jpg",
-            "huge.jpg",
-            "king.jpg",
-            "speeeed.jpg",
-            "sharks.jpg",
-            "nature.jpg",
-        ];
-        const randomNum = Math.floor(Math.random() * images.length);
-        return `http://127.0.0.1:8000/images/${images[randomNum]}`;
-    };
-
+    const colorCoder = (data) => {
+        if(data === 'Foods & Beverage'){
+            return "bg-[#B8DF5D]"
+        }else if(data === 'Beauty & Cosmetic'){
+            return "bg-[#FB84B2]"
+        }else if(data === 'Clothes & Fashion'){
+            return "bg-[#CDADF1]"
+        }else if(data === 'Services'){
+            return "bg-[#EDAC6B]"
+        }else if(data === 'Lifestyle'){
+            return "bg-[#D3DE5D]"
+        }else if(data === 'Logistics'){
+            return "bg-[#80BDF6]"
+        }
+    }
     const cardRepeater = (data) => {
-        if (!data) {
+        if (!data || data.length === 0) {
             return <p>No campaigns available.</p>;
         } else {
-            return data.slice(0, visibleCampaign).map((dat, idx) => {
+            return data.map((campaign, idx) => {
+                const progress =
+                    campaign.goal_amount > 0
+                        ? Math.min(
+                              (campaign.collected_amount /
+                                  campaign.goal_amount) *
+                                  100,
+                              100
+                          ).toFixed(1)
+                        : 0;
+
                 return (
-                    <div key={idx} className="border rounded-lg p-4 shadow-md ">
-                        <div>
+                    <div
+                        key={idx}
+                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
+                    >
+                        {!campaign.thumbnail_url && (
                             <img
                                 src="http://127.0.0.1:8000/images/boat.jpg"
-                                alt="Campaign"
-                                className="w-full h-64 object-cover mb-4 rounded "
+                                alt={campaign.title}
+                                className="w-full h-64 object-cover mb-4 rounded"
                             />
-                        </div>
-                        <h2 className="text-lg font-semibold mb-2 min-h-12 max-h-16 overflow-hidden text-center items-center justify-center flex">
-                            {dat.title.length > 50
-                                ? dat.title.substring(0, 50) + "..."
-                                : dat.title}
+                        )}
+
+                        <h2 className="h-[48px] flex justify-center items-center text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden leading-snug">
+                            {campaign.title.length > 50
+                                ? campaign.title.substring(0, 50) + "..."
+                                : campaign.title}
                         </h2>
-                        <p className="text-sm text-gray-600 mb-6 mt-6 text-justify">
-                            {dat.description.length > 200
-                                ? dat.description.substring(0, 200) + "..."
-                                : dat.description}
+
+                        <p className="text-sm text-gray-600 text-center mb-2">
+                            {new Date(campaign.start_campaign).toLocaleDateString() + " - " + new Date(campaign.end_campaign).toLocaleDateString()}
                         </p>
-                        <Link href={`/campaigns/details/${dat.id.toString()}`}>
-                            <Button
-                                variant="primary"
-                                className="w-b justify-center mx-auto flex"
+                        <div className="flex justify-center gap-2 mb-4">
+                            <span className={`text-sm rounded-sm text-center px-4 py-1 mb-2 ${colorCoder(campaign.category)}`}>
+                                {campaign.category ?? "Uncategorized"}
+                            </span>
+                        </div>
+
+                        <p className="h-[80px] text-sm text-gray-700 mb-3 text-justify">
+                            {campaign.description
+                                ?.replace(/(<([^>]+)>)/gi, "")
+                                .slice(0, 150) || "No description available."}
+                            ...
+                        </p>
+
+                        <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                            <div
+                                className="bg-purple-700 h-3 rounded-full"
+                                style={{ width: `${progress}%` }}
+                            ></div>
+                        </div>
+
+                        <p className="text-sm text-gray-600 mb-2 text-center">
+                            Raised {" "}{parseInt(campaign.collected_amount).toLocaleString("id-ID", {style: "currency",currency: "IDR",minimumFractionDigits: 2,})}{" "}/ {parseInt(campaign.goal_amount).toLocaleString("id-ID", {style: "currency",currency: "IDR",minimumFractionDigits: 2,})}{" "}
+                            ({progress}%)
+                        </p>
+
+                        <div className="flex justify-center gap-2 mb-4">
+                            <span
+                                className={`inline-block text-xs font-semibold px-2 py-1 rounded-full
+                            ${
+                                campaign.status === "active"
+                                    ? "bg-gray-100 text-gray-700"
+                                    : "bg-purple-100 text-purple-700"
+
+                            }`}
                             >
-                                View Details
-                            </Button>
-                        </Link>
+                                 {campaign.status === "completed" ? campaign.status.toUpperCase() : campaign.duration + " days left"}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-center mt-auto">
+                            <Link
+                                href={`/campaigns/details/${campaign.id}`}
+                                className="text-purple-700 hover:underline font-medium"
+                            >
+                                View Details →
+                            </Link>
+                        </div>
                     </div>
                 );
             });
@@ -134,7 +188,7 @@ const CampaignList = () => {
                 >
                     {lookups?.length > 0 && (
                         <Button
-                            key={999}
+                            key={998}
                             onClick={() => handleCategoryChange("All")}
                             className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
                                 chosenCategory === "All"
@@ -142,7 +196,7 @@ const CampaignList = () => {
                                     : " text-white hover:bg-purple-700 bg-purple-800"
                             }`}
                         >
-                            All
+                            Home
                         </Button>
                     )}
                     {lookups
@@ -164,6 +218,17 @@ const CampaignList = () => {
                                 {item.lookup_value}
                             </Button>
                         ))}
+                        <Button
+                            key={999}
+                            onClick={() => handleCategoryChange("Completed")}
+                            className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
+                                chosenCategory === "Completed"
+                                    ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                    : " text-white hover:bg-purple-700 bg-purple-800"
+                            }`}
+                        >
+                            Completed
+                        </Button>
                 </div>
             </div>
 

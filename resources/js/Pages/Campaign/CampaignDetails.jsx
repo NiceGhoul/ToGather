@@ -1,6 +1,7 @@
 // import { Accordion, AccordionContent } from "@/Components/ui/accordion";
 import { Button } from "@/Components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/Components/ui/carousel";
+import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Toggle } from "@/Components/ui/toggle";
@@ -133,11 +134,15 @@ const tabsContentRepeater = (data, campaign, index) => {
 export default function Create() {
     const data = ["About", "FAQ", "Updates", "Donations"];
 
-    const { campaign, donations, liked } = usePage().props;
+    const { campaign, donations, liked, user } = usePage().props;
     const [like, setLike] = useState(liked);
     const percentage = Math.round(
         (campaign.collected_amount / campaign.goal_amount) * 100
     );
+
+    const handleDonation = () => {
+        
+    }
 
     const handleLikes = (id) => {
         setLike(!like);
@@ -169,7 +174,7 @@ export default function Create() {
             </div>
             <Separator className="flex-1 bg-gray-400 h-[1px]" />
             {/* pictures and titles */}
-            <div className="flex container px-4 py-8 flex-row gap-8  justify-center items-center mx-auto">
+            <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
                 <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 border-gray-800 shrink-0">
                     <img
                         src="http://127.0.0.1:8000/images/nature.jpg"
@@ -179,10 +184,16 @@ export default function Create() {
                 </div>
 
                 <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
-                    <h1 className="text-4xl text-start font-semibold flex mb=5">
-                        {campaign.title}
-                    </h1>
-                    <h1 className="text-3xl text-end font-semibold flex my-10 text-[#7C4789]">{donations.length.toString() + " " + (donations.length > 1 ? " Donators" : " Donator")} </h1>
+                    <div className="flex flex-col gap-2 justify-center">
+                        <Label className="text-2xl text-start font-semibold ">
+                            {campaign.title}
+                        </Label>
+                        <Label className="text-lg text-start font-medium">
+                            {"Created by " +  user.nickname}
+                        </Label>
+
+                    </div>
+                    <h1 className="text-2xl text-end font-semibold flex my-10 text-[#7C4789]">{donations.length.toString() + " " + (donations.length > 1 ? " Donators" : " Donator")} </h1>
                     <div className="relative flex flex-col justify-end gap-4 mt-2">
                         <Progress
                             className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
@@ -222,7 +233,7 @@ export default function Create() {
                             {!like ? "like this campaign" : "campaign liked"}
                         </Toggle>
 
-                        <Button className="min-h-10 min-w-56 font-semibold text-lg">
+                        <Button className="min-h-10 min-w-56 font-semibold text-lg" onClick={() => handleDonation()}>
                             Donate
                         </Button>
                     </div>

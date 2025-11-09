@@ -16,7 +16,7 @@ const LikedArticle = () => {
 
     const cardRepeater = (data) => {
         if (!data || data.length === 0) {
-            return <p>No articles available.</p>;
+            return emptyList();
         } else {
             return data.map((article, idx) => {
                 const previewText =
@@ -113,7 +113,7 @@ const LikedArticle = () => {
 
     const emptyList = () => {
         return (
-            <div className="h-full w-full flex">
+            <div className="h-full w-full flex items-center justify-center">
                 <Empty>
                     <EmptyHeader>
                         <EmptyMedia variant="icon">
@@ -141,9 +141,13 @@ const LikedArticle = () => {
 
     return (
         <Layout_User>
-            <div className="flex flex-col gap-5">
-                <Label className="text-2xl mx-5 my-5">Liked Campaign</Label>
-                {likedArticles ? (
+            <div className="w-full flex flex-col gap-5">
+                {likedArticles.length > 0 ? (
+                    <Label className="text-2xl mx-5 my-5">Liked Articles</Label>
+                ) : (
+                    <></>
+                )}
+                {likedArticles.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {cardRepeater(likedArticles)}
                     </div>

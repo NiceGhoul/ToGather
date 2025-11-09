@@ -12,9 +12,6 @@ const LikedCampaign = () => {
     const { likedCampaign } = usePage().props
 
     const cardRepeater = (data) => {
-        if (!data || data.length === 0) {
-            return <p>No campaigns available.</p>;
-        } else {
             return data.map((campaign, idx) => {
                 const progress =
                     campaign.goal_amount > 0
@@ -66,10 +63,9 @@ const LikedCampaign = () => {
                                 style={{ width: `${progress}%` }}
                             ></div>
                         </div>
+
                         <p className="text-sm text-gray-600 mb-2 text-center">
-                            Raised Rp{" "}
-                            {campaign.collected_amount?.toLocaleString("id-ID")}{" "}
-                            / Rp {campaign.goal_amount?.toLocaleString("id-ID")}{" "}
+                            Raised {" "}{parseInt(campaign.collected_amount).toLocaleString("id-ID", {style: "currency",currency: "IDR",minimumFractionDigits: 2,})}{" "}/ {parseInt(campaign.goal_amount).toLocaleString("id-ID", {style: "currency",currency: "IDR",minimumFractionDigits: 2,})}{" "}
                             ({progress}%)
                         </p>
 
@@ -103,7 +99,6 @@ const LikedCampaign = () => {
                     </div>
                 );
             });
-        }
     };
 
     const emptyList = () => {
@@ -137,8 +132,12 @@ const LikedCampaign = () => {
     return (
         <Layout_User>
             <div className="flex flex-col gap-5">
-                <Label className="text-2xl mx-5 my-5">Liked Campaign</Label>
-                {likedCampaign ? (
+                {likedCampaign.length > 0 ? (
+                    <Label className="text-2xl mx-5 my-5">Liked Campaign</Label>
+                ) : (
+                    <></>
+                )}
+                {likedCampaign.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {cardRepeater(likedCampaign)}
                     </div>
