@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CampaignController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationRequestController;
 use App\Http\Controllers\AdminDashboardController;
+
 use App\Models\VerificationRequest;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -19,13 +21,16 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return redirect('/home');
 });
-Route::get('/home', [CampaignController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/check-email', [UserController::class, 'checkEmail']);
+Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
+
 
 // --- Guest Routes ---
 // Only accessible by users who are NOT logged in.
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
-    Route::get('/Login', [UserController::class, 'showLogin'])->name('login');
+    Route::get('/login', [UserController::class, 'showLogin'])->name('login');
     Route::post('/user/login', [UserController::class, 'login']);
 
     Route::get('/users/create', [UserController::class, 'create'])->name('register');
@@ -44,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaigns/create/supportingMedia', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.getSupportingMedia');
     Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
     Route::get('/campaigns/getList', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
+    Route::get('/campaigns/myCampaigns', [CampaignController::class, 'showMyCampaigns'])->name('campaigns.showMyCampaigns');
     Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
     Route::post('/campaigns/toggleLike', [CampaignController::class, 'ToggleLike'])->name('campaigns.toggleLikes');
@@ -53,9 +59,8 @@ Route::middleware('auth')->group(function () {
     //articles routing
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
-    Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
-    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
+
 
     Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');

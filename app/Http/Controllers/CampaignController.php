@@ -164,6 +164,14 @@ class CampaignController extends Controller
     public function ToggleLike(Request $request)
     {
         $user = auth()->user();
+        // 🟣 Kalau belum login, langsung kirim JSON 401
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please log in first.',
+            ], 401);
+        }
+
         $campaignId = $request->campaign_id;
 
         $existing = $user->likedItems()->where('likes_id', $campaignId)->where('likes_type', Campaign::class)->first();
@@ -175,10 +183,16 @@ class CampaignController extends Controller
                 'likes_id' => $campaignId,
                 'likes_type' => Campaign::class,
             ]);
+            $isLiked = true;
         }
+        return response()->json([
+            'success' => true,
+            'isLiked' => $isLiked,
+        ]);
     }
 
-    public function getCreateSupportingMediaData(Request $request){
+    public function getCreateSupportingMediaData(Request $request)
+    {
         $content = $request->all();
 
         return inertia::render('Campaign/createSupportingMedia');
@@ -208,43 +222,41 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCampaignRequest $request)
+    public function showMyCampaigns(Request $request)
     {
-        //
+        $user = auth()->user();
+
+        // Ambil parameter filter
+        $category = $request->input('category', 'All');
+        $search = $request->input('search', '');
+        $sortOrder = $request->input('sort', 'desc');
+
+        // Ambil semua kategori unik (untuk tombol filter di atas)
+        $categories = Campaign::where('user_id', $user->id)
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->values();
+
+        // Query utama campaign milik user
+        $campaigns = Campaign::where('user_id', $user->id)
+            ->when($category !== 'All', function ($query) use ($category) {
+                $query->where('category', $category);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', $sortOrder)
+            ->get();
+
+        return Inertia::render('Campaign/MyCampaign', [
+            'campaigns' => $campaigns,
+            'categories' => $categories,
+            'sortOrder' => $sortOrder,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Campaign $campaign)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Campaign $campaign)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateCampaignRequest $request, Campaign $campaign)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Campaign $campaign)
-    {
-        //
-    }
 }
