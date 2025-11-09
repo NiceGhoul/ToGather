@@ -164,6 +164,14 @@ class CampaignController extends Controller
     public function ToggleLike(Request $request)
     {
         $user = auth()->user();
+        // 🟣 Kalau belum login, langsung kirim JSON 401
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please log in first.',
+            ], 401);
+        }
+
         $campaignId = $request->campaign_id;
 
         $existing = $user->likedItems()->where('likes_id', $campaignId)->where('likes_type', Campaign::class)->first();
@@ -175,7 +183,12 @@ class CampaignController extends Controller
                 'likes_id' => $campaignId,
                 'likes_type' => Campaign::class,
             ]);
+            $isLiked = true;
         }
+        return response()->json([
+            'success' => true,
+            'isLiked' => $isLiked,
+        ]);
     }
 
     public function getCreateSupportingMediaData(Request $request)

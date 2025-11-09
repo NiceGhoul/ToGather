@@ -185,6 +185,7 @@ export default function Lookup() {
                                     onChange={handleChange}
                                     className="border rounded w-full p-2"
                                     required
+                                    placeholder="Lookup Type"
                                 />
                             </div>
                             <div>
@@ -198,6 +199,7 @@ export default function Lookup() {
                                     onChange={handleChange}
                                     className="border rounded w-full p-2"
                                     required
+                                    placeholder="Lookup Code"
                                 />
                             </div>
                             <div>
@@ -211,6 +213,7 @@ export default function Lookup() {
                                     onChange={handleChange}
                                     className="border rounded w-full p-2"
                                     required
+                                    placeholder="Lookup Value"
                                 />
                             </div>
                             <div>
@@ -223,6 +226,7 @@ export default function Lookup() {
                                     value={editData.lookup_description || ""}
                                     onChange={handleChange}
                                     className="border rounded w-full p-2"
+                                    placeholder="Lookup Description"
                                 />
                             </div>
                             <div className="flex justify-end gap-2 mt-4">

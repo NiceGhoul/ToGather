@@ -2,6 +2,7 @@
 import Navbar_User from "../Components/Navbar_User";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePage } from "@inertiajs/react";
+import Footer from "../Components/Footer";
 
 export default function Layout_User({ children }) {
     const page = usePage();
@@ -21,6 +22,7 @@ export default function Layout_User({ children }) {
                     {children}
                 </motion.main>
             </AnimatePresence>
+            <Footer />
         </>
     );
 }
