@@ -19,6 +19,7 @@ export default function Popup({
     confirmText = "Confirm",
     cancelText = "Cancel",
     disabledValue = false,
+    confirmDisabled = false,
     onConfirm,
     confirmColor,
     triggerClass,
@@ -104,11 +105,12 @@ export default function Popup({
 
                 <AlertDialogFooter>
                     {showCancel && (
-                        <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+                        <AlertDialogCancel disabled={confirmDisabled}>{cancelText}</AlertDialogCancel>
                     )}
                     <AlertDialogAction
                         onClick={handleConfirm}
                         className={confirmColor}
+                        disabled={confirmDisabled}
                     >
                         {confirmText}
                     </AlertDialogAction>

@@ -328,6 +328,15 @@ class ArticleController extends Controller
                 "New article '{$article->title}' has been submitted by {$article->user->nickname} and is pending review.",
                 ['article_id' => $article->id, 'user_id' => $article->user_id]
             );
+
+            // 🟣 5. Notify user (article creator)
+            NotificationController::notifyUser(
+                $article->user_id,
+                'article_submitted',
+                'Article Submitted Successfully',
+                "Your article '{$article->title}' has been submitted and is pending review by admins.",
+                ['article_id' => $article->id]
+            );
         });
 
         return redirect()->route('articles.create')->with('success', 'Article created successfully!');

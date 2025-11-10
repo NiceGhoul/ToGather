@@ -92,11 +92,14 @@ export default function Create() {
     };
 
     const confirmSubmit = () => {
+        // Prevent multiple submissions
+        if (processing) return;
+
+        setShowConfirm(false);
         const payload = { ...data, contents: blocks };
         router.post("/articles", payload, {
             forceFormData: true,
             onSuccess: () => {
-                setShowConfirm(false);
                 setShowSuccess(true);
                 setData({
                     title: "",
@@ -112,6 +115,7 @@ export default function Create() {
             },
             onError: (err) => {
                 console.error(err);
+                setShowConfirm(false);
                 alert("Failed Creating Article. Try Again");
             },
         });
@@ -472,10 +476,12 @@ export default function Create() {
                         triggerText={null}
                         title="Submit Article?"
                         description="Your article will be saved and reviewed by Admins."
-                        confirmText="Yes, Submit"
+                        confirmText={processing ? "Submitting..." : "Yes, Submit"}
                         cancelText="Cancel"
                         confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                        confirmDisabled={processing}
                         onConfirm={confirmSubmit}
+                        onClose={() => setShowConfirm(false)}
                     />
                 )}
                 {showSuccess && (
