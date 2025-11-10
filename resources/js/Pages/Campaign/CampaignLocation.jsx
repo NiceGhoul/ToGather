@@ -16,10 +16,15 @@ import 'leaflet-geosearch/dist/geosearch.css';
 import 'leaflet/dist/leaflet.css';
 import { Label } from "@/Components/ui/label";
 
-const CampaignLocation = ({ open, setCampaignLocation, onClose }) => {
+const CampaignLocation = ({ open, setCampaignLocation, onClose, locationData }) => {
     const [address, setAddress] = useState("");
-    const [coords, setCoords] = useState({ lat:-6.2088, lng: 106.8456});
+    const [coords, setCoords] = useState({ lat:-6.1542303, lng: 106.809447986802});
 
+    useEffect(() => {
+        if(locationData != null){
+            setLocation(locationData)
+        }
+    }, [locationData])
 
 function SearchBar() {
     const map = useMap();
@@ -61,20 +66,20 @@ function SearchBar() {
     });
     const API_KEY = import.meta.env.VITE_LOCATIONIQ_API_KEY
 
-    function SearchLocation(){
-        const map = useMap()
+    function SearchLocation() {
+        const map = useMap();
         useEffect(() => {
             map.on("geosearch/showlocation", (result) => {
-                if(result.location != null || result.location != undefined){
-                    const {y, x} = result.location
-                    setCoords({lat: y, lng: x})
-                }else{
-                    console.warn("returned undefined!")
+                if (result.location != null || result.location != undefined) {
+                    const { y, x } = result.location;
+                    setCoords({ lat: y, lng: x });
+                } else {
+                    console.warn("returned undefined!");
                 }
-            })
+            });
 
-        }, [map, setCoords])
-        return null
+        }, [map, setCoords]);
+        return null;
     }
 
      useEffect(() => {
@@ -107,6 +112,7 @@ function SearchBar() {
     const LocationMarker = ({ setCoords }) => {
         useMapEvents({
             click(e) {
+                console.log(e.latlng)
                 setCoords(e.latlng)
             },
         });
@@ -115,9 +121,6 @@ function SearchBar() {
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogTrigger asChild>
-                <Button variant="outline">Pick Location</Button>
-            </DialogTrigger>
 
             <DialogContent className="min-w-4xl">
                 <DialogHeader>

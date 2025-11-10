@@ -22,6 +22,7 @@ class CampaignFactory extends Factory
     {
         $startDate = $this->faker->dateTimeBetween('-2 month', '+1 month');
         $endDate = $this->faker->dateTimeBetween($startDate, '+2 months');
+        $duration = $startDate->diff($endDate);;
 
         return [
             'user_id' => User::inRandomOrder()->first()->id,
@@ -35,7 +36,7 @@ class CampaignFactory extends Factory
             'address' => $this->faker->address(),
             'status' => $this->faker->randomElement(CampaignStatus::cases()), // Use Enum
             'description' => $this->faker->paragraphs(rand(2, 5), true),
-            'duration' => $this->faker->numberBetween(30, 90),
+            'duration' => $duration->days,
             'collected_amount' => $this->faker->randomFloat(2, 0, 50000),
         ];
     }

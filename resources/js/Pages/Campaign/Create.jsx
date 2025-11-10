@@ -3,19 +3,18 @@ import Layout_User from "@/Layouts/Layout_User";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import * as React from "react"
-import { CalendarDays, CalendarIcon, ChevronDownIcon, Map } from "lucide-react"
+import { CalendarDays, CalendarIcon, Map } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Inertia } from "@inertiajs/inertia";
 import { Textarea } from "@/Components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import CampaignLocation from "./CampaignLocation";
 import Popup from "@/Components/Popup";
 import { Label } from "@/Components/ui/label";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/Components/ui/input-group";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 
 const emptyCampaign = {
     title: "",
@@ -42,9 +41,12 @@ const categories = [
     ];
 
 function create () {
+
+const { campaign, user_Id, location } = usePage().props
 const [campaignData, setCampaignData] = useState(emptyCampaign)
 const [openLocation, setOpenLocation] = useState(false)
 const [description, setDescription] = useState([])
+const [openUnsaved, setOpenUnsaved] = useState(false)
 const [openPop, setOpenPop] = useState(false)
 
 const DatePicker = ({open, date, setOpen, setDate}) => {
@@ -73,6 +75,17 @@ const DatePicker = ({open, date, setOpen, setDate}) => {
   )
 }
 
+useEffect(() => {
+    if(campaign){
+        setCampaignData(campaign)
+    }
+
+    if(campaign && location){
+        setCampaignData((prev) => ({...prev, location: location}))
+    }
+}, [campaign, location])
+
+
 const errorDescription = () => {
     const errors = [];
 
@@ -86,14 +99,19 @@ const errorDescription = () => {
     if (campaignData.goal_amount && campaignData.goal_amount > 50000000)
         errors.push("Goal amount must be less than Rp. 50.000.000,00.");
     if (!campaignData.duration) errors.push("Duration cannot be empty");
-    if (campaignData.duration && campaignData.duration < 30) errors.push("Duration must be greater than or equals to 30 days");
+    if (campaignData.duration && campaignData.duration < 15) errors.push("Duration must be greater than or equals to 15 days");
     if (campaignData.duration && campaignData.duration > 90) errors.push("Duration must be less than or equals to 90 days");
 
     return errors;
 };
 
+// const handleUnloadConf = (event) => {
+
+// }
+
 // useEffect(() => {
 //   const handleBeforeUnload = (event) => {
+//     setOpenUnsaved(true)
 //     event.preventDefault()
 //     event.returnValue = ""
 //   };
@@ -126,6 +144,10 @@ const handleClick = () => {
     }
 }
 
+const handleEditCancel = () => {
+    router.get(`/campaigns/create`)
+}
+
 const handleSave = () => {
     const formattedData = {
             ...campaignData,
@@ -145,11 +167,10 @@ const handleSave = () => {
                 <Card className="max-w-4xl mx-auto">
                     <CardHeader>
                         <CardTitle className="text-center text-xl">
-                            Create New Campaign
+                           {campaign === undefined ? " Create New Campaign" : "Update Campaign Data"}
                         </CardTitle>
                         <CardDescription className="text-center text-sm">
-                            Please fill out the form below to create a new
-                            campaign.
+                           {"Please fill out the form below to " + (campaign != undefined ? "update" : "create" ) + " a new campaign."}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4">
@@ -186,6 +207,7 @@ const handleSave = () => {
                         <div>
                             <Label className="mb-1">Category</Label>
                             <Select
+                                value={campaignData.category}
                                 onValueChange={(dat) =>
                                     setCampaignData({
                                         ...campaignData,
@@ -229,25 +251,32 @@ const handleSave = () => {
                                     <Label className="mb-1">Goal Amount</Label>
                                 </div>
                                 <div className="w-full">
-                                    <Input
-                                        type="number"
-                                        className="w-full h-[40px]"
-                                        placeholder={"max: Rp. 50.000.000, 00"}
-                                        value={
-                                            campaignData.goal_amount === 0
-                                                ? ""
-                                                : campaignData.goal_amount
-                                        }
-                                        onChange={(e) =>
-                                            setCampaignData({
-                                                ...campaignData,
-                                                goal_amount: e.target.value,
-                                            })
-                                        }
-                                    />
+                                    <InputGroup
+                                        className="h-[40px] w-full"
+
+                                    >
+                                        <InputGroupInput
+                                            placeholder="max: Rp. 50.000.000,00"
+                                            value={
+                                                campaignData.goal_amount === 0 ? "" : campaignData.goal_amount
+                                            }
+                                            onChange={(e) =>
+                                                setCampaignData({
+                                                    ...campaignData,
+                                                    goal_amount: e.target.value,
+                                                })
+                                            }
+                                        />
+                                        <InputGroupAddon align="inline-end">
+                                            <Label>,00</Label>
+                                        </InputGroupAddon>
+                                        <InputGroupAddon>
+                                            <Label>Rp. </Label>
+                                        </InputGroupAddon>
+                                    </InputGroup>
                                 </div>
                                 <div className="flex items-center justify-center">
-                                    <Label className="mt-2 text-gray-300 font-light">
+                                    <Label className="mt-2 text-gray-400 font-light">
                                         {campaignData.goal_amount
                                             ? parseInt(
                                                   campaignData.goal_amount
@@ -261,13 +290,13 @@ const handleSave = () => {
                                 </div>
                             </div>
 
-                            <div className="w-3/6 flex flex-col items-start justify-center">
+                            <div className="w-3/6 flex flex-col items-start justify-center ">
                                 <Label className="mb-1">
                                     Campaign Duration
                                 </Label>
-                                <InputGroup>
+                                <InputGroup className="h-[40px] w-full">
                                     <InputGroupInput
-                                        placeholder="range: 30 - 90 days"
+                                        placeholder="range: 15 - 90 days"
                                         value={campaignData.duration}
                                         onChange={(e) =>
                                             setCampaignData({
@@ -278,7 +307,6 @@ const handleSave = () => {
                                     />
                                     <InputGroupAddon align="inline-end">
                                         <Label>Days</Label>
-
                                     </InputGroupAddon>
                                     <InputGroupAddon>
                                         <CalendarDays />
@@ -287,10 +315,29 @@ const handleSave = () => {
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter>
-                        <Button className="ml-auto" onClick={handleClick}>
-                            Next
+                    <CardFooter className="flex flex-row gap-5 justify-end">
+                        <div className="w-full justify-center flex">
+
+                        <Button
+                            className="w-28 h-8 text-sm ml-36"
+                            onClick={handleClick}
+                            >
+                            {campaign != undefined ? "update" : "next"}
                         </Button>
+                            </div>
+
+                        <div className="w-1/6 justify-end flex">
+                            {campaign != undefined ? (
+                                <Button
+                                    className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg"
+                                    onClick={handleEditCancel}
+                                >
+                                    go to preview →
+                                </Button>
+                            ) : (
+                                <></>
+                            )}
+                        </div>
                     </CardFooter>
                 </Card>
             </div>
@@ -298,15 +345,14 @@ const handleSave = () => {
                 open={openLocation}
                 setCampaignLocation={handleCloseLocation}
                 onClose={() => setOpenLocation(false)}
+                locationData={campaignData.location}
             />
             {openPop && (
                 <Popup
                     triggerText={null}
-                    title={description.length > 0 ? "Warning" : "Submit data?"}
+                    title={description.length > 0 ? "Warning" : campaign != undefined ? "Update data?" : "Submit data?"}
                     description={
-                        description.length > 0
-                            ? description
-                            : "your campaign will be set as pending, please wait for admin approval before continuing."
+                        description.length > 0 ? description : "your campaign will be saved as a draft."
                     }
                     confirmText={description.length > 0 ? "okay" : "Confirm"}
                     cancelText="Cancel"

@@ -198,7 +198,7 @@ export default function MyArticle({
                             {article.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="text-sm text-gray-700 mb-4 text-justify">
+                        <p className="h-[80px] text-sm text-gray-700 mb-4 text-justify">
                             {previewText
                                 .replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 180) || "No preview text."}

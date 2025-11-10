@@ -28,6 +28,7 @@ export default function Navbar_User() {
         setOpen(!open);
     };
 
+
     const fetchNotifications = async () => {
         setLoading(true);
         try {
@@ -43,10 +44,11 @@ export default function Navbar_User() {
         }
     };
 
+
     const markAllAsRead = async () => {
         try {
-            await fetch("/notifications/read-all", {
-                method: "POST",
+            await fetch('/notifications/read-all', {
+                method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document
@@ -59,6 +61,7 @@ export default function Navbar_User() {
             console.error("Error marking notifications as read:", error);
         }
     };
+
 
     useEffect(() => {
         fetchNotifications();
@@ -191,7 +194,6 @@ export default function Navbar_User() {
                     <span className="nav-link font-semibold">
                         Welcome {auth?.user?.nickname ?? "Guest"}
                     </span>
-
                     <DropdownMenu
                         onOpenChange={(open) => {
                             if (open) {
@@ -211,6 +213,7 @@ export default function Navbar_User() {
                                 <Bell className="h-5 w-5 text-white" />
                                 {unreadCount > 0 && (
                                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {unreadCount > 9 ? "9+" : unreadCount}
                                         {unreadCount > 9 ? "9+" : unreadCount}
                                     </span>
                                 )}

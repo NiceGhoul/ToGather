@@ -46,19 +46,24 @@ Route::middleware('auth')->group(function () {
 
     // campaigns routing
     Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
-    Route::get('/campaigns/create/supportingMedia', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.getSupportingMedia');
+    Route::get('/campaigns/create/{id}', [CampaignController::class, 'editCampaign'])->name('campaigns.edit');
+    Route::get('/campaigns/create/createPreview', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.createPreview');
+    Route::get('/campaigns/create/detailsPreview', [CampaignController::class, 'getDetailsPreview'])->name('campaigns.detailsPreview');
+    Route::get('/campaigns/likedCampaign', [CampaignController::class, 'showLiked'])->name('campaigns.liked');
     Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
     Route::get('/campaigns/getList', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
     Route::get('/campaigns/myCampaigns', [CampaignController::class, 'showMyCampaigns'])->name('campaigns.showMyCampaigns');
     Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
+    Route::post('/campaigns/upload-image', [CampaignController::class, 'uploadSupportingMedia'])->name('campaigns.uploadImages');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
     Route::post('/campaigns/toggleLike', [CampaignController::class, 'ToggleLike'])->name('campaigns.toggleLikes');
-    // Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
 
 
     //articles routing
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
+    Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('/articles/likedArticles', [ArticleController::class, 'showLiked'])->name('articles.liked');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
 
 
