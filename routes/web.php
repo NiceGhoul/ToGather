@@ -128,6 +128,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/users/{user}/block', [UserController::class, 'block'])->name('admin.users.block');
     Route::post('/users/{user}/unblock', [UserController::class, 'unblock'])->name('admin.users.unblock');
     Route::get('/users/verification', [VerificationRequestController::class, 'index'])->name('verification.index');
+    Route::post('/users/bulkBan', [UserController::class, 'bulkBan']);
+    Route::post('/users/bulkUnban', [UserController::class, 'bulkUnban']);
 
     Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
     Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');

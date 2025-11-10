@@ -1,348 +1,435 @@
-import React from "react";
+import { useState } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
-import Data_Table from "@/Components/Data_Table"; // Import the reusable component
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
 import Popup from "@/Components/Popup";
-import { router } from "@inertiajs/react";
-import { Badge } from "@/components/ui/badge";
-import { usePage } from "@inertiajs/react";
+import { Search, RotateCcw, CheckCircle, XCircle } from "lucide-react";
+import { router, usePage } from "@inertiajs/react";
 
-const handleVerification = async (user, action) => {
-    try {
-        const url = `/users/${user}/verify`;
-        console.log("Requesting URL:", url);
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({ acceptance: action }),
-        });
-
-        if (!response.ok) {
-            // Check for 404 specifically
-            if (response.status === 404) {
-                throw new Error("API route not found. Check the URL.");
-            }
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Verification failed");
-        }
-
-        const result = await response.json();
-        console.log("Verification successful:", result);
-        alert(`User has been ${action}.`);
-
-        window.location.reload();
-    } catch (error) {
-        console.error("Error:", error);
-        alert(`An error occurred: ${error.message}`);
-    }
-};
-const statusVariantMap = {
-    accepted: "default",
-    pending: "secondary",
-    rejected: "destructive",
-};
-
-export const columns = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: "id",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                }
-            >
-                ID
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => <div className="ml-4">{row.getValue("id")}</div>,
-    },
-    {
-        accessorKey: "user.email",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                }
-            >
-                Email
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => (
-            <div className="ml-1">{row.original.user.email}</div>
-        ),
-    },
-    {
-        accessorKey: "id_photo",
-        header: "ID Photo",
-        cell: ({ row }) => {
-            const imageUrl = row.original.id_photo_url;
-
-            return (
-                <div>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" disabled={!imageUrl}>
-                                View ID Photo
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80 p-4">
-                            {imageUrl ? (
-                                <img
-                                    src={imageUrl}
-                                    alt="ID Photo"
-                                    className="w-full h-auto rounded-md object-cover border"
-                                />
-                            ) : (
-                                <p className="text-sm text-gray-500">
-                                    No ID photo provided.
-                                </p>
-                            )}
-                        </PopoverContent>
-                    </Popover>
-                </div>
-            );
-        },
-    },
-    {
-        accessorKey: "selfie_with_id",
-        header: "Selfie with ID",
-        cell: ({ row }) => {
-            const imageUrl = row.original.selfie_url;
-
-            return (
-                <div>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" disabled={!imageUrl}>
-                                View Selfie
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80 p-4">
-                            {imageUrl ? (
-                                <img
-                                    src={imageUrl}
-                                    alt="Selfie with ID"
-                                    className="w-full h-auto rounded-md object-cover border"
-                                />
-                            ) : (
-                                <p className="text-sm text-gray-500">
-                                    No selfie provided.
-                                </p>
-                            )}
-                        </PopoverContent>
-                    </Popover>
-                </div>
-            );
-        },
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => {
-            const status = row.getValue("status");
-            return (
-                <Badge variant={statusVariantMap[status] || "default"}>
-                    {status}
-                </Badge>
-            );
-        },
-    },
-    {
-        accessorKey: "created_at",
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                }
-            >
-                Created_At
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => {
-            const date = new Date(row.getValue("created_at"));
-            const formatted = date.toLocaleDateString("en-US");
-            return <div className="ml-5">{formatted}</div>;
-        },
-    },
-    {
-        id: "actions",
-        cell: ({ row }) => {
-            const request = row.original;
-            const status = request.status;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() =>
-                                navigator.clipboard.writeText(
-                                    request.user.id.toString()
-                                )
-                            }
-                        >
-                            Copy user ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-
-                        {/* --- Conditional Actions Start Here --- */}
-
-                        {/* Show "Approve" button ONLY if status is 'pending' */}
-                        {status === "pending" && (
-                            <Popup
-                                triggerText="Approve"
-                                title="Approve User Verification?"
-                                description="Are you sure you want to approve this user's verification?"
-                                confirmText="Approve"
-                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                triggerClass="w-full justify-start bg-transparent hover:bg-gray-100 text-green-600 hover:text-green-700 px-2 py-1 text-sm font-normal"
-                                onConfirm={() =>
-                                    handleVerification(
-                                        request.user.id,
-                                        "accepted"
-                                    )
-                                }
-                            />
-                        )}
-
-                        {/* Show "Reject" button if status is 'pending' OR 'accepted' */}
-                        {(status === "pending" || status === "accepted") && (
-                            <Popup
-                                triggerText="Reject"
-                                title="Reject User?"
-                                description="Are you sure you want to reject this user's verification?"
-                                confirmText="Reject"
-                                confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                triggerClass="w-full justify-start bg-transparent hover:bg-gray-100 text-red-600 hover:text-red-700 px-2 py-1 text-sm font-normal"
-                                onConfirm={() =>
-                                    handleVerification(
-                                        request.user.id,
-                                        "rejected"
-                                    )
-                                }
-                            />
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
-    },
-];
-
-// The page component is now much cleaner.
 export default function Verification({ requests }) {
     const { filters } = usePage().props;
-    const handleFilterChange = (status) => {
-        router.get(
-            "/admin/users/verification",
-            { status },
-            {
-                preserveState: true,
-                replace: true,
-            }
+
+    // 🔹 State
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState(filters.status || "all");
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [modalImage, setModalImage] = useState(null);
+    const [modalTitle, setModalTitle] = useState("");
+
+    // 🔹 Filter frontend only
+    const filteredRequests = requests.filter((req) => {
+        if (statusFilter !== "all" && req.status !== statusFilter) return false;
+        if (search) {
+            const term = search.toLowerCase();
+            return req.user.email.toLowerCase().includes(term);
+        }
+        return true;
+    });
+
+    // 🔹 Toggle select
+    const toggleSelect = (id) => {
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
     };
+
+    const toggleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(filteredRequests.map((r) => r.user.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    // 🔹 Handle single verification
+    const handleVerification = async (userId, action) => {
+        try {
+            const response = await fetch(`/users/${userId}/verify`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+                body: JSON.stringify({ acceptance: action }),
+            });
+
+            if (!response.ok) throw new Error("Verification failed");
+            window.location.reload();
+        } catch (error) {
+            console.error("Error verifying user:", error);
+            alert("An error occurred while verifying.");
+        }
+    };
+
+    // 🔹 Bulk verification
+    const handleBulkAction = async (action) => {
+        try {
+            for (const id of selectedIds) {
+                await handleVerification(id, action);
+            }
+            alert(
+                `All selected users have been ${
+                    action === "accepted" ? "approved" : "rejected"
+                }.`
+            );
+            window.location.reload();
+        } catch (error) {
+            console.error("Bulk verification error:", error);
+        }
+    };
+
     return (
         <Layout_Admin title="User Verification List">
-            <div className="p-9">
-                <div className="flex items-center gap-2 mb-4">
-                    <Button
-                        variant={!filters.status ? "secondary" : "outline"}
-                        onClick={() => handleFilterChange(null)}
-                    >
-                        All
-                    </Button>
-                    <Button
-                        variant={
-                            filters.status === "accepted"
-                                ? "secondary"
-                                : "outline"
-                        }
-                        onClick={() => handleFilterChange("accepted")}
-                    >
-                        Accepted
-                    </Button>
-                    <Button
-                        variant={
-                            filters.status === "pending"
-                                ? "secondary"
-                                : "outline"
-                        }
-                        onClick={() => handleFilterChange("pending")}
-                    >
-                        Pending
-                    </Button>
-                    <Button
-                        variant={
-                            filters.status === "rejected"
-                                ? "secondary"
-                                : "outline"
-                        }
-                        onClick={() => handleFilterChange("rejected")}
-                    >
-                        Rejected
-                    </Button>
+            <div className="p-6 space-y-6">
+                {/* 🔎 Filter Section */}
+                <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
+                    {/* Row 1: Search + Filter */}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        {/* LEFT: Search */}
+                        <div className="flex items-center gap-2">
+                            <Input
+                                type="text"
+                                placeholder="Search by email..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-[260px] focus-visible:ring-purple-700"
+                            />
+                            <Button
+                                onClick={() => setSearch(search)}
+                                className="bg-purple-800 hover:bg-purple-700 text-white"
+                            >
+                                <Search className="w-4 h-4" />
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setSearch("");
+                                    setStatusFilter("all");
+                                }}
+                                className="bg-purple-800 hover:bg-purple-700 text-white"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                            </Button>
+                        </div>
+
+                        {/* RIGHT: Status Filter Buttons */}
+                        <div className="flex items-center gap-2">
+                            {["all", "accepted", "pending", "rejected"].map(
+                                (status) => (
+                                    <Button
+                                        key={status}
+                                        className={`${
+                                            statusFilter === status
+                                                ? "bg-purple-800 text-white"
+                                                : "bg-purple-400"
+                                        } hover:bg-purple-800`}
+                                        onClick={() => setStatusFilter(status)}
+                                    >
+                                        {status === "all"
+                                            ? "All"
+                                            : status.charAt(0).toUpperCase() +
+                                              status.slice(1)}
+                                    </Button>
+                                )
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Row 2: Bulk Actions */}
+                    {statusFilter !== "all" && statusFilter !== "rejected" && (
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">
+                            <div className="text-sm mr-2">
+                                {selectedIds.length} selected
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                {/* ✅ Show both when filter = pending */}
+                                {statusFilter === "pending" && (
+                                    <>
+                                        <Popup
+                                            triggerText={
+                                                <div className="flex items-center gap-2 cursor-pointer">
+                                                    <CheckCircle className="w-4 h-4" />
+                                                    <span>
+                                                        Approve Selected
+                                                    </span>
+                                                </div>
+                                            }
+                                            title="Approve Selected Users?"
+                                            description="All selected users will be approved."
+                                            confirmText="Approve All"
+                                            confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                            triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
+                                            disabledValue={
+                                                selectedIds.length === 0
+                                            }
+                                            onConfirm={() =>
+                                                handleBulkAction("accepted")
+                                            }
+                                        />
+
+                                        <Popup
+                                            triggerText={
+                                                <div className="flex items-center gap-2 cursor-pointer">
+                                                    <XCircle className="w-4 h-4" />
+                                                    <span>Reject Selected</span>
+                                                </div>
+                                            }
+                                            title="Reject Selected Users?"
+                                            description="All selected users will be rejected."
+                                            confirmText="Reject All"
+                                            confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
+                                            disabledValue={
+                                                selectedIds.length === 0
+                                            }
+                                            onConfirm={() =>
+                                                handleBulkAction("rejected")
+                                            }
+                                        />
+                                    </>
+                                )}
+
+                                {/* ❌ Only show Reject when filter = accepted */}
+                                {statusFilter === "accepted" && (
+                                    <Popup
+                                        triggerText={
+                                            <div className="flex items-center gap-2 cursor-pointer">
+                                                <XCircle className="w-4 h-4" />
+                                                <span>Reject Selected</span>
+                                            </div>
+                                        }
+                                        title="Reject Selected Users?"
+                                        description="All selected users will be rejected."
+                                        confirmText="Reject All"
+                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
+                                        disabledValue={selectedIds.length === 0}
+                                        onConfirm={() =>
+                                            handleBulkAction("rejected")
+                                        }
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <Data_Table columns={columns} data={requests} />
+
+                {/* 🧾 Verification Table */}
+                <div className="bg-white rounded-lg shadow-md p-4">
+                    <table className="min-w-full border">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="px-4 py-2 border w-12 text-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={
+                                            filteredRequests.length > 0 &&
+                                            selectedIds.length ===
+                                                filteredRequests.length
+                                        }
+                                        onChange={(e) =>
+                                            toggleSelectAll(e.target.checked)
+                                        }
+                                    />
+                                </th>
+                                <th className="px-4 py-2 border">ID</th>
+                                <th className="px-4 py-2 border">Email</th>
+                                <th className="px-4 py-2 border">ID Photo</th>
+                                <th className="px-4 py-2 border">
+                                    Selfie with ID
+                                </th>
+                                <th className="px-4 py-2 border">Status</th>
+                                <th className="px-4 py-2 border text-center">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredRequests.length > 0 ? (
+                                filteredRequests.map((r) => (
+                                    <tr key={r.id}>
+                                        <td className="border px-4 py-2 text-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.includes(
+                                                    r.user.id
+                                                )}
+                                                onChange={() =>
+                                                    toggleSelect(r.user.id)
+                                                }
+                                            />
+                                        </td>
+                                        <td className="border px-4 py-2">
+                                            {r.id}
+                                        </td>
+                                        <td className="border px-4 py-2">
+                                            {r.user.email}
+                                        </td>
+                                        <td className="border px-4 py-2 text-center">
+                                            {r.id_photo_url ? (
+                                                <Button
+                                                    className="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm"
+                                                    onClick={() => {
+                                                        setModalImage(
+                                                            r.id_photo_url
+                                                        );
+                                                        setModalTitle(
+                                                            "ID Photo"
+                                                        );
+                                                    }}
+                                                >
+                                                    ID Photo
+                                                </Button>
+                                            ) : (
+                                                <span className="text-gray-400">
+                                                    -
+                                                </span>
+                                            )}
+                                        </td>
+
+                                        <td className="border px-4 py-2 text-center">
+                                            {r.selfie_url ? (
+                                                <Button
+                                                    className="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm"
+                                                    onClick={() => {
+                                                        setModalImage(
+                                                            r.selfie_url
+                                                        );
+                                                        setModalTitle(
+                                                            "Selfie with ID"
+                                                        );
+                                                    }}
+                                                >
+                                                    Selfie
+                                                </Button>
+                                            ) : (
+                                                <span className="text-gray-400">
+                                                    -
+                                                </span>
+                                            )}
+                                        </td>
+
+                                        <td
+                                            className={`border px-4 py-2 capitalize font-medium text-center ${
+                                                r.status === "accepted"
+                                                    ? "text-green-600"
+                                                    : r.status === "pending"
+                                                    ? "text-yellow-600"
+                                                    : "text-red-600"
+                                            }`}
+                                        >
+                                            {r.status}
+                                        </td>
+                                        <td className="border px-4 py-2 text-center">
+                                            <div className="flex justify-center gap-2">
+                                                {r.status === "pending" && (
+                                                    <>
+                                                        <Popup
+                                                            triggerText={
+                                                                <div className="flex items-center gap-4 cursor-pointer">
+                                                                    <CheckCircle className="w-4 h-4 text-green-700" />
+                                                                </div>
+                                                            }
+                                                            title="Approve User Verification?"
+                                                            description="Are you sure you want to approve this user's verification?"
+                                                            confirmText="Approve"
+                                                            confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                                            triggerClass="bg-green-200 hover:bg-green-300 text-green-700 px-3 py-1 rounded-md"
+                                                            onConfirm={() =>
+                                                                handleVerification(
+                                                                    r.user.id,
+                                                                    "accepted"
+                                                                )
+                                                            }
+                                                        />
+                                                        <Popup
+                                                            triggerText={
+                                                                <div className="flex items-center gap-2 cursor-pointer">
+                                                                    <XCircle className="w-4 h-4" />
+                                                                </div>
+                                                            }
+                                                            title="Reject User?"
+                                                            description="Are you sure you want to reject this user's verification?"
+                                                            confirmText="Reject"
+                                                            confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700 px-3 py-1 rounded-md"
+                                                            onConfirm={() =>
+                                                                handleVerification(
+                                                                    r.user.id,
+                                                                    "rejected"
+                                                                )
+                                                            }
+                                                        />
+                                                    </>
+                                                )}
+                                                {r.status === "accepted" && (
+                                                    <Popup
+                                                        triggerText={
+                                                            <div className="flex items-center gap-2 cursor-pointer">
+                                                                <XCircle className="w-4 h-4" />
+                                                            </div>
+                                                        }
+                                                        title="Reject User?"
+                                                        description="Reject this user’s verification?"
+                                                        confirmText="Reject"
+                                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700 px-3 py-1 rounded-md"
+                                                        onConfirm={() =>
+                                                            handleVerification(
+                                                                r.user.id,
+                                                                "rejected"
+                                                            )
+                                                        }
+                                                    />
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td
+                                        colSpan="7"
+                                        className="text-center py-4 text-gray-500 italic"
+                                    >
+                                        No verification requests found.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+            {modalImage && (
+                <div
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                    onClick={() => setModalImage(null)} // klik luar = tutup
+                >
+                    <div
+                        className="bg-white rounded-lg shadow-lg p-4 max-w-3xl w-full"
+                        onClick={(e) => e.stopPropagation()} // biar klik dalam gak nutup
+                    >
+                        <h2 className="text-lg font-semibold mb-3">
+                            {modalTitle}
+                        </h2>
+                        <img
+                            src={modalImage}
+                            alt={modalTitle}
+                            className="w-full h-auto rounded-md object-contain max-h-[80vh]"
+                        />
+                        <div className="flex justify-end mt-3">
+                            <Button
+                                onClick={() => setModalImage(null)}
+                                className="bg-purple-800 hover:bg-purple-700 text-white"
+                            >
+                                Close
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Layout_Admin>
     );
 }

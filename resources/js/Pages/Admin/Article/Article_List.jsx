@@ -7,108 +7,110 @@ import Popup from "@/Components/Popup";
 import { Eye, EyeOff, Search, Trash, RotateCcw, File } from "lucide-react";
 
 export default function Article_List() {
-    const { articles, categories, filters } = usePage().props;
-    const [category, setCategory] = useState(filters.category || "");
-    const [status, setStatus] = useState(filters.status || "");
-    const [search, setSearch] = useState(filters.search || "");
+    const { articles, categories } = usePage().props;
+
+    // 🔹 State untuk data dan filter
+    const [allArticles, setAllArticles] = useState(articles || []);
+    const [filteredArticles, setFilteredArticles] = useState(articles || []);
+    const [category, setCategory] = useState("");
+    const [status, setStatus] = useState("");
+    const [search, setSearch] = useState("");
+
+    // 🔹 State lain tetap sama
     const [selectedIds, setSelectedIds] = useState([]);
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
 
-    const handleFilter = () => {
-        router.get(
-            "/admin/articles/list",
-            { category, status, search },
-            { preserveState: true }
-        );
-    };
+    // 🧠 Filter frontend — otomatis jalan tiap kali search/category/status berubah
+    useEffect(() => {
+        let result = allArticles;
 
+        // 🔹 Filter awal (hanya approved + disabled)
+        if (status === "") {
+            result = result.filter(
+                (a) => a.status === "approved" || a.status === "disabled"
+            );
+        }
+        // 🔹 Kalau klik tombol "Rejected"
+        else if (status === "rejected") {
+            result = result.filter((a) => a.status === "rejected");
+        }
+        // 🔹 Kalau filter lain (misalnya khusus "approved" aja)
+        else {
+            result = result.filter((a) => a.status === status);
+        }
+
+        // 🔹 Filter category
+        if (category !== "") {
+            result = result.filter((a) => a.category === category);
+        }
+
+        // 🔹 Filter search
+        if (search.trim() !== "") {
+            result = result.filter((a) =>
+                a.title.toLowerCase().includes(search.toLowerCase())
+            );
+        }
+
+        setFilteredArticles(result);
+    }, [allArticles, search, category, status]);
+
+    // 🔁 Reset filter
     const handleResetFilter = () => {
         setCategory("");
         setStatus("");
         setSearch("");
-        router.get(
-            "/admin/articles/list",
-            { category: "", status: "", search: "" },
-            { preserveState: true }
-        );
     };
-    const handleDisable = (id) => {
-        router.post(`/admin/articles/${id}/disable`);
-    };
-    const handleDelete = (id) => {
+
+    // 🔧 Aksi server (bulk & toggle)
+    const handleDisable = (id) => router.post(`/admin/articles/${id}/disable`);
+    const handleEnable = (id) => router.post(`/admin/articles/${id}/enable`);
+    const handleDelete = (id) =>
         router.post(
             `/admin/articles/${id}/delete`,
             {},
             {
                 onSuccess: () => {
-                    // hapus id dari selection supaya counter update segera
                     setSelectedIds((prev) => prev.filter((x) => x !== id));
-
                     setSuccessPopupMessage("Article deleted");
                     setSuccessPopupOpen(true);
-
-                    // optional: reload untuk memastikan data sinkron dengan server
                     router.reload();
-                },
-                onError: (errors) => {
-                    setSuccessPopupMessage("Delete failed");
-                    setSuccessPopupOpen(true);
-                    console.error("Delete error:", errors);
                 },
             }
         );
-    };
-
-    const handleView = (id) => {
+    const handleView = (id) =>
         router.get(`/admin/articles/${id}/view?from=list`);
-    };
-    const handleEnable = (id) => {
-        router.post(`/admin/articles/${id}/enable`);
-    };
 
-    // Bulk handlers
+    // 🧩 Bulk logic
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
     };
-
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(articles.map((a) => a.id));
+            setSelectedIds(filteredArticles.map((a) => a.id));
         } else {
             setSelectedIds([]);
         }
     };
 
-    const handleBulkEnable = () => {
-        if (selectedIds.length === 0) return;
+    const handleBulkEnable = () =>
+        selectedIds.length &&
         router.post(
             "/admin/articles/bulk-approve",
             { ids: selectedIds },
-            {
-                preserveState: true,
-                onSuccess: () => setSelectedIds([]),
-            }
+            { preserveState: true, onSuccess: () => setSelectedIds([]) }
         );
-    };
-
-    const handleBulkDisable = () => {
-        if (selectedIds.length === 0) return;
+    const handleBulkDisable = () =>
+        selectedIds.length &&
         router.post(
             "/admin/articles/bulk-disable",
             { ids: selectedIds },
-            {
-                preserveState: true,
-                onSuccess: () => setSelectedIds([]),
-            }
+            { preserveState: true, onSuccess: () => setSelectedIds([]) }
         );
-    };
-
-    const handleBulkDelete = () => {
-        if (selectedIds.length === 0) return;
-
+    const handleBulkDelete = () =>
+        selectedIds.length &&
         router.post(
             "/admin/articles/bulk-delete",
             { ids: selectedIds },
@@ -118,13 +120,12 @@ export default function Article_List() {
                     setSelectedIds([]);
                     setSuccessPopupMessage("Selected articles deleted");
                     setSuccessPopupOpen(true);
-                    router.reload(); // refresh list
+                    router.reload();
                 },
             }
         );
-    };
 
-    // optional: auto-close popup after X ms (remove if you want manual close)
+    // Auto close popup
     useEffect(() => {
         if (!successPopupOpen) return;
         const t = setTimeout(() => setSuccessPopupOpen(false), 3500);
@@ -133,7 +134,6 @@ export default function Article_List() {
 
     return (
         <Layout_Admin title="Manage Articles">
-            {/* success popup (re-usable Popup component) */}
             <Popup
                 triggerText=""
                 title={successPopupMessage}
@@ -144,118 +144,143 @@ export default function Article_List() {
                 onClose={() => setSuccessPopupOpen(false)}
                 triggerClass=""
             />
+
             <div className="p-6 space-y-6">
-                {/* 🔎 Filter Section */}
+                {/* 🔎 Filter & Bulk Section */}
                 <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
                     {/* Row 1: Search & Filter */}
-                    <div className="flex flex-wrap items-center gap-4">
-                        {/* Search */}
-                        <div>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
                             <Input
                                 type="text"
                                 placeholder="Search by title..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="min-w-[200px] focus-visible:ring-purple-700"
+                                className="w-[260px] focus-visible:ring-purple-700"
                             />
-                        </div>
-
-                        {/* Category */}
-                        <div>
                             <select
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                className="border border-gray-300 rounded px-3 py-2 min-w-[160px] focus-visible:ring-purple-700 focus-visible:border-purple-700 focus-visible:ring-2"
+                                className="h-10 w-[200px] rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700 shadow-sm focus:border-purple-700 focus:ring-2 focus:ring-purple-700/50 focus:outline-none"
                             >
                                 <option value="">All Categories</option>
-                                {categories.map((cat, i) => (
-                                    <option key={i} value={cat}>
-                                        {cat}
+                                {categories.map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
                                     </option>
                                 ))}
                             </select>
-                        </div>
-
-                        {/* Status */}
-                        <div>
-                            <select
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className="border border-gray-300 rounded px-3 py-2 min-w-[160px] focus-visible:ring-purple-700 focus-visible:border-purple-700 focus-visible:ring-2"
-                            >
-                                <option value="">All Approved Article</option>
-                                <option value="approved">Enabled</option>
-                                <option value="disabled">Disabled</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </div>
-
-                        {/* Filter Button */}
-                        <div className="flex flex-row items-center gap-3">
-                            <Button
-                                onClick={handleFilter}
-                                className="bg-purple-800 hover:bg-purple-700 text-white rounded-md"
-                            >
-                                <Search />
-                            </Button>
                             <Button
                                 onClick={handleResetFilter}
-                                className="bg-purple-800 hover:bg-purple-700 text-white rounded-md"
+                                className="bg-purple-800 hover:bg-purple-700 text-white"
                             >
-                                <RotateCcw />
+                                <RotateCcw className="w-4 h-4" />
+                            </Button>
+                        </div>
+
+                        {/* Status filter buttons */}
+                        <div className="flex items-center gap-2">
+                            <Button
+                                className={`${
+                                    status === ""
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
+                                onClick={() => setStatus("")}
+                            >
+                                All
+                            </Button>
+                            <Button
+                                className={`${
+                                    status === "approved"
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
+                                onClick={() => setStatus("approved")}
+                            >
+                                Enabled
+                            </Button>
+                            <Button
+                                className={`${
+                                    status === "disabled"
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
+                                onClick={() => setStatus("disabled")}
+                            >
+                                Disabled
+                            </Button>
+                            <Button
+                                className={`${
+                                    status === "rejected"
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
+                                onClick={() => setStatus("rejected")}
+                            >
+                                Rejected
                             </Button>
                         </div>
                     </div>
 
-                    {/* Row 2: Bulk action buttons */}
-                    <div className="flex flex-wrap justify-start items-center gap-2 border-t pt-3">
-                        <div className="text-sm mr-2">
+                    {/* Row 2: Bulk actions */}
+                    <div className="flex flex-wrap justify-end items-center gap-2 border-t pt-3">
+                        <div className="text-sm mr-auto">
                             {selectedIds.length} selected
                         </div>
-                        <Popup
-                            triggerText={
-                                <div className="flex items-center gap-2 cursor-pointer">
-                                    <Eye className="w-4 h-4" />
-                                    <span>Enable All</span>
-                                </div>
-                            }
-                            title="Enable All Selected Article?"
-                            description="All selected articles will be enabled and will be shown publicly."
-                            confirmText="Yes, Enable All"
-                            confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                            triggerClass="bg-green-600 hover:bg-green-700 text-white"
-                            disabledValue={selectedIds.length === 0}
-                            onConfirm={() => handleBulkEnable()}
-                        />
-                        <Popup
-                            triggerText={
-                                <div className="flex items-center gap-2 cursor-pointer">
-                                    <EyeOff className="w-4 h-4" />
-                                    <span>Disable All</span>
-                                </div>
-                            }
-                            title="Disable All Selected Article?"
-                            description="All selected articles will be disabled and will be hidden from public."
-                            confirmText="Yes, Disable All"
-                            confirmColor="bg-yellow-600 hover:bg-yellow-700 text-white"
-                            triggerClass="bg-yellow-600 hover:bg-yellow-700 text-white"
-                            disabledValue={selectedIds.length === 0}
-                            onConfirm={() => handleBulkDisable()}
-                        />
+
+                        {/* 🔹 Tampilkan tombol Enable/Disable hanya kalau bukan status rejected */}
+                        {status !== "rejected" && (
+                            <>
+                                <Popup
+                                    triggerText={
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <Eye className="w-4 h-4" />
+                                            <span>Enable Selected</span>
+                                        </div>
+                                    }
+                                    title="Enable Selected Articles?"
+                                    description="All selected articles will be enabled and shown publicly."
+                                    confirmText="Yes, Enable Selected"
+                                    confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                    triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
+                                    disabledValue={selectedIds.length === 0}
+                                    onConfirm={handleBulkEnable}
+                                />
+
+                                <Popup
+                                    triggerText={
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <EyeOff className="w-4 h-4" />
+                                            <span>Disable Selected</span>
+                                        </div>
+                                    }
+                                    title="Disable Selected Articles?"
+                                    description="All selected articles will be disabled and hidden from public."
+                                    confirmText="Yes, Disable Selected"
+                                    confirmColor="bg-yellow-600 hover:bg-yellow-700 text-white"
+                                    triggerClass="bg-yellow-200 hover:bg-yellow-300 text-yellow-700"
+                                    disabledValue={selectedIds.length === 0}
+                                    onConfirm={handleBulkDisable}
+                                />
+                            </>
+                        )}
+
+                        {/* 🔸 Tombol Delete selalu muncul */}
                         <Popup
                             triggerText={
                                 <div className="flex items-center gap-2 cursor-pointer">
                                     <Trash className="w-4 h-4" />
-                                    <span>Delete All</span>
+                                    <span>Delete Selected</span>
                                 </div>
                             }
-                            title="Delete All Selected Article?"
+                            title="Delete Selected Articles?"
                             description="This action cannot be undone. All selected articles will be deleted permanently."
-                            confirmText="Yes, Delete All"
+                            confirmText="Yes, Delete Selected"
                             confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                            triggerClass="bg-red-600 hover:bg-red-700 text-white"
+                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                             disabledValue={selectedIds.length === 0}
-                            onConfirm={() => handleBulkDelete()}
+                            onConfirm={handleBulkDelete}
                         />
                     </div>
                 </div>
@@ -269,18 +294,17 @@ export default function Article_List() {
                                     <input
                                         type="checkbox"
                                         checked={
-                                            articles.length > 0 &&
+                                            filteredArticles.length > 0 &&
                                             selectedIds.length ===
-                                                articles.length
+                                                filteredArticles.length
                                         }
                                         onChange={(e) =>
                                             handleSelectAll(e.target.checked)
                                         }
                                     />
                                 </th>
-                                <th className="px-4 py-2 border w-100">
-                                    Title
-                                </th>
+                                <th className="px-4 py-2 border">Id</th>
+                                <th className="px-4 py-2 border">Title</th>
                                 <th className="px-4 py-2 border">Category</th>
                                 <th className="px-4 py-2 border">Author</th>
                                 <th className="px-4 py-2 border">Status</th>
@@ -288,10 +312,10 @@ export default function Article_List() {
                             </tr>
                         </thead>
                         <tbody>
-                            {articles.length > 0 ? (
-                                articles.map((a) => (
+                            {filteredArticles.length > 0 ? (
+                                filteredArticles.map((a) => (
                                     <tr key={a.id}>
-                                        <td className="border px-4 py-2 w-12 text-center">
+                                        <td className="border px-4 py-2 text-center">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
@@ -302,7 +326,10 @@ export default function Article_List() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border px-4 py-2 w-150">
+                                        <td className="border px-4 py-2">
+                                            {a.id}
+                                        </td>
+                                        <td className="border px-4 py-2">
                                             {a.title}
                                         </td>
                                         <td className="border px-4 py-2">
@@ -316,34 +343,34 @@ export default function Article_List() {
                                                 ? "Approved and Enabled"
                                                 : a.status}
                                         </td>
-                                        <td className="border px-4 py-2 text-center gap-2">
-                                            <div className="actionBtnContainer flex flex-row justify-center gap-3">
+                                        <td className="border px-4 py-2 text-center">
+                                            <div className="flex justify-center gap-3">
                                                 <Button
                                                     onClick={() =>
                                                         handleView(a.id)
                                                     }
-                                                    className="bg-purple-800 hover:bg-purple-700 text-white"
+                                                    className="bg-purple-200 hover:bg-purple-300"
                                                 >
-                                                    <File />
+                                                    <File className="text-purple-700" />
                                                 </Button>
                                                 {a.status === "approved" && (
                                                     <Button
-                                                        className="bg-yellow-600 hover:bg-yellow-700"
+                                                        className="bg-yellow-200 hover:bg-yellow-300"
                                                         onClick={() =>
                                                             handleDisable(a.id)
                                                         }
                                                     >
-                                                        <EyeOff />
+                                                        <EyeOff className="text-yellow-700" />
                                                     </Button>
                                                 )}
                                                 {a.status === "disabled" && (
                                                     <Button
-                                                        className="bg-green-600 hover:bg-green-700"
+                                                        className="bg-green-200 hover:bg-green-300"
                                                         onClick={() =>
                                                             handleEnable(a.id)
                                                         }
                                                     >
-                                                        <Eye />
+                                                        <Eye className="text-green-700" />
                                                     </Button>
                                                 )}
                                                 <Popup
@@ -354,7 +381,7 @@ export default function Article_List() {
                                                     description="This action cannot be undone. The article will be permanently removed."
                                                     confirmText="Yes, Delete"
                                                     confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                    triggerClass="bg-red-600 hover:bg-red-700 text-white"
+                                                    triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                                                     onConfirm={() =>
                                                         handleDelete(a.id)
                                                     }
@@ -366,7 +393,7 @@ export default function Article_List() {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan="6"
+                                        colSpan="7"
                                         className="text-center py-4 text-gray-500 italic"
                                     >
                                         No articles found.
