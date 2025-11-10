@@ -3,18 +3,28 @@ import Layout_Admin from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Popup from "@/Components/Popup";
-import { Search, RotateCcw, CheckCircle, XCircle } from "lucide-react";
+import {
+    Search,
+    RotateCcw,
+    CheckCircle,
+    XCircle,
+    ChevronLeft,
+    ChevronRight,
+} from "lucide-react";
 import { router, usePage } from "@inertiajs/react";
 
 export default function Verification({ requests }) {
     const { filters } = usePage().props;
 
-    // 🔹 State
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState(filters.status || "all");
     const [selectedIds, setSelectedIds] = useState([]);
     const [modalImage, setModalImage] = useState(null);
     const [modalTitle, setModalTitle] = useState("");
+
+    // 🔹 Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     // 🔹 Filter frontend only
     const filteredRequests = requests.filter((req) => {
@@ -26,7 +36,22 @@ export default function Verification({ requests }) {
         return true;
     });
 
-    // 🔹 Toggle select
+    // 🔹 Pagination logic
+    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentRequests = filteredRequests.slice(
+        startIndex,
+        startIndex + itemsPerPage
+    );
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            setSelectedIds([]);
+        }
+    };
+
+    // 🔹 Select logic
     const toggleSelect = (id) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -35,13 +60,13 @@ export default function Verification({ requests }) {
 
     const toggleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(filteredRequests.map((r) => r.user.id));
+            setSelectedIds(currentRequests.map((r) => r.user.id));
         } else {
             setSelectedIds([]);
         }
     };
 
-    // 🔹 Handle single verification
+    // 🔹 Verification actions
     const handleVerification = async (userId, action) => {
         try {
             const response = await fetch(`/users/${userId}/verify`, {
@@ -54,7 +79,6 @@ export default function Verification({ requests }) {
                 },
                 body: JSON.stringify({ acceptance: action }),
             });
-
             if (!response.ok) throw new Error("Verification failed");
             window.location.reload();
         } catch (error) {
@@ -63,7 +87,6 @@ export default function Verification({ requests }) {
         }
     };
 
-    // 🔹 Bulk verification
     const handleBulkAction = async (action) => {
         try {
             for (const id of selectedIds) {
@@ -85,15 +108,17 @@ export default function Verification({ requests }) {
             <div className="p-6 space-y-6">
                 {/* 🔎 Filter Section */}
                 <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
-                    {/* Row 1: Search + Filter */}
+                    {/* Search + Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        {/* LEFT: Search */}
                         <div className="flex items-center gap-2">
                             <Input
                                 type="text"
                                 placeholder="Search by email..."
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 className="w-[260px] focus-visible:ring-purple-700"
                             />
                             <Button
@@ -106,6 +131,7 @@ export default function Verification({ requests }) {
                                 onClick={() => {
                                     setSearch("");
                                     setStatusFilter("all");
+                                    setCurrentPage(1);
                                 }}
                                 className="bg-purple-800 hover:bg-purple-700 text-white"
                             >
@@ -113,7 +139,6 @@ export default function Verification({ requests }) {
                             </Button>
                         </div>
 
-                        {/* RIGHT: Status Filter Buttons */}
                         <div className="flex items-center gap-2">
                             {["all", "accepted", "pending", "rejected"].map(
                                 (status) => (
@@ -124,7 +149,10 @@ export default function Verification({ requests }) {
                                                 ? "bg-purple-800 text-white"
                                                 : "bg-purple-400"
                                         } hover:bg-purple-800`}
-                                        onClick={() => setStatusFilter(status)}
+                                        onClick={() => {
+                                            setStatusFilter(status);
+                                            setCurrentPage(1);
+                                        }}
                                     >
                                         {status === "all"
                                             ? "All"
@@ -136,15 +164,13 @@ export default function Verification({ requests }) {
                         </div>
                     </div>
 
-                    {/* Row 2: Bulk Actions */}
+                    {/* Bulk Actions */}
                     {statusFilter !== "all" && statusFilter !== "rejected" && (
                         <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">
                             <div className="text-sm mr-2">
                                 {selectedIds.length} selected
                             </div>
-
                             <div className="flex items-center gap-2">
-                                {/* ✅ Show both when filter = pending */}
                                 {statusFilter === "pending" && (
                                     <>
                                         <Popup
@@ -190,8 +216,6 @@ export default function Verification({ requests }) {
                                         />
                                     </>
                                 )}
-
-                                {/* ❌ Only show Reject when filter = accepted */}
                                 {statusFilter === "accepted" && (
                                     <Popup
                                         triggerText={
@@ -216,24 +240,31 @@ export default function Verification({ requests }) {
                     )}
                 </div>
 
-                {/* 🧾 Verification Table */}
-                <div className="bg-white rounded-lg shadow-md p-4">
+                {/* 🧾 Table */}
+                <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
                     <table className="min-w-full border">
                         <thead className="bg-gray-100">
                             <tr>
-                                <th className="px-4 py-2 border w-12 text-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={
-                                            filteredRequests.length > 0 &&
-                                            selectedIds.length ===
-                                                filteredRequests.length
-                                        }
-                                        onChange={(e) =>
-                                            toggleSelectAll(e.target.checked)
-                                        }
-                                    />
-                                </th>
+                                {statusFilter !== "all" &&
+                                    statusFilter !== "rejected" && (
+                                        <th className="px-4 py-2 border w-12 text-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={
+                                                    currentRequests.length >
+                                                        0 &&
+                                                    selectedIds.length ===
+                                                        currentRequests.length
+                                                }
+                                                onChange={(e) =>
+                                                    toggleSelectAll(
+                                                        e.target.checked
+                                                    )
+                                                }
+                                            />
+                                        </th>
+                                    )}
+
                                 <th className="px-4 py-2 border">ID</th>
                                 <th className="px-4 py-2 border">Email</th>
                                 <th className="px-4 py-2 border">ID Photo</th>
@@ -247,20 +278,26 @@ export default function Verification({ requests }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRequests.length > 0 ? (
-                                filteredRequests.map((r) => (
+                            {currentRequests.length > 0 ? (
+                                currentRequests.map((r) => (
                                     <tr key={r.id}>
-                                        <td className="border px-4 py-2 text-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.includes(
-                                                    r.user.id
-                                                )}
-                                                onChange={() =>
-                                                    toggleSelect(r.user.id)
-                                                }
-                                            />
-                                        </td>
+                                        {statusFilter !== "all" &&
+                                            statusFilter !== "rejected" && (
+                                                <td className="border px-4 py-2 text-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIds.includes(
+                                                            r.user.id
+                                                        )}
+                                                        onChange={() =>
+                                                            toggleSelect(
+                                                                r.user.id
+                                                            )
+                                                        }
+                                                    />
+                                                </td>
+                                            )}
+
                                         <td className="border px-4 py-2">
                                             {r.id}
                                         </td>
@@ -288,7 +325,6 @@ export default function Verification({ requests }) {
                                                 </span>
                                             )}
                                         </td>
-
                                         <td className="border px-4 py-2 text-center">
                                             {r.selfie_url ? (
                                                 <Button
@@ -310,7 +346,6 @@ export default function Verification({ requests }) {
                                                 </span>
                                             )}
                                         </td>
-
                                         <td
                                             className={`border px-4 py-2 capitalize font-medium text-center ${
                                                 r.status === "accepted"
@@ -328,12 +363,12 @@ export default function Verification({ requests }) {
                                                     <>
                                                         <Popup
                                                             triggerText={
-                                                                <div className="flex items-center gap-4 cursor-pointer">
+                                                                <div className="flex items-center gap-2 cursor-pointer">
                                                                     <CheckCircle className="w-4 h-4 text-green-700" />
                                                                 </div>
                                                             }
                                                             title="Approve User Verification?"
-                                                            description="Are you sure you want to approve this user's verification?"
+                                                            description="Approve this user's verification?"
                                                             confirmText="Approve"
                                                             confirmColor="bg-green-600 hover:bg-green-700 text-white"
                                                             triggerClass="bg-green-200 hover:bg-green-300 text-green-700 px-3 py-1 rounded-md"
@@ -351,7 +386,7 @@ export default function Verification({ requests }) {
                                                                 </div>
                                                             }
                                                             title="Reject User?"
-                                                            description="Are you sure you want to reject this user's verification?"
+                                                            description="Reject this user's verification?"
                                                             confirmText="Reject"
                                                             confirmColor="bg-red-600 hover:bg-red-700 text-white"
                                                             triggerClass="bg-red-200 hover:bg-red-300 text-red-700 px-3 py-1 rounded-md"
@@ -363,26 +398,6 @@ export default function Verification({ requests }) {
                                                             }
                                                         />
                                                     </>
-                                                )}
-                                                {r.status === "accepted" && (
-                                                    <Popup
-                                                        triggerText={
-                                                            <div className="flex items-center gap-2 cursor-pointer">
-                                                                <XCircle className="w-4 h-4" />
-                                                            </div>
-                                                        }
-                                                        title="Reject User?"
-                                                        description="Reject this user’s verification?"
-                                                        confirmText="Reject"
-                                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700 px-3 py-1 rounded-md"
-                                                        onConfirm={() =>
-                                                            handleVerification(
-                                                                r.user.id,
-                                                                "rejected"
-                                                            )
-                                                        }
-                                                    />
                                                 )}
                                             </div>
                                         </td>
@@ -400,16 +415,61 @@ export default function Verification({ requests }) {
                             )}
                         </tbody>
                     </table>
+
+                    {/* 🔸 Pagination Section */}
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="text-sm text-gray-500">
+                            Page {currentPage} of {totalPages || 1}
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === 1}
+                                onClick={() =>
+                                    handlePageChange(currentPage - 1)
+                                }
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+                            </Button>
+                            {[...Array(totalPages)].map((_, i) => (
+                                <Button
+                                    key={i}
+                                    onClick={() => handlePageChange(i + 1)}
+                                    className={`
+                                        ${
+                                            currentPage === i + 1
+                                                ? "bg-purple-800 text-white hover:bg-purple-800"
+                                                : "bg-purple-300 text-purple-900 hover:bg-purple-800 hover:text-white"
+                                        }
+                                        font-medium transition-colors duration-200
+                                    `}
+                                >
+                                    {i + 1}
+                                </Button>
+                            ))}
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === totalPages}
+                                onClick={() =>
+                                    handlePageChange(currentPage + 1)
+                                }
+                            >
+                                Next <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* 🔹 Modal */}
             {modalImage && (
                 <div
                     className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-                    onClick={() => setModalImage(null)} // klik luar = tutup
+                    onClick={() => setModalImage(null)}
                 >
                     <div
                         className="bg-white rounded-lg shadow-lg p-4 max-w-3xl w-full"
-                        onClick={(e) => e.stopPropagation()} // biar klik dalam gak nutup
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-lg font-semibold mb-3">
                             {modalTitle}

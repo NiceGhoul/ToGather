@@ -11,22 +11,26 @@ import {
     Search,
     Check,
     XCircle,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 
 export default function User_List() {
     const { users } = usePage().props;
 
-    // 🔹 Popup states
     const [popupMessage, setPopupMessage] = useState("");
     const [popupDescription, setPopupDescription] = useState("");
     const [popupOpen, setPopupOpen] = useState(false);
 
-    // 🔹 Filter & selection states
     const [statusFilter, setStatusFilter] = useState("all");
     const [search, setSearch] = useState("");
     const [selectedIds, setSelectedIds] = useState([]);
 
-    // 🧩 Filtered data (frontend only)
+    // 🔹 Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const usersPerPage = 10; // jumlah data per halaman
+
+    // 🧩 Filtered data
     const filteredUsers = users.filter((u) => {
         if (statusFilter !== "all" && u.status !== statusFilter) return false;
         if (search) {
@@ -39,12 +43,26 @@ export default function User_List() {
         return true;
     });
 
-    // 🧩 Ban / Unban per user
+    // 🧩 Pagination logic
+    const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+    const startIndex = (currentPage - 1) * usersPerPage;
+    const currentUsers = filteredUsers.slice(
+        startIndex,
+        startIndex + usersPerPage
+    );
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            setSelectedIds([]); // reset selection tiap ganti halaman
+        }
+    };
+
+    // 🧩 Toggle Status per user
     const handleToggleStatus = (user) => {
         const url = `/admin/users/${user.id}/${
             user.status === "banned" ? "unblock" : "block"
         }`;
-
         router.post(
             url,
             {},
@@ -65,7 +83,7 @@ export default function User_List() {
         );
     };
 
-    // 🧩 Bulk select
+    // 🧩 Selection logic
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -74,13 +92,13 @@ export default function User_List() {
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(filteredUsers.map((u) => u.id));
+            setSelectedIds(currentUsers.map((u) => u.id));
         } else {
             setSelectedIds([]);
         }
     };
 
-    // 🧩 Bulk / Global Action Handler
+    // 🧩 Bulk actions
     const handleBulkAction = (action) => {
         let endpoint = "";
         let payload = {};
@@ -108,14 +126,6 @@ export default function User_List() {
                         message = "Users Unbanned";
                         desc = `${selectedIds.length} selected users have been unbanned.`;
                         break;
-                    case "banAll":
-                        message = "All Users Banned";
-                        desc = "All users in the system have been banned.";
-                        break;
-                    case "unbanAll":
-                        message = "All Users Unbanned";
-                        desc = "All users have been restored to active status.";
-                        break;
                 }
 
                 setPopupMessage(message);
@@ -136,7 +146,6 @@ export default function User_List() {
     return (
         <Layout_Admin title="User List">
             <Popup
-                triggerText=""
                 title={popupMessage}
                 description={popupDescription}
                 open={popupOpen}
@@ -148,15 +157,17 @@ export default function User_List() {
             <div className="p-6 space-y-6">
                 {/* 🔎 Filter + Bulk Section */}
                 <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
-                    {/* Row 1: Search & Filters */}
+                    {/* Search & Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                        {/* LEFT: Search bar */}
                         <div className="flex items-center gap-2">
                             <Input
                                 type="text"
                                 placeholder="Search by nickname or email..."
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 className="w-[260px] focus-visible:ring-purple-700"
                             />
                             <Button
@@ -167,47 +178,31 @@ export default function User_List() {
                             </Button>
                         </div>
 
-                        {/* RIGHT: Filter buttons */}
                         <div className="flex items-center gap-2">
-                            <Button
-                                className={`${
-                                    statusFilter === "all"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
-                                onClick={() => setStatusFilter("all")}
-                            >
-                                All
-                            </Button>
-                            <Button
-                                className={`${
-                                    statusFilter === "active"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
-                                onClick={() => setStatusFilter("active")}
-                            >
-                                Active
-                            </Button>
-                            <Button
-                                className={`${
-                                    statusFilter === "banned"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
-                                onClick={() => setStatusFilter("banned")}
-                            >
-                                Banned
-                            </Button>
+                            {["all", "active", "banned"].map((f) => (
+                                <Button
+                                    key={f}
+                                    className={`${
+                                        statusFilter === f
+                                            ? "bg-purple-800 text-white"
+                                            : "bg-purple-400"
+                                    } hover:bg-purple-800`}
+                                    onClick={() => {
+                                        setStatusFilter(f);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                                </Button>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Row 2: Bulk Action */}
+                    {/* Bulk actions */}
                     <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
                         <div className="text-sm text-gray-600 mr-2">
                             {selectedIds.length} selected
                         </div>
-
                         <div className="flex items-center gap-2">
                             <Popup
                                 triggerText={
@@ -217,8 +212,8 @@ export default function User_List() {
                                     </div>
                                 }
                                 title="Unban Selected Users?"
-                                description="All selected users will be restored and can use the platform again."
-                                confirmText="Yes, Unban All"
+                                description="All selected users will be unbanned."
+                                confirmText="Yes, Unban"
                                 confirmColor="bg-green-600 hover:bg-green-700 text-white"
                                 triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                                 disabledValue={selectedIds.length === 0}
@@ -232,8 +227,8 @@ export default function User_List() {
                                     </div>
                                 }
                                 title="Ban Selected Users?"
-                                description="All selected users will be banned and will lose access."
-                                confirmText="Yes, Ban All"
+                                description="All selected users will lose access."
+                                confirmText="Yes, Ban"
                                 confirmColor="bg-red-600 hover:bg-red-700 text-white"
                                 triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                                 disabledValue={selectedIds.length === 0}
@@ -243,8 +238,8 @@ export default function User_List() {
                     </div>
                 </div>
 
-                {/* 🧾 User Table */}
-                <div className="bg-white rounded-lg shadow-md p-4">
+                {/* 🧾 Table */}
+                <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
                     <table className="min-w-full border">
                         <thead className="bg-gray-100">
                             <tr>
@@ -252,9 +247,9 @@ export default function User_List() {
                                     <input
                                         type="checkbox"
                                         checked={
-                                            filteredUsers.length > 0 &&
+                                            currentUsers.length > 0 &&
                                             selectedIds.length ===
-                                                filteredUsers.length
+                                                currentUsers.length
                                         }
                                         onChange={(e) =>
                                             handleSelectAll(e.target.checked)
@@ -273,8 +268,8 @@ export default function User_List() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredUsers.length > 0 ? (
-                                filteredUsers.map((u) => (
+                            {currentUsers.length > 0 ? (
+                                currentUsers.map((u) => (
                                     <tr key={u.id}>
                                         <td className="border px-4 py-2 text-center">
                                             <input
@@ -327,8 +322,8 @@ export default function User_List() {
                                                 } p-2 rounded-md`}
                                                 description={
                                                     u.status === "banned"
-                                                        ? "User will be restored and can access again."
-                                                        : "User will be banned and lose access."
+                                                        ? "User will be restored."
+                                                        : "User will be banned."
                                                 }
                                                 confirmText={
                                                     u.status === "banned"
@@ -359,6 +354,47 @@ export default function User_List() {
                             )}
                         </tbody>
                     </table>
+
+                    {/* Pagination */}
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="text-sm text-gray-500">
+                            Page {currentPage} of {totalPages || 1}
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === 1}
+                                onClick={() =>
+                                    handlePageChange(currentPage - 1)
+                                }
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+                            </Button>
+                            {[...Array(totalPages)].map((_, i) => (
+                                <Button
+                                    key={i}
+                                    onClick={() => handlePageChange(i + 1)}
+                                    className={`${
+                                        currentPage === i + 1
+                                            ? "bg-purple-800 text-white hover:bg-purple-800"
+                                            : "bg-purple-300 text-white hover:bg-purple-800 hover:text-white"
+                                    }
+                                                font-medium transition-colors duration-200`}
+                                >
+                                    {i + 1}
+                                </Button>
+                            ))}
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === totalPages}
+                                onClick={() =>
+                                    handlePageChange(currentPage + 1)
+                                }
+                            >
+                                Next <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </Layout_Admin>
