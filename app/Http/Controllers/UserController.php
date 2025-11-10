@@ -142,6 +142,17 @@ class UserController extends Controller
 
             $user = Auth::user();
 
+            // Check if user is banned
+            if($user->status == UserStatus::Banned){
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->back()->withErrors([
+                    'banned' => 'Your account has been banned. Please contact support for more information.'
+                ])->withInput($request->except('password'));
+            }
+
             if ($user->role === UserRole::Admin) {
                 return Inertia::location(route('admin.dashboard'));
             }

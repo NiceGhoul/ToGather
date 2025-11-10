@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Layout_User from "@/Layouts/Layout_User";
+import Layout_Guest from "@/Layouts/Layout_Guest";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@/components/ui/separator";
@@ -17,6 +18,7 @@ const ArticleList = () => {
         articles,
         categories,
         sortOrder: initialSortOrder,
+        auth,
     } = usePage().props;
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +28,12 @@ const ArticleList = () => {
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
+    const [isLogin, setIsLogin] = useState(false)
+
+    // 🟣 Check authentication status
+    useEffect(() => {
+        setIsLogin(!!auth?.user);
+    }, [auth]);
 
     // 🟣 State untuk Like
     const [likesState, setLikesState] = useState(
@@ -223,8 +231,11 @@ const ArticleList = () => {
         }
     };
 
+    // 🟣 Dynamic Layout based on authentication
+    const Layout = isLogin ? Layout_User : Layout_Guest;
+
     return (
-        <Layout_User>
+        <Layout>
             {/* === Banner Section === */}
             <div className="w-full flex flex-col">
                 <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
@@ -395,17 +406,17 @@ const ArticleList = () => {
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                             <p
                                 onClick={handleShowMore}
-                                className="text-sm text-gray-400 font-thin cursor-pointer inline-flex items-center gap-2"
+                                className=" text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
                             >
                                 {isShowMoreLoading && <Spinner className="w-4 h-4" />}
-                                show more
+                                Show More
                             </p>
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                         </div>
                     )}
                 </CardContent>
             </div>
-        </Layout_User>
+        </Layout>
     );
 };
 
