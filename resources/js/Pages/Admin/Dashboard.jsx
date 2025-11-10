@@ -154,7 +154,7 @@ export default function Dashboard() {
                                             Daily Donations - Week {dailyWeek}, {new Date(dailyYear, dailyMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}
                                         </h3>
                                         <div className="flex gap-2">
-                                            <select 
+                                            <select
                                                 value={dailyYear}
                                                 onChange={(e) => handleDailyChange(parseInt(e.target.value), dailyMonth, dailyWeek)}
                                                 className="px-3 py-1 border rounded-md"
@@ -163,7 +163,7 @@ export default function Dashboard() {
                                                     <option key={year} value={year}>{year}</option>
                                                 ))}
                                             </select>
-                                            <select 
+                                            <select
                                                 value={dailyMonth}
                                                 onChange={(e) => handleDailyChange(dailyYear, parseInt(e.target.value), dailyWeek)}
                                                 className="px-3 py-1 border rounded-md"
@@ -174,7 +174,7 @@ export default function Dashboard() {
                                                     </option>
                                                 ))}
                                             </select>
-                                            <select 
+                                            <select
                                                 value={dailyWeek}
                                                 onChange={(e) => handleDailyChange(dailyYear, dailyMonth, parseInt(e.target.value))}
                                                 className="px-3 py-1 border rounded-md"
@@ -186,26 +186,29 @@ export default function Dashboard() {
                                             </select>
                                         </div>
                                     </div>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={dailyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                            <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#666" />
-                                            <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
-                                            <Tooltip 
-                                                formatter={(value) => [formatCurrency(value), "Amount"]}
-                                                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                                            />
-                                            <Bar dataKey="amount" fill="url(#dailyGradient)" radius={[4, 4, 0, 0]} />
-                                            <defs>
-                                                <linearGradient id="dailyGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                                                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                                                </linearGradient>
-                                            </defs>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                    {dailyDonations && dailyDonations.length === 0 && (
-                                        <p className="text-center text-gray-500 mt-4">No donation data available</p>
+                                    {dailyDonations && dailyDonations.length === 0 ? (
+                                        <div className="h-full flex items-center justify-center">
+                                            <p className="text-center text-gray-500">No donation data available</p>
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={dailyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                                <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#666" />
+                                                <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
+                                                <Tooltip
+                                                    formatter={(value) => [formatCurrency(value), "Amount"]}
+                                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                                />
+                                                <Bar dataKey="amount" fill="url(#dailyGradient)" radius={[4, 4, 0, 0]} />
+                                                <defs>
+                                                    <linearGradient id="dailyGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                                                        <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                                    </linearGradient>
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
                                     )}
                                 </div>
                             </TabsContent>
@@ -217,7 +220,7 @@ export default function Dashboard() {
                                             Weekly Donations - {new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}
                                         </h3>
                                         <div className="flex gap-2">
-                                            <select 
+                                            <select
                                                 value={selectedYear}
                                                 onChange={(e) => handleWeeklyChange(parseInt(e.target.value), selectedMonth)}
                                                 className="px-3 py-1 border rounded-md"
@@ -226,7 +229,7 @@ export default function Dashboard() {
                                                     <option key={year} value={year}>{year}</option>
                                                 ))}
                                             </select>
-                                            <select 
+                                            <select
                                                 value={selectedMonth}
                                                 onChange={(e) => handleWeeklyChange(selectedYear, parseInt(e.target.value))}
                                                 className="px-3 py-1 border rounded-md"
@@ -239,26 +242,29 @@ export default function Dashboard() {
                                             </select>
                                         </div>
                                     </div>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={weeklyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                            <XAxis dataKey="week" tick={{ fontSize: 12 }} stroke="#666" />
-                                            <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
-                                            <Tooltip 
-                                                formatter={(value) => [formatCurrency(value), "Amount"]}
-                                                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                                            />
-                                            <Bar dataKey="amount" fill="url(#weeklyGradient)" radius={[4, 4, 0, 0]} />
-                                            <defs>
-                                                <linearGradient id="weeklyGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
-                                                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.3}/>
-                                                </linearGradient>
-                                            </defs>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                    {weeklyDonations && weeklyDonations.length === 0 && (
-                                        <p className="text-center text-gray-500 mt-4">No donation data available</p>
+                                    {weeklyDonations && weeklyDonations.length === 0 ? (
+                                        <div className="h-full flex items-center justify-center">
+                                            <p className="text-center text-gray-500">No donation data available</p>
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={weeklyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                                <XAxis dataKey="week" tick={{ fontSize: 12 }} stroke="#666" />
+                                                <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
+                                                <Tooltip
+                                                    formatter={(value) => [formatCurrency(value), "Amount"]}
+                                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                                />
+                                                <Bar dataKey="amount" fill="url(#weeklyGradient)" radius={[4, 4, 0, 0]} />
+                                                <defs>
+                                                    <linearGradient id="weeklyGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
+                                                        <stop offset="100%" stopColor="#10b981" stopOpacity={0.3}/>
+                                                    </linearGradient>
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
                                     )}
                                 </div>
                             </TabsContent>
@@ -267,7 +273,7 @@ export default function Dashboard() {
                                 <div className="h-[500px] w-full">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-lg font-medium">Monthly Donations</h3>
-                                        <select 
+                                        <select
                                             value={monthlyYear}
                                             onChange={(e) => handleMonthlyYearChange(parseInt(e.target.value))}
                                             className="px-3 py-1 border rounded-md"
@@ -277,53 +283,59 @@ export default function Dashboard() {
                                             ))}
                                         </select>
                                     </div>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={monthlyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                            <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#666" />
-                                            <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
-                                            <Tooltip 
-                                                formatter={(value) => [formatCurrency(value), "Amount"]}
-                                                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                                            />
-                                            <Bar dataKey="amount" fill="url(#monthlyGradient)" radius={[4, 4, 0, 0]} />
-                                            <defs>
-                                                <linearGradient id="monthlyGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                                                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                                                </linearGradient>
-                                            </defs>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                    {monthlyDonations && monthlyDonations.length === 0 && (
-                                        <p className="text-center text-gray-500 mt-4">No donation data available</p>
+                                    {monthlyDonations && monthlyDonations.length === 0 ? (
+                                        <div className="h-full flex items-center justify-center">
+                                            <p className="text-center text-gray-500">No donation data available</p>
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={monthlyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#666" />
+                                                <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
+                                                <Tooltip
+                                                    formatter={(value) => [formatCurrency(value), "Amount"]}
+                                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                                />
+                                                <Bar dataKey="amount" fill="url(#monthlyGradient)" radius={[4, 4, 0, 0]} />
+                                                <defs>
+                                                    <linearGradient id="monthlyGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                                                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                                                    </linearGradient>
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
                                     )}
                                 </div>
                             </TabsContent>
-                            
+
                             <TabsContent value="yearly" className="mt-6">
                                 <div className="h-[500px] w-full">
                                     <h3 className="text-lg font-medium mb-4">All Years</h3>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={yearlyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                            <XAxis dataKey="year" tick={{ fontSize: 12 }} stroke="#666" />
-                                            <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
-                                            <Tooltip 
-                                                formatter={(value) => [formatCurrency(value), "Amount"]}
-                                                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                                            />
-                                            <Bar dataKey="amount" fill="url(#yearlyGradient)" radius={[4, 4, 0, 0]} />
-                                            <defs>
-                                                <linearGradient id="yearlyGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
-                                                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.3}/>
-                                                </linearGradient>
-                                            </defs>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                    {yearlyDonations && yearlyDonations.length === 0 && (
-                                        <p className="text-center text-gray-500 mt-4">No donation data available</p>
+                                    {yearlyDonations && yearlyDonations.length === 0 ? (
+                                        <div className="h-full flex items-center justify-center">
+                                            <p className="text-center text-gray-500">No donation data available</p>
+                                        </div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={yearlyDonations || []} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                                <XAxis dataKey="year" tick={{ fontSize: 12 }} stroke="#666" />
+                                                <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} stroke="#666" />
+                                                <Tooltip
+                                                    formatter={(value) => [formatCurrency(value), "Amount"]}
+                                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                                />
+                                                <Bar dataKey="amount" fill="url(#yearlyGradient)" radius={[4, 4, 0, 0]} />
+                                                <defs>
+                                                    <linearGradient id="yearlyGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
+                                                        <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                                                    </linearGradient>
+                                                </defs>
+                                            </BarChart>
+                                        </ResponsiveContainer>
                                     )}
                                 </div>
                             </TabsContent>
