@@ -1,13 +1,7 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/Components/ui/card";
+import {Card,CardAction,CardContent,CardDescription,CardHeader,CardTitle} from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";
@@ -15,16 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Textarea } from "@/Components/ui/textarea";
 import { Toggle } from "@/Components/ui/toggle";
 import Layout_User from "@/Layouts/Layout_User";
-import { usePage } from "@inertiajs/react";
-import { IconButton } from "@mui/material";
-import { Heart, Trash2 } from "lucide-react";
+import { router, usePage } from "@inertiajs/react";
+import { Edit, Heart, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const UpperPreview = ({campaign, user, images}) => {
     const [like, setLike] = useState(false)
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
-            <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 border-gray-800 shrink-0">
+            <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 shrink-0">
                 <img
                     src={images.thumbnail}
                     alt="Campaign"
@@ -66,8 +59,7 @@ export const UpperPreview = ({campaign, user, images}) => {
                     />
                     <span
                         className="absolute inset-0 flex items-start justify-center text-md font-medium "
-                        style={{ color: "black" }}
-                    >
+                        style={{ color: "black" }}>
                         0%
                     </span>
                 </div>
@@ -103,23 +95,18 @@ export const UpperPreview = ({campaign, user, images}) => {
 }
 
 export const DescriptionBuilder = ({campaign}) => {
-    const [description, setDescription] = useState([{type: "paragraph", content: "Our Story;" + campaign.description ?? "", isEditing:false}])
-
-    const [title, setTitle] = useState("")
-    const [paragraph, setParagraph] = useState("")
-    const [imagePreview, setImagePreview] = useState({index: 0, url: ""})
-    const [editMode, setEditMode] = useState(false)
+    console.log(campaign)
+    const [description, setDescription] = useState([{campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ?? "", isEditing:false}])
 
     const addParagraphBlock = () => {
-        setDescription((prev) => [...prev, { type: "paragraph", content: "New Section;", isEditing: true }]);
+        setDescription((prev) => [...prev, {campaign_id: campaign.id,  type: "paragraph", content: "New Section~;", isEditing: true }]);
     };
 
     const addMediaBlock = () => {
-        setDescription((prev) => [...prev, { type: "media", content: "", isEditing: true }]);
+        setDescription((prev) => [...prev, {campaign_id: campaign.id, type: "media", content: "", isEditing: true }]);
     };
 
     const handleChange = (index, value) => {
-        console.log(value)
         setDescription((prev) =>
             prev.map((block, i) =>
                 i === index ? { ...block, content: value } : block
@@ -139,10 +126,6 @@ export const DescriptionBuilder = ({campaign}) => {
          setDescription((prev) => prev.filter((_, i) => i !== index));
      };
 
-     useEffect(() => {
-        console.log(description)
-     }, [description])
-
     return (
         <Card className="w-full p-6 border border-gray-300 shadow-sm justify-center flex flex-col">
             <CardHeader className="flex flex-col gap-4">
@@ -150,14 +133,7 @@ export const DescriptionBuilder = ({campaign}) => {
                     <CardTitle className="text-xl font-semibold">
                         About Us
                     </CardTitle>
-
-                    {/* <Button onClick={() => setEditMode((prev) => !prev)}>
-                        {editMode ? "Preview Mode" : "Edit Mode"}
-                    </Button> */}
                 </div>
-
-                {/* {
-                editMode && ( */}
                 <div className="flex justify-center gap-4 mt-2">
                     <Button onClick={addParagraphBlock}>
                         {" "}
@@ -165,142 +141,147 @@ export const DescriptionBuilder = ({campaign}) => {
                     </Button>
                     <Button onClick={addMediaBlock}> + Add Image </Button>
                 </div>
-                {/* )
-                } */}
             </CardHeader>
             {description.length > 0 ? (
                 <CardContent className="flex flex-col gap-4 ">
-                    {description.map((block, index) => (
-                        <div
-                            key={index}
-                            className="border rounded-lg p-3 flex flex-col gap-5 bg-gray-50 relative"
-                        >
-                            {block.type === "paragraph" ? (
-                                block.isEditing ? (
-                                    <div className="flex flex-col gap-4">
-                                        <Input
-                                            className="w-[85%]"
-                                            defaultValue={
-                                                block.content.split(";")[0] ??
-                                                ""
-                                            }
-                                            placeholder="Write your section title"
-                                            onChange={(e) => {
-                                                const parts =
-                                                    block.content.split(";");
-                                                parts[0] = e.target.value;
-                                                handleChange(
-                                                    index,
-                                                    parts.join(";")
-                                                );
-                                            }}
-                                        ></Input>
-                                        <Textarea
-                                            placeholder="Write a paragraph..."
-                                            defaultValue={
-                                                block.content.split(";")[1] ??
-                                                ""
-                                            }
-                                            onChange={(e) => {
-                                                const parts =
-                                                    block.content.split(";");
-                                                parts[1] = e.target.value;
-                                                handleChange(
-                                                    index,
-                                                    parts.join(";")
-                                                );
-                                            }}
-                                            className="resize-none min-h-[120px]"
-                                        />
-                                        <div className="flex gap-2">
-                                            <Button
-                                                onClick={() => {
-                                                    toggleBlockEdit(index);
-                                                }}
-                                            >
-                                                Save
-                                            </Button>
-                                            <Button
-                                                variant="secondary"
-                                                onClick={() =>
-                                                    toggleBlockEdit(index)
-                                                }
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-4">
-                                        <Label className="text-3xl font-bold text-[#7C4789]">
-                                            {block.content.split(";")[0]}
-                                        </Label>
-                                        <p>{block.content.split(";")[1]}</p>
-                                        <div className="w-full flex justify-end">
-                                            <Button
-                                                className="w-[10%]"
-                                                size="sm"
-                                                onClick={() =>
-                                                    toggleBlockEdit(index)
-                                                }
-                                            >
-                                                Edit
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )
-                            ) : (
-                                <>
-                                    {block.content ? (
-                                        <img
-                                            src={URL.createObjectURL(
-                                                block.content ?? null
-                                            )}
-                                            alt="Preview"
-                                            className="w-full max-h-[400px] object-contain rounded"
-                                        />
-                                    ) : null}
-                                    <Input
-                                        className="w-[90%]"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            if (file) {
-                                                const url =
-                                                    URL.createObjectURL(file);
-                                                handleChange(index, file);
-                                            }
-                                        }}
-                                    />
-                                </>
-                            )}
-
-                            <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
-                                onClick={() => handleRemove(index)}
+                    <div className="flex flex-col gap-4 justify-center">
+                        {description.map((block, index) => (
+                            <div
+                                key={index}
+                                className="border rounded-lg p-3 flex flex-col gap-5 bg-gray-50 relative"
                             >
-                                <Trash2
-                                    className="w-30 h-30 text-white p-0"
-                                    strokeWidth={2.5}
-                                />
-                            </Button>
-                        </div>
-                    ))}
+                                {block.type === "paragraph" ? (
+                                    block.isEditing ? (
+                                        <div className="flex flex-col gap-4">
+                                            <Input
+                                                className="w-[85%]"
+                                                defaultValue={
+                                                    block.content.split(
+                                                        "~;"
+                                                    )[0] ?? ""
+                                                }
+                                                placeholder="Write your section title"
+                                                onChange={(e) => {
+                                                    const parts =
+                                                        block.content.split(
+                                                            "~;"
+                                                        );
+                                                    parts[0] = e.target.value;
+                                                    handleChange(
+                                                        index,
+                                                        parts.join("~;")
+                                                    );
+                                                }}
+                                            ></Input>
+                                            <Textarea
+                                                placeholder="Write a paragraph..."
+                                                defaultValue={
+                                                    block.content.split(
+                                                        "~;"
+                                                    )[1] ?? ""
+                                                }
+                                                onChange={(e) => {
+                                                    const parts =
+                                                        block.content.split(
+                                                            "~;"
+                                                        );
+                                                    parts[1] = e.target.value;
+                                                    handleChange(
+                                                        index,
+                                                        parts.join("~;")
+                                                    );
+                                                }}
+                                                className="resize-none min-h-[120px]"
+                                            />
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    onClick={() => {
+                                                        toggleBlockEdit(index);
+                                                    }}
+                                                >
+                                                    Save
+                                                </Button>
+                                                <Button
+                                                    variant="secondary"
+                                                    onClick={() =>
+                                                        toggleBlockEdit(index)
+                                                    }
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col gap-4">
+                                            <Label className="text-3xl font-bold text-[#7C4789]">
+                                                {block.content.split("~;")[0]}
+                                            </Label>
+                                            <p>
+                                                {block.content.split("~;")[1]}
+                                            </p>
+                                            <div className="w-full flex justify-end">
+                                                <Button
+                                                    className="w-[10%]"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        toggleBlockEdit(index)
+                                                    }
+                                                >
+                                                    Edit
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )
+                                ) : (
+                                    <>
+                                        {block.content ? (
+                                            <img
+                                                src={URL.createObjectURL(
+                                                    block.content ?? null
+                                                )}
+                                                alt="Preview"
+                                                className="w-full max-h-[400px] object-contain rounded"
+                                            />
+                                        ) : null}
+                                        <Input
+                                            className="w-[90%]"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file =
+                                                    e.target.files?.[0];
+                                                if (file) {
+                                                    handleChange(index, file);
+                                                }
+                                            }}
+                                        />
+                                    </>
+                                )}
+
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
+                                    onClick={() => handleRemove(index)}
+                                >
+                                    <Trash2
+                                        className="w-30 h-30 text-white p-0"
+                                        strokeWidth={2.5}
+                                    />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
                 </CardContent>
             ) : (
                 <CardContent className="flex h-[100px] w-full justify-center items-center text-gray-300 italic">
-                    {" "}
                     <h3>
-                        {" "}
                         Add explanation for your business before continuing!
-                    </h3>{" "}
+                    </h3>
                 </CardContent>
             )}
             {description.length > 0 ? (
-                <CardAction className="mt-10">
+                <CardAction className="mt-10 justify-end flex items-end w-full">
                     <Button> Save Changes </Button>
                 </CardAction>
             ) : (
@@ -310,16 +291,153 @@ export const DescriptionBuilder = ({campaign}) => {
     );
 };
 
+export const FaqBuilder = ({campaign}) => {
+
+const [userQuestions, setUserQuestions] = useState([])
+const [openItem, setOpenItem] = useState(null);
+
+useEffect(() => {
+  const editingIndex = userQuestions.findIndex((q) => q.isEditing);
+  if (editingIndex !== -1) {
+    setOpenItem(`item-${editingIndex}`);
+  }
+}, [userQuestions]);
+
+  const handleChange = (index, field, value) => {
+      setUserQuestions((prev) =>
+          prev.map((item, i) =>
+              i === index ? { ...item, [field]: value } : item
+          )
+      );
+  };
+
+     const handleAddQuestions = () => {
+        setUserQuestions((prev) => [
+            ...prev,
+            {
+                campaign_id: campaign.id,
+                question: "New Question",
+                answer: "New Answer",
+                isEditing:false,
+            },
+        ]);
+    };
+
+    const toggleEdit = (index) => {
+        setUserQuestions((prev) =>
+            prev.map((block, i) =>
+                i === index ? { ...block, isEditing: !block.isEditing } : block
+            )
+        );
+    };
+
+    return (
+        <div className="flex justify-center items-center flex-col gap-4 h-full">
+            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789]">
+                Frequently Asked Questions
+            </Label>
+            <div className="w-full h-full items-center justify-center flex">
+                {userQuestions.length === 0 ? (
+                    <div className="flex flex-col gap-8">
+                        <Label className="text-lg font-extralight italic text-gray-300">
+                            There are no FAQ available
+                        </Label>
+                    </div>
+                ) : (
+                    <div className="w-[60%] justify-center items-center">
+                        <Accordion
+                            type="single"
+                            collapsible
+                            className="w-full"
+                            onValueChange={(val) => {
+                                const currentIndex = userQuestions.findIndex(
+                                    (q) => `item-${q.id - 1}` === openItem
+                                );
+                                const isEditing =
+                                    userQuestions[currentIndex]?.isEditing;
+                                if (!isEditing) setOpenItem(val || null);
+                            }}
+                        >
+                            {userQuestions.map((dat, idx) => (
+                                <AccordionItem
+                                    key={dat.id}
+                                    value={`item-${idx}`}
+                                >
+                                    <AccordionTrigger className="flex justify-between items-center">
+                                        {/* if is editing */}
+                                        {dat.isEditing ? (
+                                            <Input
+                                                value={dat.question}
+                                                onChange={(e) =>
+                                                    handleChange(
+                                                        idx,
+                                                        "question",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="w-[80%]"
+                                            />
+                                        ) : (
+                                            <span>{dat.question}</span>
+                                        )}
+
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleEdit(idx);
+                                            }}
+                                        >
+                                            {dat.isEditing ? "Save" : "Edit"}
+                                        </Button>
+                                    </AccordionTrigger>
+
+                                    <AccordionContent>
+                                        {dat.isEditing ? (
+                                            <Textarea
+                                                value={dat.answer}
+                                                onChange={(e) =>
+                                                    handleChange(
+                                                        idx,
+                                                        "answer",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="w-full mt-2"
+                                                rows={3}
+                                            />
+                                        ) : (
+                                            <p className="mt-2 text-gray-700">
+                                                {dat.answer}
+                                            </p>
+                                        )}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </div>
+                )}
+            </div>
+            <Button
+                variant={"outline"}
+                className="text-light"
+                onClick={handleAddQuestions}
+            >
+                + Add Questions and answers
+            </Button>
+        </div>
+    );
+}
 const CreateDetailsPreview = () => {
 
     const data = ["About", "FAQ", "Updates", "Donations"];
     const { campaign, user } = usePage().props
     const [images, setImages] = useState({thumbnail: null, logo: null})
+
     const handleBack = () => {
-          router.get('/campaigns/create/createPreview');
+          router.get(`/campaigns/create/createPreview/${campaign.id}`);
     };
-
-
 
     const contentDivider = (data) => {
         if (data === "About") {
@@ -332,10 +450,8 @@ const CreateDetailsPreview = () => {
             return (
                 // has a dropdown box
                 <div className="flex flex-col gap-8 px-8 py-4 text-center h-[500px]">
-                    <p>{data}</p>
-                    {/* <Accordion>
-                        <AccordionContent>Test</AccordionContent>
-                    </Accordion> */}
+                    <FaqBuilder campaign={campaign} />
+
                 </div>
             );
         } else if (data === "Updates") {

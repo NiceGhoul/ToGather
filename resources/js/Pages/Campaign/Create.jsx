@@ -145,7 +145,7 @@ const handleClick = () => {
 }
 
 const handleEditCancel = () => {
-    router.get(`/campaigns/create`)
+    router.get(`/campaigns/create/createPreview/${campaignData.id}`)
 }
 
 const handleSave = () => {
@@ -332,7 +332,7 @@ const handleSave = () => {
                                     className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg"
                                     onClick={handleEditCancel}
                                 >
-                                    go to preview →
+                                    go to media →
                                 </Button>
                             ) : (
                                 <></>

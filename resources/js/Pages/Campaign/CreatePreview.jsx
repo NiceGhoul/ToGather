@@ -9,14 +9,14 @@ import { Separator } from "@/Components/ui/separator";
 import Layout_User from "@/Layouts/Layout_User";
 import { router, usePage } from "@inertiajs/react";
 import { Map } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const PreviewLayout = ({ user, campaign, images }) => {
     return (
         <div className="flex container px-4 py-4 flex-row gap-16 justify-center items-center mx-auto scale-90 border-2 rounded-xl border-gray-300">
             <div className="flex flex-col w-[600px] h-[400px]">
                 <div className="flex flex-row w-[600px] h-[400px] overflow-hidden border border-gray-800 rounded items-center">
-                    {images.thumbnail != null ? (
+                    {images.thumbnailPreview != null ? (
                         <img
                             src={images.thumbnailPreview}
                             at="thumbnail"
@@ -116,6 +116,24 @@ const CreatePreview = () => {
     const [openPopUp, setOpenPopUp] = useState(false)
     const [popUpData, setPopupData] = useState({ title:"", description: "", confText: "", confColor:""})
 
+    useEffect(() => {
+    if (campaign?.images && campaign.images.length > 0) {
+        const thumb = campaign.images.find(img => img.path.includes("thumbnail"));
+        const logo = campaign.images.find(img => img.path.includes("logo"));
+        console.log("im running here")
+        setImages(prev => ({
+            ...prev,
+            thumbnailPreview: thumb ? thumb.url : null,
+            logoPreview: logo ? logo.url : null,
+        }));
+
+    }
+}, [campaign]);
+
+useEffect(() => {
+console.log(images)
+},[images])
+
     const handleImageChange = (e, type) => {
         const file = e.target.files[0];
         if (file) {
@@ -188,6 +206,11 @@ const CreatePreview = () => {
         router.get(`/campaigns/create/${campaign.id}`)
     }
 
+    const handleToPreview = () => {
+        router.get(`/campaigns/create`)
+    }
+
+    console.log(campaign)
     return (
         <Layout_User>
             <div>
@@ -209,6 +232,15 @@ const CreatePreview = () => {
                                 show what your campaign details would looked
                                 like.
                             </CardDescription>
+                        </div>
+                        <div className="justify-center items-center">
+                        <Button
+                            className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
+                            onClick={() => handleToPreview()}
+                        >
+                            Go to preview →
+                        </Button>
+
                         </div>
                     </CardHeader>
                     <CardContent>

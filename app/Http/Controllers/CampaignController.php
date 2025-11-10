@@ -91,12 +91,10 @@ class CampaignController extends Controller
 
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
-            // if ($usersCampaign->contains(fn($c) => $c->status->value === 'pending')) {
             if ($usersCampaign) {
                 if ($usersCampaign->status->value === 'pending') {
                     return inertia('Campaign/CampaignPending');
                     // If user already has a campaign with the status draft
-                    // } else if ($usersCampaign->contains(fn($c) => $c->status->value === 'draft')) {
                 } else if ($usersCampaign->status->value === 'draft') {
 
                     if ($usersCampaign->images->isNotEmpty()) {
@@ -245,6 +243,18 @@ class CampaignController extends Controller
         ]);
     }
 
+    public function getCreateSupportingMediaData($id)
+    {
+         $user = auth()->user();
+         $content = Campaign::with('images')->findOrFail($id);
+        //  dd($content);
+        return inertia::render('Campaign/CreatePreview', [
+            'campaign' => $content,
+            'user' => $user,
+        ]);
+    }
+
+
     public function getDetailsPreview(Request $request)
     {
          $user = auth()->user();
@@ -287,6 +297,7 @@ class CampaignController extends Controller
 
     public function uploadSupportingMedia(Request $request)
     {
+        $user = auth()->user();
         $request->validate([
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
             'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
@@ -319,6 +330,7 @@ class CampaignController extends Controller
 
         return Inertia::render('Campaign/CreateDetailsPreview', [
             'campaign' => Campaign::with('images')->findOrFail($request->campaign_id),
+            'user' => $user,
         ]);
 
     }
