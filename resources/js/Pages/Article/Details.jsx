@@ -1,12 +1,19 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { Heart, ArrowLeft } from "lucide-react";
+import Layout_Guest from "@/Layouts/Layout_Guest";
 
 export default function Details() {
-    const { article } = usePage().props;
+    const { article, auth } = usePage().props;
+    const [isLogin, setIsLogin] = useState(false)
+
+    // 🟣 Check authentication status
+    useEffect(() => {
+        setIsLogin(!!auth?.user);
+    }, [auth]);
 
     // ---------- LIKE ----------
     const [liked, setLiked] = useState(article.is_liked_by_user ?? false);
@@ -42,8 +49,11 @@ export default function Details() {
         return a.order_y - b.order_y;
     });
 
+    // 🟣 Dynamic Layout based on authentication
+    const Layout = isLogin ? Layout_User : Layout_Guest;
+
     return (
-        <Layout_User>
+        <Layout>
             <div className="w-full flex flex-col items-center py-10">
                 {/* HEADER */}
                 <div className="w-full max-w-4xl flex items-center justify-start mb-6">
@@ -161,9 +171,8 @@ export default function Details() {
                                                                 src={
                                                                     block.image_url
                                                                 }
-                                                                alt={`Block ${
-                                                                    index + 1
-                                                                }`}
+                                                                alt={`Block ${index + 1
+                                                                    }`}
                                                                 className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform cursor-pointer"
                                                                 onClick={() => {
                                                                     setModalImage(
@@ -213,6 +222,6 @@ export default function Details() {
                     </button>
                 </div>
             )}
-        </Layout_User>
+        </Layout>
     );
 }

@@ -106,7 +106,7 @@ class CampaignController extends Controller
                         ]);
                     } else {
                         return inertia::render('Campaign/CreatePreview', [
-                            'campaign' => $usersCampaign->first(),
+                            'campaign' => $usersCampaign,
                             'user' => $user,
                         ]);
                     }

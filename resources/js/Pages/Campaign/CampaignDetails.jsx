@@ -8,10 +8,12 @@ import { Toggle } from "@/Components/ui/toggle";
 import Layout_User from "@/Layouts/Layout_User";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inertia } from "@inertiajs/inertia";
-import { usePage } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
+
+
 
 const scrollDonations = (data, idx) => {
     // maybe set the donation by the date
@@ -74,7 +76,7 @@ const contentDivider = (data, campaign) => {
                                 />
                             </CarouselItem>
                         </CarouselContent>
-                        <CarouselNext/>
+                        <CarouselNext />
                         <CarouselPrevious />
                     </Carousel>
                 </div>
@@ -141,7 +143,7 @@ export default function Create() {
     );
 
     const handleDonation = () => {
-        
+
     }
 
     const handleLikes = (id) => {

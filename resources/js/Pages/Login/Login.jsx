@@ -7,6 +7,15 @@ import {
     CardContent,
     CardFooter,
 } from "@/components/ui/card";
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import Layout_L from "../../Layouts/Layout_Login";
 import { Link, useForm } from "@inertiajs/react";
@@ -20,6 +29,7 @@ export default function Login() {
     const [clientErrors, setClientErrors] = React.useState({});
     const [touched, setTouched] = React.useState({});
     const [backendError, setBackendError] = React.useState("");
+    const [showBannedAlert, setShowBannedAlert] = React.useState(false);
     const emailRef = React.useRef(null);
     const passwordRef = React.useRef(null);
     const [isSubmitLoading, setIsSubmitLoading] = useState(false);
@@ -71,11 +81,16 @@ export default function Login() {
             preserveScroll: true,
             replace: true,
             onError: (err) => {
-                // Simpan error backend ke state agar bisa dikontrol
-                if (err.email && !err.password) {
+                // Check if account is banned
+                if (err.banned) {
+                    setShowBannedAlert(true);
+                    setBackendError("");
+                } else if (err.email && !err.password) {
                     setBackendError(err.email);
+                    setShowBannedAlert(false);
                 } else {
                     setBackendError("");
+                    setShowBannedAlert(false);
                 }
                 setIsSubmitLoading(false)
             },
@@ -86,6 +101,41 @@ export default function Login() {
 
     return (
         <Layout_L>
+            {/* Banned Account Alert Dialog */}
+            <AlertDialog open={showBannedAlert} onOpenChange={setShowBannedAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            <svg
+                                className="w-6 h-6 text-red-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                />
+                            </svg>
+                            Account Banned
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {errors.banned || 'Your account has been banned. Please contact support for more information.'}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction
+                            onClick={() => setShowBannedAlert(false)}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Close
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <Card className="bg-[#BCA3CA]">
                 <CardHeader className="mt-5">
                     <CardTitle className="text-2xl mx-auto">Login</CardTitle>

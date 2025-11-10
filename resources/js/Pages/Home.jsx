@@ -199,6 +199,12 @@ export default function Home() {
                         >
                             <Link href="/articles/list">Browse Articles</Link>
                         </Button>
+                        <Button
+                            asChild
+                            className="bg-white text-purple-700 hover:bg-purple-100 font-semibold px-6 py-2"
+                        >
+                            <Link href="/donate">Donate Now</Link>
+                        </Button>
                     </div>
                 </div>
             </section>

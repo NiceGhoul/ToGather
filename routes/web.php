@@ -69,33 +69,32 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
-    Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
     Route::get('/minio/{path}', [ArticleController::class, 'serveImage'])->where('path', '.*')->name('minio.serve');
     Route::post('/articles/{id}/like', [ArticleController::class, 'toggleLike'])->name('articles.toggleLike');
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
     Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
     Route::post('/upload-image', [ImageController::class, 'upload'])->name('image.upload');
-
+    
     // MinIO file uploads
     Route::post('/api/upload-image', [ImageController::class, 'uploadImage'])->name('api.upload.image');
     Route::post('/api/upload-document', [FileController::class, 'uploadDocument'])->name('api.upload.document');
     Route::delete('/api/delete-file', [FileController::class, 'deleteFile'])->name('api.delete.file');
-
-
+    
+    
     Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
-
+    
     // Donations
     Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
     Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
     Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
-
+    
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -104,7 +103,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/campaigns-details', [ProfileController::class, 'campaignsDetails']);
     Route::get('/profile/raised-details', [ProfileController::class, 'raisedDetails']);
     Route::get('/profile/articles-details', [ProfileController::class, 'articlesDetails']);
-
+    
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -118,6 +117,7 @@ Route::get('/api/get-video', [FileController::class, 'getVideo'])->name('api.get
 // Midtrans webhook
 Route::post('/midtrans/callback', [DonationController::class, 'midtransCallback'])->name('midtrans.callback');
 
+Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
 
 // --- Admin Routes ---
 // Must be logged in AND have the 'admin' role.
@@ -128,6 +128,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/users/{user}/block', [UserController::class, 'block'])->name('admin.users.block');
     Route::post('/users/{user}/unblock', [UserController::class, 'unblock'])->name('admin.users.unblock');
     Route::get('/users/verification', [VerificationRequestController::class, 'index'])->name('verification.index');
+    Route::post('/users/bulkBan', [UserController::class, 'bulkBan']);
+    Route::post('/users/bulkUnban', [UserController::class, 'bulkUnban']);
 
     Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
     Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');
