@@ -92,25 +92,26 @@ class CampaignController extends Controller
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
             // if ($usersCampaign->contains(fn($c) => $c->status->value === 'pending')) {
-            if ($usersCampaign->status->value === 'pending') {
-                return inertia('Campaign/CampaignPending');
-            // If user already has a campaign with the status draft
-            // } else if ($usersCampaign->contains(fn($c) => $c->status->value === 'draft')) {
-            } else if ($usersCampaign->status->value === 'draft') {
+            if ($usersCampaign) {
+                if ($usersCampaign->status->value === 'pending') {
+                    return inertia('Campaign/CampaignPending');
+                    // If user already has a campaign with the status draft
+                    // } else if ($usersCampaign->contains(fn($c) => $c->status->value === 'draft')) {
+                } else if ($usersCampaign->status->value === 'draft') {
 
-                if ($usersCampaign->images->isNotEmpty()) {
-                    return Inertia::render('Campaign/CreateDetailsPreview', [
-                        'campaign' => $usersCampaign,
-                        'user' => $user,
-                    ]);
-                } else {
-                    return inertia::render('Campaign/CreatePreview', [
-                        'campaign' => $usersCampaign->first(),
-                        'user' => $user,
-                    ]);
+                    if ($usersCampaign->images->isNotEmpty()) {
+                        return Inertia::render('Campaign/CreateDetailsPreview', [
+                            'campaign' => $usersCampaign,
+                            'user' => $user,
+                        ]);
+                    } else {
+                        return inertia::render('Campaign/CreatePreview', [
+                            'campaign' => $usersCampaign->first(),
+                            'user' => $user,
+                        ]);
+                    }
                 }
-            }
-            else {
+            } else {
                 return inertia::render('Campaign/Create', [
                     'user_Id' => Auth::user()->id,
                 ]);
