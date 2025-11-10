@@ -656,31 +656,19 @@ class ArticleController extends Controller
         $category = $request->query('category');
         $status = $request->query('status');
         $search = $request->query('search');
-        if ($status === 'rejected') {
-            $articles = Article::with(['user', 'thumbnailImage'])
-                ->whereIn('status', ['rejected',])
-                ->when($category, fn($q) => $q->where('category', $category))
-                ->when($status, fn($q) => $q->where('status', $status))
-                ->when(
-                    $search,
-                    fn($q) =>
-                    $q->where('title', 'like', "%{$search}%")
-                )
-                ->orderByDesc('created_at')
-                ->get();
-        } else {
-            $articles = Article::with(['user', 'thumbnailImage'])
-                ->whereIn('status', ['approved', 'disabled'])
-                ->when($category, fn($q) => $q->where('category', $category))
-                ->when($status, fn($q) => $q->where('status', $status))
-                ->when(
-                    $search,
-                    fn($q) =>
-                    $q->where('title', 'like', "%{$search}%")
-                )
-                ->orderByDesc('created_at')
-                ->get();
-        }
+
+        $articles = Article::with(['user', 'thumbnailImage'])
+            ->whereIn('status', ['approved', 'disabled', 'rejected'])
+            ->when($category, fn($q) => $q->where('category', $category))
+            ->when($status, fn($q) => $q->where('status', $status))
+            ->when(
+                $search,
+                fn($q) =>
+                $q->where('title', 'like', "%{$search}%")
+            )
+            ->orderByDesc('created_at')
+            ->get();
+
 
 
 

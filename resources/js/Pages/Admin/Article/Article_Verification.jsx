@@ -3,7 +3,7 @@ import Layout_Admin from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
 import Popup from "@/Components/Popup";
 import { useState, useEffect } from "react";
-import { File, Check, X } from "lucide-react";
+import { File, CheckCircle, XCircle } from "lucide-react";
 
 export default function ArticleRequestList() {
     const { articles } = usePage().props;
@@ -144,6 +144,7 @@ export default function ArticleRequestList() {
                 title={successPopupMessage}
                 description=""
                 confirmText="OK"
+                confirmColor={"bg-purple-800 hover:bg-purple-700 text-white"}
                 open={successPopupOpen}
                 onConfirm={handleSuccessClose}
                 onClose={handleSuccessClose}
@@ -155,13 +156,15 @@ export default function ArticleRequestList() {
                     Pending Article Requests
                 </h1>
 
-                <div className="mb-4 flex items-center gap-3">
-                    <div className="text-sm">{selectedIds.length} selected</div>
+                <div className="mb-4 flex items-center gap-3 flex-row justify-end">
+                    <div className="text-sm mr-auto">
+                        {selectedIds.length} selected
+                    </div>
 
                     <Popup
                         triggerText={
                             <div className="flex items-center gap-2 cursor-pointer">
-                                <Check className="w-4 h-4" />
+                                <CheckCircle className="w-4 h-4 text-green-700" />
                                 <span>Approve Selected</span>
                             </div>
                         }
@@ -169,19 +172,19 @@ export default function ArticleRequestList() {
                         description="This will approve all selected articles."
                         confirmText="Yes, Approve"
                         confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                        triggerClass="bg-green-600 hover:bg-green-700 text-white"
+                        triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                         disabledValue={selectedIds.length === 0}
                         onConfirm={() => handleBulkApprove()}
                     />
 
                     {/* BUKAN kirim langsung — buka modal alasan dulu */}
                     <Button
-                        className="bg-red-600 hover:bg-red-700 text-white"
+                        className="bg-red-200 hover:bg-red-300 text-red-700"
                         disabled={selectedIds.length === 0}
                         onClick={() => setBulkRejectModalOpen(true)}
                     >
                         <div className="flex items-center gap-2">
-                            <X className="w-4 h-4" />
+                            <XCircle className="w-4 h-4" />
                             <span>Reject Selected</span>
                         </div>
                     </Button>
@@ -202,6 +205,7 @@ export default function ArticleRequestList() {
                                     }
                                 />
                             </th>
+                            <th className="border px-4 py-2">Id</th>
                             <th className="border px-4 py-2">Title</th>
                             <th className="border px-4 py-2">Author</th>
                             <th className="border px-4 py-2">Category</th>
@@ -219,6 +223,9 @@ export default function ArticleRequestList() {
                                             checked={selectedIds.includes(a.id)}
                                             onChange={() => handleToggle(a.id)}
                                         />
+                                    </td>
+                                    <td className="border px-4 py-2 font-medium text-black">
+                                        {a.id}
                                     </td>
                                     <td className="border px-4 py-2 font-medium text-black">
                                         {a.title}
@@ -242,18 +249,18 @@ export default function ArticleRequestList() {
                                                         `/admin/articles/${a.id}/view?from=verification`
                                                     )
                                                 }
-                                                className="bg-purple-800 hover:bg-purple-700"
+                                                className="bg-purple-200 hover:bg-purple-300 text-purple-700"
                                             >
                                                 <File />
                                             </Button>
 
                                             <Popup
-                                                triggerText={<Check />}
+                                                triggerText={<CheckCircle />}
                                                 title="Approve Article?"
                                                 description="This action cannot be undone. The article will be approved and be shown on public"
                                                 confirmText="Yes, Approve"
                                                 confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                                triggerClass="bg-green-600 hover:bg-green-700 text-white"
+                                                triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                                                 onConfirm={() =>
                                                     handleApprove(a.id)
                                                 }
@@ -261,13 +268,13 @@ export default function ArticleRequestList() {
 
                                             {/* Per-item Reject: buka modal alasan */}
                                             <Button
-                                                className="bg-red-600 hover:bg-red-700 text-white"
+                                                className="bg-red-200 hover:bg-red-300 text-red-700"
                                                 onClick={() => {
                                                     setTargetRejectId(a.id);
                                                     setRejectModalOpen(true);
                                                 }}
                                             >
-                                                <X />
+                                                <XCircle />
                                             </Button>
                                         </div>
                                     </td>

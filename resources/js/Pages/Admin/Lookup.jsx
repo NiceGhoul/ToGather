@@ -94,6 +94,7 @@ export default function Lookup() {
                         variant="default"
                         size="sm"
                         onClick={() => handleAdd()}
+                        className="bg-purple-800 hover:bg-purple-700 text-white"
                     >
                         + Add New Lookup
                     </Button>
@@ -133,8 +134,9 @@ export default function Lookup() {
                                         variant="outline"
                                         size="icon"
                                         onClick={() => handleEdit(lookup)}
+                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700"
                                     >
-                                        <Pencil className="w-4 h-4" />
+                                        <Pencil className="w-4 h-4 text-purple-700 hover:text-purple-700" />
                                     </Button>
 
                                     {/* Tombol Delete */}
@@ -146,7 +148,7 @@ export default function Lookup() {
                                         description="This action cannot be undone. The Lookup will be removed permanently."
                                         confirmText="Yes, Delete"
                                         confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                        triggerClass="bg-red-600 hover:bg-red-700 text-white"
+                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                                         onConfirm={() =>
                                             handleDelete(lookup.id)
                                         }
@@ -237,7 +239,11 @@ export default function Lookup() {
                                 >
                                     Cancel
                                 </Button>
-                                <Button type="submit" variant="default">
+                                <Button
+                                    type="submit"
+                                    variant="default"
+                                    className="bg-purple-800 hover:bg-purple-700 text-white"
+                                >
                                     Save
                                 </Button>
                             </div>

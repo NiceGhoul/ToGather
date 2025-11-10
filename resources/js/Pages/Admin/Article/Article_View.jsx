@@ -516,6 +516,7 @@ export default function ArticleView() {
                     title={successPopupMessage}
                     description=""
                     confirmText="OK"
+                    confirmColor={"bg-purple-800 hover:bg-purple-700"}
                     open={successPopupOpen}
                     onConfirm={() => {
                         setSuccessPopupOpen(false);
@@ -551,6 +552,7 @@ export default function ArticleView() {
                                     setEditingMode(true);
                                 }
                             }}
+                            className="bg-purple-800 hover:bg-purple-700 text-white"
                         >
                             {!editingMode && (
                                 <div className="flex items-center gap-2 cursor-pointer text-xs">
@@ -570,7 +572,7 @@ export default function ArticleView() {
                             <>
                                 <Button
                                     onClick={saveAllChanges}
-                                    className="bg-green-600"
+                                    className="bg-green-600 hover:bg-green-500"
                                 >
                                     <div className="flex items-center gap-2 cursor-pointer text-xs">
                                         <Save className="w-4 h-4" />
@@ -579,7 +581,7 @@ export default function ArticleView() {
                                 </Button>
                                 <Button
                                     onClick={cancelAll}
-                                    className="bg-gray-400 hover:bg-red-600 text-white"
+                                    className="bg-red-600 hover:bg-red-500 text-white"
                                 >
                                     <div className="flex items-center gap-2 cursor-pointer text-xs">
                                         <Ban className="w-4 h-4" />
@@ -587,7 +589,10 @@ export default function ArticleView() {
                                     </div>
                                 </Button>
                                 {/* grid controls */}
-                                <Button onClick={addRow}>
+                                <Button
+                                    onClick={addRow}
+                                    className="bg-purple-800 hover:bg-purple-700 text-white"
+                                >
                                     <div className="flex items-center gap-2 cursor-pointer text-xs">
                                         <Rows2 className="w-4 h-4" />
                                         <span>Add Row</span>
@@ -596,6 +601,7 @@ export default function ArticleView() {
                                 <Button
                                     onClick={addColumn}
                                     disabled={maxX >= 2}
+                                    className="bg-purple-800 hover:bg-purple-700 text-white"
                                 >
                                     <div className="flex items-center gap-2 cursor-pointer text-xs">
                                         <Columns2 className="w-4 h-4" />
@@ -989,6 +995,7 @@ export default function ArticleView() {
                 title="Unsaved Changes"
                 description="You have unsaved changes. Are you sure you want to leave edit mode? Your changes will be lost."
                 confirmText="OK"
+                confirmColor={"bg-purple-800 hover:bg-purple-700 text-white"}
                 open={unsavedPopupOpen}
                 onConfirm={() => {
                     setUnsavedPopupOpen(false);

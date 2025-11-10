@@ -24,17 +24,24 @@ class UserController extends Controller
             ->when($request->input('status'), function ($query, $status) {
                 return $query->where('status', 'like', $status);
             })
+            ->when($request->input('search'), function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('nickname', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
             ->get();
 
         return Inertia::render('Admin/User/User_List', [
             'users' => $users,
-            'filters' => $request->only(['status'])
+            'filters' => $request->only(['status', 'search']),
         ]);
     }
+
     public function block(User $user)
     {
         $user->update(['status' => 'banned']);
-        
+
         // Notify user about ban
         NotificationController::notifyUser(
             $user->id,
@@ -43,14 +50,14 @@ class UserController extends Controller
             'Your account has been banned. You cannot create new articles or campaigns. Please contact support for more information.',
             ['user_id' => $user->id]
         );
-        
+
         return back()->with('success', 'User has been banned.');
     }
 
     public function unblock(User $user)
     {
         $user->update(['status' => 'active']);
-        
+
         // Notify user about unban
         NotificationController::notifyUser(
             $user->id,
@@ -59,7 +66,7 @@ class UserController extends Controller
             'Your account has been restored. You can now create articles and campaigns again.',
             ['user_id' => $user->id]
         );
-        
+
         return back()->with('success', 'User has been unblocked.');
     }
 
@@ -127,7 +134,9 @@ class UserController extends Controller
         return redirect('/');
     }
 
-    public function destroy(User $campaign) {}
+    public function destroy(User $campaign)
+    {
+    }
 
 
     public function login(Request $request)
@@ -173,7 +182,7 @@ class UserController extends Controller
         ]);
 
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        
+
         // Store OTP in session
         session([
             'otp_' . $request->email => $otp,
@@ -183,7 +192,7 @@ class UserController extends Controller
         // Send OTP via email
         Mail::raw("Your OTP code is: {$otp}\n\nThis code will expire in 5 minutes.", function ($message) use ($request) {
             $message->to($request->email)
-                    ->subject('Your OTP Code - ToGather');
+                ->subject('Your OTP Code - ToGather');
         });
 
         return response()->json([
@@ -215,6 +224,53 @@ class UserController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+
+    // 🟥 Ban Selected Users
+    public function bulkBan(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('error', 'No users selected.');
+        }
+
+        User::whereIn('id', $ids)->update(['status' => 'banned']);
+
+        // Optional: kirim notifikasi
+        foreach ($ids as $id) {
+            NotificationController::notifyUser(
+                $id,
+                'account_banned',
+                'Account Banned',
+                'Your account has been banned as part of an admin action.'
+            );
+        }
+
+        return back()->with('success', 'Selected users have been banned.');
+    }
+
+    // 🟩 Unban Selected Users
+    public function bulkUnban(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return back()->with('error', 'No users selected.');
+        }
+
+        User::whereIn('id', $ids)->update(['status' => 'active']);
+
+        foreach ($ids as $id) {
+            NotificationController::notifyUser(
+                $id,
+                'account_unbanned',
+                'Account Restored',
+                'Your account has been restored. You can now use all features again.'
+            );
+        }
+
+        return back()->with('success', 'Selected users have been unbanned.');
+    }
+
 
     public function logout(Request $request)
     {
