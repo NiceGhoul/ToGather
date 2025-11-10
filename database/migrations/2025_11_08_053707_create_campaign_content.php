@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('campaign_content', function (Blueprint $table) {
            $table->id();
             $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
+            $table->text('tabs')->nullable();
             $table->enum('type', ['paragraph', 'media']);
             $table->longText('content')->nullable();
             $table->integer('order_y')->default(1);

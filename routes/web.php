@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
     // campaigns routing
     Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
     Route::get('/campaigns/create/{id}', [CampaignController::class, 'editCampaign'])->name('campaigns.edit');
-    Route::get('/campaigns/create/createPreview', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.createPreview');
+    Route::get('/campaigns/create/createPreview/{id}', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.createPreview');
     Route::get('/campaigns/create/detailsPreview', [CampaignController::class, 'getDetailsPreview'])->name('campaigns.detailsPreview');
     Route::get('/campaigns/likedCampaign', [CampaignController::class, 'showLiked'])->name('campaigns.liked');
     Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
@@ -72,29 +72,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
     Route::get('/minio/{path}', [ArticleController::class, 'serveImage'])->where('path', '.*')->name('minio.serve');
     Route::post('/articles/{id}/like', [ArticleController::class, 'toggleLike'])->name('articles.toggleLike');
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
     Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
     Route::post('/upload-image', [ImageController::class, 'upload'])->name('image.upload');
-    
+
     // MinIO file uploads
     Route::post('/api/upload-image', [ImageController::class, 'uploadImage'])->name('api.upload.image');
     Route::post('/api/upload-document', [FileController::class, 'uploadDocument'])->name('api.upload.document');
     Route::delete('/api/delete-file', [FileController::class, 'deleteFile'])->name('api.delete.file');
-    
-    
+
+
     Route::post('/users/{user}/verify', [VerificationRequestController::class, 'verifyUser'])->name('verify.user');
-    
+
     // Donations
     Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
     Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
     Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
-    
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -103,7 +103,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/campaigns-details', [ProfileController::class, 'campaignsDetails']);
     Route::get('/profile/raised-details', [ProfileController::class, 'raisedDetails']);
     Route::get('/profile/articles-details', [ProfileController::class, 'articlesDetails']);
-    
+
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
