@@ -1,7 +1,7 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bell } from "lucide-react";
+import { Bell, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 export default function Navbar_User() {
     const [open, setOpen] = useState(false);
@@ -73,7 +74,8 @@ export default function Navbar_User() {
     return (
         <header>
             <nav className="flex justify-between items-center px-6 py-4">
-                <div className="flex gap-4">
+                <div className="flex gap-4 items-center">
+                    {/* HOME */}
                     <Link
                         href="/home"
                         className={`px-3 py-2 rounded-md transition-all duration-200 ${
@@ -82,30 +84,110 @@ export default function Navbar_User() {
                                 : "hover:bg-white/10 text-white font-semibold"
                         }`}
                     >
-                        Home for User
+                        Home
                     </Link>
 
-                    <Link
-                        href="/campaigns/list"
-                        className={`px-3 py-2 rounded-md transition-all duration-200 ${
-                            isActive("/campaigns")
-                                ? "bg-white/20  text-white font-semibold"
-                                : "hover:bg-white/10 text-white font-semibold"
-                        }`}
-                    >
-                        Campaign
-                    </Link>
+                    <div className="flex items-center gap-4">
+                        {/* 🟣 CAMPAIGN DROPDOWN */}
+                        <div className="relative group">
+                            <button
+                                type="button"
+                                className={`flex items-center px-3 py-2 rounded-md leading-none transition-all duration-200 text-white font-semibold
+                                            ${
+                                                isActive("/campaigns")
+                                                    ? "bg-white/20"
+                                                    : "hover:bg-white/10"
+                                            }`}
+                            >
+                                Campaign
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                            </button>
 
-                    <Link
-                        href="/articles/list"
-                        className={`px-3 py-2 rounded-md transition-all duration-200 ${
-                            isActive("/articles")
-                                ? "bg-white/20 text-white font-semibold"
-                                : "hover:bg-white/10 text-white font-semibold"
-                        }`}
-                    >
-                        Article
-                    </Link>
+                            <div
+                                className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white
+                                         text-gray-900 shadow-lg py-2 px-2 z-50
+                                           opacity-0 translate-y-1 pointer-events-none
+                                           group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+                                           transition-all duration-150"
+                            >
+                                <Link
+                                    href="/campaigns/list"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                >
+                                    Browse Campaigns
+                                </Link>
+                                <Link
+                                    href="/campaigns/myCampaigns"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                >
+                                    My Campaigns
+                                </Link>
+                                <Link
+                                    href="#"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                >
+                                    Liked Campaigns
+                                </Link>
+                                <div className="border-t my-2" />
+                                <Link
+                                    href="/campaigns/create"
+                                    className="block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100"
+                                >
+                                    Start a Campaign
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* 🟣 ARTICLE DROPDOWN */}
+                        <div className="relative group">
+                            <button
+                                type="button"
+                                className={`flex items-center px-3 py-2 rounded-md leading-none transition-all duration-200 text-white font-semibold
+                                            ${
+                                                isActive("/articles")
+                                                    ? "bg-white/20"
+                                                    : "hover:bg-white/10"
+                                            }`}
+                            >
+                                Article
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                            </button>
+
+                            <div
+                                className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white
+                                         text-gray-900 shadow-lg py-2 px-2 z-50
+                                           opacity-0 translate-y-1 pointer-events-none
+                                           group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+                                           transition-all duration-150"
+                            >
+                                <Link
+                                    href="/articles/list"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                >
+                                    Browse Articles
+                                </Link>
+                                <Link
+                                    href="/articles/myArticles"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                >
+                                    My Articles
+                                </Link>
+                                <Link
+                                    href="#"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                >
+                                    Liked Articles
+                                </Link>
+                                <div className="border-t my-2" />
+                                <Link
+                                    href="/articles/create"
+                                    className="block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100"
+                                >
+                                    Write an Article
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="relative flex items-center gap-4">
@@ -150,23 +232,27 @@ export default function Navbar_User() {
                                         No notifications
                                     </DropdownMenuItem>
                                 ) : (
-                                    notifications.map((notification) => (
-                                        <DropdownMenuItem
-                                            key={notification.id}
-                                            className="flex-col items-start p-3"
-                                        >
-                                            <div className="font-medium">
-                                                {notification.title}
-                                            </div>
-                                            <div className="text-sm text-muted-foreground">
-                                                {notification.message}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                                {new Date(
-                                                    notification.created_at
-                                                ).toLocaleDateString()}
-                                            </div>
-                                        </DropdownMenuItem>
+                                    notifications.map((notification, index) => (
+                                        <div key={notification.id}>
+                                            <DropdownMenuItem
+                                                className="flex-col items-start p-3"
+                                            >
+                                                <div className="font-medium">
+                                                    {notification.title}
+                                                </div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {notification.message}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    {new Date(
+                                                        notification.created_at
+                                                    ).toLocaleDateString()}
+                                                </div>
+                                            </DropdownMenuItem>
+                                            {index < notifications.length - 1 && (
+                                                <Separator />
+                                            )}
+                                        </div>
                                     ))
                                 )}
                             </ScrollArea>
@@ -187,35 +273,8 @@ export default function Navbar_User() {
                             </Avatar>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                                 <Link href="/profile">Profile</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem disabled>
-                                My Campaign
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Link href="/articles/myArticles">
-                                    My Articles
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Link href="/articles/likedArticles">Liked Article</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Link href="/campaigns/likedCampaign">Liked Campaign</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/campaigns/create">
-                                    Create Campaign
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href="/articles/create">
-                                    Create Article
-                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={handleLogout}>

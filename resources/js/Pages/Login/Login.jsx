@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import {
     Card,
     CardHeader,
@@ -7,6 +7,7 @@ import {
     CardContent,
     CardFooter,
 } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import Layout_L from "../../Layouts/Layout_Login";
 import { Link, useForm } from "@inertiajs/react";
 
@@ -21,6 +22,7 @@ export default function Login() {
     const [backendError, setBackendError] = React.useState("");
     const emailRef = React.useRef(null);
     const passwordRef = React.useRef(null);
+    const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,6 +53,7 @@ export default function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitLoading(true);
         setTouched({ email: true, password: true });
         const validationErrors = validate();
         if (Object.keys(validationErrors).length > 0) {
@@ -74,7 +77,10 @@ export default function Login() {
                 } else {
                     setBackendError("");
                 }
+                setIsSubmitLoading(false)
             },
+            onFinish: () => setIsSubmitLoading(false),
+
         });
     };
 
@@ -152,9 +158,10 @@ export default function Login() {
                                 )}
                             <button
                                 type="submit"
-                                className="register-btn mt-4"
-                                disabled={processing}
+                                className="register-btn disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                                disabled={isSubmitLoading}
                             >
+                                {isSubmitLoading && <Spinner className="w-4 h-4" />}
                                 Submit
                             </button>
                             {/* Error dari backend (email/password missmatch) hanya di bawah tombol submit */}
