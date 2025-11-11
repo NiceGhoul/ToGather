@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Inertia\Inertia;
 use App\Http\Controllers\NotificationController;
+use App\Models\CampaignContent;
 use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
 
@@ -334,6 +335,41 @@ class CampaignController extends Controller
         ]);
 
     }
+
+    public function saveUpdates(Request $request)
+    {
+        $user = Auth()->user();
+
+        CampaignContent::create([
+            'campaign_id' => $request->campaign_id,
+            'tabs' => $request->tabs,
+            'type' => $request->media['type'],
+            'content' => $request->input('content'),
+        ]);
+
+        $campaign = Campaign::with('images', 'campaign_content')->where('campaign_id', $request->campaign_id);
+
+        return inertia::render('Campaign/CreateDetailsPreview', [
+            'campaign' => $campaign,
+            'user' => $user,
+        ]);
+    }
+
+    public function insertCampaignContent(Request $request){
+        $user = Auth()->user();
+
+        if($request){
+            CampaignContent::create([$request]);
+        }
+
+        $campaign = Campaign::with('images', 'campaign_content')->where('campaign_id', $request->campaign_id);
+
+        return inertia::render('Campaign/CreateDetailsPreview', [
+            'campaign' => $campaign,
+            'user' => $user,
+        ]);
+    }
+
 
     public function showMyCampaigns(Request $request)
     {

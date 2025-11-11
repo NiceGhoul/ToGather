@@ -57,6 +57,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/campaigns/upload-image', [CampaignController::class, 'uploadSupportingMedia'])->name('campaigns.uploadImages');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
     Route::post('/campaigns/toggleLike', [CampaignController::class, 'ToggleLike'])->name('campaigns.toggleLikes');
+    Route::post('/campaigns/insertContent', [CampaignController::class, 'insertCampaignContent'])->name('campaigns.insertContent');
+
 
 
     //articles routing
