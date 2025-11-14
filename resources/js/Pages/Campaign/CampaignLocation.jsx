@@ -18,7 +18,7 @@ import { Label } from "@/Components/ui/label";
 
 const CampaignLocation = ({ open, setCampaignLocation, onClose, locationData }) => {
     const [address, setAddress] = useState("");
-    const [coords, setCoords] = useState({ lat:-6.1542303, lng: 106.809447986802});
+    const [coords, setCoords] = useState({ lat:-6.200284252332842, lng: 106.78547062682863});
 
     useEffect(() => {
         if(locationData != null){

@@ -76,6 +76,7 @@ const DatePicker = ({open, date, setOpen, setDate}) => {
 }
 
 useEffect(() => {
+    console.log(campaign, location)
     if(campaign){
         setCampaignData(campaign)
     }
@@ -320,7 +321,7 @@ const handleSave = () => {
 
                         <Button
                             className="w-28 h-8 text-sm ml-36"
-                            onClick={handleClick}
+                            onClick={handleSave}
                             >
                             {campaign != undefined ? "update" : "next"}
                         </Button>

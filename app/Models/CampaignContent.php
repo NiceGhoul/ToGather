@@ -11,11 +11,18 @@ class CampaignContent extends Model
 
      protected $fillable = [
         'campaign_id',
-        'tabs',
         'type',
         'content',
         'order_y',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($content) {
+            $content->images()->delete();
+            $content->videos()->delete();
+        });
+    }
 
     // campaign content belongs to campaign model
     public function campaign()
@@ -23,8 +30,12 @@ class CampaignContent extends Model
         return $this->belongsTo(Article::class);
     }
 
-   public function images()
-{
-    return $this->morphMany(Image::class, 'imageable');
-}
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+    public function videos()
+    {
+        return $this->morphMany(Video::class, 'videoable');
+    }
 }

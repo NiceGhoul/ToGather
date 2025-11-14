@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campaign_content', function (Blueprint $table) {
+        Schema::create('campaign_contents', function (Blueprint $table) {
            $table->id();
             $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
-            $table->text('tabs')->nullable();
-            $table->enum('type', ['paragraph', 'media']);
+            $table->enum('type', ['paragraph', 'media', 'updates', 'faqs']);
             $table->longText('content')->nullable();
             $table->integer('order_y')->default(1);
             $table->timestamps();
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campaign_content');
+        Schema::dropIfExists('campaign_contents');
     }
 };
