@@ -80,7 +80,8 @@ class ArticleController extends Controller
     }
 
 
-    public function showLiked(){
+    public function showLiked()
+    {
         $user = auth()->user();
         // $articles = Article::All();
         // $likes = $articles->likes()->where('user_id', $user->id())->where('likes_id', $articles->id())->get();
@@ -91,7 +92,7 @@ class ArticleController extends Controller
             if ($articles->thumbnailImage) {
                 $articles->thumbnail_url = $articles->thumbnailImage->url;
             }
-            if($articles->user->nickname){
+            if ($articles->user->nickname) {
                 $articles->nickname = $articles->user->nickname;
             }
             $articles->contents->transform(function ($content) {
@@ -601,6 +602,7 @@ class ArticleController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
         $wasRejected = $article->status === 'rejected';
+        $updateData = [];
 
         $validated = $request->validate([
             'contents' => 'required|array|min:1',
@@ -610,7 +612,7 @@ class ArticleController extends Controller
             'contents.*.order_y' => 'required|integer',
         ]);
 
-        DB::transaction(function () use ($request, $article, $wasRejected) {
+        DB::transaction(function () use ($request, $article, $wasRejected, $updateData) {
             $article->update(['status' => 'pending']);
             $article->contents()->delete();
             if ($wasRejected) {

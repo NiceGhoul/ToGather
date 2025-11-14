@@ -14,9 +14,13 @@ import { useState, useRef } from "react";
 import Popup from "@/Components/Popup";
 import { CaseSensitive, Image } from "lucide-react";
 
+// 🔥 QUILL VERSION
+import MiniEditor from "@/Components/MiniEditor";
+
 export default function Create() {
     const thumbInputRef = useRef(null);
     const { categories } = usePage().props;
+
     const { data, setData, processing } = useForm({
         title: "",
         category: "",
@@ -24,17 +28,25 @@ export default function Create() {
         contents: [],
     });
 
+    // =====================================================
+    //                 BLOCK STATE (1 column)
+    // =====================================================
     const [blocks, setBlocks] = useState([
         { type: "text", content: "", order_x: 1, order_y: 1 },
     ]);
 
+    // =====================================================
+    //                    POPUP STATES
+    // =====================================================
     const [showConfirm, setShowConfirm] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [showError, setShowError] = useState(false);
     const [showTitleError, setShowTitleError] = useState(false);
     const [showCategoryError, setShowCategoryError] = useState(false);
 
-    // 🟣 Thumbnail Preview
+    // =====================================================
+    //                     THUMBNAIL
+    // =====================================================
     const [thumbPreview, setThumbPreview] = useState(null);
     const handleThumbnailChange = (e) => {
         const file = e.target.files[0];
@@ -44,38 +56,44 @@ export default function Create() {
         }
     };
 
-    // 🟣 Grid Handlers
-    const removeBlock = (index) => {
-        const updated = [...blocks];
-        updated.splice(index, 1);
-        setBlocks(updated);
-    };
-
+    // =====================================================
+    //                     BLOCK LOGIC
+    // =====================================================
     const updateBlockContent = (index, newContent) => {
         const updated = [...blocks];
         updated[index].content = newContent;
         setBlocks(updated);
     };
 
+    // ALWAYS add block below
     const addBlockAt = (order_x, order_y, type) => {
-        if (blocks.some((b) => b.order_x === order_x && b.order_y === order_y))
-            return;
-        setBlocks([...blocks, { type, content: "", order_x, order_y }]);
+        const nextY = blocks.length + 1;
+        setBlocks([
+            ...blocks,
+            { type, content: "", order_x: 1, order_y: nextY },
+        ]);
     };
 
-    // 🟣 Image Change Handler
     const handleImageChange = (idx, e) => {
         const file = e.target.files[0];
         if (file) {
-            const updated = [...blocks];
-            updated[idx].content = file;
-            setBlocks(updated);
+            updateBlockContent(idx, file);
         }
     };
 
-    // 🟣 Submit
+    const removeBlock = (index) => {
+        if (index === 0) return; // first block always exist
+        const updated = [...blocks];
+        updated.splice(index, 1);
+        setBlocks(updated);
+    };
+
+    // =====================================================
+    //                      SUBMIT
+    // =====================================================
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!data.title.trim() && !data.category) {
             setShowError(true);
             return;
@@ -88,58 +106,61 @@ export default function Create() {
             setShowCategoryError(true);
             return;
         }
+
         setShowConfirm(true);
     };
 
     const confirmSubmit = () => {
-        // Prevent multiple submissions
         if (processing) return;
 
         setShowConfirm(false);
+
         const payload = { ...data, contents: blocks };
+
         router.post("/articles", payload, {
             forceFormData: true,
             onSuccess: () => {
                 setShowSuccess(true);
+
+                // reset
                 setData({
                     title: "",
                     category: "",
                     thumbnail: null,
                     contents: [],
                 });
+
                 setBlocks([
                     { type: "text", content: "", order_x: 1, order_y: 1 },
                 ]);
+
                 setThumbPreview(null);
                 if (thumbInputRef.current) thumbInputRef.current.value = null;
-            },
-            onError: (err) => {
-                console.error(err);
-                setShowConfirm(false);
-                alert("Failed Creating Article. Try Again");
             },
         });
     };
 
+    // =====================================================
+    //                     UI STARTS HERE
+    // =====================================================
     return (
         <Layout_User>
             <div className="container mx-auto px-4 py-8 space-y-8">
-                {/* LEFT: FORM */}
+                {/* FORM */}
                 <Card className="w-full my-5">
                     <CardHeader>
                         <CardTitle>Create New Article</CardTitle>
                         <CardDescription>
-                            Freely add and arrange content in the grid below for
-                            your article.
+                            Add content blocks vertically (1 column).
                         </CardDescription>
                     </CardHeader>
+
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* TITLE */}
                             <div>
-                                <Label htmlFor="title">Title</Label>
+                                <Label>Title</Label>
                                 <Input
-                                    id="title"
                                     value={data.title}
                                     onChange={(e) =>
                                         setData("title", e.target.value)
@@ -149,9 +170,8 @@ export default function Create() {
 
                             {/* CATEGORY */}
                             <div>
-                                <Label htmlFor="category">Category</Label>
+                                <Label>Category</Label>
                                 <select
-                                    id="category"
                                     className="border rounded px-3 py-2 w-full"
                                     value={data.category}
                                     onChange={(e) =>
@@ -169,195 +189,113 @@ export default function Create() {
 
                             {/* THUMBNAIL */}
                             <div>
-                                <Label htmlFor="thumbnail">
-                                    Thumbnail (auto-scaled)
-                                </Label>
+                                <Label>Thumbnail</Label>
                                 <Input
-                                    id="thumbnail"
                                     type="file"
                                     accept="image/*"
                                     ref={thumbInputRef}
                                     onChange={handleThumbnailChange}
                                 />
+
                                 {thumbPreview && (
                                     <div className="w-full max-w-md mt-3 rounded-lg overflow-hidden border mx-auto bg-white flex justify-center">
                                         <img
                                             src={thumbPreview}
-                                            alt="Thumbnail Preview"
                                             className="max-h-[300px] object-contain rounded-md"
                                         />
                                     </div>
                                 )}
                             </div>
 
-                            {/* CONTENT GRID */}
-                            <div className="space-y-4">
-                                <Label className="font-medium text-lg">
-                                    Article's Content
-                                </Label>
-                                {(() => {
-                                    const maxRow = Math.max(
-                                        1,
-                                        ...blocks.map((b) => b.order_y)
-                                    );
-                                    const maxCol = Math.max(
-                                        2,
-                                        ...blocks.map((b) => b.order_x)
-                                    );
-                                    const displayRows = maxRow + 1;
-                                    const cells = [];
-                                    for (let r = 1; r <= displayRows; r++) {
-                                        for (let c = 1; c <= maxCol; c++) {
-                                            cells.push({
-                                                order_x: c,
-                                                order_y: r,
-                                            });
-                                        }
-                                    }
-                                    return (
-                                        <div
-                                            className="grid gap-4"
-                                            style={{
-                                                gridTemplateColumns: `repeat(${maxCol}, minmax(0,1fr))`,
-                                            }}
-                                        >
-                                            {cells.map((cell) => {
-                                                const idx = blocks.findIndex(
-                                                    (b) =>
-                                                        b.order_x ===
-                                                            cell.order_x &&
-                                                        b.order_y ===
-                                                            cell.order_y
-                                                );
-                                                const block =
-                                                    idx !== -1
-                                                        ? blocks[idx]
-                                                        : null;
-                                                return (
-                                                    <div
-                                                        key={`${cell.order_y}-${cell.order_x}`}
-                                                        className="border rounded-lg p-3 bg-gray-50 relative shadow-sm min-h-[160px]"
-                                                    >
-                                                        <p className="text-xs text-gray-500 mb-1">
-                                                            Grid ({cell.order_x}
-                                                            ,{cell.order_y}) –{" "}
-                                                            {block
-                                                                ? block.type ===
-                                                                  "text"
-                                                                    ? "Text"
-                                                                    : "Image"
-                                                                : "Empty"}
-                                                        </p>
+                            {/* ================================================= */}
+                            {/*                 BLOCK LIST (1 COLUMN)            */}
+                            {/* ================================================= */}
+                            <div className="space-y-5">
+                                {blocks.map((block, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="border rounded-lg p-3 bg-gray-50 relative shadow-sm"
+                                    >
+                                        <p className="text-xs text-gray-500 mb-2">
+                                            Block {idx + 1} – {block.type}
+                                        </p>
 
-                                                        {block ? (
-                                                            block.type ===
-                                                            "text" ? (
-                                                                <textarea
-                                                                    className="w-full border rounded p-2 mt-1 h-40 resize-y"
-                                                                    value={
-                                                                        block.content
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        updateBlockContent(
-                                                                            idx,
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                    placeholder="Write text..."
-                                                                />
-                                                            ) : (
-                                                                <>
-                                                                    <Input
-                                                                        type="file"
-                                                                        accept="image/*"
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            handleImageChange(
-                                                                                idx,
-                                                                                e
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                    {block.content && (
-                                                                        <div className="w-full mt-3 flex justify-center bg-white border rounded-md p-2">
-                                                                            <img
-                                                                                src={URL.createObjectURL(
-                                                                                    block.content
-                                                                                )}
-                                                                                alt="preview"
-                                                                                className="max-h-[250px] object-contain rounded-md"
-                                                                            />
-                                                                        </div>
-                                                                    )}
-                                                                </>
-                                                            )
-                                                        ) : (
-                                                            <div className="mt-2 flex gap-2">
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() =>
-                                                                        addBlockAt(
-                                                                            cell.order_x,
-                                                                            cell.order_y,
-                                                                            "text"
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <CaseSensitive className="text-size-sm" />
-                                                                </Button>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() =>
-                                                                        addBlockAt(
-                                                                            cell.order_x,
-                                                                            cell.order_y,
-                                                                            "image"
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Image />
-                                                                </Button>
-                                                            </div>
-                                                        )}
-
-                                                        {block &&
-                                                            !(
-                                                                block.order_x ===
-                                                                    1 &&
-                                                                block.order_y ===
-                                                                    1
-                                                            ) && (
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="destructive"
-                                                                    size="sm"
-                                                                    className="absolute top-2 right-2"
-                                                                    onClick={() =>
-                                                                        removeBlock(
-                                                                            idx
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    ✕
-                                                                </Button>
+                                        {block.type === "text" ? (
+                                            <MiniEditor
+                                                value={block.content}
+                                                onChange={(html) =>
+                                                    updateBlockContent(
+                                                        idx,
+                                                        html
+                                                    )
+                                                }
+                                            />
+                                        ) : (
+                                            <>
+                                                <Input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) =>
+                                                        handleImageChange(
+                                                            idx,
+                                                            e
+                                                        )
+                                                    }
+                                                />
+                                                {block.content && (
+                                                    <div className="mt-3 bg-white border rounded-md p-2 flex justify-center">
+                                                        <img
+                                                            src={URL.createObjectURL(
+                                                                block.content
                                                             )}
+                                                            className="max-h-[250px] object-contain rounded-md"
+                                                        />
                                                     </div>
-                                                );
-                                            })}
-                                        </div>
-                                    );
-                                })()}
+                                                )}
+                                            </>
+                                        )}
+
+                                        {idx !== 0 && (
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                size="sm"
+                                                className="absolute top-2 right-2"
+                                                onClick={() => removeBlock(idx)}
+                                            >
+                                                ✕
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {/* ADD NEW BLOCK */}
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        onClick={() =>
+                                            addBlockAt(1, 999, "text")
+                                        }
+                                    >
+                                        <CaseSensitive className="mr-1" />
+                                        Add Text Block
+                                    </Button>
+
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        onClick={() =>
+                                            addBlockAt(1, 999, "image")
+                                        }
+                                    >
+                                        <Image className="mr-1" />
+                                        Add Image Block
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="buttonContainer flex justify-end">
+
+                            <div className="flex justify-end">
                                 <Button type="submit" disabled={processing}>
                                     {processing
                                         ? "Saving..."
@@ -368,33 +306,29 @@ export default function Create() {
                     </CardContent>
                 </Card>
 
-                {/* RIGHT: LIVE PREVIEW */}
+                {/* ================================================= */}
+                {/*                     LIVE PREVIEW                */}
+                {/* ================================================= */}
                 <Card className="w-full sticky top-20 h-fit">
                     <CardHeader>
                         <CardTitle>Live Preview</CardTitle>
-                        <CardDescription>
-                            How your article will appear
-                        </CardDescription>
                     </CardHeader>
+
                     <CardContent>
                         {/* Thumbnail */}
                         <div className="mb-4 flex justify-center">
                             {thumbPreview ? (
-                                <div className="w-full max-w-4xl">
-                                    <img
-                                        src={thumbPreview}
-                                        alt="Thumbnail Preview"
-                                        className="w-full h-64 object-cover mb-4 rounded"
-                                    />
-                                </div>
+                                <img
+                                    src={thumbPreview}
+                                    className="w-full max-w-4xl h-64 object-cover rounded"
+                                />
                             ) : (
-                                <div className="w-full max-w-4xl h-64 rounded bg-gray-100 flex items-center justify-center text-gray-400 shadow-sm">
+                                <div className="w-full max-w-4xl h-64 rounded bg-gray-100 flex items-center justify-center text-gray-400">
                                     Thumbnail Preview
                                 </div>
                             )}
                         </div>
 
-                        {/* Title + Info */}
                         <h3 className="text-2xl font-bold mb-1">
                             {data.title || "Article Title"}
                         </h3>
@@ -402,132 +336,82 @@ export default function Create() {
                             by Unknown · {new Date().toLocaleDateString()}
                         </p>
 
-                        {/* Content Preview */}
-                        {(() => {
-                            const maxRow = Math.max(
-                                1,
-                                ...blocks.map((b) => b.order_y)
-                            );
-                            const maxCol = Math.max(
-                                1,
-                                ...blocks.map((b) => b.order_x)
-                            );
-                            const cells = [];
-
-                            for (let y = 1; y <= maxRow; y++) {
-                                for (let x = 1; x <= maxCol; x++) {
-                                    const block = blocks.find(
-                                        (b) =>
-                                            b.order_x === x && b.order_y === y
-                                    );
-                                    cells.push({ x, y, block });
-                                }
-                            }
-
-                            return (
-                                <div
-                                    className="grid gap-4"
-                                    style={{
-                                        gridTemplateColumns: `repeat(${maxCol}, minmax(0,1fr))`,
-                                    }}
-                                >
-                                    {cells.map(({ x, y, block }, i) => (
+                        {/* PREVIEW BLOCKS */}
+                        <div className="space-y-6">
+                            {blocks.map((block, i) => (
+                                <div key={i}>
+                                    {block.type === "text" ? (
                                         <div
-                                            key={`${y}-${x}`}
-                                            className="rounded flex flex-col"
-                                        >
-                                            {block ? (
-                                                block.type === "text" ? (
-                                                    <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
-                                                        {block.content ||
-                                                            "Empty Text"}
-                                                    </p>
-                                                ) : (
-                                                    block.content && (
-                                                        <div className="w-full max-w-md mx-auto mt-2 rounded-lg overflow-hidden shadow-sm bg-white">
-                                                            <img
-                                                                src={URL.createObjectURL(
-                                                                    block.content
-                                                                )}
-                                                                alt={`Block ${
-                                                                    i + 1
-                                                                }`}
-                                                                className="max-h-[300px] object-contain rounded-md"
-                                                            />
-                                                        </div>
-                                                    )
-                                                )
-                                            ) : (
-                                                <div className="min-h-[100px] text-gray-400 text-sm">
-                                                    Empty
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
+                                            dangerouslySetInnerHTML={{
+                                                __html:
+                                                    block.content ||
+                                                    "<i>Empty Text</i>",
+                                            }}
+                                            className="text-sm text-gray-800"
+                                        />
+                                    ) : (
+                                        block.content && (
+                                            <img
+                                                src={URL.createObjectURL(
+                                                    block.content
+                                                )}
+                                                className="max-h-[300px] object-contain rounded"
+                                            />
+                                        )
+                                    )}
                                 </div>
-                            );
-                        })()}
+                            ))}
+                        </div>
                     </CardContent>
                 </Card>
 
                 {/* POPUPS */}
                 {showConfirm && (
                     <Popup
-                        triggerText={null}
                         title="Submit Article?"
-                        description="Your article will be saved and reviewed by Admins."
-                        confirmText={processing ? "Submitting..." : "Yes, Submit"}
+                        confirmText="Yes, Submit"
                         cancelText="Cancel"
-                        confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                        confirmDisabled={processing}
                         onConfirm={confirmSubmit}
                         onClose={() => setShowConfirm(false)}
                     />
                 )}
+
                 {showSuccess && (
                     <Popup
-                        triggerText={null}
                         title="Article Submitted!"
-                        description="Your article is pending review by Admins."
                         confirmText="Okay"
                         showCancel={false}
-                        confirmColor="bg-green-600 hover:bg-green-700 text-white"
                         onConfirm={() => {
                             setShowSuccess(false);
                             router.get("/articles/list");
                         }}
                     />
                 )}
+
                 {showError && (
                     <Popup
-                        triggerText={null}
-                        title="Incomplete Form"
-                        description="Please fill in the title and select a category before submitting."
-                        confirmText="Okay"
+                        title="Error"
+                        description="Please fill title & category"
+                        confirmText="OK"
                         showCancel={false}
-                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
                         onConfirm={() => setShowError(false)}
                     />
                 )}
+
                 {showTitleError && (
                     <Popup
-                        triggerText={null}
-                        title="Incomplete Form"
-                        description="Please fill in the title before submitting."
-                        confirmText="Okay"
+                        title="Missing Title"
+                        confirmText="OK"
                         showCancel={false}
-                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
                         onConfirm={() => setShowTitleError(false)}
                     />
                 )}
+
                 {showCategoryError && (
                     <Popup
-                        triggerText={null}
-                        title="Incomplete Form"
-                        description="Please select a category before submitting."
-                        confirmText="Okay"
+                        title="Missing Category"
+                        confirmText="OK"
                         showCancel={false}
-                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
                         onConfirm={() => setShowCategoryError(false)}
                     />
                 )}
