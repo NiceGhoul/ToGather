@@ -3,7 +3,13 @@ import Layout_Admin from "@/Layouts/Layout_Admin";
 import { Button } from "@/components/ui/button";
 import Popup from "@/Components/Popup";
 import { useState, useEffect } from "react";
-import { File, CheckCircle, XCircle } from "lucide-react";
+import {
+    File,
+    CheckCircle,
+    XCircle,
+    ChevronLeft,
+    ChevronRight,
+} from "lucide-react";
 
 export default function ArticleRequestList() {
     const { articles } = usePage().props;
@@ -21,6 +27,24 @@ export default function ArticleRequestList() {
     const [bulkRejectModalOpen, setBulkRejectModalOpen] = useState(false);
     const [bulkRejectReason, setBulkRejectReason] = useState("");
 
+    // ===== Pagination =====
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(articles.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentArticles = articles.slice(
+        startIndex,
+        startIndex + itemsPerPage
+    );
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            setSelectedIds([]);
+        }
+    };
+
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -29,7 +53,7 @@ export default function ArticleRequestList() {
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(articles.map((a) => a.id));
+            setSelectedIds(currentArticles.map((a) => a.id));
         } else {
             setSelectedIds([]);
         }
@@ -53,7 +77,6 @@ export default function ArticleRequestList() {
         );
     };
 
-    // ---- Per-item reject submit (dengan reason) ----
     const submitReject = (id, reason) => {
         router.post(
             `/admin/articles/${id}/reject`,
@@ -75,7 +98,6 @@ export default function ArticleRequestList() {
         );
     };
 
-    // ---- Bulk approve (tetap sama) ----
     const handleBulkApprove = () => {
         if (selectedIds.length === 0) return;
         router.post(
@@ -89,8 +111,7 @@ export default function ArticleRequestList() {
                     setSelectedIds([]);
                     router.reload();
                 },
-                onError: (errors) => {
-                    console.error("Bulk approve error:", errors);
+                onError: () => {
                     setSuccessPopupMessage("Bulk approve failed");
                     setSuccessPopupOpen(true);
                 },
@@ -98,12 +119,11 @@ export default function ArticleRequestList() {
         );
     };
 
-    // ---- Bulk reject (minta reason dulu) ----
     const submitBulkReject = (ids, reason) => {
         if (ids.length === 0) return;
         router.post(
             "/admin/articles/bulk-reject",
-            { ids, reason }, // pastikan backend menerima 'reason'
+            { ids, reason },
             {
                 preserveState: true,
                 onSuccess: () => {
@@ -114,8 +134,7 @@ export default function ArticleRequestList() {
                     setBulkRejectReason("");
                     router.reload();
                 },
-                onError: (errors) => {
-                    console.error("Bulk reject error:", errors);
+                onError: () => {
                     setSuccessPopupMessage("Bulk reject failed");
                     setSuccessPopupOpen(true);
                 },
@@ -123,13 +142,11 @@ export default function ArticleRequestList() {
         );
     };
 
-    // close popup then refresh list so UI stays in sync
     const handleSuccessClose = () => {
         setSuccessPopupOpen(false);
         router.reload();
     };
 
-    // optional auto-close after X ms
     useEffect(() => {
         if (!successPopupOpen) return;
         const t = setTimeout(() => handleSuccessClose(), 2500);
@@ -138,7 +155,6 @@ export default function ArticleRequestList() {
 
     return (
         <Layout_Admin title="Article Requests">
-            {/* success popup */}
             <Popup
                 triggerText=""
                 title={successPopupMessage}
@@ -151,12 +167,13 @@ export default function ArticleRequestList() {
                 triggerClass=""
             />
 
-            <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">
+            <div className="p-6 space-y-6">
+                <h1 className="text-2xl font-bold mb-2">
                     Pending Article Requests
                 </h1>
 
-                <div className="mb-4 flex items-center gap-3 flex-row justify-end">
+                {/* 🔹 Bulk Actions */}
+                <div className="mb-4 flex items-center gap-3 flex-row justify-end border-b pb-3">
                     <div className="text-sm mr-auto">
                         {selectedIds.length} selected
                     </div>
@@ -177,7 +194,6 @@ export default function ArticleRequestList() {
                         onConfirm={() => handleBulkApprove()}
                     />
 
-                    {/* BUKAN kirim langsung — buka modal alasan dulu */}
                     <Button
                         className="bg-red-200 hover:bg-red-300 text-red-700"
                         disabled={selectedIds.length === 0}
@@ -190,108 +206,164 @@ export default function ArticleRequestList() {
                     </Button>
                 </div>
 
-                <table className="min-w-full border text-sm">
-                    <thead>
-                        <tr className="bg-gray-100 text-left">
-                            <th className="border px-4 py-2">
-                                <input
-                                    type="checkbox"
-                                    checked={
-                                        articles.length > 0 &&
-                                        selectedIds.length === articles.length
-                                    }
-                                    onChange={(e) =>
-                                        handleSelectAll(e.target.checked)
-                                    }
-                                />
-                            </th>
-                            <th className="border px-4 py-2">Id</th>
-                            <th className="border px-4 py-2">Title</th>
-                            <th className="border px-4 py-2">Author</th>
-                            <th className="border px-4 py-2">Category</th>
-                            <th className="border px-4 py-2">Created At</th>
-                            <th className="border px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {articles.length > 0 ? (
-                            articles.map((a) => (
-                                <tr key={a.id} className="hover:bg-gray-50">
-                                    <td className="border px-4 py-2">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.includes(a.id)}
-                                            onChange={() => handleToggle(a.id)}
-                                        />
-                                    </td>
-                                    <td className="border px-4 py-2 font-medium text-black">
-                                        {a.id}
-                                    </td>
-                                    <td className="border px-4 py-2 font-medium text-black">
-                                        {a.title}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        {a.user?.nickname || a.user?.name}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        {a.category}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        {new Date(
-                                            a.created_at
-                                        ).toLocaleString()}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                        <div className="flex flex-row justify-center gap-3">
-                                            <Button
-                                                onClick={() =>
-                                                    router.get(
-                                                        `/admin/articles/${a.id}/view?from=verification`
-                                                    )
-                                                }
-                                                className="bg-purple-200 hover:bg-purple-300 text-purple-700"
-                                            >
-                                                <File />
-                                            </Button>
-
-                                            <Popup
-                                                triggerText={<CheckCircle />}
-                                                title="Approve Article?"
-                                                description="This action cannot be undone. The article will be approved and be shown on public"
-                                                confirmText="Yes, Approve"
-                                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                                triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
-                                                onConfirm={() =>
-                                                    handleApprove(a.id)
+                {/* 🧾 Table + Pagination wrapper */}
+                <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[45rem]">
+                    <table className="min-w-full border text-sm">
+                        <thead>
+                            <tr className="bg-gray-100 text-left">
+                                <th className="border px-4 py-2 text-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={
+                                            currentArticles.length > 0 &&
+                                            selectedIds.length ===
+                                                currentArticles.length
+                                        }
+                                        onChange={(e) =>
+                                            handleSelectAll(e.target.checked)
+                                        }
+                                    />
+                                </th>
+                                <th className="border px-4 py-2">Id</th>
+                                <th className="border px-4 py-2">Title</th>
+                                <th className="border px-4 py-2">Author</th>
+                                <th className="border px-4 py-2">Category</th>
+                                <th className="border px-4 py-2">Created At</th>
+                                <th className="border px-4 py-2 text-center">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentArticles.length > 0 ? (
+                                currentArticles.map((a) => (
+                                    <tr key={a.id} className="hover:bg-gray-50">
+                                        <td className="border px-4 py-2 text-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.includes(
+                                                    a.id
+                                                )}
+                                                onChange={() =>
+                                                    handleToggle(a.id)
                                                 }
                                             />
+                                        </td>
+                                        <td className="border px-4 py-2 font-medium">
+                                            {a.id}
+                                        </td>
+                                        <td className="border px-4 py-2 font-medium">
+                                            {a.title}
+                                        </td>
+                                        <td className="border px-4 py-2">
+                                            {a.user?.nickname || a.user?.name}
+                                        </td>
+                                        <td className="border px-4 py-2">
+                                            {a.category}
+                                        </td>
+                                        <td className="border px-4 py-2">
+                                            {new Date(
+                                                a.created_at
+                                            ).toLocaleString()}
+                                        </td>
+                                        <td className="border px-4 py-2 text-center">
+                                            <div className="flex flex-row justify-center gap-3">
+                                                <Button
+                                                    onClick={() =>
+                                                        router.get(
+                                                            `/admin/articles/${a.id}/view?from=verification`
+                                                        )
+                                                    }
+                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700"
+                                                >
+                                                    <File />
+                                                </Button>
 
-                                            {/* Per-item Reject: buka modal alasan */}
-                                            <Button
-                                                className="bg-red-200 hover:bg-red-300 text-red-700"
-                                                onClick={() => {
-                                                    setTargetRejectId(a.id);
-                                                    setRejectModalOpen(true);
-                                                }}
-                                            >
-                                                <XCircle />
-                                            </Button>
-                                        </div>
+                                                <Popup
+                                                    triggerText={
+                                                        <CheckCircle />
+                                                    }
+                                                    title="Approve Article?"
+                                                    description="The article will be approved and shown publicly."
+                                                    confirmText="Yes, Approve"
+                                                    confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                                    triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
+                                                    onConfirm={() =>
+                                                        handleApprove(a.id)
+                                                    }
+                                                />
+
+                                                <Button
+                                                    className="bg-red-200 hover:bg-red-300 text-red-700"
+                                                    onClick={() => {
+                                                        setTargetRejectId(a.id);
+                                                        setRejectModalOpen(
+                                                            true
+                                                        );
+                                                    }}
+                                                >
+                                                    <XCircle />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td
+                                        colSpan="7"
+                                        className="text-center py-6 text-gray-500 border italic"
+                                    >
+                                        No pending article requests.
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td
-                                    colSpan="6"
-                                    className="text-center py-6 text-gray-500 border"
+                            )}
+                        </tbody>
+                    </table>
+
+                    {/* 🔸 Pagination Section */}
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="text-sm text-gray-500">
+                            Page {currentPage} of {totalPages || 1}
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === 1}
+                                onClick={() =>
+                                    handlePageChange(currentPage - 1)
+                                }
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+                            </Button>
+                            {[...Array(totalPages)].map((_, i) => (
+                                <Button
+                                    key={i}
+                                    onClick={() => handlePageChange(i + 1)}
+                                    className={`
+                                        ${
+                                            currentPage === i + 1
+                                                ? "bg-purple-800 text-white hover:bg-purple-800"
+                                                : "bg-purple-300 text-purple-900 hover:bg-purple-800 hover:text-white"
+                                        }
+                                        font-medium transition-colors duration-200
+                                    `}
                                 >
-                                    No pending article requests.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                    {i + 1}
+                                </Button>
+                            ))}
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === totalPages}
+                                onClick={() =>
+                                    handlePageChange(currentPage + 1)
+                                }
+                            >
+                                Next <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* ==== MODAL: Per-item Reject reason ==== */}

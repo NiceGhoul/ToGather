@@ -8,7 +8,7 @@ import Layout_Guest from "@/Layouts/Layout_Guest";
 
 export default function Details() {
     const { article, auth } = usePage().props;
-    const [isLogin, setIsLogin] = useState(false)
+    const [isLogin, setIsLogin] = useState(false);
 
     // 🟣 Check authentication status
     useEffect(() => {
@@ -171,8 +171,6 @@ export default function Details() {
                                                                 src={
                                                                     block.image_url
                                                                 }
-                                                                alt={`Block ${index + 1
-                                                                    }`}
                                                                 className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform cursor-pointer"
                                                                 onClick={() => {
                                                                     setModalImage(
