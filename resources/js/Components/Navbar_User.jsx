@@ -123,7 +123,7 @@ export default function Navbar_User() {
                                     My Campaigns
                                 </Link>
                                 <Link
-                                    href="#"
+                                    href="/campaigns/likedCampaign"
                                     className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
                                 >
                                     Liked Campaigns
@@ -173,7 +173,7 @@ export default function Navbar_User() {
                                     My Articles
                                 </Link>
                                 <Link
-                                    href="#"
+                                    href="/articles/likedArticles"
                                     className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
                                 >
                                     Liked Articles

@@ -11,8 +11,6 @@ import { router } from "@inertiajs/react";
 
 
 export const AboutBuilder = ({campaign, contents}) => {
-    console.log(contents)
-    const[openPop, setOpenPop] = useState(true)
     const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ?? "",order_y:1, isEditing:false}])
 
     const addParagraphBlock = () => {

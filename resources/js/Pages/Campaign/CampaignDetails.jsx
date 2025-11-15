@@ -1,6 +1,6 @@
 // import { Accordion, AccordionContent } from "@/Components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/Components/ui/carousel";
 import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
@@ -12,11 +12,13 @@ import { Link, usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
-
-
+import { AboutDetails } from "./AboutDetails";
+import { UpdatesDetails } from "./UpdatesDetails";
+import { FaqDetails } from "./FAQDetails";
+import { DonationsDetails } from "./DonationsDetails";
 
 const scrollDonations = (data, idx) => {
-    // maybe set the donation by the date
+    console.log(data)
     return (
         <Card
             key={idx}
@@ -33,77 +35,44 @@ const scrollDonations = (data, idx) => {
             <div className="flex flex-col items-center text-right gap-1 flex-1">
                 <CardHeader className="flex text-center justify-center">
                     <CardTitle className="text-xl font-bold">
-                        {data.anonymous === 1
-                            ? data.user.nickname
-                            : "anonymous"}
+                        {data.user ? data.user.nickname : "anonymous"}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="text-lg font-normal">
-                    {"$" + data.amount + ",00"}
+                    {"Rp. " + data.amount + ",00"}
                 </CardContent>
             </div>
         </Card>
     );
 };
 
-const contentDivider = (data, campaign) => {
+const contentDivider = (data, campaign, contents, donation) => {
     if (data === "About") {
         return (
             // this will be editable i think, if creator is the one opening the page, the edit section will be activated
-            <div className="flex flex-col gap-8 px-8 py-4 text-left">
-                <h1 className="text-3xl font-bold text-[#7C4789]">Our Story</h1>
-                <p>{campaign.description}</p>
-                <h2 className="text-3xl font-bold text-[#7C4789] mb-4">
-                    Media
-                </h2>
-                {/* should be scrollable */}
-                <div className="">
-                    <Carousel className="w-full">
-                        <CarouselContent>
-                            <CarouselItem>
-                                <img
-                                    src="http://127.0.0.1:8000/images/king.jpg"
-                                    alt="tes1"
-                                    className="w-full h-[300px] object-cover"
-                                />
-                            </CarouselItem>
-
-                            <CarouselItem>
-                                <img
-                                    src="http://127.0.0.1:8000/images/sharks.jpg"
-                                    alt="tes2"
-                                    className="w-full h-[300px] object-cover"
-                                />
-                            </CarouselItem>
-                        </CarouselContent>
-                        <CarouselNext />
-                        <CarouselPrevious />
-                    </Carousel>
-                </div>
+            <div>
+                <AboutDetails campaign={campaign} contents={contents.filter((dat) => dat.type === "paragraph" || dat.type === "media")} />
             </div>
         );
     } else if (data === "FAQ") {
         return (
             // has a dropdown box
             <div>
-                <p>{data}</p>
-                {/* <Accordion>
-                    <AccordionContent>Test</AccordionContent>
-                </Accordion> */}
+                <FaqDetails contents={contents.filter((dat) => dat.type === "faqs")} />
             </div>
         );
     } else if (data === "Updates") {
         return (
             // navigation bar on the side, with the updates on the inside  (make new table in xampp)
             <div>
-                <p>{data}</p>
+                <UpdatesDetails contents={contents.filter((dat) => dat.type === "updates")} />
             </div>
         );
     } else if (data === "Donations") {
         return (
             // get all of the donation this project has received
             <div>
-                <p>{data}</p>
+                <DonationsDetails donations={donation} />
             </div>
         );
     }
@@ -122,13 +91,13 @@ const tabsRepeater = (data, index) => {
     );
 };
 
-const tabsContentRepeater = (data, campaign, index) => {
+const tabsContentRepeater = (data, campaign, index, contents, donations) => {
     return (
         <TabsContent
             value={index + 1}
             className="w-[90%] h-[100%] text-lg text-center py-4"
         >
-            {contentDivider(data, campaign)}
+            {contentDivider(data, campaign, contents, donations)}
         </TabsContent>
     );
 };
@@ -136,15 +105,25 @@ const tabsContentRepeater = (data, campaign, index) => {
 export default function Create() {
     const data = ["About", "FAQ", "Updates", "Donations"];
 
-    const { campaign, donations, liked, user } = usePage().props;
+    const { campaign, donations, liked, user, contents } = usePage().props;
+    const [images, setImages] = useState({thumbnail: null, logo: null})
     const [like, setLike] = useState(liked);
+
+console.log(user, donations)
+
     const percentage = Math.round(
         (campaign.collected_amount / campaign.goal_amount) * 100
     );
 
-    const handleDonation = () => {
-
-    }
+     useEffect(() => {
+        if (campaign.images && (images.thumbnail === null || images.logo === null)) {
+            campaign.images.map((dat) => {
+                dat.url.includes("thumbnail")
+                    ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
+                    : setImages((prev) => ({ ...prev, logo: dat.url }));
+            });
+        }
+    }, [campaign]);
 
     const handleLikes = (id) => {
         setLike(!like);
@@ -177,51 +156,67 @@ export default function Create() {
             <Separator className="flex-1 bg-gray-400 h-[1px]" />
             {/* pictures and titles */}
             <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
-                <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 border-gray-800 shrink-0">
+                <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 shrink-0">
                     <img
-                        src="http://127.0.0.1:8000/images/nature.jpg"
+                        src={images.thumbnail}
                         alt="Campaign"
                         className="w-full h-full object-cover mb-4 rounded"
                     />
                 </div>
 
                 <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
-                    <div className="flex flex-col gap-2 justify-center">
-                        <Label className="text-2xl text-start font-semibold ">
-                            {campaign.title}
-                        </Label>
-                        <Label className="text-lg text-start font-medium">
-                            {"Created by " +  user.nickname}
-                        </Label>
-
+                    <div className="flex overflow-hidden item-center justify-start gap-5 flex-row">
+                        <Avatar className="w-20 h-20 border-2 border-gray-700">
+                            <AvatarImage
+                                src={images.logo}
+                                alt={campaign.title}
+                            />
+                            <AvatarFallback>
+                                {campaign != undefined ? campaign.title[0] : ""}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col gap-1 justify-center">
+                            <Label className="text-3xl text-start font-semibold">
+                                {campaign.title}
+                            </Label>
+                            <Label className="text-md text-start font-medium">
+                                {"Created by " + user.nickname}
+                            </Label>
+                        </div>
                     </div>
-                    <h1 className="text-2xl text-end font-semibold flex my-10 text-[#7C4789]">{donations.length.toString() + " " + (donations.length > 1 ? " Donators" : " Donator")} </h1>
+                    <div className="flex flex-row justify-between">
+                        <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789]">
+                            {donations.length.toString() + " " + (donations.length > 1 ? " Donators" : " Donator")}
+                        </h1>
+
+                        <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
+                            {campaign.duration + " Days left"}
+                        </h1>
+                    </div>
                     <div className="relative flex flex-col justify-end gap-4 mt-2">
                         <Progress
                             className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
-                            value={
-                                (campaign.collected_amount /
-                                    campaign.goal_amount) *
-                                100
-                            }
+                            value={(campaign.collected_amount / campaign.goal_amount) * 100}
                         />
                         <span
                             className="absolute inset-0 flex items-start justify-center text-md font-medium "
-                            style={{
-                                color: percentage > 50 ? "white" : "black",
-                            }}
+                            style={{ color: "black" }}
                         >
                             {percentage}%
                         </span>
                     </div>
-                    <p className="text-lg font-normal flex justify-end mt-5">
-                        {"$" +
+                    <p className="text-lg font-normal flex justify-end mt-2">
+                        {"Rp. " +
                             campaign.collected_amount +
-                            ",00" +
-                            " / " +
-                            "$" +
-                            campaign.goal_amount +
-                            ",00"}
+                            ",00 / Rp. " +
+                            parseInt(campaign.goal_amount).toLocaleString(
+                                "id-ID",
+                                {
+                                    style: "currency",
+                                    currency: "IDR",
+                                    minimumFractionDigits: 2,
+                                }
+                            )}
                     </p>
                     <div className="flex flex-row items-center justify-between mt-5">
                         <Toggle
@@ -235,9 +230,11 @@ export default function Create() {
                             {!like ? "like this campaign" : "campaign liked"}
                         </Toggle>
 
-                        <Button className="min-h-10 min-w-56 font-semibold text-lg" onClick={() => handleDonation()}>
-                            Donate
-                        </Button>
+                        <Link href={`/donate?campaign_id=${campaign.id}`}>
+                            <Button className="min-h-10 min-w-56 font-semibold text-lg">
+                                Donate
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -252,7 +249,7 @@ export default function Create() {
                     </TabsList>
                     <div className="flex justify-center items-center gap-2 bg-transparent border-b border-gray-300 rounded-none">
                         {data.map((dat, idx) => {
-                            return tabsContentRepeater(dat, campaign, idx);
+                            return tabsContentRepeater(dat, campaign, idx, contents, donations);
                         })}
                     </div>
                 </Tabs>

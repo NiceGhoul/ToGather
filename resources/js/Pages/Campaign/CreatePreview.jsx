@@ -109,7 +109,6 @@ export const UploadSupportingMedia = ({handler}) => {
     )
 }
 
-
 const CreatePreview = () => {
     const { campaign, user } = usePage().props;
     const [images, setImages] = useState({thumbnail: null, logo: null, thumbnailPreview: null, logoPreview: null})

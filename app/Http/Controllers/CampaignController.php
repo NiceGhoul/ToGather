@@ -171,11 +171,26 @@ class CampaignController extends Controller
     public function getCampaignDetails($id)
     {
         $user = auth()->user();
-        $donations = Donation::with(['user'])->where('campaign_id', $id)->where('status', 'successful')->get();
+        $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
         $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
-        $campaignData = Campaign::findOrFail($id);
+        $campaignData = Campaign::where('id', $id)->with('images')->latest()->first();
+        $content = CampaignContent::with('images')->where('campaign_id', $id)->get()->map(function($data){
+            $media = $data->images->map(function ($image){
+                return[
+                    'path' => $image->path,
+                    'filetype' => 'images',
+                    'url' => $image->url,
+                ];
+
+            });
+            $data->setAttribute('media', $media);
+            $data->unsetRelation('images');
+
+            return $data;
+        });
         return inertia::render('Campaign/CampaignDetails', [
             'campaign' => $campaignData,
+            'contents' => $content,
             'donations' => $donations,
             'liked' => $likes,
             'user' => $user,
