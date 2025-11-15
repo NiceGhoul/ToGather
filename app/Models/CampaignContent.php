@@ -16,13 +16,13 @@ class CampaignContent extends Model
         'order_y',
     ];
 
-    protected static function booted()
-    {
-        static::deleting(function ($content) {
-            $content->images()->delete();
-            $content->videos()->delete();
-        });
-    }
+    // protected static function booted()
+    // {
+    //     static::deleting(function ($content) {
+    //         $content->images()->delete();
+    //         $content->videos()->delete();
+    //     });
+    // }
 
     // campaign content belongs to campaign model
     public function campaign()

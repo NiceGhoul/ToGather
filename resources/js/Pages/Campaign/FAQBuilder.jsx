@@ -32,9 +32,9 @@ useEffect(() => {
 }, [userQuestions]);
 
 const handleDelete = (dat, idx) => {
-    console.log(dat)
+    // console.log(dat)
     setUserQuestions((dat) => dat.filter((_, i) => i != idx))
-    router.post(`/campaigns/deleteContent/${dat.id}`)
+    router.post(`/campaigns/deleteContent`, dat)
 }
 
   const handleChange = (index, field, value) => {

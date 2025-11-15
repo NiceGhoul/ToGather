@@ -88,8 +88,6 @@ class CampaignController extends Controller
 
             return $data;
         });
-        // $content = CampaignContent::with('images')->where('campaign_id', $usersCampaign->id)->get();
-
         // dd($usersCampaign);
         if (!$verificationRequest) {
             // No verification request - show verification form
@@ -235,7 +233,6 @@ class CampaignController extends Controller
     public function ToggleLike(Request $request)
     {
         $user = auth()->user();
-        // 🟣 Kalau belum login, langsung kirim JSON 401
         if (!$user) {
             return response()->json([
                 'success' => false,
@@ -344,7 +341,7 @@ class CampaignController extends Controller
                 ]);
             }
         }
-        $content = CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
+        CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
             $media = $data->images->map(function ($image) {
                 return [
                     'path' => $image->path,
@@ -357,18 +354,25 @@ class CampaignController extends Controller
 
             return $data;
         });
+    }
 
-        return Inertia::render('Campaign/CreateDetailsPreview', [
-            'campaign' => Campaign::with('images')->findOrFail($request->campaign_id),
-            'contents' => $content,
-            'user' => $user,
-        ]);
+    public function finalizeCampaign($id)
+    {
+        $campaign = Campaign::find($id);
+
+        if ($campaign) {
+            $campaign->status = "pending";
+            $campaign->save();
+        }
+
+        return inertia::render('Campaign/CampaignPending');
 
     }
 
-    public function deleteCampaignInfo($id)
+    public function deleteCampaignInfo(Request $request)
     {
-        $content = CampaignContent::findOrFail($id);
+
+        $content = CampaignContent::findOrFail($request->id);
 
         $tab = match ($content->type) {
         'updates' => 2,
@@ -376,12 +380,13 @@ class CampaignController extends Controller
         default => 0,
     };
 
-        if ($content->images()->count() > 0) {
-            foreach ($content->media as $m) {
-                Storage::disk('minio')->delete($m->path);
-                $m->delete();
-            }
-        }
+
+        // if (!empty($request->media)) {
+        //     foreach ($content->media as $m) {
+        //         Storage::disk('minio')->delete($m->path);
+        //         $m->delete();
+        //     }
+        // }
 
         $content->delete();
 
@@ -410,7 +415,7 @@ class CampaignController extends Controller
             foreach ($request->file('media') as $file) {
 
                 // bikin minio dlu
-                $path = $file->store('campaigns/updates/media', 'minio');
+                $path = $file->store('campaigns/updates/' . $content['campaign_id'], 'minio');
 
                 // insert ke db sesuai pathnya
                 Image::create([
@@ -425,20 +430,49 @@ class CampaignController extends Controller
     }
 
     public function insertFAQContent(Request $request){
-
         foreach ($request->all() as $dat) {
             CampaignContent::updateOrCreate(['id' => $dat['id']],$dat);
         }
 
-
         return redirect()->route('campaigns.create')->with('activeTab', 1);
     }
 
-    public function insertAboutContent(Request $request){
-
+    public function insertAboutContent(Request $request)
+    {
         foreach ($request->all() as $dat) {
-            // dd($dat);
-            CampaignContent::updateOrCreate(['id' => $dat['id']],$dat);
+
+            $payload = [
+                'campaign_id' => $dat['campaign_id'],
+                'type'=> $dat['type'],
+                'content'=> null,
+                'order_y'=>$dat['order_y'],
+            ];
+
+            if ($dat['type'] === 'media') {
+                // dd($dat);
+                if (isset($dat['content']) && $dat['content'] instanceof \Illuminate\Http\UploadedFile) {
+
+                    if (!empty($dat['id'])) {
+                        $existing = CampaignContent::find($dat['id']);
+                        if ($existing && $existing->content) {
+                            Storage::disk('minio')->delete($existing->content);
+                        }
+                    }
+
+                    $path = Storage::disk('minio')->put("campaigns/about/" . $dat['campaign_id'], $dat['content']);
+
+                    $payload['content'] = Storage::disk('minio')->url($path);
+                } else {
+                    $payload['content'] = $dat['content'];
+                }
+            } else {
+                $payload['content'] = $dat['content'];
+            }
+
+            CampaignContent::updateOrCreate(
+                ['id' => $dat['id'] ?? null],
+                $payload
+            );
         }
 
         return redirect()->route('campaigns.create')->with('activeTab', 0);

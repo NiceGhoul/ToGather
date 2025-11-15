@@ -16,6 +16,7 @@ const CampaignList = () => {
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
+
     useEffect(() => {
         if (campaigns?.length) {
             setCampaignList(campaigns);

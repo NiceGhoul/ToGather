@@ -1,25 +1,30 @@
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
-import { Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import Edit from "../Article/Edit";
 import { Button } from "@/Components/ui/button";
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Toaster } from "@/Components/ui/sonner";
+import { router } from "@inertiajs/react";
 
 
 export const AboutBuilder = ({campaign, contents}) => {
-    const [description, setDescription] = useState([{campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ?? "", isEditing:false}])
+    console.log(contents)
+    const[openPop, setOpenPop] = useState(true)
+    const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ?? "",order_y:1, isEditing:false}])
 
     const addParagraphBlock = () => {
-        setDescription((prev) => [...prev, {campaign_id: campaign.id,  type: "paragraph", content: "", isEditing: true }]);
+        setDescription((prev) => [...prev, {campaign_id: campaign.id,  type: "paragraph", content: "",order_y: prev.order_y + 1 , isEditing: true }]);
     };
 
     const addMediaBlock = () => {
-        setDescription((prev) => [...prev, {campaign_id: campaign.id, type: "media", content: "", isEditing: true }]);
+        setDescription((prev) => [...prev, {campaign_id: campaign.id, type: "media", content: "",order_y: prev.order_y + 1 , isEditing: true }]);
     };
 
     const handleChange = (index, value) => {
+        // console.log(value)
         setDescription((prev) =>
             prev.map((block, i) =>
                 i === index ? { ...block, content: value } : block
@@ -39,6 +44,27 @@ export const AboutBuilder = ({campaign, contents}) => {
          setDescription((prev) => prev.filter((_, i) => i !== index));
      };
 
+     const handleSave = () => {
+         if (description.some((dat) => dat.content === "")) {
+             toast.error("there are empty descriptions!", {
+                 description:
+                     "please double check your description before submitting.",
+             });
+         } else {
+            const prepared = description.map((block, index) => {
+                return {
+                    id: block.id ?? null,
+                    campaign_id: block.campaign_id,
+                    type: block.type,
+                    content: block.type === "paragraph" ? block.content : block.content?.file,
+                    // file: block.type === "media" ? block.content?.file ?? null : null,
+                    existing:  block.type === "media" && typeof block.content === "string" ? block.content : null,
+                };
+            })
+             router.post("/campaigns/insertAbout", prepared)
+         }
+     };
+
     return (
         <Card className="w-full p-6 border border-gray-300 shadow-sm justify-center flex flex-col">
             <CardHeader className="flex flex-col gap-4">
@@ -48,9 +74,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                     </CardTitle>
                 </div>
                 <div className="flex justify-center gap-4 mt-2">
-                    <Button onClick={addParagraphBlock}>
-                        + Add Paragraph
-                    </Button>
+                    <Button onClick={addParagraphBlock}> + Add Paragraph </Button>
                     <Button onClick={addMediaBlock}> + Add Image </Button>
                 </div>
             </CardHeader>
@@ -148,9 +172,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                     <>
                                         {block.content ? (
                                             <img
-                                                src={URL.createObjectURL(
-                                                    block.content ?? null
-                                                )}
+                                                src={block.content.preview ?? block.content}
                                                 alt="Preview"
                                                 className="w-full max-h-[400px] object-contain rounded"
                                             />
@@ -163,7 +185,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                 const file =
                                                     e.target.files?.[0];
                                                 if (file) {
-                                                    handleChange(index, file);
+                                                    handleChange(index, {file: file, preview: URL.createObjectURL(file)});
                                                 }
                                             }}
                                         />
@@ -194,11 +216,12 @@ export const AboutBuilder = ({campaign, contents}) => {
             )}
             {description.length > 0 ? (
                 <CardAction className="mt-10 justify-end flex items-end w-full">
-                    <Button> Save Changes </Button>
+                    <Button onClick={handleSave}> Save Changes </Button>
                 </CardAction>
             ) : (
                 <></>
             )}
+            <Toaster className="text-xl" toastOptions={{ duration:1500 }} position="top-center"/>
         </Card>
     );
 };

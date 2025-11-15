@@ -17,7 +17,6 @@ import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
 
 export const UpperPreview = ({campaign, user, images}) => {
-    console.log(images)
     const [like, setLike] = useState(false)
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
@@ -109,8 +108,12 @@ const CreateDetailsPreview = () => {
     const [popUpData, setPopupData] = useState({ title:"", description: "", confText: "", confColor:""})
 
     const handleBack = () => {
-        router.get(`/campaigns/create/createPreview/${campaign.id}`);
+        router.get(`/campaigns/create/createPreview/${campaign.id}`)
     };
+
+    const handleFinalize = () => {
+        router.post(`/campaigns/finalize/${campaign.id}`)
+    }
     const handleInsertContent = (campaignContent) => {
         router.post(`/campaigns/insertContent`, campaignContent)
     }
@@ -122,7 +125,7 @@ const CreateDetailsPreview = () => {
         if (data === "About") {
             return (
                 <div className="flex flex-col gap-8 px-8 py-4 text-left min-h-[500px]">
-                    <AboutBuilder campaign={campaign} contents={contents.filter((dat) => dat.type === 'about')}/>
+                    <AboutBuilder campaign={campaign} contents={contents.filter((dat) => dat.type === 'paragraph' || dat.type === 'media')}/>
                 </div>
             );
         } else if (data === "FAQ") {
@@ -219,7 +222,7 @@ const CreateDetailsPreview = () => {
                     <div className="justify-center items-center">
                         <Button
                             className="bg-transparent text-green-700 hover:bg-green-100 text-xl "
-                            onClick={() => handleBack()}
+                            onClick={() => handleFinalize()}
                         >
                             Finalize →
                         </Button>
