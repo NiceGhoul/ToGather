@@ -12,13 +12,41 @@ import { router } from "@inertiajs/react";
 
 export const AboutBuilder = ({campaign, contents}) => {
     const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ?? "",order_y: 1, isEditing:false}])
-
+    console.log(campaign)
     const addParagraphBlock = () => {
-        setDescription((prev) => [...prev, {campaign_id: campaign.id,  type: "paragraph", content: "",order_y: +prev.order_y + 1 , isEditing: true }]);
+        setDescription((prev) => {
+            const lastOrder =
+                prev.length > 0 ? prev[prev.length - 1].order_y : 0;
+
+            return [
+                ...prev,
+                {
+                    campaign_id: campaign.id,
+                    type: "paragraph",
+                    content: "",
+                    order_y: lastOrder + 1,
+                    isEditing: true,
+                },
+            ];
+        });
     };
 
     const addMediaBlock = () => {
-        setDescription((prev) => [...prev, {campaign_id: campaign.id, type: "media", content: "",order_y: +prev.order_y + 1 , isEditing: true }]);
+        setDescription((prev) => {
+            const lastOrder =
+                prev.length > 0 ? prev[prev.length - 1].order_y : 0;
+
+            return [
+                ...prev,
+                {
+                    campaign_id: campaign.id,
+                    type: "media",
+                    content: "",
+                    order_y: lastOrder + 1,
+                    isEditing: true,
+                },
+            ];
+        });
     };
 
     const handleChange = (index, value) => {
@@ -60,6 +88,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                     order_y: block.order_y,
                 };
             })
+            // console.log(prepared)
              router.post("/campaigns/insertAbout", prepared)
          }
      };

@@ -36,6 +36,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
         return sorted
     })
 
+    console.log(campaigns)
     const [chosenCategory, setChosenCategory] = useState("All")
     const [searchTerm, setSearchTerm] = useState("")
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc")
@@ -97,6 +98,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
     };
 
     const colorCoder = (data) => {
+        console.log(data)
         if(data === 'Foods & Beverage'){
             return "bg-[#B8DF5D]"
         }else if(data === 'Beauty & Cosmetic'){
@@ -113,7 +115,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
     }
 
     const handleMoveToEdit = (id) => {
-        router.get(`/campaigns/create/${id}`)
+        router.get(`/campaigns/create/detailsPreview/${id}`)
     }
 
     const handleDeleteCamapign = (campaignId) => {
@@ -142,7 +144,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                     >
                         {!images.thumbnail && (
                             <img
-                                src={campaign.images[0].url}
+                                src={campaign?.images[0]?.url}
                                 alt={campaign.title}
                                 className="w-full h-64 object-cover mb-4 rounded"
                             />
@@ -209,16 +211,18 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                         <div className="flex justify-center mt-auto">
                             {campaign.status != "completed" ? (
                                 <div className="flex gap-4 flex justify-center items-center">
+                                    {campaign.status === "draft" &&
                                     <Button
                                         className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg"
                                         onClick={() => setOpenPop(true)}
                                     >
                                         ✖ Cancel
-                                    </Button >
+                                    </Button >}
                                     {campaign.status != "rejected" &&
                                     <Button onClick={() => handleMoveToEdit(campaign.id)} className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg">
                                             Edit →
-                                    </Button> }
+                                    </Button>
+                                    }
                                 </div>
                             ) : (
                                 <Link

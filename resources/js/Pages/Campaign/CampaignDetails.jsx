@@ -109,8 +109,6 @@ export default function Create() {
     const [images, setImages] = useState({thumbnail: null, logo: null})
     const [like, setLike] = useState(liked);
 
-console.log(user, donations)
-
     const percentage = Math.round(
         (campaign.collected_amount / campaign.goal_amount) * 100
     );

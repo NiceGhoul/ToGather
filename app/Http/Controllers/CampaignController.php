@@ -156,8 +156,7 @@ class CampaignController extends Controller
                     //         'user' => $user,
                     //     ]);
                     // }
-                    $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())
-                        ->where('status', 'draft')->first();
+                    $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())->first();
                     $location = Location::where('campaign_id', $id)->first();
                     return Inertia::render('Campaign/Create', [
                         'user_Id' => Auth::id(),
@@ -344,11 +343,9 @@ class CampaignController extends Controller
                 ->where('id', $id)
                 ->where('user_id', $user->id)
                 ->firstOrFail();
-                // dd($usersCampaign);
         } else {
-            $usersCampaign = $user->campaigns()
-                ->whereIn('status', ['pending', 'draft'])
-                ->with('images')
+            $usersCampaign = $user->campaigns()->with('images')
+                ->whereIn('status', ['pending', 'draft', 'active'])
                 ->latest()
                 ->first();
         }
@@ -382,7 +379,7 @@ class CampaignController extends Controller
         }else{
             $content = [];
         }
-
+        // dd($content);
         return inertia::render('Campaign/CreateDetailsPreview', [
             'campaign' => $usersCampaign,
             'contents' => $content,
@@ -541,8 +538,8 @@ class CampaignController extends Controller
                 }
             }
         }
-
-        return redirect()->route('campaigns.create', ['id' => $content->first()->id])->with('activeTab', 2);
+        // dd($content);
+        return redirect()->route('campaigns.detailsPreview', ['id' => $content->first()->campaign_id])->with('activeTab', 2);
     }
 
     public function insertFAQContent(Request $request){
@@ -554,12 +551,12 @@ class CampaignController extends Controller
 
         }
 
-        return redirect()->route('campaigns.create',$campaignId)->with('activeTab', 1);
+        return redirect()->route('campaigns.detailsPreview',$campaignId)->with('activeTab', 1);
     }
 
     public function insertAboutContent(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         foreach ($request->all() as $dat) {
             $payload = [
                 'campaign_id' => $dat['campaign_id'],
@@ -594,8 +591,8 @@ class CampaignController extends Controller
                 $payload
             );
         }
-
-        return redirect()->route('campaigns.create')->with('activeTab', 0);
+        // dd($request);
+        return redirect()->route('campaigns.detailsPreview', $request->all()[0]['campaign_id'])->with('activeTab', 0);
     }
 
 

@@ -120,9 +120,7 @@ const CreateDetailsPreview = () => {
     const handleFinalize = () => {
         router.post(`/campaigns/finalize/${campaign.id}`)
     }
-    const handleInsertContent = (campaignContent) => {
-        router.post(`/campaigns/insertContent`, campaignContent)
-    }
+
     const handleInsertUpdates = (campaignContent) => {
         router.post(`/campaigns/insertUpdates`, campaignContent)
     }
