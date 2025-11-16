@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -39,7 +40,18 @@ class HandleInertiaRequests extends Middleware
     if ($user) {
         $user->load('images');
     }
-    
+        Inertia::share([
+            'draft_campaign' => function () {
+                if (!auth()->check()) return null;
+
+                return auth()->user()
+                    ->campaigns()
+                    ->where('status', 'draft')
+                    ->latest()
+                    ->first();
+            },
+        ]);
+
     return array_merge(parent::share($request), [
         'auth' => [
             'user' => $user, // kirim user login ke frontend

@@ -20,6 +20,8 @@ export default function Navbar_User() {
     const [loading, setLoading] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
 
+
+
     const handleLogout = () => {
         router.post("/logout");
     };
@@ -69,7 +71,17 @@ export default function Navbar_User() {
 
     const { url, props } = usePage();
     const auth = props.auth;
+    const draft = props.draft_campaign
+    console.log(draft)
     const isActive = (path) => url.startsWith(path);
+
+    const handleStart = () => {
+        if(draft){
+            router.get(`campaigns/create/detailsPreview/${draft.id}`)
+        }else{
+            router.get('camapaigns/create')
+        }
+    }
 
     return (
         <header>
@@ -129,12 +141,11 @@ export default function Navbar_User() {
                                     Liked Campaigns
                                 </Link>
                                 <div className="border-t my-2" />
-                                <Link
-                                    href="/campaigns/create"
-                                    className="block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100"
-                                >
+                                <Button
+                                    onClick={() => handleStart()}
+                                    className="bg-color-none text-black w-full text-start block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100">
                                     Start a Campaign
-                                </Link>
+                                </Button>
                             </div>
                         </div>
 
