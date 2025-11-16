@@ -20,9 +20,12 @@ const CampaignLocation = ({ open, setCampaignLocation, onClose, locationData }) 
     const [address, setAddress] = useState("");
     const [coords, setCoords] = useState({ lat:-6.200284252332842, lng: 106.78547062682863});
 
+
+
     useEffect(() => {
         if(locationData != null){
             setLocation(locationData)
+            setCoords({lat: locationData.lat, lng: locationData.lon})
         }
     }, [locationData])
 
@@ -64,6 +67,7 @@ function SearchBar() {
         postcode: "",
         country: "",
     });
+
     const API_KEY = import.meta.env.VITE_LOCATIONIQ_API_KEY
 
     function SearchLocation() {

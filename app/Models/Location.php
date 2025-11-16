@@ -10,7 +10,7 @@ class Location extends Model
         'location_id',
         'campaign_id',
         'lat',
-        'long',
+        'lon',
         'address',
         'city_block', // rw
         'village', // keluarahan

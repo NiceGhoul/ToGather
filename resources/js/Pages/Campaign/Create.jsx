@@ -46,7 +46,7 @@ const { campaign, user_Id, location } = usePage().props
 const [campaignData, setCampaignData] = useState(emptyCampaign)
 const [openLocation, setOpenLocation] = useState(false)
 const [description, setDescription] = useState([])
-const [openUnsaved, setOpenUnsaved] = useState(false)
+// const [openUnsaved, setOpenUnsaved] = useState(false)
 const [openPop, setOpenPop] = useState(false)
 
 const DatePicker = ({open, date, setOpen, setDate}) => {
@@ -106,10 +106,6 @@ const errorDescription = () => {
     return errors;
 };
 
-// const handleUnloadConf = (event) => {
-
-// }
-
 // useEffect(() => {
 //   const handleBeforeUnload = (event) => {
 //     setOpenUnsaved(true)
@@ -125,6 +121,7 @@ const errorDescription = () => {
 // }, []);
 
 const handleCloseLocation = (locationData, addressData) => {
+    console.log(locationData)
     setOpenLocation(false)
     setCampaignData((prev) => ({...prev, location: locationData}))
     setCampaignData((prev) => ({...prev, address: addressData}))
@@ -159,6 +156,7 @@ const handleSave = () => {
             ? new Date(campaignData.end_campaign).toISOString().slice(0, 19).replace("T", " ")
             : null,
         };
+        // console.log(formattedData)
         router.post("/campaigns/newCampaign", formattedData);
 }
 

@@ -16,14 +16,10 @@ import {
     EmptyMedia,
     EmptyTitle,
 } from "@/components/ui/empty";
-import { set } from "date-fns";
+import Popup from "@/Components/Popup";
 
-export default function MyCampaign({
-    campaigns = [],
-    categories = [],
-    sortOrder: initialSortOrder,
-}) {
-    const [visibleCampaigns, setVisibleCampaigns] = useState(8);
+export default function MyCampaign({campaigns = [], categories = [], sortOrder: initialSortOrder}) {
+    const [visibleCampaigns, setVisibleCampaigns] = useState(8)
     const [campaignList, setCampaignList] = useState(() => {
         if (!campaigns) return [];
         // Urutkan agar active & pending muncul di depan
@@ -37,12 +33,26 @@ export default function MyCampaign({
             };
             return (order[a.status] || 99) - (order[b.status] || 99);
         });
-        return sorted;
-    });
+        return sorted
+    })
 
-    const [chosenCategory, setChosenCategory] = useState("All");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
+    const [chosenCategory, setChosenCategory] = useState("All")
+    const [searchTerm, setSearchTerm] = useState("")
+    const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc")
+    const [images, setImages] = useState({thumbnail: null})
+    const [openPop, setOpenPop] = useState(false)
+
+    useEffect(() => {
+        if (campaigns.images && (images.thumbnail === null)) {
+            campaigns.images.map((dat) => {
+                console.log(dat)
+                dat.url.includes("thumbnail")
+                    ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
+                    : setImages((prev) => ({ ...prev, logo: dat.url }));
+            });
+        }
+
+    }, [campaigns]);
 
     useEffect(() => {
         setVisibleCampaigns(8);
@@ -86,6 +96,30 @@ export default function MyCampaign({
         );
     };
 
+    const colorCoder = (data) => {
+        if(data === 'Foods & Beverage'){
+            return "bg-[#B8DF5D]"
+        }else if(data === 'Beauty & Cosmetic'){
+            return "bg-[#FB84B2]"
+        }else if(data === 'Clothes & Fashion'){
+            return "bg-[#CDADF1]"
+        }else if(data === 'Services'){
+            return "bg-[#EDAC6B]"
+        }else if(data === 'Lifestyle'){
+            return "bg-[#D3DE5D]"
+        }else if(data === 'Logistics'){
+            return "bg-[#80BDF6]"
+        }
+    }
+
+    const handleMoveToEdit = (id) => {
+        router.get(`/campaigns/create/${id}`)
+    }
+
+    const handleDeleteCamapign = (campaignId) => {
+        router.post()
+    }
+
     const cardRepeater = (data) => {
         if (!data || data.length === 0) {
             return <p>No campaigns available.</p>;
@@ -106,15 +140,15 @@ export default function MyCampaign({
                         key={idx}
                         className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
                     >
-                        {!campaign.thumbnail_url && ( //nanti perlu diganti
+                        {!images.thumbnail && (
                             <img
-                                src="http://127.0.0.1:8000/images/boat.jpg"
+                                src={campaign.images[0].url}
                                 alt={campaign.title}
                                 className="w-full h-64 object-cover mb-4 rounded"
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden leading-snug">
+                        <h2 className="text-lg font-semibold mb-2 items-center justify-center flex text-center min-h-[3rem] max-h-[3rem] overflow-hidden leading-snug">
                             {campaign.title.length > 50
                                 ? campaign.title.substring(0, 50) + "..."
                                 : campaign.title}
@@ -124,9 +158,15 @@ export default function MyCampaign({
                             {new Date(campaign.created_at).toLocaleDateString()}
                         </p>
 
-                        <p className="text-sm text-gray-500 text-center mb-2">
-                            {campaign.category ?? "Uncategorized"}
-                        </p>
+                        <div className="flex justify-center gap-2 mb-4">
+                            <span
+                                className={`text-sm font-semibold text-gray-100 rounded-sm text-center px-4 py-1 mb-2 ${colorCoder(
+                                    campaign.category
+                                )}`}
+                            >
+                                {campaign.category ?? "Uncategorized"}
+                            </span>
+                        </div>
 
                         <p className="text-sm text-gray-700 mb-3 text-justify">
                             {campaign.description
@@ -166,14 +206,28 @@ export default function MyCampaign({
                                 {campaign.status.toUpperCase()}
                             </span>
                         </div>
-
                         <div className="flex justify-center mt-auto">
-                            <Link
-                                href={`/campaigns/details/${campaign.id}`}
-                                className="text-purple-700 hover:underline font-medium"
-                            >
-                                View Details →
-                            </Link>
+                            {campaign.status != "completed" ? (
+                                <div className="flex gap-4 flex justify-center items-center">
+                                    <Button
+                                        className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg"
+                                        onClick={() => setOpenPop(true)}
+                                    >
+                                        ✖ Cancel
+                                    </Button >
+                                    {campaign.status != "rejected" &&
+                                    <Button onClick={() => handleMoveToEdit(campaign.id)} className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg">
+                                            Edit →
+                                    </Button> }
+                                </div>
+                            ) : (
+                                <Link
+                                    href={`/campaigns/details/${campaign.id}`}
+                                    className="text-purple-700 hover:underline text-lg font-medium"
+                                >
+                                    View Details →
+                                </Link>
+                            )}
                         </div>
                     </div>
                 );
@@ -394,6 +448,17 @@ export default function MyCampaign({
                     )}
                 </CardContent>
             </div>
+            <Popup
+                open={openPop}
+                triggerText={null}
+                title={"you are about to delete a campaign!"}
+                description={"This will remove all instances of data associated to this campaign. Are you sure to continue?"}
+                confirmText={"Confirm"}
+                cancelText="Cancel"
+                showCancel={true}
+                confirmColor={"bg-red-600 hover:bg-red-700 text-white"}
+                onConfirm={() => setOpenPop(false)}
+            />
         </Layout_User>
     );
 }

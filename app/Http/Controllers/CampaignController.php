@@ -65,41 +65,61 @@ class CampaignController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($id = null)
     {
         $user = auth()->user();
+
         // Check if user is banned first
         if ($user->status->value === 'banned' || $user->status === 'banned') {
             return inertia('Verification/Banned');
         }
 
         $verificationRequest = $user->verificationRequests()->latest()->first();
-        $usersCampaign = $user->campaigns()->whereIn('status', ['pending', 'draft'])->with('images')->latest()->first();
-        $content = CampaignContent::with('images', 'videos')->where('campaign_id', $usersCampaign->id)->get()->map(function($data){
 
-            $imageMedia = $data->images->map(function ($img) {
-                return [
-                    'path' => $img->path,
-                    'filetype' => 'image',
-                    'url' => $img->url,
-                ];
-            });
-            $videoMedia = $data->videos->map(function ($vid) {
-                return [
-                    'path' => $vid->path,
-                    'filetype' => 'video',
-                    'url' => $vid->url,
-                ];
-            });
-            $media = $imageMedia->merge($videoMedia);
+        if ($id != null) {
+            $usersCampaign = $user->campaigns()->with('images')
+                ->where('id', $id)
+                ->where('user_id', $user->id)
+                ->firstOrFail();
+                // dd($usersCampaign);
+        } else {
+            $usersCampaign = $user->campaigns()
+                ->whereIn('status', ['pending', 'draft'])
+                ->with('images')
+                ->latest()
+                ->first();
+        }
+        $content = [];
+        // if($usersCampaign){
+        //     $content = CampaignContent::with('images', 'videos')->where('campaign_id', $usersCampaign->id)->get()->map(function($data){
+        //         $imageMedia = $data->images->map(function ($img) {
+        //             return [
+        //                 'path' => $img->path,
+        //                 'filetype' => 'image',
+        //                 'url' => $img->url,
+        //             ];
+        //         });
 
-            $data->setAttribute('media', $media);
-            $data->unsetRelation('images');
-            $data->unsetRelation('videos');
+        //         $videoMedia = $data->videos->map(function ($vid) {
+        //             return [
+        //                 'path' => $vid->path,
+        //                 'filetype' => 'video',
+        //                 'url' => $vid->url,
+        //             ];
+        //         });
 
-            return $data;
-        });
-        // dd($usersCampaign);
+        //         $media = collect($imageMedia)->merge(collect($videoMedia));
+
+        //         $data->setAttribute('media', $media);
+        //         $data->unsetRelation('images');
+        //         $data->unsetRelation('videos');
+
+        //         return $data;
+        //     });
+        // }else{
+        //     $content = [];
+        // }
+        // dd($content);
         if (!$verificationRequest) {
             // No verification request - show verification form
             return inertia('Verification/Create');
@@ -117,25 +137,33 @@ class CampaignController extends Controller
 
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
+            // dd($usersCampaign);
             if ($usersCampaign) {
                 if ($usersCampaign->status->value === 'pending') {
                     return inertia('Campaign/CampaignPending');
                     // If user already has a campaign with the status draft
-                } else if ($usersCampaign->status->value === 'draft') {
-
-                    if ($usersCampaign->images->isNotEmpty()) {
-
-                        return Inertia::render('Campaign/CreateDetailsPreview', [
-                            'campaign' => $usersCampaign,
-                            'contents' => $content,
-                            'user' => $user,
-                        ]);
-                    } else {
-                        return inertia::render('Campaign/CreatePreview', [
-                            'campaign' => $usersCampaign,
-                            'user' => $user,
-                        ]);
-                    }
+                } else if ($usersCampaign->status->value === 'draft' || $usersCampaign->status->value === 'active') {
+                    // dd($usersCampaign);
+                    // if ($usersCampaign->images->isNotEmpty()) {
+                    //     return Inertia::render('Campaign/CreateDetailsPreview', [
+                    //         'campaign' => $usersCampaign,
+                    //         'contents' => $content,
+                    //         'user' => $user,
+                    //     ]);
+                    // } else {
+                    //     return inertia::render('Campaign/CreatePreview', [
+                    //         'campaign' => $usersCampaign,
+                    //         'user' => $user,
+                    //     ]);
+                    // }
+                    $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())
+                        ->where('status', 'draft')->first();
+                    $location = Location::where('campaign_id', $id)->first();
+                    return Inertia::render('Campaign/Create', [
+                        'user_Id' => Auth::id(),
+                        'campaign' => $draft,
+                        'location' => $location,
+                    ]);
                 }
             } else {
                 return inertia::render('Campaign/Create', [
@@ -144,20 +172,9 @@ class CampaignController extends Controller
             }
         }
 
-        return inertia('Verification/Create');
+        // return inertia('Verification/Create');
     }
 
-    public function editCampaign($id)
-    {
-        $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())
-        ->where('status', 'draft')->first();
-        $location = Location::where('campaign_id', $id)->first();
-        return Inertia::render('Campaign/Create', [
-        'user_Id' => Auth::id(),
-        'campaign' => $draft,
-        'location' => $location,
-    ]);
-    }
 
     public function showList()
     {
@@ -238,7 +255,7 @@ class CampaignController extends Controller
             $campaign = Campaign::create($data);
 
         }
-
+        // dd($request->all());
         if ($campaign && $request->has('location')) {
             $location = $request->input('location');
             $location['campaign_id'] = $campaign->id;
@@ -260,10 +277,7 @@ class CampaignController extends Controller
             ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
         );
 
-        return inertia::render('Campaign/CreatePreview', [
-                    'campaign' => $data,
-                    'user' => auth()->user(),
-                ]);
+        return redirect()->route('campaigns.createPreview',$campaign->id);
     }
 
 
@@ -299,23 +313,80 @@ class CampaignController extends Controller
     public function getCreateSupportingMediaData($id)
     {
          $user = auth()->user();
-         $content = Campaign::with('images')->findOrFail($id);
+
+        if ($id != null) {
+            $usersCampaign = $user->campaigns()->with('images')
+                ->where('id', $id)
+                ->where('user_id', $user->id)
+                ->firstOrFail();
+            // dd($usersCampaign);
+        } else {
+            $usersCampaign = $user->campaigns()
+                ->whereIn('status', ['pending', 'draft'])
+                ->with('images')
+                ->latest()
+                ->first();
+        }
+
+
         return inertia::render('Campaign/CreatePreview', [
-            'campaign' => $content,
+            'campaign' => $usersCampaign,
             'user' => $user,
         ]);
     }
 
-    public function getDetailsPreview(Request $request)
+    public function getDetailsPreview($id)
     {
          $user = auth()->user();
-        $campaign = $request->all();
-         $content = Campaign::with('campaign_contents')->where('campaign_id', $request->campaign_id)->get();
+
+        if ($id != null) {
+            $usersCampaign = $user->campaigns()->with('images')
+                ->where('id', $id)
+                ->where('user_id', $user->id)
+                ->firstOrFail();
+                // dd($usersCampaign);
+        } else {
+            $usersCampaign = $user->campaigns()
+                ->whereIn('status', ['pending', 'draft'])
+                ->with('images')
+                ->latest()
+                ->first();
+        }
+        $content = [];
+        if($usersCampaign){
+            $content = CampaignContent::with('images', 'videos')->where('campaign_id', $usersCampaign->id)->get()->map(function($data){
+                $imageMedia = $data->images->map(function ($img) {
+                    return [
+                        'path' => $img->path,
+                        'filetype' => 'image',
+                        'url' => $img->url,
+                    ];
+                });
+
+                $videoMedia = $data->videos->map(function ($vid) {
+                    return [
+                        'path' => $vid->path,
+                        'filetype' => 'video',
+                        'url' => $vid->url,
+                    ];
+                });
+
+                $media = collect($imageMedia)->merge(collect($videoMedia));
+
+                $data->setAttribute('media', $media);
+                $data->unsetRelation('images');
+                $data->unsetRelation('videos');
+
+                return $data;
+            });
+        }else{
+            $content = [];
+        }
 
         return inertia::render('Campaign/CreateDetailsPreview', [
-            'campaign' => $campaign,
-            'user' => $user,
+            'campaign' => $usersCampaign,
             'contents' => $content,
+            'user' => $user,
         ]);
     }
 
@@ -471,16 +542,19 @@ class CampaignController extends Controller
             }
         }
 
-        return redirect()->route('campaigns.create')->with('activeTab', 2);
+        return redirect()->route('campaigns.create', ['id' => $content->first()->id])->with('activeTab', 2);
     }
 
     public function insertFAQContent(Request $request){
         // dd($request->all());
+        $campaignId = 0;
         foreach ($request->all() as $dat) {
             CampaignContent::updateOrCreate(['id' => $dat['id']],$dat);
+            $campaignId = $dat['id'];
+
         }
 
-        return redirect()->route('campaigns.create')->with('activeTab', 1);
+        return redirect()->route('campaigns.create',$campaignId)->with('activeTab', 1);
     }
 
     public function insertAboutContent(Request $request)
@@ -542,8 +616,7 @@ class CampaignController extends Controller
             ->values();
 
         // Query utama campaign milik user
-        $campaigns = Campaign::where('user_id', $user->id)
-            ->when($category !== 'All', function ($query) use ($category) {
+            $campaigns = Campaign::with('images')->where('user_id', $user->id)->when($category !== 'All', function ($query) use ($category) {
                 $query->where('category', $category);
             })
             ->when($search, function ($query) use ($search) {

@@ -206,7 +206,7 @@ console.log(images)
     }
 
     const handleToPreview = () => {
-        router.get(`/campaigns/create`)
+        router.get(`/campaigns/create/detailsPreview/${campaign.id}`)
     }
 
     console.log(campaign)

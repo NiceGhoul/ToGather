@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('campaign_id')->unique()->constrained()->onDelete('cascade');
-            $table->decimal('lat', 20, 7)->nullable();
-            $table->decimal('lon', 20, 12)->nullable();
+            $table->decimal('lat', 30,20)->nullable();
+            $table->decimal('lon', 30,20)->nullable();
             $table->string('city_block')->nullable();
             $table->string('village')->nullable();
             $table->string('suburb')->nullable();

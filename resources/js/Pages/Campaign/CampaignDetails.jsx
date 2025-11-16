@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Inertia } from "@inertiajs/inertia";
 import { Link, usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { Heart } from "lucide-react";
+import { Heart, Map } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AboutDetails } from "./AboutDetails";
 import { UpdatesDetails } from "./UpdatesDetails";
@@ -156,12 +156,18 @@ console.log(user, donations)
             <Separator className="flex-1 bg-gray-400 h-[1px]" />
             {/* pictures and titles */}
             <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
-                <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 shrink-0">
-                    <img
-                        src={images.thumbnail}
-                        alt="Campaign"
-                        className="w-full h-full object-cover mb-4 rounded"
-                    />
+                <div className="flex flex-col w-[600px] h-[400px]">
+                    <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 shrink-0">
+                        <img
+                            src={images.thumbnail}
+                            alt="Campaign"
+                            className="w-full h-full object-cover mb-4 rounded"
+                        />
+                    </div>
+                    <div className="flex flex-row gap-0 my-5 justify-center items-center">
+                        <Map />
+                        <p className="w-full text-center">{campaign.address}</p>
+                    </div>
                 </div>
 
                 <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
@@ -186,7 +192,11 @@ console.log(user, donations)
                     </div>
                     <div className="flex flex-row justify-between">
                         <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789]">
-                            {donations.length.toString() + " " + (donations.length > 1 ? " Donators" : " Donator")}
+                            {donations.length.toString() +
+                                " " +
+                                (donations.length > 1
+                                    ? " Donators"
+                                    : " Donator")}
                         </h1>
 
                         <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
@@ -196,7 +206,11 @@ console.log(user, donations)
                     <div className="relative flex flex-col justify-end gap-4 mt-2">
                         <Progress
                             className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
-                            value={(campaign.collected_amount / campaign.goal_amount) * 100}
+                            value={
+                                (campaign.collected_amount /
+                                    campaign.goal_amount) *
+                                100
+                            }
                         />
                         <span
                             className="absolute inset-0 flex items-start justify-center text-md font-medium "
@@ -249,7 +263,13 @@ console.log(user, donations)
                     </TabsList>
                     <div className="flex justify-center items-center gap-2 bg-transparent border-b border-gray-300 rounded-none">
                         {data.map((dat, idx) => {
-                            return tabsContentRepeater(dat, campaign, idx, contents, donations);
+                            return tabsContentRepeater(
+                                dat,
+                                campaign,
+                                idx,
+                                contents,
+                                donations
+                            );
                         })}
                     </div>
                 </Tabs>

@@ -3,7 +3,7 @@ import Layout_User from "@/Layouts/Layout_User";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@/Components/ui/separator";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonGroup } from "@/Components/ui/button-group";
 import { Input } from "@/Components/ui/input";
 import { SearchIcon } from "lucide-react";
@@ -16,10 +16,20 @@ const CampaignList = () => {
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
+    const [images, setImages] = useState({thumbnail: null})
 
     useEffect(() => {
         if (campaigns?.length) {
             setCampaignList(campaigns);
+        }
+
+        if (campaigns.images && images.thumbnail === null) {
+            campaigns.images.map((dat) => {
+                console.log(dat);
+                dat.url.includes("thumbnail")
+                    ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
+                    : setImages((prev) => ({ ...prev, logo: dat.url }));
+            });
         }
     }, [campaigns]);
 
@@ -108,10 +118,20 @@ const CampaignList = () => {
                         </h2>
 
                         <p className="text-sm text-gray-600 text-center mb-2">
-                            {new Date(campaign.start_campaign).toLocaleDateString() + " - " + new Date(campaign.end_campaign).toLocaleDateString()}
+                            {new Date(
+                                campaign.start_campaign
+                            ).toLocaleDateString() +
+                                " - " +
+                                new Date(
+                                    campaign.end_campaign
+                                ).toLocaleDateString()}
                         </p>
                         <div className="flex justify-center gap-2 mb-4">
-                            <span className={`text-sm rounded-sm text-center px-4 py-1 mb-2 ${colorCoder(campaign.category)}`}>
+                            <span
+                                className={`text-sm font-semibold text-gray-100 rounded-sm text-center px-4 py-1 mb-2 ${colorCoder(
+                                    campaign.category
+                                )}`}
+                            >
                                 {campaign.category ?? "Uncategorized"}
                             </span>
                         </div>
@@ -131,21 +151,45 @@ const CampaignList = () => {
                         </div>
 
                         <p className="text-sm text-gray-600 mb-2 text-center">
-                            Raised {" "}{parseInt(campaign.collected_amount).toLocaleString("id-ID", {style: "currency",currency: "IDR",minimumFractionDigits: 2,})}{" "}/ {parseInt(campaign.goal_amount).toLocaleString("id-ID", {style: "currency",currency: "IDR",minimumFractionDigits: 2,})}{" "}
+                            Raised{" "}
+                            {parseInt(campaign.collected_amount).toLocaleString(
+                                "id-ID",
+                                {
+                                    style: "currency",
+                                    currency: "IDR",
+                                    minimumFractionDigits: 2,
+                                }
+                            )}{" "}
+                            /{" "}
+                            {parseInt(campaign.goal_amount).toLocaleString(
+                                "id-ID",
+                                {
+                                    style: "currency",
+                                    currency: "IDR",
+                                    minimumFractionDigits: 2,
+                                }
+                            )}{" "}
                             ({progress}%)
                         </p>
 
                         <div className="flex justify-center gap-2 mb-4">
-                            <span
-                                className={`inline-block text-xs font-semibold px-2 py-1 rounded-full
+                            <span className={`inline-block text-sm font-semibold px-2 py-1 rounded-full ${campaign.duration}
                             ${
                                 campaign.status === "active"
                                     ? "bg-gray-100 text-gray-700"
                                     : "bg-purple-100 text-purple-700"
-
                             }`}
                             >
-                                 {campaign.status === "completed" ? campaign.status.toUpperCase() : campaign.duration + " days left"}
+                                {campaign.status === "completed"
+                                    ? campaign.status.toUpperCase()
+                                    : `${Math.max(
+                                          Math.floor(
+                                              (new Date(campaign.end_campaign) -
+                                                  Date.now()) /
+                                                  (1000 * 60 * 60 * 24)
+                                          ),
+                                          0
+                                      )} days left`}
                             </span>
                         </div>
 

@@ -10,7 +10,7 @@ import { Toggle } from "@/Components/ui/toggle";
 import Layout_User from "@/Layouts/Layout_User";
 import { router, usePage } from "@inertiajs/react";
 import { IconFolderCode } from "@tabler/icons-react";
-import { Heart } from "lucide-react";
+import { Heart, Map } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
@@ -19,20 +19,28 @@ import { UpdateBuilder } from "./UpdatesBuilder";
 export const UpperPreview = ({campaign, user, images}) => {
     const [like, setLike] = useState(false)
     return (
-        <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
-            <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 shrink-0">
-                <img
-                    src={images.thumbnail}
-                    alt="Campaign"
-                    className="w-full h-full object-cover mb-4 rounded"
-                />
+        <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
+            <div className="flex flex-col w-[600px] h-[400px]">
+                <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 shrink-0">
+                    <img
+                        src={images.thumbnail}
+                        alt="Campaign"
+                        className="w-full h-full object-cover mb-4 rounded"
+                    />
+                </div>
+                <div className="flex flex-row gap-2 my-5 justify-center items-center">
+                    <Map />
+                    <p className="w-full text-center">{campaign.address}</p>
+                </div>
             </div>
 
             <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
                 <div className="flex overflow-hidden item-center justify-start gap-5 flex-row">
                     <Avatar className="w-20 h-20 border-2 border-gray-700">
                         <AvatarImage src={images.logo} alt={campaign.title} />
-                        <AvatarFallback>{campaign != undefined ? campaign.title[0] : ""}</AvatarFallback>
+                        <AvatarFallback>
+                            {campaign != undefined ? campaign.title[0] : ""}
+                        </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col gap-1 justify-center">
                         <Label className="text-3xl text-start font-semibold">
@@ -43,7 +51,7 @@ export const UpperPreview = ({campaign, user, images}) => {
                         </Label>
                     </div>
                 </div>
-                 <div className="flex flex-row justify-between">
+                <div className="flex flex-row justify-between">
                     <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789]">
                         0 Donator
                     </h1>
@@ -59,7 +67,8 @@ export const UpperPreview = ({campaign, user, images}) => {
                     />
                     <span
                         className="absolute inset-0 flex items-start justify-center text-md font-medium "
-                        style={{ color: "black" }}>
+                        style={{ color: "black" }}
+                    >
                         0%
                     </span>
                 </div>
@@ -198,7 +207,7 @@ const CreateDetailsPreview = () => {
 
     return (
         <Layout_User>
-            <Card>
+            <Card className="rounded-none border-0 border-b">
                 <CardHeader className="flex flex-row">
                     <div className="justify-center items-center">
                         <Button
@@ -226,7 +235,7 @@ const CreateDetailsPreview = () => {
                     </div>
                 </CardHeader>
 
-                <CardContent>
+                <CardContent className="border-none">
                     <UpperPreview campaign={campaign } user={user} images={images} />
                 </CardContent>
             </Card>

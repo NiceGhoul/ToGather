@@ -5,8 +5,10 @@ import {
     AccordionTrigger,
 } from "@/Components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/Components/ui/empty";
 import { Separator } from "@/Components/ui/separator";
 import { Spinner } from "@/Components/ui/spinner";
+import { IconFolderCode } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 export const DonationsDetails = ({ donations }) => {
@@ -93,7 +95,7 @@ export const DonationsDetails = ({ donations }) => {
                     <EmptyTitle>This is the donation page</EmptyTitle>
                     <EmptyDescription>
                         Every donation this campaign obtained will be displayed
-                        here. You can see the total donation as well as the
+                        here. You can see the donations amount, as well as the
                         message left by donators!
                     </EmptyDescription>
                 </EmptyHeader>

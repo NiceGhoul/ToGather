@@ -45,10 +45,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
     // campaigns routing
-    Route::get('/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
-    Route::get('/campaigns/create/{id}', [CampaignController::class, 'editCampaign'])->name('campaigns.edit');
+    Route::get('/campaigns/create/{id?}', [CampaignController::class, 'create'])->name('campaigns.create');
     Route::get('/campaigns/create/createPreview/{id}', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.createPreview');
-    Route::get('/campaigns/create/detailsPreview', [CampaignController::class, 'getDetailsPreview'])->name('campaigns.detailsPreview');
+    Route::get('/campaigns/create/detailsPreview/{id}', [CampaignController::class, 'getDetailsPreview'])->name('campaigns.detailsPreview');
     Route::get('/campaigns/likedCampaign', [CampaignController::class, 'showLiked'])->name('campaigns.liked');
     Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
     Route::get('/campaigns/getList', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
