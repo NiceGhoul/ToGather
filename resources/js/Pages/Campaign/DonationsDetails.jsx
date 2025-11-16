@@ -37,7 +37,7 @@ export const DonationsDetails = ({ donations }) => {
         return null;
     };
 
-    return (
+    return donations.length > 0 ? (
         <div className="flex flex-wrap items-center justify-center gap-4 overflow-x-auto">
             {donations.map((d) => (
                 <Accordion
@@ -82,6 +82,23 @@ export const DonationsDetails = ({ donations }) => {
                     </AccordionItem>
                 </Accordion>
             ))}
+        </div>
+    ) : (
+        <div className="flex flex-col gap-8 px-8 py-4 text-center min-h-[500px]">
+            <Empty>
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <IconFolderCode />
+                    </EmptyMedia>
+                    <EmptyTitle>This is the donation page</EmptyTitle>
+                    <EmptyDescription>
+                        Every donation this campaign obtained will be displayed
+                        here. You can see the total donation as well as the
+                        message left by donators!
+                    </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>{/* <Button>Add data</Button> */}</EmptyContent>
+            </Empty>
         </div>
     );
 };

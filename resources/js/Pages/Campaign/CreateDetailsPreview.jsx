@@ -55,10 +55,7 @@ export const UpperPreview = ({campaign, user, images}) => {
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
                     <Progress
                         className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
-                        value={
-                            (campaign.collected_amount / campaign.goal_amount) *
-                            100
-                        }
+                        value={0}
                     />
                     <span
                         className="absolute inset-0 flex items-start justify-center text-md font-medium "

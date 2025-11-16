@@ -12,7 +12,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
     // useState that saves what will be shown on the right side
     const [updates, setUpdates] = useState(contents);
     const [selectedUpdate, setSelectedUpdate] = useState(updates[0]);
-
+    console.log(contents)
     const handleAddUpdate = () => {
         const date = new Date();
         setUpdates((prev) => {
@@ -52,7 +52,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
 
         const cleanedMedia = (formData.media || []).filter((dat) => dat && (dat.file || dat.url));
 
-        console.log(cleanedMedia)
+        // console.log(cleanedMedia)
 
         const updatedList = updates.map((upd) => upd.id === selectedUpdate.id ? {...upd, content: `${formData.title}~;${formData.content ?? ""}`,media: cleanedMedia} : upd );
 
@@ -74,7 +74,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
     const handleMediaChange = (e) => {
         const files = Array.from(e.target.files);
         const previews = files.map((file) => ({
-            filetype: file.type.startsWith("image/") ? "images" : "videos",
+            filetype: file.type.startsWith("image/") ? "image" : "video",
             url: URL.createObjectURL(file),
             file,
         }));
@@ -157,8 +157,8 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                             key={idx}
                                                             className="flex justify-center"
                                                         >
-                                                            {m.filetype ??
-                                                            m.filetype === "images" ? (
+                                                            {
+                                                            m.filetype === "image" ? (
                                                                 <img src={m.url} alt={`Media ${idx + 1}`} className="rounded-lg min-w-[100%] max-h-[450px] object-contain"/>
                                                             ) : (
                                                                 <video controls className="rounded-lg w-full min-h-[400px] object-content">
@@ -187,7 +187,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                         key={idx}
                                                         className="relative"
                                                     >
-                                                        {m.filetype === "images" ? (
+                                                        {m.filetype === "image" ? (
                                                             <img
                                                                 src={m.url}
                                                                 alt=""

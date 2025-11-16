@@ -49,6 +49,7 @@ const handleDelete = (dat, idx) => {
         setUserQuestions((prev) => [
             ...prev,
             {
+                id: null,
                 campaign_id: campaign.id,
                 question: "Write Questions here",
                 answer: "Write your answer on this text box",
@@ -67,8 +68,6 @@ const handleDelete = (dat, idx) => {
 
     const handleSave = () => {
         const data = userQuestions.map((_, idx) => ({id:userQuestions[idx].id ,campaign_id: campaign.id, type:'faqs', content:userQuestions[idx].question + "~;" + userQuestions[idx].answer, order_y: idx + 1}))
-
-        // console.log(data)
         router.post('/campaigns/insertFAQ', data)
     }
 
@@ -95,7 +94,7 @@ const handleDelete = (dat, idx) => {
                             >
                                 <Accordion
                                     type="single"
-                                    collapsible
+                                    collapsible={dat.isEditing ? false : true}
                                     className="w-full "
                                     onValueChange={(val) => {
                                         const currentIndex =
@@ -119,15 +118,23 @@ const handleDelete = (dat, idx) => {
                                             {/* if is editing */}
                                             {dat.isEditing ? (
                                                 <Input
+                                                    onKeyDownCapture={(e) =>
+                                                        e.stopPropagation()
+                                                    }
+                                                    onKeyUpCapture={(e) =>
+                                                        e.stopPropagation()
+                                                    }
+                                                    onKeyPressCapture={(e) =>
+                                                        e.stopPropagation()
+                                                    }
+                                                    onKeyDown={(e) => {
+                                                        // extra defense: prevent space from toggling
+                                                        if (e.code === "Space")
+                                                            e.nativeEvent.stopImmediatePropagation();
+                                                    }}
                                                     value={dat.question}
                                                     // placeholder={"Write your answer on this text box"}
-                                                    onChange={(e) =>
-                                                        handleChange(
-                                                            idx,
-                                                            "question",
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                    onChange={(e) => handleChange(idx, "question", e.target.value)}
                                                     className="w-[80%]"
                                                 />
                                             ) : (
@@ -141,13 +148,10 @@ const handleDelete = (dat, idx) => {
                                             {dat.isEditing ? (
                                                 <Textarea
                                                     value={dat.answer}
-                                                    onChange={(e) =>
-                                                        handleChange(
-                                                            idx,
-                                                            "answer",
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                    onKeyDown={(e) =>e .stopPropagation()}
+                                                    onKeyDownCapture={(e) => e.stopPropagation()}
+                                                    onKeyUpCapture={(e) => e.stopPropagation()}
+                                                    onChange={(e) => handleChange(idx, "answer", e.target.value)}
                                                     className="w-full mt-2"
                                                     rows={3}
                                                 />

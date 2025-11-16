@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class video extends Model
+class Video extends Model
 {
     use HasFactory;
     protected $fillable = ['path', 'videoable_id', 'videoable_type'];

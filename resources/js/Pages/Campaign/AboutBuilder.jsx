@@ -11,14 +11,14 @@ import { router } from "@inertiajs/react";
 
 
 export const AboutBuilder = ({campaign, contents}) => {
-    const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ?? "",order_y:1, isEditing:false}])
+    const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ?? "",order_y: 1, isEditing:false}])
 
     const addParagraphBlock = () => {
-        setDescription((prev) => [...prev, {campaign_id: campaign.id,  type: "paragraph", content: "",order_y: prev.order_y + 1 , isEditing: true }]);
+        setDescription((prev) => [...prev, {campaign_id: campaign.id,  type: "paragraph", content: "",order_y: +prev.order_y + 1 , isEditing: true }]);
     };
 
     const addMediaBlock = () => {
-        setDescription((prev) => [...prev, {campaign_id: campaign.id, type: "media", content: "",order_y: prev.order_y + 1 , isEditing: true }]);
+        setDescription((prev) => [...prev, {campaign_id: campaign.id, type: "media", content: "",order_y: +prev.order_y + 1 , isEditing: true }]);
     };
 
     const handleChange = (index, value) => {
@@ -57,6 +57,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                     content: block.type === "paragraph" ? block.content : block.content?.file,
                     // file: block.type === "media" ? block.content?.file ?? null : null,
                     existing:  block.type === "media" && typeof block.content === "string" ? block.content : null,
+                    order_y: block.order_y,
                 };
             })
              router.post("/campaigns/insertAbout", prepared)
@@ -73,7 +74,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                 </div>
                 <div className="flex justify-center gap-4 mt-2">
                     <Button onClick={addParagraphBlock}> + Add Paragraph </Button>
-                    <Button onClick={addMediaBlock}> + Add Image </Button>
+                    <Button onClick={addMediaBlock}> + Add Media </Button>
                 </div>
             </CardHeader>
             {description.length > 0 ? (

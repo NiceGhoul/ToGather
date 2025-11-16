@@ -1,7 +1,7 @@
 import Popup from "@/Components/Popup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
-import {Card,CardContent, CardDescription, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Card,CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";
@@ -12,6 +12,7 @@ import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const PreviewLayout = ({ user, campaign, images }) => {
+    console.log(campaign)
     return (
         <div className="flex container px-4 py-4 flex-row gap-16 justify-center items-center mx-auto scale-90 border-2 rounded-xl border-gray-300">
             <div className="flex flex-col w-[600px] h-[400px]">
@@ -59,15 +60,14 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                         {campaign.duration + " Days left"}
                     </h1>
                 </div>
-                <div className="relative flex flex-col justify-end gap-2 mt-2">
+                <div className="relative flex flex-col justify-end gap-4 mt-2">
                     <Progress
-                        className="h-4 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
-                        value={
-                            (campaign.collected_amount / campaign.goal_amount) *
-                            100
-                        }
+                        className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
+                        value={0}
                     />
-                    <span className="absolute inset-0 flex items-start justify-center text-sm font-medium text-black">
+                    <span
+                        className="absolute inset-0 flex items-start justify-center text-md font-medium "
+                        style={{ color: "black" }}>
                         0%
                     </span>
                 </div>
