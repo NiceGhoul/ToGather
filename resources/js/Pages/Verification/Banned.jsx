@@ -7,7 +7,7 @@ import { AlertTriangle } from "lucide-react";
 export default function Banned() {
     return (
         <Layout_User>
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8 mt-40">
                 <Card className="max-w-md mx-auto">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-red-600">

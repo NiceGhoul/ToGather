@@ -69,7 +69,7 @@ export default function Details() {
 
                 {/* THUMBNAIL */}
                 {article.thumbnail_url && (
-                    <div className="w-full max-w-4xl h-[300px] rounded-xl overflow-hidden bg-gray-100 shadow-sm mb-8">
+                    <div className="w-full max-w-4xl h-[300px] rounded-xl overflow-hidden bg-gray-100 shadow-sm mb-8 dark:bg-gray-800">
                         <img
                             src={article.thumbnail_url}
                             alt={article.title}
@@ -84,10 +84,10 @@ export default function Details() {
 
                 {/* TITLE & AUTHOR */}
                 <div className="w-full max-w-4xl text-left mb-4">
-                    <h1 className="text-3xl font-bold">{article.title}</h1>
+                    <h1 className="text-3xl font-bold dark:text-white">{article.title}</h1>
                 </div>
 
-                <div className="w-full max-w-4xl flex items-center gap-3 text-gray-500 mb-6">
+                <div className="w-full max-w-4xl flex items-center gap-3 text-gray-500 mb-6 dark:text-gray-400">
                     <p>
                         by {article.user?.nickname ?? "Unknown"} ·{" "}
                         {new Date(article.created_at).toLocaleDateString()}
@@ -104,7 +104,7 @@ export default function Details() {
                         >
                             <Heart className="w-5 h-5" />
                         </Toggle>
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
                             {likeCount} {likeCount === 1 ? "like" : "likes"}
                         </span>
                     </div>
@@ -171,7 +171,7 @@ export default function Details() {
                                                                 src={
                                                                     block.image_url
                                                                 }
-                                                                className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform cursor-pointer"
+                                                                className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform cursor-pointer dark:bg-gray-800"
                                                                 onClick={() => {
                                                                     setModalImage(
                                                                         block.image_url
@@ -193,7 +193,7 @@ export default function Details() {
                             );
                         })()
                     ) : (
-                        <p className="text-gray-500 italic mb-6 text-center">
+                        <p className="text-gray-500 italic mb-6 text-center dark:text-gray-400">
                             This article has no content blocks.
                         </p>
                     )}

@@ -312,14 +312,14 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                     </div>
 
                     {/* kanan */}
-                    <div className="w-[280px] bg-purple-100 rounded-2xl p-4 flex flex-col gap-3 h-fit">
+                    <div className="w-[280px] bg-purple-100 rounded-2xl p-4 flex flex-col gap-3 h-fit dark:bg-purple-900/50">
                         {updates.map((upd) => (
                             <Card
                                 key={upd.id}
                                 className={`cursor-pointer p-3 rounded-xl transition-all ${
                                     selectedUpdate?.id === upd.id
-                                        ? "bg-[#7C4789] text-white"
-                                        : "hover:bg-[#7C4789]/10"
+                                        ? "bg-[#7C4789] text-white dark:bg-purple-900"
+                                        : "hover:bg-[#7C4789]/10 dark:bg-purple-900/50"
                                 }`}
                                 onClick={() => {
                                     setEditMode(false);
@@ -358,7 +358,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                         ))}
                         <Button
                             variant={"outline"}
-                            className="text-light"
+                            className="text-light dark:bg-purple-900/80"
                             onClick={handleAddUpdate}
                         >
                             + Add Project Update

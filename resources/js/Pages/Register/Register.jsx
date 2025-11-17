@@ -292,16 +292,16 @@ export default function Register() {
 
     return (
         <Layout_Register>
-            <Card className="bg-[#BCA3CA] rounded-2xl max-w-md mx-auto mt-12">
+            <Card className="bg-[#BCA3CA] dark:bg-gray-800 rounded-2xl max-w-md mx-auto mt-12">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">
+                    <CardTitle className="text-2xl dark:text-white">
                         {step === 1
                             ? "Sign Up"
                             : step === 2
                             ? "OTP Authentication"
                             : "Finish Your Account"}
                     </CardTitle>
-                    <CardDescription className="mt-2">
+                    <CardDescription className="mt-2 dark:text-gray-300">
                         {step === 1 &&
                             "Kindly fill in this form to set up your ToGather account"}
                         {step === 2 && (
@@ -356,7 +356,7 @@ export default function Register() {
                         {step === 1 && (
                             <>
                                 <div>
-                                    <label htmlFor="email">Email</label>
+                                    <label htmlFor="email" className="dark:text-gray-200">Email</label>
                                     <input
                                         ref={emailRef}
                                         value={formData.email}
@@ -387,7 +387,7 @@ export default function Register() {
                                 </div>
 
                                 <div>
-                                    <label htmlFor="password">Password</label>
+                                    <label htmlFor="password" className="dark:text-gray-200">Password</label>
                                     <input
                                         ref={passwordRef}
                                         value={formData.password}
@@ -445,7 +445,7 @@ export default function Register() {
                                 </div>
 
                                 <div>
-                                    <label htmlFor="confirmPassword">
+                                    <label htmlFor="confirmPassword" className="dark:text-gray-200">
                                         Confirm Password
                                     </label>
                                     <input
@@ -501,10 +501,10 @@ export default function Register() {
                                             ref={otpRefs[i]}
                                             type="text"
                                             maxLength="1"
-                                            className={`w-10 h-12 text-center rounded border ${
+                                            className={`w-10 h-12 text-center rounded border bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
                                                 touched.otp && errors.otp
                                                     ? "border-red-500"
-                                                    : "border-gray-300"
+                                                    : "border-gray-300 dark:border-gray-600"
                                             }`}
                                             value={formData.otp[i] || ""}
                                             onChange={(e) => {
@@ -552,8 +552,8 @@ export default function Register() {
                                     </p>
                                 )}
                                 {isCounting ? (
-                                    <p className="mt-2 text-sm text-gray-700">
-                                        Didn’t receive OTP?{" "}
+                                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Didn't receive OTP?{" "}
                                         <span className="font-semibold">
                                             Resend again in 00:
                                             {otpTimer
@@ -562,7 +562,7 @@ export default function Register() {
                                         </span>
                                     </p>
                                 ) : (
-                                    <p className="mt-2 text-sm text-gray-700">
+                                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                                         Didn't receive OTP?{" "}
                                         <button
                                             type="button"
@@ -584,7 +584,7 @@ export default function Register() {
                         {step === 3 && (
                             <>
                                 <div>
-                                    <label htmlFor="nickname">Nickname</label>
+                                    <label htmlFor="nickname" className="dark:text-gray-200">Nickname</label>
                                     <input
                                         ref={nicknameRef}
                                         value={formData.nickname}
@@ -597,7 +597,7 @@ export default function Register() {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="address">Alamat</label>
+                                    <label htmlFor="address" className="dark:text-gray-200">Alamat</label>
                                     <input
                                         ref={addressRef}
                                         value={formData.address}
@@ -622,8 +622,8 @@ export default function Register() {
                                     <div
                                         className={`w-6 h-6 rounded-full text-sm flex items-center justify-center font-bold ${
                                             step >= n
-                                                ? "bg-[#5a4070] text-white"
-                                                : "bg-white text-black border border-gray-300"
+                                                ? "bg-[#5a4070] dark:bg-purple-700 text-white"
+                                                : "bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600"
                                         }`}
                                     >
                                         {n}
@@ -632,8 +632,8 @@ export default function Register() {
                                         <div
                                             className={`absolute top-1/2 left-full transform -translate-y-1/2 w-24 h-1 ${
                                                 step > n
-                                                    ? "bg-[#5a4070]"
-                                                    : "bg-white"
+                                                    ? "bg-[#5a4070] dark:bg-purple-700"
+                                                    : "bg-white dark:bg-gray-700"
                                             }`}
                                         />
                                     )}
@@ -680,11 +680,11 @@ export default function Register() {
                     </form>
 
                     {step === 1 && (
-                        <p className="text-sm mt-6 text-center">
+                        <p className="text-sm mt-6 text-center dark:text-gray-300">
                             Already have an account?{" "}
                             <Link
                                 href="/login"
-                                className="font-semibold text-back hover:underline"
+                                className="font-semibold text-back hover:underline dark:text-white"
                             >
                                 Login Now
                             </Link>
@@ -696,5 +696,4 @@ export default function Register() {
     );
 }
 
-const input = `block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300
-    placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white`;
+const input = `block w-full rounded-md border-0 p-2 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-gray-600 placeholder:text-slate-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white dark:bg-gray-800`;

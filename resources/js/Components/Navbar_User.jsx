@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Navbar_User() {
     const [open, setOpen] = useState(false);
@@ -79,7 +80,7 @@ export default function Navbar_User() {
         if(draft){
             router.get(`campaigns/create/detailsPreview/${draft.id}`)
         }else{
-            router.get('camapaigns/create')
+            router.get('campaigns/create')
         }
     }
 
@@ -116,34 +117,34 @@ export default function Navbar_User() {
                             </button>
 
                             <div
-                                className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white
-                                         text-gray-900 shadow-lg py-2 px-2 z-50
+                                className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white dark:bg-gray-800
+                                         text-gray-900 dark:text-white shadow-lg py-2 px-2 z-50
                                            opacity-0 translate-y-1 pointer-events-none
                                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
                                            transition-all duration-150"
                             >
                                 <Link
                                     href="/campaigns/list"
-                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     Browse Campaigns
                                 </Link>
                                 <Link
                                     href="/campaigns/myCampaigns"
-                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     My Campaigns
                                 </Link>
                                 <Link
                                     href="/campaigns/likedCampaign"
-                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     Liked Campaigns
                                 </Link>
-                                <div className="border-t my-2" />
+                                <div className="border-t dark:border-gray-700 my-2" />
                                 <Button
                                     onClick={() => handleStart()}
-                                    className="bg-color-none text-black w-full text-start block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100">
+                                    className="bg-color-none text-black dark:text-white w-full text-start block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700">
                                     Start a Campaign
                                 </Button>
                             </div>
@@ -165,34 +166,34 @@ export default function Navbar_User() {
                             </button>
 
                             <div
-                                className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white
-                                         text-gray-900 shadow-lg py-2 px-2 z-50
+                                className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white dark:bg-gray-800
+                                         text-gray-900 dark:text-white shadow-lg py-2 px-2 z-50
                                            opacity-0 translate-y-1 pointer-events-none
                                            group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
                                            transition-all duration-150"
                             >
                                 <Link
                                     href="/articles/list"
-                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     Browse Articles
                                 </Link>
                                 <Link
                                     href="/articles/myArticles"
-                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     My Articles
                                 </Link>
                                 <Link
                                     href="/articles/likedArticles"
-                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100"
+                                    className="block px-4 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     Liked Articles
                                 </Link>
-                                <div className="border-t my-2" />
+                                <div className="border-t dark:border-gray-700 my-2" />
                                 <Link
                                     href="/articles/create"
-                                    className="block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100"
+                                    className="block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     Write an Article
                                 </Link>
@@ -205,6 +206,7 @@ export default function Navbar_User() {
                     <span className="nav-link font-semibold">
                         Welcome {auth?.user?.nickname ?? "Guest"}
                     </span>
+                    <ThemeToggle />
                     <DropdownMenu
                         onOpenChange={(open) => {
                             if (open) {

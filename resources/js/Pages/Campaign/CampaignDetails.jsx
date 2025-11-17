@@ -22,7 +22,7 @@ const scrollDonations = (data, idx) => {
     return (
         <Card
             key={idx}
-            className="w-[300px] h-[100px] mx-auto flex flex-row items-center justify-between px-4"
+            className="w-[300px] h-[100px] mx-auto flex flex-row items-center justify-between px-4 dark:bg-gray-800 dark:border-gray-700"
         >
             <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-800 shrink-0">
                 <img
@@ -34,11 +34,11 @@ const scrollDonations = (data, idx) => {
 
             <div className="flex flex-col items-center text-right gap-1 flex-1">
                 <CardHeader className="flex text-center justify-center">
-                    <CardTitle className="text-xl font-bold">
+                    <CardTitle className="text-xl font-bold dark:text-white">
                         {data.user ? data.user.nickname : "anonymous"}
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="text-lg font-normal">
+                <CardContent className="text-lg font-normal dark:text-gray-300">
                     {"Rp. " + data.amount + ",00"}
                 </CardContent>
             </div>
@@ -164,7 +164,7 @@ export default function Create() {
                     </div>
                     <div className="flex flex-row gap-0 my-5 justify-center items-center">
                         <Map />
-                        <p className="w-full text-center">{campaign.address}</p>
+                        <p className="w-full text-center dark:text-gray-300">{campaign.address}</p>
                     </div>
                 </div>
 
@@ -180,16 +180,16 @@ export default function Create() {
                             </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col gap-1 justify-center">
-                            <Label className="text-3xl text-start font-semibold">
+                            <Label className="text-3xl text-start font-semibold dark:text-white">
                                 {campaign.title}
                             </Label>
-                            <Label className="text-md text-start font-medium">
+                            <Label className="text-md text-start font-medium dark:text-gray-300">
                                 {"Created by " + user.nickname}
                             </Label>
                         </div>
                     </div>
                     <div className="flex flex-row justify-between">
-                        <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789]">
+                        <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-gray-300">
                             {donations.length.toString() +
                                 " " +
                                 (donations.length > 1
@@ -197,13 +197,13 @@ export default function Create() {
                                     : " Donator")}
                         </h1>
 
-                        <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
+                        <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
                             {campaign.duration + " Days left"}
                         </h1>
                     </div>
                     <div className="relative flex flex-col justify-end gap-4 mt-2">
                         <Progress
-                            className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
+                            className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789] dark:bg-gray-700"
                             value={
                                 (campaign.collected_amount /
                                     campaign.goal_amount) *
@@ -211,13 +211,13 @@ export default function Create() {
                             }
                         />
                         <span
-                            className="absolute inset-0 flex items-start justify-center text-md font-medium "
+                            className="absolute inset-0 flex items-start justify-center text-md font-medium dark:text-white"
                             style={{ color: "black" }}
                         >
                             {percentage}%
                         </span>
                     </div>
-                    <p className="text-lg font-normal flex justify-end mt-2">
+                    <p className="text-lg font-normal flex justify-end mt-2 dark:text-gray-300">
                         {"Rp. " +
                             campaign.collected_amount +
                             ",00 / Rp. " +

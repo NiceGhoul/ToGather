@@ -159,7 +159,7 @@ export default function Create() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* TITLE */}
                             <div>
-                                <Label>Title</Label>
+                                <Label className="mb-1 dark:text-white">Title</Label>
                                 <Input
                                     value={data.title}
                                     onChange={(e) =>
@@ -170,7 +170,7 @@ export default function Create() {
 
                             {/* CATEGORY */}
                             <div>
-                                <Label>Category</Label>
+                                <Label className="mb-1 dark:text-white">Category</Label>
                                 <select
                                     className="border rounded px-3 py-2 w-full"
                                     value={data.category}
@@ -189,7 +189,7 @@ export default function Create() {
 
                             {/* THUMBNAIL */}
                             <div>
-                                <Label>Thumbnail</Label>
+                                <Label className="mb-1 dark:text-white">Thumbnail</Label>
                                 <Input
                                     type="file"
                                     accept="image/*"
@@ -332,12 +332,12 @@ export default function Create() {
                         <h3 className="text-2xl font-bold mb-1">
                             {data.title || "Article Title"}
                         </h3>
-                        <p className="text-sm text-gray-500 mb-4">
+                        <p className="text-sm text-gray-500 mb-4 dark:text-white">
                             by Unknown · {new Date().toLocaleDateString()}
                         </p>
 
                         {/* PREVIEW BLOCKS */}
-                        <div className="space-y-6">
+                        <div className="space-y-6 ">
                             {blocks.map((block, i) => (
                                 <div key={i}>
                                     {block.type === "text" ? (
@@ -347,7 +347,7 @@ export default function Create() {
                                                     block.content ||
                                                     "<i>Empty Text</i>",
                                             }}
-                                            className="text-sm text-gray-800"
+                                            className="text-sm text-gray-800 dark:text-white"
                                         />
                                     ) : (
                                         block.content && (

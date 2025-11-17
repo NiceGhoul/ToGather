@@ -168,7 +168,7 @@ const ArticleList = () => {
                 return (
                     <div
                         key={idx}
-                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
+                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between dark:bg-gray-800 dark:border-gray-700"
                     >
                         {article.thumbnail_url && (
                             <img
@@ -178,22 +178,22 @@ const ArticleList = () => {
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 min-h-[2rem] max-h-[3rem] overflow-hidden text-center leading-snug">
+                        <h2 className="text-lg font-semibold mb-2 min-h-[2rem] max-h-[3rem] overflow-hidden text-center leading-snug dark:text-white">
                             {article.title.length > 50
                                 ? article.title.substring(0, 50) + "..."
                                 : article.title}
                         </h2>
 
-                        <p className="text-sm text-gray-600 text-center mb-2">
+                        <p className="text-sm text-gray-600 text-center mb-2 dark:text-gray-400">
                             by {article.user?.nickname ?? "Unknown"} ·{" "}
                             {new Date(article.created_at).toLocaleDateString()}
                         </p>
 
-                        <p className="text-sm text-gray-500 text-center mb-4">
+                        <p className="text-sm text-gray-500 text-center mb-4 dark:text-gray-400">
                             {article.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="h-[80px]text-sm text-gray-700 mb-6 text-justify">
+                        <p className="h-[80px]text-sm text-gray-700 mb-6 text-justify dark:text-gray-300">
                             {previewText
                                 .replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 180) || "No preview text."}
@@ -220,7 +220,7 @@ const ArticleList = () => {
                                 >
                                     <Heart className="w-5 h-5" />
                                 </Toggle>
-                                <span className="text-sm text-gray-600">
+                                <span className="text-sm text-gray-600 dark:text-gray-300">
                                     {article.likes_count ?? 0}
                                 </span>
                             </div>
@@ -245,7 +245,7 @@ const ArticleList = () => {
                         className="absolute inset-0 w-full h-full object-cover opacity-60"
                     />
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">
+                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md dark:text-white">
                             Discover Stories, Insights & Ideas
                         </h1>
                         <p className="text-white/90 mt-2 text-sm md:text-base">
@@ -320,7 +320,7 @@ const ArticleList = () => {
                             }
                         );
                     }}
-                    className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none  bg-white hover:ring-1 hover:ring-purple-700"
+                    className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none  bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                 >
                     <option value="desc">Newest First</option>
                     <option value="asc">Oldest First</option>
@@ -332,7 +332,7 @@ const ArticleList = () => {
                         placeholder="Search Articles"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="focus-visible:ring-1 focus-visible:ring-purple-700 hover:ring-1 hover:ring-purple-700 focus-visible:bg-purple-100"
+                        className="focus-visible:ring-1 focus-visible:ring-purple-700 hover:ring-1 hover:ring-purple-700 focus-visible:bg-purple-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus-visible:bg-purple-900/30"
                     />
                     <Button
                         variant="outline"
@@ -396,7 +396,7 @@ const ArticleList = () => {
                             {cardRepeater(articleList)}
                         </div>
                     ) : (
-                        <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20">
+                        <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20 dark:text-gray-400">
                             No articles found.
                         </p>
                     )}

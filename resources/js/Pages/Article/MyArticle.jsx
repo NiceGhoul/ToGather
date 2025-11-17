@@ -174,7 +174,7 @@ export default function MyArticle({
                 return (
                     <div
                         key={idx}
-                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
+                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between dark:bg-gray-800 dark:border-gray-600"
                     >
                         {article.thumbnail_url && (
                             <img
@@ -190,15 +190,15 @@ export default function MyArticle({
                                 : article.title}
                         </h2>
 
-                        <p className="text-sm text-gray-600 text-center mb-2">
+                        <p className="text-sm text-gray-600 text-center mb-2 dark:text-white">
                             {new Date(article.created_at).toLocaleDateString()}
                         </p>
 
-                        <p className="text-sm text-gray-500 text-center mb-2">
+                        <p className="text-sm text-gray-500 text-center mb-2 dark:text-white">
                             {article.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="h-[80px] text-sm text-gray-700 mb-4 text-justify">
+                        <p className="h-[80px] text-sm text-gray-700 mb-4 text-justify dark:text-white">
                             {previewText
                                 .replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 180) || "No preview text."}
@@ -310,7 +310,7 @@ export default function MyArticle({
             </div>
 
             {/* === Search + Sort === */}
-            <div className="w-11/12 flex m-10 items-end justify-end gap-3">
+            <div className="w-11/12 flex m-10 items-end justify-end gap-3 ">
                 <select
                     value={sortOrder}
                     onChange={(e) => {
@@ -338,18 +338,18 @@ export default function MyArticle({
                             }
                         );
                     }}
-                    className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none bg-white hover:ring-1 hover:ring-purple-700"
+                    className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 >
                     <option value="desc">Newest First</option>
                     <option value="asc">Oldest First</option>
                 </select>
 
-                <ButtonGroup className="w-84">
+                <ButtonGroup className="w-84 ">
                     <Input
                         placeholder="Search My Articles"
                         value={searchTerm} // ⬅️ ini penting biar gak hilang
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className=" focus-visible:ring-1 focus-visible:ring-purple-700 hover:ring-1 hover:ring-purple-700 focus-visible:bg-purple-100"
+                        className=" focus-visible:ring-1 focus-visible:ring-purple-700 hover:ring-1 hover:ring-purple-700 focus-visible:bg-purple-100 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                     />
 
                     <Button

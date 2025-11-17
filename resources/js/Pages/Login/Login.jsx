@@ -136,10 +136,10 @@ export default function Login() {
                 </AlertDialogContent>
             </AlertDialog>
 
-            <Card className="bg-[#BCA3CA]">
+            <Card className="bg-[#BCA3CA] dark:bg-gray-800">
                 <CardHeader className="mt-5">
-                    <CardTitle className="text-2xl mx-auto">Login</CardTitle>
-                    <CardDescription className="mx-auto">
+                    <CardTitle className="text-2xl mx-auto dark:text-white">Login</CardTitle>
+                    <CardDescription className="mx-auto dark:text-gray-300">
                         Please fill out the form below to login.
                     </CardDescription>
                 </CardHeader>
@@ -147,7 +147,7 @@ export default function Login() {
                 <CardContent className="mb-5">
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label htmlFor="email">Email</label>
+                            <label htmlFor="email" className="dark:text-gray-200">Email</label>
                             <input
                                 ref={emailRef}
                                 value={data.email}
@@ -156,12 +156,12 @@ export default function Login() {
                                 type="email"
                                 id="email"
                                 name="email"
-                                className={`block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ${
+                                className={`block w-full rounded-md border-0 p-2 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ${
                                     (clientErrors.email && touched.email) ||
                                     errors.email
                                         ? "ring-red-500 border-red-500"
-                                        : "ring-slate-300"
-                                } placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white`}
+                                        : "ring-slate-300 dark:ring-gray-600"
+                                } placeholder:text-slate-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white dark:bg-gray-800`}
                                 placeholder="Enter your email"
                             />
                             {clientErrors.email && touched.email && (
@@ -172,7 +172,7 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <label htmlFor="password">Password</label>
+                            <label htmlFor="password" className="dark:text-gray-200">Password</label>
                             <input
                                 ref={passwordRef}
                                 value={data.password}
@@ -181,13 +181,13 @@ export default function Login() {
                                 type="password"
                                 id="password"
                                 name="password"
-                                className={`block w-full rounded-md border-0 p-2 text-slate-900 shadow-sm ring-1 ring-inset ${
+                                className={`block w-full rounded-md border-0 p-2 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ${
                                     (clientErrors.password &&
                                         touched.password) ||
                                     errors.password
                                         ? "ring-red-500 border-red-500"
-                                        : "ring-slate-300"
-                                } placeholder:text-slate-500 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white`}
+                                        : "ring-slate-300 dark:ring-gray-600"
+                                } placeholder:text-slate-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm bg-white dark:bg-gray-800`}
                                 placeholder="Enter your password"
                             />
                             {clientErrors.password && touched.password && (
@@ -223,9 +223,9 @@ export default function Login() {
                         </CardFooter>
                     </form>
 
-                    <p className="text-sm mt-4 mx-auto">
+                    <p className="text-sm mt-4 mx-auto dark:text-gray-300">
                         Didn't have an account yet?{" "}
-                        <Link href="/users/create" className="font-semibold">
+                        <Link href="/users/create" className="font-semibold dark:text-white">
                             Register
                         </Link>
                     </p>

@@ -111,10 +111,10 @@ export default function Show({
         <Layout_User>
             <Head title="Profile" />
 
-            <div className="bg-gray-50 py-8">
+            <div className="bg-gray-50 dark:bg-gray-900 py-8">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header Section */}
-                    <Card className="mb-8">
+                    <Card className="mb-8 dark:bg-gray-800 dark:border-gray-700">
                         <CardContent className="pt-6">
                             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                                 <Avatar className="h-24 w-24">
@@ -127,10 +127,10 @@ export default function Show({
                                 </Avatar>
 
                                 <div className="flex-1 text-center sm:text-left">
-                                    <h1 className="text-3xl font-bold text-gray-900">
+                                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                                         {user.nickname}
                                     </h1>
-                                    <p className="text-gray-600 mt-1">
+                                    <p className="text-gray-600 dark:text-gray-400 mt-1">
                                         {user.email}
                                     </p>
                                     <div className="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start">
@@ -164,15 +164,15 @@ export default function Show({
                     {(!verificationRequest ||
                         verificationRequest?.status === "rejected") &&
                         user.status !== "banned" && (
-                            <Card className="mb-8 border-amber-200 bg-amber-50">
+                            <Card className="mb-8 border-amber-200 bg-amber-50 dark:border-amber-700 dark:bg-amber-900/20">
                                 <CardContent>
                                     <div className="flex items-center gap-4">
                                         <AlertCircle className="h-8 w-8 text-amber-600" />
                                         <div className="flex-1">
-                                            <h3 className="font-semibold text-amber-900">
+                                            <h3 className="font-semibold text-amber-900 dark:text-amber-200">
                                                 Verification Required
                                             </h3>
-                                            <p className="text-sm text-amber-700 mt-1">
+                                            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
                                                 You need to complete
                                                 verification to create campaigns
                                                 and articles.
@@ -281,7 +281,7 @@ export default function Show({
                     </div>
 
                     {/* Profile Information */}
-                    <Card>
+                    <Card className="dark:bg-gray-800 dark:border-gray-700">
                         <CardHeader>
                             <CardTitle>Profile Information</CardTitle>
                         </CardHeader>
@@ -291,10 +291,10 @@ export default function Show({
                                     <div className="flex items-center gap-3">
                                         <User className="h-5 w-5 text-gray-400" />
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                 Nickname
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 {user.nickname}
                                             </p>
                                         </div>
@@ -303,10 +303,10 @@ export default function Show({
                                     <div className="flex items-center gap-3">
                                         <Mail className="h-5 w-5 text-gray-400" />
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                 Email
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 {user.email}
                                             </p>
                                         </div>
@@ -315,7 +315,7 @@ export default function Show({
                                     <div className="flex items-center gap-3">
                                         <Shield className="h-5 w-5 text-gray-400" />
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                 Verification Status
                                             </p>
                                             <div className="flex items-center gap-2">
@@ -355,10 +355,10 @@ export default function Show({
                                     <div className="flex items-center gap-3">
                                         <MapPin className="h-5 w-5 text-gray-400" />
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                 Location
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 {user.address || "Not provided"}
                                             </p>
                                         </div>
@@ -367,10 +367,10 @@ export default function Show({
                                     <div className="flex items-center gap-3">
                                         <Calendar className="h-5 w-5 text-gray-400" />
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                 Member Since
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                                 {new Date(
                                                     user.created_at
                                                 ).toLocaleDateString("en-US", {
@@ -402,9 +402,9 @@ export default function Show({
 
             {/* Edit Profile Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md dark:bg-gray-800">
                     <DialogHeader>
-                        <DialogTitle>Edit Profile</DialogTitle>
+                        <DialogTitle className="dark:text-white">Edit Profile</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit} className="space-y-4">
                         {/* Profile Image Upload */}
@@ -454,14 +454,14 @@ export default function Show({
                         </div>
 
                         <div>
-                            <Label htmlFor="nickname">Nickname</Label>
+                            <Label htmlFor="nickname" className="dark:text-white">Nickname</Label>
                             <Input
                                 id="nickname"
                                 value={data.nickname}
                                 onChange={(e) =>
                                     setData("nickname", e.target.value)
                                 }
-                                className="mt-1"
+                                className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                             />
                             {errors.nickname && (
                                 <p className="text-sm text-red-600 mt-1">
@@ -471,7 +471,7 @@ export default function Show({
                         </div>
 
                         <div>
-                            <Label htmlFor="current_password">
+                            <Label htmlFor="current_password" className="dark:text-white">
                                 Current Password
                             </Label>
                             <Input
@@ -481,7 +481,7 @@ export default function Show({
                                 onChange={(e) =>
                                     setData("current_password", e.target.value)
                                 }
-                                className="mt-1"
+                                className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                             />
                             {errors.current_password && (
                                 <p className="text-sm text-red-600 mt-1">
@@ -491,7 +491,7 @@ export default function Show({
                         </div>
 
                         <div>
-                            <Label htmlFor="password">New Password</Label>
+                            <Label htmlFor="password" className="dark:text-white">New Password</Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -499,7 +499,7 @@ export default function Show({
                                 onChange={(e) =>
                                     setData("password", e.target.value)
                                 }
-                                className="mt-1"
+                                className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                             />
                             {errors.password && (
                                 <p className="text-sm text-red-600 mt-1">
@@ -509,7 +509,7 @@ export default function Show({
                         </div>
 
                         <div>
-                            <Label htmlFor="password_confirmation">
+                            <Label htmlFor="password_confirmation" className="dark:text-white">
                                 Confirm New Password
                             </Label>
                             <Input
@@ -522,7 +522,7 @@ export default function Show({
                                         e.target.value
                                     )
                                 }
-                                className="mt-1"
+                                className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                             />
                             {errors.password_confirmation && (
                                 <p className="text-sm text-red-600 mt-1">
@@ -554,9 +554,9 @@ export default function Show({
                     setDetailsModal({ ...detailsModal, open })
                 }
             >
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto dark:bg-gray-800">
                     <DialogHeader>
-                        <DialogTitle>
+                        <DialogTitle className="dark:text-white">
                             {detailsModal.type === "donations" &&
                                 "Your Donations"}
                             {detailsModal.type === "campaigns" &&
@@ -569,34 +569,34 @@ export default function Show({
                     </DialogHeader>
                     <div className="space-y-4">
                         {detailsModal.data.length === 0 ? (
-                            <p className="text-gray-500 text-center py-8">
+                            <p className="text-gray-500 dark:text-gray-400 text-center py-8">
                                 No data available
                             </p>
                         ) : (
                             detailsModal.data.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="border rounded-lg p-4"
+                                    className="border dark:border-gray-700 rounded-lg p-4 dark:bg-gray-700/50"
                                 >
                                     {detailsModal.type === "donations" && (
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <h4 className="font-semibold">
+                                                <h4 className="font-semibold dark:text-white">
                                                     {item.campaign_title}
                                                 </h4>
-                                                <p className="text-sm text-gray-600">
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
                                                     {new Date(
                                                         item.created_at
                                                     ).toLocaleDateString()}
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-bold text-green-600">
+                                                <p className="font-bold text-green-600 dark:text-green-400">
                                                     {formatCurrency(
                                                         item.amount
                                                     )}
                                                 </p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                                     {item.status
                                                         .charAt(0)
                                                         .toUpperCase() +
@@ -608,7 +608,7 @@ export default function Show({
                                     {detailsModal.type === "campaigns" && (
                                         <div>
                                             <div className="flex justify-between items-start mb-2">
-                                                <h4 className="font-semibold">
+                                                <h4 className="font-semibold dark:text-white">
                                                     {item.title}
                                                 </h4>
                                                 <Badge
@@ -638,14 +638,14 @@ export default function Show({
                                                         item.status.slice(1)}
                                                 </Badge>
                                             </div>
-                                            <p className="text-sm text-gray-600 mb-2">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                                 {item.description?.substring(
                                                     0,
                                                     100
                                                 )}
                                                 ...
                                             </p>
-                                            <div className="flex justify-between text-sm">
+                                            <div className="flex justify-between text-sm dark:text-gray-300">
                                                 <span>
                                                     Target:{" "}
                                                     {formatCurrency(
@@ -664,16 +664,16 @@ export default function Show({
                                     {detailsModal.type === "raised" && (
                                         <div>
                                             <div className="flex justify-between items-start mb-2">
-                                                <h4 className="font-semibold">
+                                                <h4 className="font-semibold dark:text-white">
                                                     {item.title}
                                                 </h4>
-                                                <p className="font-bold text-green-600">
+                                                <p className="font-bold text-green-600 dark:text-green-400">
                                                     {formatCurrency(
                                                         item.total_raised
                                                     )}
                                                 </p>
                                             </div>
-                                            <div className="flex justify-between text-sm text-gray-600">
+                                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                                                 <span>
                                                     {item.donors_count} Donors
                                                 </span>
@@ -691,7 +691,7 @@ export default function Show({
                                     {detailsModal.type === "articles" && (
                                         <div>
                                             <div className="flex justify-between items-start mb-2">
-                                                <h4 className="font-semibold">
+                                                <h4 className="font-semibold dark:text-white">
                                                     {item.title}
                                                 </h4>
                                                 <Badge
@@ -715,7 +715,7 @@ export default function Show({
                                                         item.status.slice(1)}
                                                 </Badge>
                                             </div>
-                                            <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                                                 <span>
                                                     Category: {item.category}
                                                 </span>
@@ -725,7 +725,7 @@ export default function Show({
                                                     ).toLocaleDateString()}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-sm">
+                                            <div className="flex items-center gap-2 text-sm dark:text-gray-300">
                                                 <Heart className="w-4 h-4 text-gray-400" />
                                                 <span>
                                                     {item.likes_count || 0}{" "}

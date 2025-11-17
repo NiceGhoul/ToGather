@@ -43,10 +43,10 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                         <AvatarFallback>{campaign.title[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col gap-1 justify-center">
-                        <Label className="text-3xl text-start font-semibold">
+                        <Label className="text-3xl text-start font-semibold dark:text-white">
                             {campaign.title}
                         </Label>
-                        <Label className="text-md text-start font-medium">
+                        <Label className="text-md text-start font-medium dark:text-white">
                             {"Created by " + user.nickname}
                         </Label>
                     </div>
@@ -90,18 +90,18 @@ export const PreviewLayout = ({ user, campaign, images }) => {
 export const UploadSupportingMedia = ({handler}) => {
     return (
         <div className="w-3/6 flex container flex-col gap-4 justify-center items-start mx-auto scale-90 mt-5">
-            <Label className="text-xl">Upload Supporting Media</Label>
+            <Label className="text-xl dark:text-white">Upload Supporting Media</Label>
 
             <div className="flex container h-24 px-8 py-8 flex-row gap-4 justify-center items-center mx-auto border-2 rounded-xl border-gray-300">
                 <div>
-                    <Label htmlFor="picture" className="mb-1">Thumbnail</Label>
+                    <Label htmlFor="picture" className="mb-1 dark:text-white">Thumbnail</Label>
                     <Input id="picture" type="file" accept=".jpg,.jpeg,.png"  onChange={(e) => handler(e, "thumbnail")} />
                 </div>
 
                 <Separator orientation="vertical" className="bg-gray-500 mt-2"/>
 
                 <div>
-                    <Label htmlFor="logo" className="mb-1">Logo</Label>
+                    <Label htmlFor="logo" className="mb-1 dark:text-white">Logo</Label>
                     <Input id="logo" type="file" accept=".jpg,.jpeg,.png"  onChange={(e) => handler(e, "logo")} />
                 </div>
             </div>

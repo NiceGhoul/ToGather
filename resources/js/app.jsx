@@ -1,5 +1,6 @@
 import { createInertiaApp } from '@inertiajs/react'
 import { createRoot } from 'react-dom/client'
+import { ThemeProvider } from 'next-themes'
 import '../css/app.css';
 import axios from 'axios';
 
@@ -19,7 +20,11 @@ createInertiaApp({
     return pages[`./Pages/${name}.jsx`]
   },
   setup({ el, App, props }) {
-    createRoot(el).render(<App {...props} />)
+    createRoot(el).render(
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <App {...props} />
+      </ThemeProvider>
+    )
   },
   progress: {
     color: '#000',

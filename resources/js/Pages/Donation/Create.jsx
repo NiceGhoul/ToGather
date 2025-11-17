@@ -90,12 +90,12 @@ export default function Create({ campaign, campaigns }) {
 
     return (
         <Layout_User>
-            <div className="min-h-screen bg-gray-50 py-4">
+            <div className="min-h-screen bg-gray-50 py-4 dark:bg-gray-900">
                 <div className="max-w-4xl mx-auto px-4">
                     {/* Header Section */}
                     <div className="text-center mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-1">Make a Donation</h1>
-                        <p className="text-gray-600">Your generosity can make a real difference in someone's life</p>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1 dark:text-white">Make a Donation</h1>
+                        <p className="text-gray-600 dark:text-white">Your generosity can make a real difference in someone's life</p>
                     </div>
 
                     <Card className="shadow-lg border-0">
@@ -104,20 +104,21 @@ export default function Create({ campaign, campaigns }) {
                             <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {/* Campaign Selection */}
                                 <div className="space-y-3 lg:col-span-2">
-                                    <Label className="text-base font-semibold flex items-center gap-2">
-                                        <Target className="w-4 h-4 text-gray-600" />
+                                    <Label className="text-base font-semibold flex items-center gap-2 dark:text-white">
+                                        <Target className="w-4 h-4 text-gray-600 dark:text-white" />
                                         Select Campaign
                                     </Label>
                                     {selectedCampaign ? (
-                                        <Card className="bg-gray-50 border-gray-200">
+                                        <Card className="bg-gray-50 border-gray-200 dark:bg-gray-900 dark:border-gray-600">
                                             <CardContent className="p-4">
-                                                <div className="flex justify-between items-center">
+                                                <div className="flex justify-between items-center ">
                                                     <div>
-                                                        <h3 className="font-semibold text-gray-900">{selectedCampaign.title}</h3>
-                                                        <p className="text-sm text-gray-600 mt-1">Selected Campaign</p>
+                                                        <h3 className="font-semibold text-gray-900 dark:text-white">{selectedCampaign.title}</h3>
+                                                        <p className="text-sm text-gray-600 mt-1 dark:text-white">Selected Campaign</p>
                                                     </div>
                                                     {!campaign && (
                                                         <Button 
+                                                            className="dark:bg-gray-600"
                                                             type="button" 
                                                             variant="outline" 
                                                             size="sm"
@@ -135,7 +136,7 @@ export default function Create({ campaign, campaigns }) {
                                     ) : (
                                         <div className="space-y-3">
                                             <div className="relative">
-                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 dark:bg-gray-900 dark:border-gray-600" />
                                                 <Input
                                                     className="pl-10"
                                                     placeholder="Search for a campaign to support..."
@@ -148,7 +149,7 @@ export default function Create({ campaign, campaigns }) {
                                                     {searchResults.map((camp) => (
                                                         <div
                                                             key={camp.id}
-                                                            className="p-4 hover:bg-gray-50 cursor-pointer border-b last:border-b-0 transition-colors"
+                                                            className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0 transition-colors"
                                                             onClick={() => selectCampaign(camp)}
                                                         >
                                                             <div className="flex items-center gap-3">
@@ -165,8 +166,8 @@ export default function Create({ campaign, campaigns }) {
 
                                 {/* Amount */}
                                 <div className="space-y-4">
-                                    <Label htmlFor="amount" className="text-base font-semibold flex items-center gap-2">
-                                        <Gift className="w-4 h-4 text-gray-600" />
+                                    <Label htmlFor="amount" className="text-base font-semibold flex items-center gap-2 dark:text-white">
+                                        <Gift className="w-4 h-4 text-gray-600 dark:text-white" />
                                         Donation Amount
                                     </Label>
                                     
@@ -179,7 +180,7 @@ export default function Create({ campaign, campaigns }) {
                                                 variant={formData.amount == amount ? "default" : "outline"}
                                                 className={`h-12 text-sm font-medium transition-all ${
                                                     formData.amount == amount 
-                                                        ? 'bg-gray-900 text-white shadow-md' 
+                                                        ? 'bg-gray-900 text-white shadow-md dark:bg-gray-700' 
                                                         : 'hover:border-gray-300 hover:bg-gray-50'
                                                 }`}
                                                 onClick={() => setFormData(prev => ({ ...prev, amount: amount.toString() }))}
@@ -191,7 +192,7 @@ export default function Create({ campaign, campaigns }) {
                                     
                                     {/* Custom Amount Input */}
                                     <div className="space-y-3">
-                                        <Label htmlFor="amount" className="text-sm text-gray-600">Or enter custom amount:</Label>
+                                        <Label htmlFor="amount" className="text-sm text-gray-600 dark:text-white">Or enter custom amount:</Label>
                                         <Input
                                             id="amount"
                                             type="number"
@@ -213,8 +214,8 @@ export default function Create({ campaign, campaigns }) {
 
                                 {/* Message */}
                                 <div className="space-y-3">
-                                    <Label htmlFor="message" className="text-base font-semibold flex items-center gap-2">
-                                        <Users className="w-4 h-4 text-gray-600" />
+                                    <Label htmlFor="message" className="text-base font-semibold flex items-center gap-2 dark:text-white">
+                                        <Users className="w-4 h-4 text-gray-600 dark:text-white" />
                                         Personal Message <span className="text-sm font-normal text-gray-500">(Optional)</span>
                                     </Label>
                                     <Textarea
@@ -226,23 +227,23 @@ export default function Create({ campaign, campaigns }) {
                                         rows={9}
                                         className="resize-none"
                                     />
-                                    <div className="flex justify-between text-xs text-gray-500">
+                                    <div className="flex justify-between text-xs text-gray-500 dark:text-white">
                                         <span>Your message will be shared with the campaign organizer</span>
                                         <span>{formData.message.length}/500</span>
                                     </div>
                                     
                                     {/* Anonymous Option */}
-                                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded border mt-4">
+                                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded border mt-4 dark:bg-gray-800 dark:border-gray-600">
                                         <Checkbox
                                             id="anonymous"
                                             checked={formData.anonymous}
                                             onCheckedChange={(checked) => setFormData(prev => ({ ...prev, anonymous: checked }))}
                                         />
                                         <div>
-                                            <Label htmlFor="anonymous" className="text-sm cursor-pointer font-medium">
+                                            <Label htmlFor="anonymous" className="text-sm cursor-pointer font-medium dark:text-white">
                                                 Donate anonymously
                                             </Label>
-                                            <p className="text-xs text-gray-600 mt-1">
+                                            <p className="text-xs text-gray-600 mt-1 dark:text-white">
                                                 Your name won't be displayed publicly with this donation
                                             </p>
                                         </div>
@@ -257,7 +258,7 @@ export default function Create({ campaign, campaigns }) {
                             <Button 
                                 type="submit" 
                                 onClick={handleSubmit}
-                                className="w-full h-12 text-base font-semibold bg-gray-900 hover:bg-gray-800 shadow-md transition-all duration-200"
+                                className="w-full h-12 text-base font-semibold bg-gray-900 hover:bg-gray-800 shadow-md transition-all duration-200 dark:text-white dark:bg-gray-700 dark:hover:bg-gray-800"
                                 disabled={!formData.campaign_id || !formData.amount}
                             >
                                 <Heart className="w-4 h-4 mr-2" />

@@ -174,7 +174,7 @@ const handleSave = () => {
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4">
                         <div>
-                            <Label className="mb-1">Campaign Title</Label>
+                            <Label className="mb-1 dark:text-white">Campaign Title</Label>
                             <Input
                                 placeholder="Enter your title"
                                 value={campaignData.title}
@@ -187,9 +187,9 @@ const handleSave = () => {
                             />
                         </div>
 
-                        <div>
-                            <Label className="mb-1">Description</Label>
-                            <Textarea
+                        <div className="dark:text-white">
+                            <Label className="mb-1 dark:text-white">Description</Label>
+                            <Textarea 
                                 placeholder={`Give your campaign a brief description:
 (what your product is, what your plan is for this campaign, or you can describe what your campaign is about)`}
                                 value={campaignData.description}
@@ -199,12 +199,12 @@ const handleSave = () => {
                                         description: e.target.value,
                                     })
                                 }
-                                className="min-h-36"
+                                className="min-h-36 dark:text-white"
                             />
                         </div>
 
                         <div>
-                            <Label className="mb-1">Category</Label>
+                            <Label className="mb-1 dark:text-white">Category</Label>
                             <Select
                                 value={campaignData.category}
                                 onValueChange={(dat) =>
@@ -228,7 +228,7 @@ const handleSave = () => {
                         </div>
 
                         <div>
-                            <Label>Location</Label>
+                            <Label className="mb-1 dark:text-white">Location</Label>
                             <Button
                                 className="w-full gap-4"
                                 variant="outline"
@@ -247,7 +247,7 @@ const handleSave = () => {
                         <div className="flex justify-between items-start gap-4 mt-4">
                             <div className="w-3/6">
                                 <div className="flex flex-row items-center justify-between">
-                                    <Label className="mb-1">Goal Amount</Label>
+                                    <Label className="mb-1 dark:text-white">Goal Amount</Label>
                                 </div>
                                 <div className="w-full">
                                     <InputGroup
@@ -270,7 +270,7 @@ const handleSave = () => {
                                             <Label>,00</Label>
                                         </InputGroupAddon>
                                         <InputGroupAddon>
-                                            <Label>Rp. </Label>
+                                            <Label className="dark:text-white">Rp. </Label>
                                         </InputGroupAddon>
                                     </InputGroup>
                                 </div>
@@ -290,7 +290,7 @@ const handleSave = () => {
                             </div>
 
                             <div className="w-3/6 flex flex-col items-start justify-center ">
-                                <Label className="mb-1">
+                                <Label className="mb-1 dark:text-white">
                                     Campaign Duration
                                 </Label>
                                 <InputGroup className="h-[40px] w-full">
@@ -305,7 +305,7 @@ const handleSave = () => {
                                         }
                                     />
                                     <InputGroupAddon align="inline-end">
-                                        <Label>Days</Label>
+                                        <Label className="dark:text-white">Days</Label>
                                     </InputGroupAddon>
                                     <InputGroupAddon>
                                         <CalendarDays />

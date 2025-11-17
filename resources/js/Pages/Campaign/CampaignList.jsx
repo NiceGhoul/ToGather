@@ -101,7 +101,7 @@ const CampaignList = () => {
                 return (
                     <div
                         key={idx}
-                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
+                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between dark:bg-gray-800 dark:border-gray-700"
                     >
                         {!campaign.thumbnail_url && (
                             <img
@@ -111,13 +111,13 @@ const CampaignList = () => {
                             />
                         )}
 
-                        <h2 className="h-[48px] flex justify-center items-center text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden leading-snug">
+                        <h2 className="h-[48px] flex justify-center items-center text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden leading-snug dark:text-white">
                             {campaign.title.length > 50
                                 ? campaign.title.substring(0, 50) + "..."
                                 : campaign.title}
                         </h2>
 
-                        <p className="text-sm text-gray-600 text-center mb-2">
+                        <p className="text-sm text-gray-600 text-center mb-2 dark:text-gray-400">
                             {new Date(
                                 campaign.start_campaign
                             ).toLocaleDateString() +
@@ -136,21 +136,21 @@ const CampaignList = () => {
                             </span>
                         </div>
 
-                        <p className="h-[80px] text-sm text-gray-700 mb-3 text-justify">
+                        <p className="h-[80px] text-sm text-gray-700 mb-3 text-justify dark:text-gray-300">
                             {campaign.description
                                 ?.replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 150) || "No description available."}
                             ...
                         </p>
 
-                        <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                        <div className="w-full bg-gray-200 rounded-full h-3 mb-3 dark:bg-gray-700">
                             <div
                                 className="bg-purple-700 h-3 rounded-full"
                                 style={{ width: `${progress}%` }}
                             ></div>
                         </div>
 
-                        <p className="text-sm text-gray-600 mb-2 text-center">
+                        <p className="text-sm text-gray-600 mb-2 text-center dark:text-gray-400">
                             Raised{" "}
                             {parseInt(campaign.collected_amount).toLocaleString(
                                 "id-ID",
@@ -225,7 +225,7 @@ const CampaignList = () => {
                     }}
                 >
                     <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full">
-                        <h1 className="text-4xl font-bold text-white text-center">
+                        <h1 className="text-4xl font-bold text-white text-center dark:text-white">
                             <p>Together we Rise ToGather we Grow</p>
                         </h1>
                     </div>
@@ -286,6 +286,7 @@ const CampaignList = () => {
                     <Input
                         placeholder="Search Campaign"
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="dark:bg-gray-800 dark:text-white dark:border-gray-600"
                     />
                     <Button variant="outline" aria-label="Search">
                         <SearchIcon />
@@ -296,7 +297,7 @@ const CampaignList = () => {
             {/* lower part (campaigns) */}
             <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4">
+                    <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4 dark:text-white">
                         <Separator className="flex-1" />
                         {chosenCategory === "All"
                             ? "All Campaigns"
@@ -310,7 +311,7 @@ const CampaignList = () => {
                             {cardRepeater(campaignList)}
                         </div>
                     ) : (
-                        <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20">
+                        <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20 dark:text-gray-400">
                             No campaigns found.
                         </p>
                     )}

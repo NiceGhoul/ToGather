@@ -81,7 +81,7 @@ const handleDelete = (dat, idx) => {
             <div className="w-full h-full items-center justify-center flex">
                 {userQuestions.length === 0 ? (
                     <div className="flex flex-col gap-8">
-                        <Label className="text-lg font-extralight italic text-gray-300">
+                        <Label className="text-lg font-extralight italic text-gray-300 dark:text-white">
                             There are no FAQ available
                         </Label>
                     </div>

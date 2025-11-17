@@ -43,10 +43,10 @@ export const UpperPreview = ({campaign, user, images}) => {
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col gap-1 justify-center">
-                        <Label className="text-3xl text-start font-semibold">
+                        <Label className="text-3xl text-start font-semibold dark:text-white">
                             {campaign.title}
                         </Label>
-                        <Label className="text-md text-start font-medium">
+                        <Label className="text-md text-start font-medium dark:text-white">
                             {"Created by " + user.nickname}
                         </Label>
                     </div>
