@@ -1,5 +1,6 @@
 import { Link } from "@inertiajs/react";
 import { ChevronDown } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Navbar_Guest() {
     // fungsi bantu kalau mau highlight aktif

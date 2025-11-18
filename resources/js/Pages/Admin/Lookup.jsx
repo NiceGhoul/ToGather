@@ -88,7 +88,7 @@ export default function Lookup() {
     return (
         <AdminLayout title="Lookup Table">
             <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">Lookup Table</h1>
+                <h1 className="text-2xl font-bold mb-4 dark:text-white">Lookup Table</h1>
                 <div className="btnContainer mb-4 flex justify-end">
                     <Button
                         variant="default"
@@ -99,36 +99,36 @@ export default function Lookup() {
                         + Add New Lookup
                     </Button>
                 </div>
-                <table className="min-w-full border">
+                <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
                     <thead>
-                        <tr className="bg-gray-100">
-                            <th className="border px-4 py-2 hidden">ID</th>
-                            <th className="border px-4 py-2">Type</th>
-                            <th className="border px-4 py-2">Code</th>
-                            <th className="border px-4 py-2">Value</th>
-                            <th className="border px-4 py-2">Description</th>
-                            <th className="border px-4 py-2">Action</th>
+                        <tr className="bg-gray-100 dark:bg-gray-700">
+                            <th className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">ID</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Type</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Code</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Value</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Description</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {lookups.map((lookup) => (
-                            <tr key={lookup.id}>
-                                <td className="border px-4 py-2 hidden">
+                            <tr key={lookup.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">
                                     {lookup.id}
                                 </td>
-                                <td className="border px-4 py-2">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_type}
                                 </td>
-                                <td className="border px-4 py-2">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_code}
                                 </td>
-                                <td className="border px-4 py-2">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_value}
                                 </td>
-                                <td className="border px-4 py-2">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_description}
                                 </td>
-                                <td className="border px-4 py-2 text-center space-x-2">
+                                <td className="border px-4 py-2 text-center space-x-2 dark:border-gray-700 dark:text-gray-200">
                                     {/* Tombol Edit */}
                                     <Button
                                         variant="outline"
@@ -163,21 +163,20 @@ export default function Lookup() {
             {/* Modal Edit */}
             {showModal && editData && (
                 <div
-                    className="fixed inset-0 flex items-center justify-center z-50"
-                    style={{ background: "rgba(255,255,255,0.5)" }}
+                    className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 dark:bg-black/50"
                     onClick={handleModalClose}
                 >
                     <div
-                        className="bg-white p-6 rounded shadow-lg w-full max-w-md relative"
+                        className="bg-white dark:bg-gray-900 p-6 rounded shadow-lg w-full max-w-md relative"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <h2 className="text-xl font-bold mb-4">
+                        <h2 className="text-xl font-bold mb-4 dark:text-white">
                             {editData.id ? "Edit Lookup" : "Add New Lookup"}
                         </h2>
 
                         <form onSubmit={handleModalSave} className="space-y-3">
                             <div>
-                                <label className="block font-medium">
+                                <label className="block font-medium dark:text-gray-200">
                                     Type
                                 </label>
                                 <input
@@ -185,13 +184,13 @@ export default function Lookup() {
                                     name="lookup_type"
                                     value={editData.lookup_type}
                                     onChange={handleChange}
-                                    className="border rounded w-full p-2"
+                                    className="border rounded w-full p-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                     required
                                     placeholder="Lookup Type"
                                 />
                             </div>
                             <div>
-                                <label className="block font-medium">
+                                <label className="block font-medium dark:text-gray-200">
                                     Code
                                 </label>
                                 <input
@@ -199,13 +198,13 @@ export default function Lookup() {
                                     name="lookup_code"
                                     value={editData.lookup_code}
                                     onChange={handleChange}
-                                    className="border rounded w-full p-2"
+                                    className="border rounded w-full p-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                     required
                                     placeholder="Lookup Code"
                                 />
                             </div>
                             <div>
-                                <label className="block font-medium">
+                                <label className="block font-medium dark:text-gray-200">
                                     Value
                                 </label>
                                 <input
@@ -213,13 +212,13 @@ export default function Lookup() {
                                     name="lookup_value"
                                     value={editData.lookup_value}
                                     onChange={handleChange}
-                                    className="border rounded w-full p-2"
+                                    className="border rounded w-full p-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                     required
                                     placeholder="Lookup Value"
                                 />
                             </div>
                             <div>
-                                <label className="block font-medium">
+                                <label className="block font-medium dark:text-gray-200">
                                     Description
                                 </label>
                                 <input
@@ -227,7 +226,7 @@ export default function Lookup() {
                                     name="lookup_description"
                                     value={editData.lookup_description || ""}
                                     onChange={handleChange}
-                                    className="border rounded w-full p-2"
+                                    className="border rounded w-full p-2 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                                     placeholder="Lookup Description"
                                 />
                             </div>

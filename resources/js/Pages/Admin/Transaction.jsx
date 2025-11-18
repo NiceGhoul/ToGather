@@ -29,9 +29,9 @@ export default function Transaction({ donations, stats }) {
 
     const getStatusBadge = (status) => {
         const variants = {
-            successful: "bg-green-100 text-green-800",
-            pending: "bg-yellow-100 text-yellow-800",
-            failed: "bg-red-100 text-red-800",
+            successful: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+            pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+            failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
         };
         return (
             <Badge
@@ -71,13 +71,13 @@ export default function Transaction({ donations, stats }) {
         <Layout_Admin>
             <Head title="Transactions" />
 
-            <div className="bg-gray-50 py-8">
+            <div className="bg-gray-50 dark:bg-gray-950 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                             Transaction Management
                         </h1>
-                        <p className="text-gray-600 mt-2">
+                        <p className="text-gray-600 dark:text-gray-400 mt-2">
                             Monitor all donation transactions
                         </p>
                     </div>
@@ -170,7 +170,7 @@ export default function Transaction({ donations, stats }) {
                                     paginatedDonations.map((donation) => (
                                         <div
                                             key={donation.id}
-                                            className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                                            className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -178,7 +178,7 @@ export default function Transaction({ donations, stats }) {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <p className="font-semibold text-gray-900">
+                                                        <p className="font-semibold text-gray-900 dark:text-white">
                                                             {donation.anonymous
                                                                 ? "Anonymous"
                                                                 : donation.user
@@ -189,13 +189,13 @@ export default function Transaction({ donations, stats }) {
                                                             donation.status
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-600">
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
                                                         Donated to:{" "}
                                                         {donation.campaign
                                                             ?.title ||
                                                             "Unknown Campaign"}
                                                     </p>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-500">
                                                         {formatDate(
                                                             donation.created_at
                                                         )}
@@ -203,13 +203,13 @@ export default function Transaction({ donations, stats }) {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-lg font-bold text-gray-900">
+                                                <p className="text-lg font-bold text-gray-900 dark:text-white">
                                                     {formatCurrency(
                                                         donation.amount
                                                     )}
                                                 </p>
                                                 {donation.message && (
-                                                    <p className="text-xs text-gray-500 max-w-xs truncate">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-500 max-w-xs truncate">
                                                         "{donation.message}"
                                                     </p>
                                                 )}
@@ -218,7 +218,7 @@ export default function Transaction({ donations, stats }) {
                                     ))
                                 ) : (
                                     <div className="text-center py-8">
-                                        <p className="text-gray-500">
+                                        <p className="text-gray-500 dark:text-gray-400">
                                             No transactions found
                                         </p>
                                     </div>
@@ -235,7 +235,7 @@ export default function Transaction({ donations, stats }) {
                                     >
                                         Prev
                                     </Button>
-                                    <span className="text-sm text-gray-600">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
                                         Page {currentPage} of {totalPages}
                                     </span>
                                     <Button

@@ -107,7 +107,7 @@ export default function Verification({ requests }) {
         <Layout_Admin title="User Verification List">
             <div className="p-6 space-y-6">
                 {/* 🔎 Filter Section */}
-                <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Search + Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -166,8 +166,8 @@ export default function Verification({ requests }) {
 
                     {/* Bulk Actions */}
                     {statusFilter !== "all" && statusFilter !== "rejected" && (
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">
-                            <div className="text-sm mr-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-t dark:border-gray-700 pt-3">
+                            <div className="text-sm mr-2 dark:text-gray-200">
                                 {selectedIds.length} selected
                             </div>
                             <div className="flex items-center gap-2">
@@ -241,13 +241,13 @@ export default function Verification({ requests }) {
                 </div>
 
                 {/* 🧾 Table */}
-                <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
-                    <table className="min-w-full border">
-                        <thead className="bg-gray-100">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
+                    <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
+                        <thead className="bg-gray-100 dark:bg-gray-700">
                             <tr>
                                 {statusFilter !== "all" &&
                                     statusFilter !== "rejected" && (
-                                        <th className="px-4 py-2 border w-12 text-center">
+                                        <th className="px-4 py-2 border dark:border-gray-700 w-12 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"
                                                 checked={
@@ -265,14 +265,14 @@ export default function Verification({ requests }) {
                                         </th>
                                     )}
 
-                                <th className="px-4 py-2 border">ID</th>
-                                <th className="px-4 py-2 border">Email</th>
-                                <th className="px-4 py-2 border">ID Photo</th>
-                                <th className="px-4 py-2 border">
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Email</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID Photo</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
                                     Selfie with ID
                                 </th>
-                                <th className="px-4 py-2 border">Status</th>
-                                <th className="px-4 py-2 border text-center">
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Status</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 text-center dark:text-gray-200">
                                     Actions
                                 </th>
                             </tr>
@@ -280,10 +280,10 @@ export default function Verification({ requests }) {
                         <tbody>
                             {currentRequests.length > 0 ? (
                                 currentRequests.map((r) => (
-                                    <tr key={r.id}>
+                                    <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         {statusFilter !== "all" &&
                                             statusFilter !== "rejected" && (
-                                                <td className="border px-4 py-2 text-center">
+                                                <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedIds.includes(
@@ -298,13 +298,13 @@ export default function Verification({ requests }) {
                                                 </td>
                                             )}
 
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {r.id}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {r.user.email}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             {r.id_photo_url ? (
                                                 <Button
                                                     className="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm"
@@ -320,12 +320,12 @@ export default function Verification({ requests }) {
                                                     ID Photo
                                                 </Button>
                                             ) : (
-                                                <span className="text-gray-400">
+                                                <span className="text-gray-400 dark:text-gray-500">
                                                     -
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             {r.selfie_url ? (
                                                 <Button
                                                     className="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm"
@@ -341,23 +341,23 @@ export default function Verification({ requests }) {
                                                     Selfie
                                                 </Button>
                                             ) : (
-                                                <span className="text-gray-400">
+                                                <span className="text-gray-400 dark:text-gray-500">
                                                     -
                                                 </span>
                                             )}
                                         </td>
                                         <td
-                                            className={`border px-4 py-2 capitalize font-medium text-center ${
+                                            className={`border dark:border-gray-700 px-4 py-2 capitalize font-medium text-center ${
                                                 r.status === "accepted"
-                                                    ? "text-green-600"
+                                                    ? "text-green-600 dark:text-green-400"
                                                     : r.status === "pending"
-                                                    ? "text-yellow-600"
-                                                    : "text-red-600"
+                                                    ? "text-yellow-600 dark:text-yellow-400"
+                                                    : "text-red-600 dark:text-red-400"
                                             }`}
                                         >
                                             {r.status}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <div className="flex justify-center gap-2">
                                                 {r.status === "pending" && (
                                                     <>
@@ -407,7 +407,7 @@ export default function Verification({ requests }) {
                                 <tr>
                                     <td
                                         colSpan="7"
-                                        className="text-center py-4 text-gray-500 italic"
+                                        className="text-center py-4 text-gray-500 dark:text-gray-400 italic border dark:border-gray-700"
                                     >
                                         No verification requests found.
                                     </td>
@@ -418,7 +418,7 @@ export default function Verification({ requests }) {
 
                     {/* 🔸 Pagination Section */}
                     <div className="flex items-center justify-between mt-4">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                             Page {currentPage} of {totalPages || 1}
                         </div>
                         <div className="flex gap-2">
@@ -468,10 +468,10 @@ export default function Verification({ requests }) {
                     onClick={() => setModalImage(null)}
                 >
                     <div
-                        className="bg-white rounded-lg shadow-lg p-4 max-w-3xl w-full"
+                        className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 max-w-3xl w-full"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <h2 className="text-lg font-semibold mb-3">
+                        <h2 className="text-lg font-semibold mb-3 dark:text-white">
                             {modalTitle}
                         </h2>
                         <img

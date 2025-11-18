@@ -156,7 +156,7 @@ export default function User_List() {
 
             <div className="p-6 space-y-6">
                 {/* 🔎 Filter + Bulk Section */}
-                <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Search & Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -199,8 +199,8 @@ export default function User_List() {
                     </div>
 
                     {/* Bulk actions */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
-                        <div className="text-sm text-gray-600 mr-2">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-t dark:border-gray-700 pt-3">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mr-2">
                             {selectedIds.length} selected
                         </div>
                         <div className="flex items-center gap-2">
@@ -239,11 +239,11 @@ export default function User_List() {
                 </div>
 
                 {/* 🧾 Table */}
-                <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
-                    <table className="min-w-full border">
-                        <thead className="bg-gray-100">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
+                    <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
+                        <thead className="bg-gray-100 dark:bg-gray-700">
                             <tr>
-                                <th className="px-4 py-2 border w-12 text-center">
+                                <th className="px-4 py-2 border dark:border-gray-700 w-12 text-center dark:text-gray-200">
                                     <input
                                         type="checkbox"
                                         checked={
@@ -256,13 +256,13 @@ export default function User_List() {
                                         }
                                     />
                                 </th>
-                                <th className="px-4 py-2 border">ID</th>
-                                <th className="px-4 py-2 border">Nickname</th>
-                                <th className="px-4 py-2 border">Email</th>
-                                <th className="px-4 py-2 border">Address</th>
-                                <th className="px-4 py-2 border">Role</th>
-                                <th className="px-4 py-2 border">Status</th>
-                                <th className="px-4 py-2 border text-center">
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Nickname</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Email</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Address</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Role</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Status</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 text-center dark:text-gray-200">
                                     Actions
                                 </th>
                             </tr>
@@ -270,8 +270,8 @@ export default function User_List() {
                         <tbody>
                             {currentUsers.length > 0 ? (
                                 currentUsers.map((u) => (
-                                    <tr key={u.id}>
-                                        <td className="border px-4 py-2 text-center">
+                                    <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
@@ -282,31 +282,31 @@ export default function User_List() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {u.id}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {u.nickname}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {u.email}
                                         </td>
-                                        <td className="border px-4 py-2 truncate max-w-xs">
+                                        <td className="border dark:border-gray-700 px-4 py-2 truncate max-w-xs dark:text-gray-200">
                                             {u.address}
                                         </td>
-                                        <td className="border px-4 py-2 capitalize">
+                                        <td className="border dark:border-gray-700 px-4 py-2 capitalize dark:text-gray-200">
                                             {u.role}
                                         </td>
                                         <td
-                                            className={`border px-4 py-2 capitalize font-medium ${
+                                            className={`border dark:border-gray-700 px-4 py-2 capitalize font-medium ${
                                                 u.status === "banned"
-                                                    ? "text-red-600"
-                                                    : "text-green-600"
+                                                    ? "text-red-600 dark:text-red-400"
+                                                    : "text-green-600 dark:text-green-400"
                                             }`}
                                         >
                                             {u.status}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <Popup
                                                 triggerText={
                                                     u.status === "banned" ? (
@@ -346,7 +346,7 @@ export default function User_List() {
                                 <tr>
                                     <td
                                         colSpan="8"
-                                        className="text-center py-4 text-gray-500 italic"
+                                        className="text-center py-4 text-gray-500 dark:text-gray-400 italic border dark:border-gray-700"
                                     >
                                         No users found.
                                     </td>
@@ -357,7 +357,7 @@ export default function User_List() {
 
                     {/* Pagination */}
                     <div className="flex items-center justify-between mt-4">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                             Page {currentPage} of {totalPages || 1}
                         </div>
                         <div className="flex gap-2">

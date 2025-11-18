@@ -25,6 +25,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useState, useEffect } from "react";
 
 export default function Page({ children, title }) {
@@ -83,7 +84,9 @@ export default function Page({ children, title }) {
                                 <Separator orientation="vertical" className=" data-[orientation=vertical]:h-4" />
                                 <h1 className="text-lg font-semibold">{title}</h1>
                             </div>
-                            <DropdownMenu onOpenChange={(open) => {
+                            <div className="flex items-center gap-2">
+                                <ThemeToggle />
+                                <DropdownMenu onOpenChange={(open) => {
                                 if (open) {
                                     fetchNotifications();
                                     if (unreadCount > 0) {
@@ -133,6 +136,7 @@ export default function Page({ children, title }) {
                                     </ScrollArea>
                                 </DropdownMenuContent>
                             </DropdownMenu>
+                            </div>
                         </div>
                     </header>
                     <div className="flex-1 overflow-auto">

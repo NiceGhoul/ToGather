@@ -53,27 +53,27 @@ export default function Dashboard() {
 
     const getStatusColor = (status) => {
         const colors = {
-            pending: 'bg-yellow-100 text-yellow-800',
-            approved: 'bg-green-100 text-green-800',
-            active: 'bg-green-100 text-green-800',
-            rejected: 'bg-red-100 text-red-800',
-            disabled: 'bg-gray-100 text-gray-800',
-            banned: 'bg-red-100 text-red-800',
+            pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+            approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+            active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+            rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+            disabled: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+            banned: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     };
 
     return (
         <Layout_Admin>
             <div className="p-6 space-y-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
                 </div>
                 
                 {/* Debug Info */}
-                <div className="text-xs text-gray-500">
-                    Daily: {dailyDonations?.length || 0} items, 
-                    Weekly: {weeklyDonations?.length || 0} items, 
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                    Daily: {dailyDonations?.length || 0} items,
+                    Weekly: {weeklyDonations?.length || 0} items,
                     Monthly: {monthlyDonations?.length || 0} items,
                     Yearly: {yearlyDonations?.length || 0} items
                 </div>
@@ -157,7 +157,7 @@ export default function Dashboard() {
                                             <select
                                                 value={dailyYear}
                                                 onChange={(e) => handleDailyChange(parseInt(e.target.value), dailyMonth, dailyWeek)}
-                                                className="px-3 py-1 border rounded-md"
+                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                             >
                                                 {Array.from({length: 5}, (_, i) => new Date().getFullYear() - i).map(year => (
                                                     <option key={year} value={year}>{year}</option>
@@ -166,7 +166,7 @@ export default function Dashboard() {
                                             <select
                                                 value={dailyMonth}
                                                 onChange={(e) => handleDailyChange(dailyYear, parseInt(e.target.value), dailyWeek)}
-                                                className="px-3 py-1 border rounded-md"
+                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                             >
                                                 {Array.from({length: 12}, (_, i) => i + 1).map(month => (
                                                     <option key={month} value={month}>
@@ -177,7 +177,7 @@ export default function Dashboard() {
                                             <select
                                                 value={dailyWeek}
                                                 onChange={(e) => handleDailyChange(dailyYear, dailyMonth, parseInt(e.target.value))}
-                                                className="px-3 py-1 border rounded-md"
+                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                             >
                                                 <option value={1}>Week 1</option>
                                                 <option value={2}>Week 2</option>
@@ -188,7 +188,7 @@ export default function Dashboard() {
                                     </div>
                                     {dailyDonations && dailyDonations.length === 0 ? (
                                         <div className="h-full flex items-center justify-center">
-                                            <p className="text-center text-gray-500">No donation data available</p>
+                                            <p className="text-center text-gray-500 dark:text-gray-400">No donation data available</p>
                                         </div>
                                     ) : (
                                         <ResponsiveContainer width="100%" height="100%">
@@ -223,7 +223,7 @@ export default function Dashboard() {
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e) => handleWeeklyChange(parseInt(e.target.value), selectedMonth)}
-                                                className="px-3 py-1 border rounded-md"
+                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                             >
                                                 {Array.from({length: 5}, (_, i) => new Date().getFullYear() - i).map(year => (
                                                     <option key={year} value={year}>{year}</option>
@@ -232,7 +232,7 @@ export default function Dashboard() {
                                             <select
                                                 value={selectedMonth}
                                                 onChange={(e) => handleWeeklyChange(selectedYear, parseInt(e.target.value))}
-                                                className="px-3 py-1 border rounded-md"
+                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                             >
                                                 {Array.from({length: 12}, (_, i) => i + 1).map(month => (
                                                     <option key={month} value={month}>
@@ -244,7 +244,7 @@ export default function Dashboard() {
                                     </div>
                                     {weeklyDonations && weeklyDonations.length === 0 ? (
                                         <div className="h-full flex items-center justify-center">
-                                            <p className="text-center text-gray-500">No donation data available</p>
+                                            <p className="text-center text-gray-500 dark:text-gray-400">No donation data available</p>
                                         </div>
                                     ) : (
                                         <ResponsiveContainer width="100%" height="100%">
@@ -276,7 +276,7 @@ export default function Dashboard() {
                                         <select
                                             value={monthlyYear}
                                             onChange={(e) => handleMonthlyYearChange(parseInt(e.target.value))}
-                                            className="px-3 py-1 border rounded-md"
+                                            className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                         >
                                             {Array.from({length: 5}, (_, i) => new Date().getFullYear() - i).map(year => (
                                                 <option key={year} value={year}>{year}</option>
@@ -285,7 +285,7 @@ export default function Dashboard() {
                                     </div>
                                     {monthlyDonations && monthlyDonations.length === 0 ? (
                                         <div className="h-full flex items-center justify-center">
-                                            <p className="text-center text-gray-500">No donation data available</p>
+                                            <p className="text-center text-gray-500 dark:text-gray-400">No donation data available</p>
                                         </div>
                                     ) : (
                                         <ResponsiveContainer width="100%" height="100%">
@@ -315,7 +315,7 @@ export default function Dashboard() {
                                     <h3 className="text-lg font-medium mb-4">All Years</h3>
                                     {yearlyDonations && yearlyDonations.length === 0 ? (
                                         <div className="h-full flex items-center justify-center">
-                                            <p className="text-center text-gray-500">No donation data available</p>
+                                            <p className="text-center text-gray-500 dark:text-gray-400">No donation data available</p>
                                         </div>
                                     ) : (
                                         <ResponsiveContainer width="100%" height="100%">
@@ -352,7 +352,7 @@ export default function Dashboard() {
                         <CardContent>
                             <div className="space-y-4">
                                 {Object.entries(campaignStats).map(([status, count]) => (
-                                    <div key={status} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div key={status} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-3 h-3 rounded-full ${
                                                 status === 'pending' ? 'bg-yellow-500' :
@@ -364,7 +364,7 @@ export default function Dashboard() {
                                             }`}></div>
                                             <span className="font-medium capitalize">{status}</span>
                                         </div>
-                                        <span className="text-2xl font-bold text-gray-700">{count}</span>
+                                        <span className="text-2xl font-bold text-gray-700 dark:text-gray-300">{count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -378,7 +378,7 @@ export default function Dashboard() {
                         <CardContent>
                             <div className="space-y-4">
                                 {Object.entries(articleStats).map(([status, count]) => (
-                                    <div key={status} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div key={status} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-3 h-3 rounded-full ${
                                                 status === 'pending' ? 'bg-yellow-500' :
@@ -390,7 +390,7 @@ export default function Dashboard() {
                                             }`}></div>
                                             <span className="font-medium capitalize">{status}</span>
                                         </div>
-                                        <span className="text-2xl font-bold text-gray-700">{count}</span>
+                                        <span className="text-2xl font-bold text-gray-700 dark:text-gray-300">{count}</span>
                                     </div>
                                 ))}
                             </div>

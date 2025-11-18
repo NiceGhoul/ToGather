@@ -168,13 +168,13 @@ export default function ArticleRequestList() {
             />
 
             <div className="p-6 space-y-6">
-                <h1 className="text-2xl font-bold mb-2">
+                <h1 className="text-2xl font-bold mb-2 dark:text-white">
                     Pending Article Requests
                 </h1>
 
                 {/* 🔹 Bulk Actions */}
-                <div className="mb-4 flex items-center gap-3 flex-row justify-end border-b pb-3">
-                    <div className="text-sm mr-auto">
+                <div className="mb-4 flex items-center gap-3 flex-row justify-end border-b dark:border-gray-700 pb-3">
+                    <div className="text-sm mr-auto dark:text-gray-200">
                         {selectedIds.length} selected
                     </div>
 
@@ -207,11 +207,11 @@ export default function ArticleRequestList() {
                 </div>
 
                 {/* 🧾 Table + Pagination wrapper */}
-                <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[45rem]">
-                    <table className="min-w-full border text-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[45rem]">
+                    <table className="min-w-full border dark:border-gray-700 text-sm dark:bg-gray-800">
                         <thead>
-                            <tr className="bg-gray-100 text-left">
-                                <th className="border px-4 py-2 text-center">
+                            <tr className="bg-gray-100 dark:bg-gray-700 text-left">
+                                <th className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                     <input
                                         type="checkbox"
                                         checked={
@@ -224,12 +224,12 @@ export default function ArticleRequestList() {
                                         }
                                     />
                                 </th>
-                                <th className="border px-4 py-2">Id</th>
-                                <th className="border px-4 py-2">Title</th>
-                                <th className="border px-4 py-2">Author</th>
-                                <th className="border px-4 py-2">Category</th>
-                                <th className="border px-4 py-2">Created At</th>
-                                <th className="border px-4 py-2 text-center">
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Id</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Title</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Author</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Category</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Created At</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                     Action
                                 </th>
                             </tr>
@@ -237,8 +237,8 @@ export default function ArticleRequestList() {
                         <tbody>
                             {currentArticles.length > 0 ? (
                                 currentArticles.map((a) => (
-                                    <tr key={a.id} className="hover:bg-gray-50">
-                                        <td className="border px-4 py-2 text-center">
+                                    <tr key={a.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
@@ -249,24 +249,24 @@ export default function ArticleRequestList() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border px-4 py-2 font-medium">
+                                        <td className="border dark:border-gray-700 px-4 py-2 font-medium dark:text-gray-200">
                                             {a.id}
                                         </td>
-                                        <td className="border px-4 py-2 font-medium">
+                                        <td className="border dark:border-gray-700 px-4 py-2 font-medium dark:text-gray-200">
                                             {a.title}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.user?.nickname || a.user?.name}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.category}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {new Date(
                                                 a.created_at
                                             ).toLocaleString()}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <div className="flex flex-row justify-center gap-3">
                                                 <Button
                                                     onClick={() =>
@@ -312,7 +312,7 @@ export default function ArticleRequestList() {
                                 <tr>
                                     <td
                                         colSpan="7"
-                                        className="text-center py-6 text-gray-500 border italic"
+                                        className="text-center py-6 text-gray-500 dark:text-gray-400 border dark:border-gray-700 italic"
                                     >
                                         No pending article requests.
                                     </td>
@@ -323,7 +323,7 @@ export default function ArticleRequestList() {
 
                     {/* 🔸 Pagination Section */}
                     <div className="flex items-center justify-between mt-4">
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                             Page {currentPage} of {totalPages || 1}
                         </div>
                         <div className="flex gap-2">
@@ -390,11 +390,11 @@ export default function ArticleRequestList() {
                     }}
                 >
                     <div className="mt-2">
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 dark:text-white">
                             Reason for Rejection:
                         </label>
                         <textarea
-                            className="w-full border rounded-md p-2 text-sm"
+                            className="w-full border dark:border-gray-600 rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white"
                             rows={4}
                             placeholder="Write your reason here..."
                             value={rejectReason}
@@ -428,15 +428,15 @@ export default function ArticleRequestList() {
                     }}
                 >
                     <div className="mt-2">
-                        <p className="text-sm mb-2">
+                        <p className="text-sm mb-2 dark:text-gray-200">
                             You are rejecting <b>{selectedIds.length}</b>{" "}
                             article(s).
                         </p>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 dark:text-white">
                             Reason for Rejection:
                         </label>
                         <textarea
-                            className="w-full border rounded-md p-2 text-sm"
+                            className="w-full border dark:border-gray-600 rounded-md p-2 text-sm dark:bg-gray-800 dark:text-white"
                             rows={4}
                             placeholder="Write your reason here..."
                             value={bulkRejectReason}

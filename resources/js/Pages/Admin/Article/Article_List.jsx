@@ -147,7 +147,7 @@ export default function Article_List() {
 
             <div className="p-6 space-y-6">
                 {/* 🔎 Filter & Bulk Section */}
-                <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Row 1: Search & Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ export default function Article_List() {
                             <select
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                className="h-10 w-[200px] rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700 shadow-sm focus:border-purple-700 focus:ring-2 focus:ring-purple-700/50 focus:outline-none"
+                                className="h-10 w-[200px] rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 text-sm text-gray-700 dark:text-white shadow-sm focus:border-purple-700 focus:ring-2 focus:ring-purple-700/50 focus:outline-none"
                             >
                                 <option value="">All Categories</option>
                                 {categories.map((c) => (
@@ -224,8 +224,8 @@ export default function Article_List() {
                     </div>
 
                     {/* Row 2: Bulk actions */}
-                    <div className="flex flex-wrap justify-end items-center gap-2 border-t pt-3">
-                        <div className="text-sm mr-auto">
+                    <div className="flex flex-wrap justify-end items-center gap-2 border-t dark:border-gray-700 pt-3">
+                        <div className="text-sm mr-auto dark:text-gray-200">
                             {selectedIds.length} selected
                         </div>
 
@@ -286,11 +286,11 @@ export default function Article_List() {
                 </div>
 
                 {/* 🗂️ Articles Table */}
-                <div className="bg-white rounded-lg shadow-md p-4">
-                    <table className="min-w-full border">
-                        <thead className="bg-gray-100">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                    <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
+                        <thead className="bg-gray-100 dark:bg-gray-700">
                             <tr>
-                                <th className="px-4 py-2 border w-12 text-center">
+                                <th className="px-4 py-2 border dark:border-gray-700 w-12 text-center dark:text-gray-200">
                                     <input
                                         type="checkbox"
                                         checked={
@@ -303,19 +303,19 @@ export default function Article_List() {
                                         }
                                     />
                                 </th>
-                                <th className="px-4 py-2 border">Id</th>
-                                <th className="px-4 py-2 border">Title</th>
-                                <th className="px-4 py-2 border">Category</th>
-                                <th className="px-4 py-2 border">Author</th>
-                                <th className="px-4 py-2 border">Status</th>
-                                <th className="px-4 py-2 border">Actions</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Id</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Title</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Category</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Author</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Status</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredArticles.length > 0 ? (
                                 filteredArticles.map((a) => (
-                                    <tr key={a.id}>
-                                        <td className="border px-4 py-2 text-center">
+                                    <tr key={a.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
@@ -326,24 +326,24 @@ export default function Article_List() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.id}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.title}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.category}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.user?.nickname || a.user?.name}
                                         </td>
-                                        <td className="border px-4 py-2 capitalize">
+                                        <td className="border dark:border-gray-700 px-4 py-2 capitalize dark:text-gray-200">
                                             {a.status === "approved"
                                                 ? "Approved and Enabled"
                                                 : a.status}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <div className="flex justify-center gap-3">
                                                 <Button
                                                     onClick={() =>
@@ -394,7 +394,7 @@ export default function Article_List() {
                                 <tr>
                                     <td
                                         colSpan="7"
-                                        className="text-center py-4 text-gray-500 italic"
+                                        className="text-center py-4 text-gray-500 dark:text-gray-400 italic border dark:border-gray-700"
                                     >
                                         No articles found.
                                     </td>
