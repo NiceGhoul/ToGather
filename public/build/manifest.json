@@ -11,13 +11,19 @@
     "file": "assets/marker-icon-hN30_KVU.png",
     "src": "node_modules/leaflet/dist/images/marker-icon.png"
   },
+  "resources/css/app.css": {
+    "file": "assets/app-lBIB-CbI.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
   "resources/js/app.jsx": {
-    "file": "assets/app-sJvV49rt.js",
+    "file": "assets/app-CpCVeE6V.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
     "css": [
-      "assets/app-BllOqzGU.css"
+      "assets/app-CLcylvLU.css",
+      "assets/app-lBIB-CbI.css"
     ],
     "assets": [
       "assets/layers-BWBAp2CZ.png",
