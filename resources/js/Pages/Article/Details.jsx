@@ -1,8 +1,8 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { usePage } from "@inertiajs/react";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
+import { Button } from "@/Components/ui/button";
+import { Toggle } from "@/Components/ui/toggle";
 import { Heart, ArrowLeft } from "lucide-react";
 import Layout_Guest from "@/Layouts/Layout_Guest";
 

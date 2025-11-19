@@ -2,8 +2,8 @@ import * as React from "react"
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Data_Table from "@/Components/Data_Table"; // Import the reusable component
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/Components/ui/button"
+import { Checkbox } from "@/Components/ui/checkbox"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/Components/ui/dropdown-menu"
 
 // Define the columns specifically for the UserList page.
 // This could also be in its own file if it gets very large.

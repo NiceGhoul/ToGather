@@ -7,8 +7,8 @@ import {
     CardDescription,
     CardContent,
     CardFooter,
-} from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
+} from "@/Components/ui/card";
+import { Spinner } from "@/Components/ui/spinner";
 import Layout_Register from "../../Layouts/Layout_Register";
 import { Link } from "@inertiajs/react";
 import axios from "axios";

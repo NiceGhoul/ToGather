@@ -1,6 +1,6 @@
 import { usePage, router } from "@inertiajs/react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Button } from "@/Components/ui/button";
 import { useState, useEffect } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Popup from "@/Components/Popup";
@@ -181,41 +181,37 @@ export default function Article_List() {
                         {/* Status filter buttons */}
                         <div className="flex items-center gap-2">
                             <Button
-                                className={`${
-                                    status === ""
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
+                                className={`${status === ""
+                                    ? "bg-purple-800 text-white"
+                                    : "bg-purple-400"
+                                    } hover:bg-purple-800`}
                                 onClick={() => setStatus("")}
                             >
                                 All
                             </Button>
                             <Button
-                                className={`${
-                                    status === "approved"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
+                                className={`${status === "approved"
+                                    ? "bg-purple-800 text-white"
+                                    : "bg-purple-400"
+                                    } hover:bg-purple-800`}
                                 onClick={() => setStatus("approved")}
                             >
                                 Enabled
                             </Button>
                             <Button
-                                className={`${
-                                    status === "disabled"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
+                                className={`${status === "disabled"
+                                    ? "bg-purple-800 text-white"
+                                    : "bg-purple-400"
+                                    } hover:bg-purple-800`}
                                 onClick={() => setStatus("disabled")}
                             >
                                 Disabled
                             </Button>
                             <Button
-                                className={`${
-                                    status === "rejected"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
+                                className={`${status === "rejected"
+                                    ? "bg-purple-800 text-white"
+                                    : "bg-purple-400"
+                                    } hover:bg-purple-800`}
                                 onClick={() => setStatus("rejected")}
                             >
                                 Rejected
@@ -296,7 +292,7 @@ export default function Article_List() {
                                         checked={
                                             filteredArticles.length > 0 &&
                                             selectedIds.length ===
-                                                filteredArticles.length
+                                            filteredArticles.length
                                         }
                                         onChange={(e) =>
                                             handleSelectAll(e.target.checked)

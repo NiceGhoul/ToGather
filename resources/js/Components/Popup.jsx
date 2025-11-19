@@ -8,8 +8,8 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
     AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@/Components/ui/alert-dialog";
+import { Button } from "@/Components/ui/button";
 import { useState, useEffect } from "react";
 
 export default function Popup({
