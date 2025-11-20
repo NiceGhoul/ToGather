@@ -106,7 +106,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
 
     return (
         <>
-            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789]">
+            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789] dark:text-purple-400">
                 Project Updates
             </Label>
             <div className="flex flex-col justify-center items-center gap-8 h-full w-full p-6">
@@ -129,7 +129,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                         className="text-sm h-[50px]"
                                     />
                                 ) : (
-                                    <Label className="text-2xl font-bold text-[#7C4789]">
+                                    <Label className="text-2xl font-bold text-[#7C4789] dark:text-purple-400">
                                         {selectedUpdate.content
                                             ? selectedUpdate.content.split(
                                                   "~;"
@@ -139,7 +139,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                 )}
                                 {/* Date */}
                                 {!editMode && (
-                                    <p className="text-left text-base text-gray-400 my-2">
+                                    <p className="text-left text-base text-gray-400 dark:text-gray-500 my-2">
                                         {!selectedUpdate.created_at
                                             ? new Date().toLocaleDateString("en-GB").replaceAll("/", "-")
                                             : new Date(selectedUpdate.created_at).toLocaleDateString("en-GB").replaceAll("/", "-")
@@ -246,7 +246,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                         }
                                     />
                                 ) : (
-                                    <p className="text-left text-md text-gray-700 whitespace-pre-line">
+                                    <p className="text-left text-md text-gray-700 dark:text-gray-300 whitespace-pre-line">
                                         {selectedUpdate.content.split("~;")[1]}
                                     </p>
                                 )}
@@ -278,7 +278,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                 onClick={() =>
                                                     handleUpdatesDelete()
                                                 }
-                                                className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
+                                                className="cursor-pointer rounded-md p-1 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600 text-gray-600 dark:text-gray-300 transition-colors"
                                             />
 
                                             <Button
@@ -305,7 +305,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                 </div>
                             </>
                         ) : (
-                            <Label className="text-lg italic text-gray-400">
+                            <Label className="text-lg italic text-gray-400 dark:text-gray-500">
                                 No updates have been made.
                             </Label>
                         )}

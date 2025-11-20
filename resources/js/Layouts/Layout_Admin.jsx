@@ -6,16 +6,16 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/Components/ui/breadcrumb"
+import { Separator } from "@/Components/ui/separator"
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/Components/ui/sidebar"
 import { Link, usePage, router } from "@inertiajs/react";
 import { Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -23,9 +23,9 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+} from "@/Components/ui/dropdown-menu";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { ThemeToggle } from "@/Components/ui/theme-toggle";
 import { useState, useEffect } from "react";
 
 export default function Page({ children, title }) {

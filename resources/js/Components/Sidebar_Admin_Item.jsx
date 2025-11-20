@@ -13,14 +13,14 @@ import {
 
 import { NavMain } from "@/Components/Sidebar_Admin";
 import { NavUser } from "@/Components/Sidebar_Admin_Profile";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { TeamSwitcher } from "@/Components/team-switcher";
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
     SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@/Components/ui/sidebar";
 
 // Data for the main navigation
 const sidebarNavItems = [

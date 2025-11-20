@@ -75,7 +75,7 @@ const handleDelete = (dat, idx) => {
 
     return (
         <div className="flex justify-center items-center flex-col gap-45 h-full">
-            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789]">
+            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789] dark:text-purple-400">
                 Frequently Asked Questions
             </Label>
             <div className="w-full h-full items-center justify-center flex">
@@ -138,7 +138,7 @@ const handleDelete = (dat, idx) => {
                                                     className="w-[80%]"
                                                 />
                                             ) : (
-                                                <span className="text-xl font-semibold">
+                                                <span className="text-xl font-semibold dark:text-white">
                                                     {dat.question}
                                                 </span>
                                             )}
@@ -156,7 +156,7 @@ const handleDelete = (dat, idx) => {
                                                     rows={3}
                                                 />
                                             ) : (
-                                                <p className="mt-2 text-gray-700 text-base">
+                                                <p className="mt-2 text-gray-700 dark:text-gray-300 text-base">
                                                     {dat.answer}
                                                 </p>
                                             )}
@@ -180,14 +180,14 @@ const handleDelete = (dat, idx) => {
                                                 e.stopPropagation();
                                                 toggleEdit(idx);
                                             }}
-                                            className="cursor-pointer rounded-md p-1 hover:bg-gray-200 text-gray-600 hover:text-blue-600 transition-colors"
+                                            className="cursor-pointer rounded-md p-1 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
                                         />
                                     )}
 
                                     <Trash
                                         size={30}
                                         onClick={() => handleDelete(dat, idx)}
-                                        className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
+                                        className="cursor-pointer rounded-md p-1 hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600 text-gray-600 dark:text-gray-300 transition-colors"
                                     />
                                 </div>
                             </div>

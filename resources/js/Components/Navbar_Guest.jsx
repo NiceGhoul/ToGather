@@ -1,6 +1,6 @@
 import { Link } from "@inertiajs/react";
 import { ChevronDown } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeToggle } from "@/Components/ui/theme-toggle";
 
 export default function Navbar_Guest() {
     // fungsi bantu kalau mau highlight aktif
@@ -40,20 +40,20 @@ export default function Navbar_Guest() {
                         </button>
 
                         <div
-                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white text-gray-900 shadow-lg py-2 px-2 z-50
+                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-lg py-2 px-2 z-50
                                 opacity-0 translate-y-1 pointer-events-none
                                 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
                                 transition-all duration-150"
                         >
                             <Link
                                 href="/campaigns/list"
-                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Browse Campaigns
                             </Link>
                             <Link
                                 href="/login"
-                                className="block px-3 py-2 text-sm rounded-md font-semibold hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm rounded-md font-semibold hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Start a Campaign
                             </Link>
@@ -75,20 +75,20 @@ export default function Navbar_Guest() {
                         </button>
 
                         <div
-                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white text-gray-900 shadow-lg py-2 px-2 z-50
+                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-lg py-2 px-2 z-50
                                 opacity-0 translate-y-1 pointer-events-none
                                 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
                                 transition-all duration-150"
                         >
                             <Link
                                 href="/articles/list"
-                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Browse Articles
                             </Link>
                             <Link
                                 href="/login"
-                                className="block px-3 py-2 text-sm font-semibold rounded-md hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Write an Article
                             </Link>

@@ -164,7 +164,7 @@ export default function Edit() {
 
     // -------- CELL UI --------
     const renderCellContent = (block, idx) => {
-        if (!block) return <div className="text-gray-400">Empty</div>;
+        if (!block) return <div className="text-gray-400 dark:text-gray-500">Empty</div>;
 
         // TEXT BLOCK
         if (block.type === "text") {
@@ -220,7 +220,7 @@ export default function Edit() {
                         className="w-full rounded-md shadow"
                     />
                 ) : (
-                    <div className="text-gray-400">No Image</div>
+                    <div className="text-gray-400 dark:text-gray-500">No Image</div>
                 )}
             </div>
         );
@@ -368,9 +368,9 @@ export default function Edit() {
                         return (
                             <div
                                 key={i}
-                                className="p-4 border rounded-md bg-white shadow-sm"
+                                className="p-4 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 shadow-sm"
                             >
-                                <div className="mb-2 text-xs text-gray-400">
+                                <div className="mb-2 text-xs text-gray-400 dark:text-gray-500">
                                     Grid (1, {y}) —
                                     {block
                                         ? block.type === "text"

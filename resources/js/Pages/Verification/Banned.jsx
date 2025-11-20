@@ -10,7 +10,7 @@ export default function Banned() {
             <div className="container mx-auto px-4 py-8 mt-40">
                 <Card className="max-w-md mx-auto">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-red-600">
+                        <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
                             <AlertTriangle className="h-5 w-5" />
                             Account Banned
                         </CardTitle>
@@ -19,12 +19,12 @@ export default function Banned() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="text-center">
-                        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                        <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded">
                             <p className="font-medium">Your account is currently banned</p>
                             <p className="text-sm mt-1">You cannot create articles or campaigns</p>
                         </div>
-                        <p className="text-sm text-gray-600 mb-4">
-                            Your account has been suspended due to policy violations. 
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            Your account has been suspended due to policy violations.
                             Please contact support for more information about your account status.
                         </p>
                         <Button asChild className="w-full">
