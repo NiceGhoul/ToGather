@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
 import Popup from "@/Components/Popup";
 import {
     Search,

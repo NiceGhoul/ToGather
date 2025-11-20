@@ -1,7 +1,7 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { usePage, router } from "@inertiajs/react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { Heart, ArrowLeft } from "lucide-react";
 
 export default function MyArticleDetails() {

@@ -1,6 +1,6 @@
 import Layout_User from "@/Layouts/Layout_User";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 import { Link } from "@inertiajs/react";
 
 export default function CampaignPending() {

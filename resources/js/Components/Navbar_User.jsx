@@ -10,10 +10,10 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+} from "@/Components/ui/dropdown-menu";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { Separator } from "@/Components/ui/separator";
+import { ThemeToggle } from "@/Components/ui/theme-toggle";
 
 export default function Navbar_User() {
     const [open, setOpen] = useState(false);

@@ -6,11 +6,11 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 import { Spinner } from "@/Components/ui/spinner";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 import { useState } from "react";
 
 export default function Create() {

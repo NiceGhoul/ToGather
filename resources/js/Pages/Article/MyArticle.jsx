@@ -1,12 +1,12 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { Link, router, usePage } from "@inertiajs/react";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Toggle } from "@/components/ui/toggle";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { Input } from "@/components/ui/input";
+import { CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Toggle } from "@/Components/ui/toggle";
+import { Button } from "@/Components/ui/button";
+import { Separator } from "@/Components/ui/separator";
+import { Skeleton } from "@/Components/ui/skeleton";
+import { ButtonGroup } from "@/Components/ui/button-group";
+import { Input } from "@/Components/ui/input";
 import { SearchIcon, Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { IconFolderCode } from "@tabler/icons-react";
@@ -18,7 +18,7 @@ import {
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
-} from "@/components/ui/empty";
+} from "@/Components/ui/empty";
 
 export default function MyArticle({
     articles = [],

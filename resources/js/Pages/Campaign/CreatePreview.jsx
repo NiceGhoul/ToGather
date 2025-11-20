@@ -1,7 +1,7 @@
 import Popup from "@/Components/Popup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
-import {Card,CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Card,CardContent, CardDescription, CardHeader, CardTitle,} from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";

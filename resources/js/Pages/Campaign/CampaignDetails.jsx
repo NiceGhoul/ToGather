@@ -6,7 +6,7 @@ import { Progress } from "@/Components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Toggle } from "@/Components/ui/toggle";
 import Layout_User from "@/Layouts/Layout_User";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Inertia } from "@inertiajs/inertia";
 import { Link, usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
