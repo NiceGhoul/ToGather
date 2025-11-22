@@ -41,7 +41,8 @@ class CampaignController extends Controller
 
     public function AdminCampaign(Request $request)
     {
-        $baseStatuses = ['active', 'completed', 'rejected', 'banned'];
+        $baseStatuses = ['active', 'completed', 'rejected', 'banned', 'inactive'];
+        $categories = Lookup::where('lookup_type', 'CampaignCategory')->pluck('lookup_value');
         $campaigns = Campaign::with(['user', 'verifier'])
             ->whereIn('status', $baseStatuses)
             ->when($request->input('status'), function ($query, $status) {
@@ -51,15 +52,82 @@ class CampaignController extends Controller
 
         return Inertia::render('Admin/Campaign/Campaign_List', [
             'campaigns' => $campaigns,
+            'categories' => $categories,
             'filters' => $request->only(['status'])
         ]);
     }
     public function AdminVerification()
     {
+        $categories = Lookup::where('lookup_type', 'CampaignCategory')->pluck('lookup_value');
         $campaigns = Campaign::with(['user', 'verifier'])->where('status', 'pending')->get();
         return Inertia::render('Admin/Campaign/Campaign_Verification', [
             'campaigns' => $campaigns,
+            'categories' => $categories,
         ]);
+    }
+
+    public function AdminDelete($id){
+        $campaign = Campaign::find($id);
+        $campaign->delete();
+
+        NotificationController::notifyUser(
+            $campaign->user_id,
+            'campaign_deleted',
+            'Campaign Deleted',
+            "'{$campaign->title}' has been deleted by Admin.",
+            ['campaign_id' => $campaign->id]
+        );
+
+        return redirect()->route('admin.campaign.adminIndex')->with('success', 'Campaign deleted!');
+    }
+
+
+    public function AdminChangeStatus(Request $request, $id){
+        $campaign = Campaign::findOrFail($id);
+        $campaign->update(['status' => $request->status]);
+
+        // Notify user about article approval
+        NotificationController::notifyUser(
+            $campaign->user_id,
+            "campaign_{$request->status}",
+            'campaign Approved',
+            "Your Campaign '{$campaign->title}' status is now: {$request->status}!",
+            ['campaign_id' => $campaign->id]
+        );
+
+        return back()->with('success', 'Campaign Accepted by Admin!');
+    }
+
+    public function AdminActivate($id){
+        $campaign = Campaign::findOrFail($id);
+        $campaign->update(['status' => 'approved']);
+
+        // Notify user about article approval
+        NotificationController::notifyUser(
+            $campaign->user_id,
+            'campaign_approved',
+            'campaign Approved',
+            "Your Campaign '{$campaign->title}' has been approved and is now shown to the public!",
+            ['campaign_id' => $campaign->id]
+        );
+
+        return back()->with('success', 'Campaign Accepted by Admin!');
+    }
+
+    public function AdminDeactivate($id){
+        $campaign = Campaign::findOrFail($id);
+        $campaign->update(['status' => 'approved']);
+
+        // Notify user about article approval
+        NotificationController::notifyUser(
+            $campaign->user_id,
+            'campaign_approved',
+            'campaign Approved',
+            "Your Campaign '{$campaign->title}' has been approved and is now shown to the public!",
+            ['campaign_id' => $campaign->id]
+        );
+
+        return back()->with('success', 'Campaign Accepted by Admin!');
     }
 
     /**
@@ -89,37 +157,6 @@ class CampaignController extends Controller
                 ->latest()
                 ->first();
         }
-        $content = [];
-        // if($usersCampaign){
-        //     $content = CampaignContent::with('images', 'videos')->where('campaign_id', $usersCampaign->id)->get()->map(function($data){
-        //         $imageMedia = $data->images->map(function ($img) {
-        //             return [
-        //                 'path' => $img->path,
-        //                 'filetype' => 'image',
-        //                 'url' => $img->url,
-        //             ];
-        //         });
-
-        //         $videoMedia = $data->videos->map(function ($vid) {
-        //             return [
-        //                 'path' => $vid->path,
-        //                 'filetype' => 'video',
-        //                 'url' => $vid->url,
-        //             ];
-        //         });
-
-        //         $media = collect($imageMedia)->merge(collect($videoMedia));
-
-        //         $data->setAttribute('media', $media);
-        //         $data->unsetRelation('images');
-        //         $data->unsetRelation('videos');
-
-        //         return $data;
-        //     });
-        // }else{
-        //     $content = [];
-        // }
-        // dd($content);
         if (!$verificationRequest) {
             // No verification request - show verification form
             return inertia('Verification/Create');
@@ -137,25 +174,11 @@ class CampaignController extends Controller
 
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
-            // dd($usersCampaign);
             if ($usersCampaign) {
                 if ($usersCampaign->status->value === 'pending') {
                     return inertia('Campaign/CampaignPending');
                     // If user already has a campaign with the status draft
                 } else if ($usersCampaign->status->value === 'draft' || $usersCampaign->status->value === 'active') {
-                    // dd($usersCampaign);
-                    // if ($usersCampaign->images->isNotEmpty()) {
-                    //     return Inertia::render('Campaign/CreateDetailsPreview', [
-                    //         'campaign' => $usersCampaign,
-                    //         'contents' => $content,
-                    //         'user' => $user,
-                    //     ]);
-                    // } else {
-                    //     return inertia::render('Campaign/CreatePreview', [
-                    //         'campaign' => $usersCampaign,
-                    //         'user' => $user,
-                    //     ]);
-                    // }
                     $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())->first();
                     $location = Location::where('campaign_id', $id)->first();
                     return Inertia::render('Campaign/Create', [
@@ -200,9 +223,9 @@ class CampaignController extends Controller
         $user = auth()->user();
         $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
         $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
-        $campaignData = Campaign::where('id', $id)->with('images')->latest()->first();
+        $campaignData = Campaign::where('id', $id)->with('images')->with('user')->latest()->first();
+        // dd($campaignData);
         $content = CampaignContent::with('images', 'videos')->where('campaign_id', $id)->get()->map(function($data){
-
             $imageMedia = $data->images->map(function ($img) {
                 return [
                     'path' => $img->path,
@@ -272,7 +295,7 @@ class CampaignController extends Controller
         NotificationController::notifyAdmins(
             'campaign_created',
             'New Campaign Submitted',
-            "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and is pending review.",
+            "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",
             ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
         );
 
@@ -283,6 +306,7 @@ class CampaignController extends Controller
     public function ToggleLike(Request $request)
     {
         $user = auth()->user();
+        $isLiked = false;
         if (!$user) {
             return response()->json([
                 'success' => false,
@@ -399,14 +423,14 @@ class CampaignController extends Controller
         }
 
         if ($category === 'Completed') {
-            $campaigns = Campaign::where('status', ['completed'])->get();
+            $campaigns = Campaign::with('images')->where('status', ['completed'])->get();
         }
 
         else if ($category === 'All') {
-            $campaigns = Campaign::where('status', ['active'])->get();
+            $campaigns = Campaign::with('images')->where('status', ['active'])->get();
 
         } else {
-            $campaigns = Campaign::where('category', $category)->where('status', ['active'])->get();
+            $campaigns = Campaign::with('images')->where('category', $category)->where('status', ['active'])->get();
 
         }
 
@@ -476,6 +500,13 @@ class CampaignController extends Controller
             $campaign->status = "pending";
             $campaign->save();
         }
+
+        NotificationController::notifyAdmins(
+            'campaign_created',
+            'New Campaign Submitted',
+            "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and status has been changed to pending for staff review.",
+            ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
+        );
 
         return inertia::render('Campaign/CampaignPending');
 

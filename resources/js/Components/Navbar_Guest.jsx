@@ -7,8 +7,9 @@ export default function Navbar_Guest() {
     const isActive = (path) => window.location.pathname.startsWith(path);
 
     return (
-        <header>
-            <nav className="flex justify-between items-center px-6 py-4">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full [transform:none!important] bg-purple-800">
+
+            <nav className="flex justify-between items-center px-6 py-4 top-0 z-50 w-full bg-purple-800">
                 {/* 🔹 LEFT SIDE (Home, Campaign, Article) */}
                 <div className="flex items-center gap-4">
                     {/* HOME */}
@@ -96,8 +97,9 @@ export default function Navbar_Guest() {
                     </div>
                 </div>
 
-                {/* 🔹 RIGHT SIDE (Login / Register) */}
+                {/* RIGHT SIDE (Login / Register) */}
                 <div className="flex items-center gap-4">
+                                        <ThemeToggle />
                     <Link
                         href="/users/create"
                         className="px-3 py-2 rounded-md text-white font-semibold hover:bg-white/10 transition-all"

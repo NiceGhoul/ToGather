@@ -10,4 +10,5 @@ enum CampaignStatus: string
     case Rejected = 'rejected';
     case Banned = 'banned';
     case Draft = 'draft';
+    case Inactive = 'inactive';
 }

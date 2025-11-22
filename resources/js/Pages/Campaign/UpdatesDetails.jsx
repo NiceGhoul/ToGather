@@ -88,16 +88,14 @@ export const UpdatesDetails = ({ contents }) => {
                     </div>
 
                     {/* kanan */}
-                    <div className="w-[280px] bg-purple-200 rounded-2xl p-4 flex flex-col gap-3 h-fit shadow-md justify-center">
-                        <Label className="w-full justify-center bg-[#7C4789] text-white font-semibold text-2xl py-3 border-2 border-black rounded-2xl">Available Updates</Label>
+                    <div className="w-[280px] rounded-2xl p-4 flex flex-col gap-3 h-fit shadow-md justify-center">
+                        <Label className="w-full justify-center dark:text-white font-semibold text-xl py-3 border-b-1 border-black dark: border-gray-400">Campaign Updates</Label>
                         {contents.length > 0 ?
                         contents.map((upd) => (
                             <Card
                                 key={upd.id}
                                 className={`cursor-pointer border-1 border-gray-400 p-3 rounded-xl transition-all ${
-                                    selectedUpdate?.id === upd.id
-                                        ? "bg-[#7C4789] text-white"
-                                        : "hover:bg-[#7C4789]/10"
+                                    selectedUpdate?.id === upd.id ? "bg-[#7C4789] " : "hover:bg-gray-100 dark:hover:bg-gray-900"
                                 }`}
                                 onClick={() => setSelectedUpdate(upd)}
                             >
@@ -105,8 +103,8 @@ export const UpdatesDetails = ({ contents }) => {
                                     <Label
                                         className={`font-bold text-base ${
                                             selectedUpdate?.id === upd.id
-                                                ? "text-white"
-                                                : "text-[#7C4789]"
+                                                ? "text-white dark:text-white"
+                                                : "text-[#7C4789] dark:text-white"
                                         }`}
                                     >
                                         {upd.content
@@ -117,7 +115,7 @@ export const UpdatesDetails = ({ contents }) => {
                                         className={`text-sm mt-1 ${
                                             selectedUpdate?.id === upd.id
                                                 ? "text-gray-100"
-                                                : "text-gray-500"
+                                                : "text-gray-400"
                                         }`}
                                     >
                                         {!upd.created_at
@@ -130,7 +128,7 @@ export const UpdatesDetails = ({ contents }) => {
                                     </p>
                                 </CardContent>
                             </Card>
-                        )) : <div className="h-full my-25 justify-center text-center items-center"><Label className="text-base italic text-gray-400 text-center">There are currently no updates available!</Label></div>}
+                        )) : <div className="h-full my-25 justify-center text-center items-center"><Label className="text-md font-extralight italic text-gray-400 text-center">There are currently no updates available!</Label></div>}
                     </div>
                 </div>
             </div>

@@ -17,6 +17,7 @@ class AdminDashboardController extends Controller
     public function index()
     {
         // Get overview statistics
+         $user = auth()->user();
         $stats = [
             'total_users' => User::count(),
             'total_campaigns' => Campaign::count(),
@@ -33,7 +34,7 @@ class AdminDashboardController extends Controller
         $dailyYear = request('daily_year', Carbon::now()->year);
         $dailyMonth = request('daily_month', Carbon::now()->month);
         $dailyWeek = request('daily_week', 1);
-        
+
         $dailyDonations = Donation::whereIn('status', ['successful', 'pending'])
         ->whereYear('created_at', $dailyYear)
         ->whereMonth('created_at', $dailyMonth)
@@ -58,7 +59,7 @@ class AdminDashboardController extends Controller
         // TODO: Change back to 'successful' when Midtrans callback is working
         $currentMonth = request('weekly_month', Carbon::now()->month);
         $currentYear = request('weekly_year', Carbon::now()->year);
-        
+
         $weeklyDonations = Donation::whereIn('status', ['successful', 'pending'])
         ->whereYear('created_at', $currentYear)
         ->whereMonth('created_at', $currentMonth)
@@ -162,6 +163,7 @@ class AdminDashboardController extends Controller
         });
 
         return Inertia::render('Admin/Dashboard', [
+            'user' => $user,
             'stats' => $stats,
             'dailyDonations' => $dailyDonations,
             'weeklyDonations' => $weeklyDonations,

@@ -1,18 +1,8 @@
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import { Textarea } from "@/Components/ui/textarea";
-import { Button } from "@/Components/ui/button";
-import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
-import { Toaster } from "@/Components/ui/sonner";
-import { router } from "@inertiajs/react";
-
 
 export const AboutDetails = ({contents}) => {
     const [description, setDescription] = useState(contents)
-    console.log(contents)
     return (
         <div className="w-full p-6 justify-center flex flex-col items-center">
             {description.length > 0 ? (
@@ -45,10 +35,10 @@ export const AboutDetails = ({contents}) => {
                     </div>
                 </div>
             ) : (
-                <div className="flex h-[100px] w-full justify-center items-center text-gray-300 italic">
-                    <h3>
-                        Add explanation for your business before continuing!
-                    </h3>
+                <div className="flex h-[480px] w-full justify-center items-center text-gray-300 italic">
+                    <Label className={"text-base font-extralight italic text-gray-300"}>
+                        There are no description for the selected campaign!
+                    </Label>
                 </div>
             )}
         </div>

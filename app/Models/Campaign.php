@@ -25,7 +25,15 @@ class Campaign extends Model
         'goal_amount',
         'collected_amount',
         'duration',
+        'rejected_reason',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($campaign) {
+            $campaign->images()->delete();
+        });
+    }
 
     // A Campaign belongs to a User (creator)
     public function user()

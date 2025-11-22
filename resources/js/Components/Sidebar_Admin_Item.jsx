@@ -21,6 +21,7 @@ import {
     SidebarHeader,
     SidebarRail,
 } from "@/components/ui/sidebar";
+import { usePage } from "@inertiajs/react";
 
 // Data for the main navigation
 const sidebarNavItems = [

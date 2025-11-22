@@ -7,15 +7,16 @@ import { Bar, BarChart, Line, LineChart, XAxis, YAxis, ResponsiveContainer, Tool
 import { useState } from "react";
 
 export default function Dashboard() {
-    const { 
-        stats, 
-        dailyDonations, 
-        weeklyDonations, 
-        monthlyDonations, 
-        yearlyDonations, 
-        userStats, 
-        campaignStats, 
-        articleStats 
+    const {
+        user,
+        stats,
+        dailyDonations,
+        weeklyDonations,
+        monthlyDonations,
+        yearlyDonations,
+        userStats,
+        campaignStats,
+        articleStats
     } = usePage().props;
 
     const [dailyYear, setDailyYear] = useState(new Date().getFullYear());
@@ -64,14 +65,15 @@ export default function Dashboard() {
     };
 
     return (
-        <Layout_Admin>
+        <Layout_Admin title={"Welcome, " + user.nickname}>
             <div className="p-6 space-y-6">
                 <div className="flex justify-between items-center">
+                    <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
                 </div>
-                
+
                 {/* Debug Info */}
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-gray-500">
                     Daily: {dailyDonations?.length || 0} items,
                     Weekly: {weeklyDonations?.length || 0} items,
                     Monthly: {monthlyDonations?.length || 0} items,
@@ -146,7 +148,7 @@ export default function Dashboard() {
                                 <TabsTrigger value="monthly">Monthly</TabsTrigger>
                                 <TabsTrigger value="yearly">Yearly</TabsTrigger>
                             </TabsList>
-                            
+
                             <TabsContent value="daily" className="mt-6">
                                 <div className="h-[500px] w-full">
                                     <div className="flex justify-between items-center mb-4">
@@ -212,7 +214,7 @@ export default function Dashboard() {
                                     )}
                                 </div>
                             </TabsContent>
-                            
+
                             <TabsContent value="weekly" className="mt-6">
                                 <div className="h-[500px] w-full">
                                     <div className="flex justify-between items-center mb-4">
@@ -268,7 +270,7 @@ export default function Dashboard() {
                                     )}
                                 </div>
                             </TabsContent>
-                            
+
                             <TabsContent value="monthly" className="mt-6">
                                 <div className="h-[500px] w-full">
                                     <div className="flex justify-between items-center mb-4">
@@ -360,11 +362,12 @@ export default function Dashboard() {
                                                 status === 'rejected' ? 'bg-red-500' :
                                                 status === 'banned' ? 'bg-red-600' :
                                                 status === 'disabled' ? 'bg-gray-400' :
+                                                status === 'completed' ? 'bg-purple-400' :
                                                 'bg-gray-500'
                                             }`}></div>
                                             <span className="font-medium capitalize">{status}</span>
                                         </div>
-                                        <span className="text-2xl font-bold text-gray-700 dark:text-gray-300">{count}</span>
+                                        <span className="text-2xl font-bold text-gray-700 dark:text-white">{count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -378,7 +381,7 @@ export default function Dashboard() {
                         <CardContent>
                             <div className="space-y-4">
                                 {Object.entries(articleStats).map(([status, count]) => (
-                                    <div key={status} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                    <div key={status} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-3 h-3 rounded-full ${
                                                 status === 'pending' ? 'bg-yellow-500' :
@@ -390,7 +393,7 @@ export default function Dashboard() {
                                             }`}></div>
                                             <span className="font-medium capitalize">{status}</span>
                                         </div>
-                                        <span className="text-2xl font-bold text-gray-700 dark:text-gray-300">{count}</span>
+                                        <span className="text-2xl font-bold text-gray-700 dark:text-white">{count}</span>
                                     </div>
                                 ))}
                             </div>

@@ -26,13 +26,13 @@ export const FaqDetails = ({ contents }) => {
 
     return (
         <div className="flex justify-center items-center flex-col gap-20 h-full">
-            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789]">
+            <Label className="text-2xl justify-center items-center font-bold text-[#7C4789] mt-10">
                 Frequently Asked Questions
             </Label>
-            <div className="w-full h-full items-center justify-center flex mb-100">
+            <div className="w-full h-full items-center justify-center flex">
                 {userQuestions.length === 0 ? (
-                    <div className="flex flex-col gap-8">
-                        <Label className="text-lg font-extralight italic text-gray-300">
+                    <div className="flex flex-col items-center justify-center h-[480px]">
+                        <Label className="text-base font-extralight italic text-gray-300">
                             There are no FAQ available
                         </Label>
                     </div>

@@ -68,7 +68,7 @@ export default function Transaction({ donations, stats }) {
         setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
     return (
-        <Layout_Admin>
+        <Layout_Admin title={"Transaction Management"}>
             <Head title="Transactions" />
 
             <div className="bg-gray-50 dark:bg-gray-950 py-8">

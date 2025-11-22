@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('category');
             $table->decimal('goal_amount', 10, 2);
-            $table->enum('status', ['draft','pending', 'active', 'completed', 'rejected', 'banned'])->default('pending');
+            $table->enum('status', ['draft','pending', 'active', 'completed', 'rejected', 'banned', 'inactive'])->default('pending');
             $table->dateTime('start_campaign')->nullable();
             $table->dateTime('end_campaign')->nullable();
             $table->string('address');

@@ -4,172 +4,103 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Popup from "@/Components/Popup";
-import { Eye, EyeOff, Search, Trash, RotateCcw, File } from "lucide-react";
+import { Eye, EyeOff, Trash, RotateCcw, File, Ban } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import { Label } from "@/Components/ui/label";
 
 export default function Campaign_List() {
-    const { articles, categories } = usePage().props;
 
-    // 🔹 State untuk data dan filter
-    const [allCampaign, setAllArticles] = useState(articles || []);
-    const [filteredArticles, setFilteredArticles] = useState(articles || []);
-    const [category, setCategory] = useState("");
-    const [status, setStatus] = useState("");
+    const { campaigns, filters, categories } = usePage().props;
+    const [filteredCampaign, setFilteredCampaigns] = useState(campaigns || []);
+    const [category, setCategory] = useState("All");
+    const [status, setStatus] = useState("All");
     const [search, setSearch] = useState("");
-
-    // 🔹 State lain tetap sama
     const [selectedIds, setSelectedIds] = useState([]);
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
+    const statuses = ["active", "inactive", "pending", "draft", "rejected", "banned", "completed"]
+       const handleResetFilter = () => {
+           setCategory("All");
+           setStatus("All");
+           setSearch("");
+       };
 
-    // 🧠 Filter frontend — otomatis jalan tiap kali search/category/status berubah
+    const handleDelete = (id) => {
+        router.post(`/admin/campaigns/delete/${id}`)
+    }
+
     useEffect(() => {
-        let result = allArticles;
-
-        // 🔹 Filter awal (hanya approved + disabled)
-        if (status === "") {
-            result = result.filter(
-                (a) => a.status === "approved" || a.status === "disabled"
-            );
-        }
-        // 🔹 Kalau klik tombol "Rejected"
-        else if (status === "rejected") {
-            result = result.filter((a) => a.status === "rejected");
-        }
-        // 🔹 Kalau filter lain (misalnya khusus "approved" aja)
-        else {
+        let result = campaigns;
+        if (status != "All") {
             result = result.filter((a) => a.status === status);
         }
 
-        // 🔹 Filter category
-        if (category !== "") {
+        if (category != "All") {
             result = result.filter((a) => a.category === category);
         }
 
-        // 🔹 Filter search
-        if (search.trim() !== "") {
-            result = result.filter((a) =>
-                a.title.toLowerCase().includes(search.toLowerCase())
-            );
+        if (search.trim() != "") {
+            result = result.filter((a) => a.title.toLowerCase().includes(search.toLowerCase()) || a.user.nickname.toLowerCase().includes(search.toLowerCase())) || a.user.name.toLowerCase().includes(search.toLowerCase())
         }
 
-        setFilteredArticles(result);
-    }, [allArticles, search, category, status]);
+        setFilteredCampaigns(result);
+    }, [campaigns, search, category, status, handleDelete]);
 
-    // 🔁 Reset filter
-    const handleResetFilter = () => {
-        setCategory("");
-        setStatus("");
-        setSearch("");
-    };
-
-    // 🔧 Aksi server (bulk & toggle)
-    const handleDisable = (id) => router.post(`/admin/articles/${id}/disable`);
-    const handleEnable = (id) => router.post(`/admin/articles/${id}/enable`);
-    const handleDelete = (id) =>
-        router.post(
-            `/admin/articles/${id}/delete`,
-            {},
-            {
-                onSuccess: () => {
-                    setSelectedIds((prev) => prev.filter((x) => x !== id));
-                    setSuccessPopupMessage("Article deleted");
-                    setSuccessPopupOpen(true);
-                    router.reload();
-                },
-            }
-        );
-    const handleView = (id) =>
-        router.get(`/admin/articles/${id}/view?from=list`);
-
-    // 🧩 Bulk logic
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
     };
+
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(filteredArticles.map((a) => a.id));
+            setSelectedIds(campaigns.map((a) => a.id));
         } else {
             setSelectedIds([]);
         }
     };
 
-    const handleBulkEnable = () =>
-        selectedIds.length &&
-        router.post(
-            "/admin/articles/bulk-approve",
-            { ids: selectedIds },
-            { preserveState: true, onSuccess: () => setSelectedIds([]) }
-        );
-    const handleBulkDisable = () =>
-        selectedIds.length &&
-        router.post(
-            "/admin/articles/bulk-disable",
-            { ids: selectedIds },
-            { preserveState: true, onSuccess: () => setSelectedIds([]) }
-        );
-    const handleBulkDelete = () =>
-        selectedIds.length &&
-        router.post(
-            "/admin/articles/bulk-delete",
-            { ids: selectedIds },
-            {
-                preserveState: true,
-                onSuccess: () => {
-                    setSelectedIds([]);
-                    setSuccessPopupMessage("Selected articles deleted");
-                    setSuccessPopupOpen(true);
-                    router.reload();
-                },
-            }
-        );
+    const handleView = (id) => {
+        router.get(`/admin/campaigns/view/${id}`)
+    }
 
-    // Auto close popup
-    useEffect(() => {
-        if (!successPopupOpen) return;
-        const t = setTimeout(() => setSuccessPopupOpen(false), 3500);
-        return () => clearTimeout(t);
-    }, [successPopupOpen]);
+    const handleChangeStatus = (id, status) => {
+        router.post(`/admin/campaigns/changeStatus/${id}`, {status: status})
+    }
 
     return (
-        <Layout_Admin title="Manage Articles">
-            <Popup
-                triggerText=""
-                title={successPopupMessage}
-                description=""
-                confirmText="OK"
-                open={successPopupOpen}
-                onConfirm={() => setSuccessPopupOpen(false)}
-                onClose={() => setSuccessPopupOpen(false)}
-                triggerClass=""
-            />
-
+        <Layout_Admin title="Manage Campaigns">
             <div className="p-6 space-y-6">
                 {/* 🔎 Filter & Bulk Section */}
-                <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
+                <div className="dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Row 1: Search & Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                             <Input
                                 type="text"
-                                placeholder="Search by title..."
+                                placeholder="Search by title/creator"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-[260px] focus-visible:ring-purple-700"
+                                className="h-10 w-[260px] focus-visible:ring-purple-700 dark:text-white"
                             />
-                            <select
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                className="h-10 w-[200px] rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700 shadow-sm focus:border-purple-700 focus:ring-2 focus:ring-purple-700/50 focus:outline-none"
+                            <Select
+                                onValueChange={(value) => setCategory(value)}
+                                className="h-10 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 text-sm text-gray-700 dark:text-white shadow-sm focus:border-purple-700 focus:ring-2 focus:ring-purple-700/50 focus:outline-none"
                             >
-                                <option value="">All Categories</option>
-                                {categories.map((c) => (
-                                    <option key={c} value={c}>
-                                        {c}
-                                    </option>
-                                ))}
-                            </select>
+                                <SelectTrigger className="w-[250px]">
+                                    <SelectValue placeholder="Select a Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="All">
+                                        All Categories
+                                    </SelectItem>
+                                    {categories.map((c) => (
+                                        <SelectItem key={c} value={c}>
+                                            {c}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                             <Button
                                 onClick={handleResetFilter}
                                 className="bg-purple-800 hover:bg-purple-700 text-white"
@@ -180,46 +111,23 @@ export default function Campaign_List() {
 
                         {/* Status filter buttons */}
                         <div className="flex items-center gap-2">
-                            <Button
-                                className={`${
-                                    status === ""
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
-                                onClick={() => setStatus("")}
+                            <Label className="dark:text-white text-base">Filter By Status: </Label>
+                            <Select
+                                className="h-10 w-[250px] rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700 shadow-sm focus:border-purple-700 focus:ring-2 focus:ring-purple-700/50 focus:outline-none"
+                                onValueChange={(value) => setStatus(value)}
                             >
-                                All
-                            </Button>
-                            <Button
-                                className={`${
-                                    status === "approved"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
-                                onClick={() => setStatus("approved")}
-                            >
-                                Enabled
-                            </Button>
-                            <Button
-                                className={`${
-                                    status === "disabled"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
-                                onClick={() => setStatus("disabled")}
-                            >
-                                Disabled
-                            </Button>
-                            <Button
-                                className={`${
-                                    status === "rejected"
-                                        ? "bg-purple-800 text-white"
-                                        : "bg-purple-400"
-                                } hover:bg-purple-800`}
-                                onClick={() => setStatus("rejected")}
-                            >
-                                Rejected
-                            </Button>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select a status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={"All"}>All</SelectItem>
+                                    {statuses.map((dat, idx) => (
+                                        <SelectItem key={idx} value={dat}>
+                                            {dat}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 
@@ -230,7 +138,7 @@ export default function Campaign_List() {
                         </div>
 
                         {/* 🔹 Tampilkan tombol Enable/Disable hanya kalau bukan status rejected */}
-                        {status !== "rejected" && (
+                        {status === "active" && (
                             <>
                                 <Popup
                                     triggerText={
@@ -239,13 +147,13 @@ export default function Campaign_List() {
                                             <span>Enable Selected</span>
                                         </div>
                                     }
-                                    title="Enable Selected Articles?"
-                                    description="All selected articles will be enabled and shown publicly."
+                                    title="Enable Selected Campaigns?"
+                                    description="All selected campaigns will be enabled and shown publicly."
                                     confirmText="Yes, Enable Selected"
                                     confirmColor="bg-green-600 hover:bg-green-700 text-white"
                                     triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                                     disabledValue={selectedIds.length === 0}
-                                    onConfirm={handleBulkEnable}
+                                    // onConfirm={handleBulkEnable}
                                 />
 
                                 <Popup
@@ -255,15 +163,32 @@ export default function Campaign_List() {
                                             <span>Disable Selected</span>
                                         </div>
                                     }
-                                    title="Disable Selected Articles?"
+                                    title="Disable Selected Campaigns?"
                                     description="All selected articles will be disabled and hidden from public."
                                     confirmText="Yes, Disable Selected"
                                     confirmColor="bg-yellow-600 hover:bg-yellow-700 text-white"
                                     triggerClass="bg-yellow-200 hover:bg-yellow-300 text-yellow-700"
                                     disabledValue={selectedIds.length === 0}
-                                    onConfirm={handleBulkDisable}
+                                    // onConfirm={handleBulkDisable}
                                 />
                             </>
+                        )}
+                        {status === "banned" && (
+                            <Popup
+                                triggerText={
+                                    <div className="flex items-center gap-2 cursor-pointer">
+                                        <Ban className="w-4 h-4" />
+                                        <span>Unban Selected</span>
+                                    </div>
+                                }
+                                title="Unban Selected Campaigns?"
+                                description="All selected campaigns will be Unbanned and shown to the public."
+                                confirmText="Yes, Unban Selected"
+                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
+                                disabledValue={selectedIds.length === 0}
+                                // onConfirm={handleBulkDelete}
+                            />
                         )}
 
                         {/* 🔸 Tombol Delete selalu muncul */}
@@ -274,48 +199,52 @@ export default function Campaign_List() {
                                     <span>Delete Selected</span>
                                 </div>
                             }
-                            title="Delete Selected Articles?"
-                            description="This action cannot be undone. All selected articles will be deleted permanently."
+                            title="Delete Selected Campaign?"
+                            description="This action cannot be undone. All selected Campaign will be deleted permanently."
                             confirmText="Yes, Delete Selected"
                             confirmColor="bg-red-600 hover:bg-red-700 text-white"
                             triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                             disabledValue={selectedIds.length === 0}
-                            onConfirm={handleBulkDelete}
+                            // onConfirm={handleBulkDelete}
                         />
                     </div>
                 </div>
 
-                {/* 🗂️ Articles Table */}
-                <div className="bg-white rounded-lg shadow-md p-4">
-                    <table className="min-w-full border">
-                        <thead className="bg-gray-100">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                    <table className="min-w-full border-separate border-spacing-0 dark:bg-gray-800">
+                        <thead className="bg-gray-100 dark:bg-gray-700 dark:text-gray-100">
                             <tr>
-                                <th className="px-4 py-2 border w-12 text-center">
+                                <th className="px-4 py-2 border dark:border-gray-700 w-12 text-center">
                                     <input
                                         type="checkbox"
                                         checked={
-                                            filteredArticles.length > 0 &&
+                                            filteredCampaign.length > 0 &&
                                             selectedIds.length ===
-                                                filteredArticles.length
+                                                filteredCampaign.length
                                         }
                                         onChange={(e) =>
                                             handleSelectAll(e.target.checked)
                                         }
                                     />
                                 </th>
-                                <th className="px-4 py-2 border">Id</th>
-                                <th className="px-4 py-2 border">Title</th>
-                                <th className="px-4 py-2 border">Category</th>
-                                <th className="px-4 py-2 border">Author</th>
-                                <th className="px-4 py-2 border">Status</th>
-                                <th className="px-4 py-2 border">Actions</th>
+                                <th className="px-4 py-2">Id</th>
+                                <th className="px-4 py-2">Title</th>
+                                <th className="px-4 py-2">Category</th>
+                                <th className="px-4 py-2">Creator</th>
+                                <th className="px-4 py-2">Goal Amount</th>
+                                <th className="px-4 py-2">Durations</th>
+                                <th className="px-4 py-2">Status</th>
+                                <th className="px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredArticles.length > 0 ? (
-                                filteredArticles.map((a) => (
-                                    <tr key={a.id}>
-                                        <td className="border px-4 py-2 text-center">
+                            {filteredCampaign.length > 0 ? (
+                                filteredCampaign.map((a) => (
+                                    <tr
+                                        key={a.id}
+                                        class="dark:border-gray-700 px-4 py-2 dark:text-gray-200 dark:hover:bg-gray-800"
+                                    >
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200 text-center">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
@@ -326,48 +255,60 @@ export default function Campaign_List() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.id}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.title}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.category}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.user?.nickname || a.user?.name}
                                         </td>
-                                        <td className="border px-4 py-2 capitalize">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
+                                            {parseInt(
+                                                a.goal_amount
+                                            ).toLocaleString("id-ID", {
+                                                style: "currency",
+                                                currency: "IDR",
+                                                minimumFractionDigits: 2,
+                                            })}
+                                        </td>
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
+                                            {a.duration}
+                                            {a.duration > 1 ? " days" : " day"}
+                                        </td>
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200 capitalize">
                                             {a.status === "approved"
                                                 ? "Approved and Enabled"
                                                 : a.status}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className=" px-4 py-2 text-center">
                                             <div className="flex justify-center gap-3">
                                                 <Button
                                                     onClick={() =>
                                                         handleView(a.id)
                                                     }
-                                                    className="bg-purple-200 hover:bg-purple-300"
-                                                >
-                                                    <File className="text-purple-700" />
+                                                    className="bg-purple-200 hover:bg-purple-300 dark:bg-purple-900 dark:hover:bg-purple-300">
+                                                    <File className="text-purple-700 dark:text-purple-300" />
                                                 </Button>
-                                                {a.status === "approved" && (
+                                                {a.status === "active" && (
                                                     <Button
                                                         className="bg-yellow-200 hover:bg-yellow-300"
                                                         onClick={() =>
-                                                            handleDisable(a.id)
+                                                            handleChangeStatus(a.id,"inactive")
                                                         }
                                                     >
                                                         <EyeOff className="text-yellow-700" />
                                                     </Button>
                                                 )}
-                                                {a.status === "disabled" && (
+                                                {a.status === "inactive" && (
                                                     <Button
                                                         className="bg-green-200 hover:bg-green-300"
                                                         onClick={() =>
-                                                            handleEnable(a.id)
+                                                            handleChangeStatus(a.id, "active")
                                                         }
                                                     >
                                                         <Eye className="text-green-700" />
@@ -377,8 +318,8 @@ export default function Campaign_List() {
                                                     triggerText={
                                                         <Trash className="w-4 h-4" />
                                                     }
-                                                    title="Delete Article?"
-                                                    description="This action cannot be undone. The article will be permanently removed."
+                                                    title="Delete Campaign?"
+                                                    description="This action cannot be undone. The campaign will be permanently removed."
                                                     confirmText="Yes, Delete"
                                                     confirmColor="bg-red-600 hover:bg-red-700 text-white"
                                                     triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
@@ -396,7 +337,7 @@ export default function Campaign_List() {
                                         colSpan="7"
                                         className="text-center py-4 text-gray-500 italic"
                                     >
-                                        No articles found.
+                                        No Campaign found.
                                     </td>
                                 </tr>
                             )}

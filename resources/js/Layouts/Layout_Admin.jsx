@@ -32,11 +32,11 @@ export default function Page({ children, title }) {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
-    
+
     const handleLogout = () => {
         router.post("/logout");
     };
-    
+
     const fetchNotifications = async () => {
         setLoading(true);
         try {
@@ -51,10 +51,10 @@ export default function Page({ children, title }) {
             setLoading(false);
         }
     };
-    
+
     const markAllAsRead = async () => {
         try {
-            await fetch('/notifications/read-all', { 
+            await fetch('/notifications/read-all', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default function Page({ children, title }) {
             console.error('Error marking notifications as read:', error);
         }
     };
-    
+
     // Fetch unread count on component mount
     useEffect(() => {
         fetchNotifications();
@@ -76,13 +76,17 @@ export default function Page({ children, title }) {
             <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset className="w-full max-w-full h-screen overflow-hidden">
-                    <header
-                        className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
                         <div className="flex items-center justify-between w-full px-5">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 text-white ">
                                 <SidebarTrigger className="-ml-1" />
-                                <Separator orientation="vertical" className=" data-[orientation=vertical]:h-4" />
-                                <h1 className="text-lg font-semibold">{title}</h1>
+                                <Separator
+                                    orientation="vertical"
+                                    className=" data-[orientation=vertical]:h-4"
+                                />
+                                <h1 className="text-lg font-semibold">
+                                    {title}
+                                </h1>
                             </div>
                             <div className="flex items-center gap-2">
                                 <ThemeToggle />
@@ -118,20 +122,34 @@ export default function Page({ children, title }) {
                                                 No notifications
                                             </DropdownMenuItem>
                                         ) : (
-                                            notifications.map((notification, index) => (
-                                                <div key={notification.id}>
-                                                    <DropdownMenuItem className="flex-col items-start p-3">
-                                                        <div className="font-medium">{notification.title}</div>
-                                                        <div className="text-sm text-muted-foreground">{notification.message}</div>
-                                                        <div className="text-xs text-muted-foreground mt-1">
-                                                            {new Date(notification.created_at).toLocaleDateString()}
-                                                        </div>
-                                                    </DropdownMenuItem>
-                                                    {index < notifications.length - 1 && (
-                                                        <Separator />
-                                                    )}
-                                                </div>
-                                            ))
+                                            notifications.map(
+                                                (notification, index) => (
+                                                    <div key={notification.id}>
+                                                        <DropdownMenuItem className="flex-col items-start p-3">
+                                                            <div className="font-medium">
+                                                                {
+                                                                    notification.title
+                                                                }
+                                                            </div>
+                                                            <div className="text-sm text-muted-foreground">
+                                                                {
+                                                                    notification.message
+                                                                }
+                                                            </div>
+                                                            <div className="text-xs text-muted-foreground mt-1">
+                                                                {new Date(
+                                                                    notification.created_at
+                                                                ).toLocaleDateString()}
+                                                            </div>
+                                                        </DropdownMenuItem>
+                                                        {index <
+                                                            notifications.length -
+                                                                1 && (
+                                                            <Separator />
+                                                        )}
+                                                    </div>
+                                                )
+                                            )
                                         )}
                                     </ScrollArea>
                                 </DropdownMenuContent>
@@ -139,9 +157,7 @@ export default function Page({ children, title }) {
                             </div>
                         </div>
                     </header>
-                    <div className="flex-1 overflow-auto">
-                        {children}
-                    </div>
+                    <div className="flex-1 overflow-auto">{children}</div>
                 </SidebarInset>
             </SidebarProvider>
         </>

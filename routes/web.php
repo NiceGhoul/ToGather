@@ -136,8 +136,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/users/bulkBan', [UserController::class, 'bulkBan']);
     Route::post('/users/bulkUnban', [UserController::class, 'bulkUnban']);
 
-    Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.index');
+    Route::get('/campaigns/list', [CampaignController::class, 'AdminCampaign'])->name('campaign.adminIndex');
     Route::get('/campaigns/verification', [CampaignController::class, 'AdminVerification'])->name('campaign.verification');
+    Route::get('/campaigns/view/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaign.adminView');
+    Route::post('/campaigns/delete/{id}', [CampaignController::class, 'AdminDelete'])->name('campaign.adminDelete');
+    Route::post('/campaigns/changeStatus/{id}', [CampaignController::class, 'AdminChangeStatus'])->name('campaign.adminChangeStatus');
+    Route::post('/campaigns/activate/{id}', [CampaignController::class, 'AdminActivate'])->name('campaign.adminActive');
+    Route::post('/campaigns/deactivate/{id}', [CampaignController::class, 'AdminDeactivate'])->name('campaign.adminDeactive');
 
     Route::get('/articles/list', [ArticleController::class, 'adminIndex'])->name('articles.index');
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');

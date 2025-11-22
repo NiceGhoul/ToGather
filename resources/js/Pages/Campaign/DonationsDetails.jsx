@@ -9,6 +9,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { Separator } from "@/Components/ui/separator";
 import { Spinner } from "@/Components/ui/spinner";
 import { IconFolderCode } from "@tabler/icons-react";
+import { BanknoteArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const DonationsDetails = ({ donations }) => {
@@ -90,12 +91,12 @@ export const DonationsDetails = ({ donations }) => {
             <Empty>
                 <EmptyHeader>
                     <EmptyMedia variant="icon">
-                        <IconFolderCode />
+                        <BanknoteArrowUp />
                     </EmptyMedia>
                     <EmptyTitle>This is the donation page</EmptyTitle>
                     <EmptyDescription>
                         Every donation this campaign obtained will be displayed
-                        here. You can see the donations amount, as well as the
+                        here! You can see the donations amount, as well as the
                         message left by donators!
                     </EmptyDescription>
                 </EmptyHeader>

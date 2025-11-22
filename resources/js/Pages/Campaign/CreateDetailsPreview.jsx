@@ -62,12 +62,11 @@ export const UpperPreview = ({campaign, user, images}) => {
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
                     <Progress
-                        className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789]"
+                        className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789] dark:[&>div]: bg-[#aaaaaa]"
                         value={0}
                     />
                     <span
-                        className="absolute inset-0 flex items-start justify-center text-md font-medium "
-                        style={{ color: "black" }}
+                        className="absolute inset-0 flex items-start justify-center text-md font-medium dark:text-white"
                     >
                         0%
                     </span>
@@ -87,8 +86,14 @@ export const UpperPreview = ({campaign, user, images}) => {
                         pressed={like}
                         onPressedChange={() => setLike(!like)}
                         size="lg"
-                        variant="outline"
-                        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
+                        // variant="outline"
+                        variant={localStorage.getItem('theme') === 'dark' ? "tonal" : "outline"}
+                        className="
+                        data-[state=on]:bg-transparent
+                        data-[state=on]:text-red-400 dark:data-[state=on]:text-red-300
+                        data-[state=on]:stroke-red-400 dark:data-[state=on]:stroke-red-300
+                        data-[state=on]:*:[svg]:fill-red-500
+                        data-[state=on]:*:[svg]:stroke-red-500"
                     >
                         <Heart />
                         {!like ? "like this campaign" : "campaign liked"}
@@ -102,8 +107,6 @@ export const UpperPreview = ({campaign, user, images}) => {
         </div>
     );
 }
-
-
 
 const CreateDetailsPreview = () => {
 

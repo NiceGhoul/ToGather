@@ -1,4 +1,4 @@
-import * as React from "react"
+import { useState } from "react"
 import { ChevronsUpDown, Plus } from "lucide-react"
 
 import {
@@ -21,7 +21,9 @@ export function TeamSwitcher({
   teams
 }) {
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [activeTeam, setActiveTeam] = useState(teams[0])
+  const [open, setOpen] = useState(false)
+  const disabled = true
 
   if (!activeTeam) {
     return null
@@ -30,11 +32,14 @@ export function TeamSwitcher({
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu open={open}
+    onOpenChange={(next) => {
+      if (!disabled) setOpen(next);
+    }}>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground" >
               <div
                 className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <activeTeam.logo className="size-4" />
@@ -43,7 +48,7 @@ export function TeamSwitcher({
                 <span className="truncate font-medium">{activeTeam.name}</span>
                 <span className="truncate text-xs">{activeTeam.plan}</span>
               </div>
-              <ChevronsUpDown className="ml-auto" />
+              {/* <ChevronsUpDown className="ml-auto" /> */}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -63,14 +68,14 @@ export function TeamSwitcher({
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
               <div
                 className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>
               <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

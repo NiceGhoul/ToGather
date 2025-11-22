@@ -257,11 +257,13 @@ const CampaignList = () => {
                                 onClick={() =>
                                     handleCategoryChange(item.lookup_value)
                                 }
-                                className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
+                                className={
+                                    `px-4 py-2 rounded-md text-white transition-all duration-200 ${
                                     chosenCategory === item.lookup_value
                                         ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
-                                        : " text-white hover:bg-purple-700 bg-purple-800"
-                                }`}
+                                        : `text-white hover:bg-purple-700 ${colorCoder(item.lookup_value)}`
+                                }`
+                            }
                             >
                                 {item.lookup_value}
                             </Button>

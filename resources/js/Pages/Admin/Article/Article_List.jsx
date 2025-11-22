@@ -156,7 +156,7 @@ export default function Article_List() {
                                 placeholder="Search by title..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-[260px] focus-visible:ring-purple-700"
+                                className="h-10 w-[260px] focus-visible:ring-purple-700 dark:text-white"
                             />
                             <select
                                 value={category}

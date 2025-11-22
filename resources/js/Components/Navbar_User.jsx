@@ -73,7 +73,6 @@ export default function Navbar_User() {
     const { url, props } = usePage();
     const auth = props.auth;
     const draft = props.draft_campaign
-    console.log(draft)
     const isActive = (path) => url.startsWith(path);
 
     const handleStart = () => {
@@ -85,8 +84,9 @@ export default function Navbar_User() {
     }
 
     return (
-        <header>
-            <nav className="flex justify-between items-center px-6 py-4">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full [transform:none!important] bg-purple-800">
+
+            <nav className="flex justify-between items-center px-6 py-4 top-0 z-50 w-full bg-purple-800">
                 <div className="flex gap-4 items-center">
                     {/* HOME */}
                     <Link
@@ -101,7 +101,7 @@ export default function Navbar_User() {
                     </Link>
 
                     <div className="flex items-center gap-4">
-                        {/* 🟣 CAMPAIGN DROPDOWN */}
+                        {/*CAMPAIGN DROPDOWN */}
                         <div className="relative group">
                             <button
                                 type="button"
@@ -150,7 +150,7 @@ export default function Navbar_User() {
                             </div>
                         </div>
 
-                        {/* 🟣 ARTICLE DROPDOWN */}
+                        {/*ARTICLE DROPDOWN */}
                         <div className="relative group">
                             <button
                                 type="button"
