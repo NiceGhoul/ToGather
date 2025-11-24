@@ -84,7 +84,7 @@ export default function Navbar_User() {
     }
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 w-full [transform:none!important] bg-purple-800">
+        <header className="sticky top-0 left-0 right-0 z-50 flex justify-between items-center bg-purple-800">
 
             <nav className="flex justify-between items-center px-6 py-4 top-0 z-50 w-full bg-purple-800">
                 <div className="flex gap-4 items-center">

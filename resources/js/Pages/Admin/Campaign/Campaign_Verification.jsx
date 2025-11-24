@@ -85,7 +85,7 @@ export default function Campaign_Verification() {
         <Layout_Admin title="Verify Campaigns">
             <div className="p-6 space-y-6">
                 {/* 🔎 Filter & Bulk Section */}
-                <div className="dark:bg-gray-900 p-4 rounded-lg shadow-md space-y-4">
+                <div className="dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Row 1: Search & Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -162,11 +162,11 @@ export default function Campaign_Verification() {
                     </div>
                 </div>
 
-                <div className="dark:bg-gray-900 rounded-lg shadow-md p-4 mt-10">
-                    <table className="min-w-full border-separate border-spacing-0 dark:bg-gray-900">
+                <div className="dark:bg-gray-800 rounded-lg shadow-md p-4">
+                    <table className="min-w-full border-separate border-spacing-0 dark:bg-gray-800">
                         <thead>
                             <tr className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
-                                <th className="px-4 py-2 w-12 text-center">
+                                <th className="px-4 py-2 border dark:border-gray-700 w-12 text-center">
                                     <input
                                         type="checkbox"
                                         checked={
@@ -194,9 +194,9 @@ export default function Campaign_Verification() {
                                 filteredCampaign.map((a) => (
                                     <tr
                                         key={a.id}
-                                        class="dark:hover:bg-gray-800 border dark:border-red-600"
+                                        class="dark:border-gray-700 px-4 py-2 dark:text-gray-200 dark:hover:bg-gray-800"
                                     >
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2 text-center">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
@@ -207,19 +207,19 @@ export default function Campaign_Verification() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.id}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.title}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.category}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.user?.nickname || a.user?.name}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {parseInt(
                                                 a.goal_amount
                                             ).toLocaleString("id-ID", {
@@ -228,16 +228,16 @@ export default function Campaign_Verification() {
                                                 minimumFractionDigits: 2,
                                             })}
                                         </td>
-                                        <td className="border px-4 py-2">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.duration}
                                             {a.duration > 1 ? " days" : " day"}
                                         </td>
-                                        <td className="border px-4 py-2 capitalize">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2 capitalize">
                                             {a.status === "approved"
                                                 ? "Approved and Enabled"
                                                 : a.status}
                                         </td>
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2 text-center">
                                             <div className="flex justify-center gap-3">
                                                 <Button
                                                     onClick={() =>

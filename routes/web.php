@@ -141,8 +141,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/campaigns/view/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaign.adminView');
     Route::post('/campaigns/delete/{id}', [CampaignController::class, 'AdminDelete'])->name('campaign.adminDelete');
     Route::post('/campaigns/changeStatus/{id}', [CampaignController::class, 'AdminChangeStatus'])->name('campaign.adminChangeStatus');
-    Route::post('/campaigns/activate/{id}', [CampaignController::class, 'AdminActivate'])->name('campaign.adminActive');
-    Route::post('/campaigns/deactivate/{id}', [CampaignController::class, 'AdminDeactivate'])->name('campaign.adminDeactive');
 
     Route::get('/articles/list', [ArticleController::class, 'adminIndex'])->name('articles.index');
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');

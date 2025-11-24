@@ -86,6 +86,17 @@ class CampaignController extends Controller
         $campaign = Campaign::findOrFail($id);
         $campaign->update(['status' => $request->status]);
 
+        if ($request->status === "active") {
+            if (empty($campaign->start_date) && empty($campaign->end_date)) {
+                $start = now();
+                $end = now()->addDays($campaign->duration);
+                $campaign->update([
+                    'start_date' => $start,
+                    'end_date'   => $end,
+                ]);
+            }
+        }
+
         // Notify user about article approval
         NotificationController::notifyUser(
             $campaign->user_id,
@@ -97,39 +108,6 @@ class CampaignController extends Controller
 
         return back()->with('success', 'Campaign Accepted by Admin!');
     }
-
-    public function AdminActivate($id){
-        $campaign = Campaign::findOrFail($id);
-        $campaign->update(['status' => 'approved']);
-
-        // Notify user about article approval
-        NotificationController::notifyUser(
-            $campaign->user_id,
-            'campaign_approved',
-            'campaign Approved',
-            "Your Campaign '{$campaign->title}' has been approved and is now shown to the public!",
-            ['campaign_id' => $campaign->id]
-        );
-
-        return back()->with('success', 'Campaign Accepted by Admin!');
-    }
-
-    public function AdminDeactivate($id){
-        $campaign = Campaign::findOrFail($id);
-        $campaign->update(['status' => 'approved']);
-
-        // Notify user about article approval
-        NotificationController::notifyUser(
-            $campaign->user_id,
-            'campaign_approved',
-            'campaign Approved',
-            "Your Campaign '{$campaign->title}' has been approved and is now shown to the public!",
-            ['campaign_id' => $campaign->id]
-        );
-
-        return back()->with('success', 'Campaign Accepted by Admin!');
-    }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -380,7 +358,7 @@ class CampaignController extends Controller
                     return [
                         'path' => $img->path,
                         'filetype' => 'image',
-                        'url' => $img->url,
+                        'url' => Storage::disk('minio')->url($img->path),
                     ];
                 });
 
@@ -388,11 +366,19 @@ class CampaignController extends Controller
                     return [
                         'path' => $vid->path,
                         'filetype' => 'video',
-                        'url' => $vid->url,
+                        'url' => Storage::disk('minio')->url($vid->path),
                     ];
                 });
 
                 $media = collect($imageMedia)->merge(collect($videoMedia));
+
+                if ($data->type === 'media' && $media->isEmpty()) {
+                    $media->push([
+                        'path' => $data->content,
+                        'filetype' => 'image', // You can detect extension too
+                        'url' => Storage::disk('minio')->url($data->content),
+                    ]);
+                }
 
                 $data->setAttribute('media', $media);
                 $data->unsetRelation('images');
@@ -516,7 +502,7 @@ class CampaignController extends Controller
     {
 
         $content = CampaignContent::findOrFail($request->id);
-
+        dd($content);
         $tab = match ($content->type) {
         'updates' => 2,
         'faqs' => 1,
@@ -525,7 +511,7 @@ class CampaignController extends Controller
 
         $content->delete();
 
-         return redirect()->route('campaigns.create')->with('activeTab', $tab);
+         return redirect()->route('campaigns.detailsPreview')->with('activeTab', $tab);
     }
 
     public function insertCampaignUpdate(Request $request)
@@ -578,8 +564,7 @@ class CampaignController extends Controller
         $campaignId = 0;
         foreach ($request->all() as $dat) {
             CampaignContent::updateOrCreate(['id' => $dat['id']],$dat);
-            $campaignId = $dat['id'];
-
+            $campaignId = $dat['campaign_id'];
         }
 
         return redirect()->route('campaigns.detailsPreview',$campaignId)->with('activeTab', 1);
@@ -609,9 +594,9 @@ class CampaignController extends Controller
 
                     $path = Storage::disk('minio')->put("campaigns/about/" . $dat['campaign_id'], $dat['content']);
 
-                    $payload['content'] = Storage::disk('minio')->url($path);
+                    $payload['content'] = $path;
                 } else {
-                    $payload['content'] = $dat['content'];
+                    $payload['content'] = $dat['existing'];
                 }
             } else {
                 $payload['content'] = $dat['content'];

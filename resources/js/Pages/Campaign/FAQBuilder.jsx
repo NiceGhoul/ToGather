@@ -6,6 +6,9 @@ import { Edit, Save, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/Components/ui/button";
 import { router } from "@inertiajs/react";
+import { Alert, AlertTitle } from "@mui/material";
+import { toast } from "sonner";
+import { Toaster } from "@/Components/ui/sonner";
 
 
 export const FaqBuilder = ({campaign, contents}) => {
@@ -20,21 +23,21 @@ const [userQuestions, setUserQuestions] = useState(
             };
         })
 );
-const [openItem, setOpenItem] = useState(null);
-
-console.log(contents.filter((dat) => dat.type === 'faqs'));
+const [openItem, setOpenItem] = useState(null)
 
 useEffect(() => {
   const editingIndex = userQuestions.findIndex((q) => q.isEditing);
   if (editingIndex !== -1) {
     setOpenItem(`item-${editingIndex}`);
   }
-}, [userQuestions]);
+}, [userQuestions])
 
-const handleDelete = (dat, idx) => {
-    // console.log(dat)
-    setUserQuestions((dat) => dat.filter((_, i) => i != idx))
-    router.post(`/campaigns/deleteContent`, dat)
+const handleDelete = (itemToDelete, idx) => {
+    setUserQuestions((prev) => prev.filter((_, i) => i !== idx))
+
+    if (contents?.some((c) => c.id === itemToDelete.id)) {
+        router.post('/campaigns/deleteContent', { id: itemToDelete.id })
+    }
 }
 
   const handleChange = (index, field, value) => {
@@ -51,8 +54,8 @@ const handleDelete = (dat, idx) => {
             {
                 id: null,
                 campaign_id: campaign.id,
-                question: "Write Questions here",
-                answer: "Write your answer on this text box",
+                question: "",
+                answer: "",
                 isEditing:false,
             },
         ]);
@@ -67,6 +70,13 @@ const handleDelete = (dat, idx) => {
     };
 
     const handleSave = () => {
+        if(userQuestions.length === 0){
+            toast.error("there are empty descriptions!", {
+                 description:
+                     "please double check your description before submitting.",
+             });
+            return
+        }
         const data = userQuestions.map((_, idx) => ({id:userQuestions[idx].id ,campaign_id: campaign.id, type:'faqs', content:userQuestions[idx].question + "~;" + userQuestions[idx].answer, order_y: idx + 1}))
         router.post('/campaigns/insertFAQ', data)
     }
@@ -75,7 +85,7 @@ const handleDelete = (dat, idx) => {
 
     return (
         <div className="flex justify-center items-center flex-col gap-45 h-full">
-            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789]">
+            <Label className="text-3xl justify-center items-center font-bold text-[#7C4789] dark:text-[#9A5CAA]">
                 Frequently Asked Questions
             </Label>
             <div className="w-full h-full items-center justify-center flex">
@@ -89,13 +99,13 @@ const handleDelete = (dat, idx) => {
                     <div className="w-[60%] justify-center items-center">
                         {userQuestions.map((dat, idx) => (
                             <div
-                                key={dat.id}
+                                key={idx + 1}
                                 className="flex items-center gap-2"
                             >
                                 <Accordion
                                     type="single"
                                     collapsible={dat.isEditing ? false : true}
-                                    className="w-full "
+                                    className="w-full"
                                     onValueChange={(val) => {
                                         const currentIndex =
                                             userQuestions.findIndex(
@@ -134,7 +144,13 @@ const handleDelete = (dat, idx) => {
                                                     }}
                                                     value={dat.question}
                                                     // placeholder={"Write your answer on this text box"}
-                                                    onChange={(e) => handleChange(idx, "question", e.target.value)}
+                                                    onChange={(e) =>
+                                                        handleChange(
+                                                            idx,
+                                                            "question",
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     className="w-[80%]"
                                                 />
                                             ) : (
@@ -148,15 +164,27 @@ const handleDelete = (dat, idx) => {
                                             {dat.isEditing ? (
                                                 <Textarea
                                                     value={dat.answer}
-                                                    onKeyDown={(e) =>e .stopPropagation()}
-                                                    onKeyDownCapture={(e) => e.stopPropagation()}
-                                                    onKeyUpCapture={(e) => e.stopPropagation()}
-                                                    onChange={(e) => handleChange(idx, "answer", e.target.value)}
-                                                    className="w-full mt-2"
+                                                    onKeyDown={(e) =>
+                                                        e.stopPropagation()
+                                                    }
+                                                    onKeyDownCapture={(e) =>
+                                                        e.stopPropagation()
+                                                    }
+                                                    onKeyUpCapture={(e) =>
+                                                        e.stopPropagation()
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleChange(
+                                                            idx,
+                                                            "answer",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    className="w-full mt-2 dark:text-gray-200"
                                                     rows={3}
                                                 />
                                             ) : (
-                                                <p className="mt-2 text-gray-700 text-base">
+                                                <p className="mt-2 text-gray-700 dark:text-gray-200 text-base">
                                                     {dat.answer}
                                                 </p>
                                             )}
@@ -166,16 +194,16 @@ const handleDelete = (dat, idx) => {
                                 <div className="flex gap-2">
                                     {dat.isEditing ? (
                                         <Save
-                                            size={30}
+                                            size={35}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleEdit(idx);
                                             }}
-                                            className="cursor-pointer rounded-md p-1 hover:bg-gray-200 text-blue-600 transition-colors"
+                                            className="cursor-pointer rounded-md p-1 hover:bg-blue-200 text-blue-600 transition-colors"
                                         />
                                     ) : (
                                         <Edit
-                                            size={30}
+                                            size={35}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleEdit(idx);
@@ -185,7 +213,7 @@ const handleDelete = (dat, idx) => {
                                     )}
 
                                     <Trash
-                                        size={30}
+                                        size={35}
                                         onClick={() => handleDelete(dat, idx)}
                                         className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
                                     />
@@ -207,6 +235,11 @@ const handleDelete = (dat, idx) => {
                     <Button onClick={handleSave}>Save Changes</Button>
                 )}
             </div>
+            <Toaster
+                className="text-xl"
+                toastOptions={{ duration: 1500 }}
+                position="top-center"
+            />
         </div>
     );
 }

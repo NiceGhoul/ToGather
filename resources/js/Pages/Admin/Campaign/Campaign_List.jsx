@@ -255,7 +255,7 @@ export default function Campaign_List() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.id}
                                         </td>
                                         <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
@@ -285,7 +285,7 @@ export default function Campaign_List() {
                                                 ? "Approved and Enabled"
                                                 : a.status}
                                         </td>
-                                        <td className=" px-4 py-2 text-center">
+                                        <td className=" px-4 py-2 dark:border-gray-700 dark:text-gray-200 text-center">
                                             <div className="flex justify-center gap-3">
                                                 <Button
                                                     onClick={() =>

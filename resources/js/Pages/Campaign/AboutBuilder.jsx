@@ -4,7 +4,7 @@ import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
 import { Button } from "@/Components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/Components/ui/sonner";
 import { router } from "@inertiajs/react";
@@ -13,7 +13,8 @@ import { router } from "@inertiajs/react";
 export const AboutBuilder = ({campaign, contents}) => {
     const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
 
-    
+    // console.log(description.map((tai) => console.log(tai)))
+
     const addParagraphBlock = () => {
         setDescription((prev) => {
             const lastOrder =
@@ -51,7 +52,6 @@ export const AboutBuilder = ({campaign, contents}) => {
     };
 
     const handleChange = (index, value) => {
-        // console.log(value)
         setDescription((prev) =>
             prev.map((block, i) =>
                 i === index ? { ...block, content: value } : block
@@ -84,6 +84,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                     campaign_id: block.campaign_id,
                     type: block.type,
                     content: block.type === "paragraph" ? block.content : block.content?.file,
+                    // content: block.content,
                     // file: block.type === "media" ? block.content?.file ?? null : null,
                     existing:  block.type === "media" && typeof block.content === "string" ? block.content : null,
                     order_y: block.order_y,
@@ -107,13 +108,13 @@ export const AboutBuilder = ({campaign, contents}) => {
                     <Button onClick={addMediaBlock}> + Add Media </Button>
                 </div>
             </CardHeader>
-            {description.length > 0 ? (
+            {description && description.length > 0 ? (
                 <CardContent className="flex flex-col gap-4 ">
                     <div className="flex flex-col gap-4 justify-center">
-                        {description.map((block, index) => (
+                        {description?.map((block, index) => (
                             <div
                                 key={index}
-                                className="border rounded-lg p-3 flex flex-col gap-5 bg-gray-50 relative"
+                                className="border rounded-lg p-3 flex flex-col gap-5 bg-gray-50 dark:bg-gray-800 relative"
                             >
                                 {block.type === "paragraph" ? (
                                     block.isEditing ? (
@@ -178,7 +179,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                         </div>
                                     ) : (
                                         <div className="flex flex-col gap-4">
-                                            <Label className="text-3xl font-bold text-[#7C4789]">
+                                            <Label className="text-3xl font-bold text-[#7C4789] dark: text-[#9A5CAA]">
                                                 {block.content.split("~;")[0]}
                                             </Label>
                                             <p className="break-words font-normal text-base mt-4 text-justify">
@@ -199,9 +200,9 @@ export const AboutBuilder = ({campaign, contents}) => {
                                     )
                                 ) : (
                                     <>
-                                        {block.content ? (
+                                        {block.content    ? (
                                             <img
-                                                src={block.content.preview ?? block.content}
+                                                src={block.content.preview ?? block.media[0].url}
                                                 alt="Preview"
                                                 className="w-full max-h-[400px] object-contain rounded"
                                             />

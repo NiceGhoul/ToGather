@@ -21,7 +21,7 @@ export const UpperPreview = ({campaign, user, images}) => {
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
             <div className="flex flex-col w-[600px] h-[400px]">
-                <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 shrink-0">
+                <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0">
                     <img
                         src={images.thumbnail}
                         alt="Campaign"
@@ -36,7 +36,7 @@ export const UpperPreview = ({campaign, user, images}) => {
 
             <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
                 <div className="flex overflow-hidden item-center justify-start gap-5 flex-row">
-                    <Avatar className="w-20 h-20 border-2 border-gray-700">
+                    <Avatar className="w-20 h-20 border-2 border-gray-700 dark:bg-white">
                         <AvatarImage src={images.logo} alt={campaign.title} />
                         <AvatarFallback>
                             {campaign != undefined ? campaign.title[0] : ""}
@@ -52,11 +52,11 @@ export const UpperPreview = ({campaign, user, images}) => {
                     </div>
                 </div>
                 <div className="flex flex-row justify-between">
-                    <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789]">
+                    <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
                         0 Donator
                     </h1>
 
-                    <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
+                    <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
                         {campaign.duration + " Days left"}
                     </h1>
                 </div>
@@ -87,7 +87,7 @@ export const UpperPreview = ({campaign, user, images}) => {
                         onPressedChange={() => setLike(!like)}
                         size="lg"
                         // variant="outline"
-                        variant={localStorage.getItem('theme') === 'dark' ? "tonal" : "outline"}
+                        variant={"outline"}
                         className="
                         data-[state=on]:bg-transparent
                         data-[state=on]:text-red-400 dark:data-[state=on]:text-red-300
@@ -176,6 +176,7 @@ const CreateDetailsPreview = () => {
         return (
             <>
                 <TabsTrigger
+                    key={index}
                     value={index + 1}
                     className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
                 >
@@ -212,7 +213,7 @@ const CreateDetailsPreview = () => {
                 <CardHeader className="flex flex-row">
                     <div className="justify-center items-center">
                         <Button
-                            className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
+                            className="bg-transparent text-purple-700 dark:text-purple-400 hover:bg-purple-100 text-xl "
                             onClick={() => handleBack()}
                         >
                             ← Back
@@ -223,12 +224,12 @@ const CreateDetailsPreview = () => {
                             Edit Campaign Details
                         </CardTitle>
                         <CardDescription className="w-full text-center text-md justify-center flex items-center">
-                            Edit everything about your products here! preview what your campaign details would looked like after prior to publishing!
+                            Edit everything about your campaign here! preview what your campaign details would looked like prior to publishing!
                         </CardDescription>
                     </div>
                     <div className="justify-center items-center">
                         <Button
-                            className="bg-transparent text-green-700 hover:bg-green-100 text-xl "
+                            className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl "
                             onClick={() => handleFinalize()}
                         >
                             Finalize →

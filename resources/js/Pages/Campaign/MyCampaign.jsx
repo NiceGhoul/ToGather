@@ -118,7 +118,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
         router.get(`/campaigns/create/detailsPreview/${id}`)
     }
 
-    const handleDeleteCamapign = (campaignId) => {
+    const handleDeleteCampaign = (campaignId) => {
         router.post()
     }
 
@@ -140,7 +140,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                 return (
                     <div
                         key={idx}
-                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between"
+                        className="border rounded-lg p-4 shadow-md flex flex-col justify-between dark:bg-gray-800"
                     >
                         {!images.thumbnail && (
                             <img
@@ -156,7 +156,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                                 : campaign.title}
                         </h2>
 
-                        <p className="text-sm text-gray-600 text-center mb-2">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-2">
                             {new Date(campaign.created_at).toLocaleDateString()}
                         </p>
 
@@ -170,20 +170,20 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                             </span>
                         </div>
 
-                        <p className="text-sm text-gray-700 mb-3 text-justify">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 text-justify min-h-25">
                             {campaign.description
                                 ?.replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 150) || "No description available."}
                             ...
                         </p>
 
-                        <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                        <div className="w-full bg-gray-200 dark:bg-gray-400 rounded-full h-3 mb-3">
                             <div
                                 className="bg-purple-700 h-3 rounded-full"
                                 style={{ width: `${progress}%` }}
                             ></div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2 text-center">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 text-center">
                             Raised Rp{" "}
                             {campaign.collected_amount?.toLocaleString("id-ID")}{" "}
                             / Rp {campaign.goal_amount?.toLocaleString("id-ID")}{" "}
@@ -195,14 +195,14 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                                 className={`inline-block text-xs font-semibold px-2 py-1 rounded-full
                             ${
                                 campaign.status === "active"
-                                    ? "bg-green-100 text-green-700"
+                                    ? "bg-green-200 dark:bg-green-300 text-green-700 dark:text-green-900"
                                     : campaign.status === "pending"
-                                    ? "bg-yellow-100 text-yellow-700"
+                                    ? "bg-yellow-200 text-yellow-700"
                                     : campaign.status === "rejected"
-                                    ? "bg-red-100 text-red-700"
+                                    ? "bg-red-200 dark:bg-red-300 text-red-700"
                                     : campaign.status === "banned"
-                                    ? "bg-red-100 text-red-700"
-                                    : "bg-purple-100 text-purple-700"
+                                    ? "bg-red-200 text-red-700"
+                                    : "bg-purple-200 text-purple-700"
                             }`}
                             >
                                 {campaign.status.toUpperCase()}
@@ -213,13 +213,13 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                                 <div className="flex gap-4 flex justify-center items-center">
                                     {campaign.status === "draft" &&
                                     <Button
-                                        className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg"
+                                        className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg"
                                         onClick={() => setOpenPop(true)}
                                     >
                                         ✖ Cancel
                                     </Button >}
                                     {campaign.status != "rejected" &&
-                                    <Button onClick={() => handleMoveToEdit(campaign.id)} className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg">
+                                    <Button onClick={() => handleMoveToEdit(campaign.id)} className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg">
                                             Edit →
                                     </Button>
                                     }
@@ -227,7 +227,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                             ) : (
                                 <Link
                                     href={`/campaigns/details/${campaign.id}`}
-                                    className="text-purple-700 hover:underline text-lg font-medium"
+                                    className="text-purple-700 dark:text-purple-500 hover:underline text-lg font-medium"
                                 >
                                     View Details →
                                 </Link>
@@ -320,7 +320,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                             }
                         );
                     }}
-                    className="border rounded-md px-3 text-sm h-[38px] focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none bg-white hover:ring-1 hover:ring-purple-700"
+                    className="border rounded-md px-3 text-sm h-[38px] focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none dark:bg-black hover:ring-1 hover:ring-purple-700"
                 >
                     <option value="desc">Newest First</option>
                     <option value="asc">Oldest First</option>
