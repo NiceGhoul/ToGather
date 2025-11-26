@@ -12,7 +12,6 @@ import { Tooltip } from "@/Components/ui/tooltip";
 export default function Campaign_Verification() {
 
     const { campaigns, filters, categories } = usePage().props;
-    const [allCampaigns, setAllCampaigns] = useState(campaigns || []);
     const [filteredCampaign, setFilteredCampaigns] = useState(campaigns || []);
     const [category, setCategory] = useState("");
     const [search, setSearch] = useState("");
@@ -41,9 +40,10 @@ export default function Campaign_Verification() {
            setCategory("");
            setSearch("");
        };
+       console.log(campaigns)
 
     useEffect(() => {
-        let result = allCampaigns;
+        let result = campaigns;
         if (category != "") {
             result = result.filter((a) => a.category === category);
         }
@@ -53,7 +53,7 @@ export default function Campaign_Verification() {
         }
 
         setFilteredCampaigns(result);
-    }, [allCampaigns, search, category, status]);
+    }, [campaigns, search, category]);
 
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
@@ -73,13 +73,10 @@ export default function Campaign_Verification() {
         router.get(`/admin/campaigns/view/${id}`)
     }
 
-    const handleDelete = (id) => {
-        router.post(`/admin/campaigns/delete/${id}`)
-    }
 
-      const handleChangeStatus = (id, status) => {
-          router.post(`/admin/campaigns/changeStatus/${id}`, status);
-      };
+    const handleChangeStatus = (id, status) => {
+        router.post(`/admin/campaigns/changeStatus/${id}`, { status });
+    };
 
     return (
         <Layout_Admin title="Verify Campaigns">
@@ -182,6 +179,7 @@ export default function Campaign_Verification() {
                                 <th className="px-4 py-2">Id</th>
                                 <th className="px-4 py-2">Title</th>
                                 <th className="px-4 py-2">Category</th>
+                                <th className="px-4 py-2">Date Created</th>
                                 <th className="px-4 py-2">Creator</th>
                                 <th className="px-4 py-2">Goal Amount</th>
                                 <th className="px-4 py-2">Durations</th>
@@ -194,7 +192,7 @@ export default function Campaign_Verification() {
                                 filteredCampaign.map((a) => (
                                     <tr
                                         key={a.id}
-                                        class="dark:border-gray-700 px-4 py-2 dark:text-gray-200 dark:hover:bg-gray-800"
+                                        class="dark:border-gray-700 px-4 py-2 dark:text-gray-200 dark:hover:bg-gray-600 hover:bg-gray-200"
                                     >
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2 text-center">
                                             <input
@@ -215,6 +213,9 @@ export default function Campaign_Verification() {
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.category}
+                                        </td>
+                                        <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
+                                            {new Date(a.created_at).toLocaleString()}
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.user?.nickname || a.user?.name}
@@ -257,7 +258,7 @@ export default function Campaign_Verification() {
                                                     confirmColor="bg-green-600 hover:bg-green-700 text-white"
                                                     triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                                                     onConfirm={() =>
-                                                        handleDelete(a.id)
+                                                        handleChangeStatus(a.id, "active")
                                                     }
                                                 />
                                                 <Popup
@@ -270,7 +271,7 @@ export default function Campaign_Verification() {
                                                     confirmColor="bg-red-600 hover:bg-red-700 text-white"
                                                     triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                                                     onConfirm={() =>
-                                                        handleDelete(a.id)
+                                                        handleChangeStatus(a.id, "rejected")
                                                     }
                                                 />
                                             </div>

@@ -11,6 +11,9 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useState } from "react";
 
 export const UpdatesDetails = ({ contents }) => {
+
+    console.log(contents)
+
     const [selectedUpdate, setSelectedUpdate] = useState(contents[0]);
     return (
         <>
@@ -39,7 +42,7 @@ export const UpdatesDetails = ({ contents }) => {
 
                                 {/* media carousel */}
                                 {selectedUpdate.media?.length > 0 && (
-                                    <Carousel className="w-full max-w-[80%] mx-auto border-2 mb-10">
+                                    <Carousel className="w-full max-w-[80%] mx-auto border-2 rounded-lg mb-10">
                                         <CarouselContent>
                                             {selectedUpdate.media.map(
                                                 (m, idx) => (
@@ -47,21 +50,15 @@ export const UpdatesDetails = ({ contents }) => {
                                                         key={idx}
                                                         className="flex justify-center"
                                                     >
-                                                        {m.filetype ??
-                                                        m.filetype ===
-                                                            "images" ? (
+                                                        {
+                                                        m.filetype.toString() === "image" ? (
                                                             <img
                                                                 src={m.url}
-                                                                alt={`Media ${
-                                                                    idx + 1
-                                                                }`}
+                                                                alt={`Media ${idx + 1}`}
                                                                 className="rounded-lg min-w-[100%] max-h-[450px] object-contain"
                                                             />
                                                         ) : (
-                                                            <video
-                                                                controls
-                                                                className="rounded-lg w-full min-h-[400px] object-content"
-                                                            >
+                                                            <video controls className="rounded-lg w-full min-h-[400px] object-content">
                                                                 <source
                                                                     src={m.url}
                                                                     type="video/mp4"

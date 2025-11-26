@@ -147,6 +147,7 @@ const handleEditCancel = () => {
 }
 
 const handleSave = () => {
+
     const formattedData = {
             ...campaignData,
             start_campaign: campaignData.start_campaign
@@ -189,7 +190,7 @@ const handleSave = () => {
 
                         <div className="dark:text-white">
                             <Label className="mb-1 dark:text-white">Description</Label>
-                            <Textarea 
+                            <Textarea
                                 placeholder={`Give your campaign a brief description:
 (what your product is, what your plan is for this campaign, or you can describe what your campaign is about)`}
                                 value={campaignData.description}
@@ -319,7 +320,7 @@ const handleSave = () => {
 
                         <Button
                             className="w-28 h-8 text-sm ml-36"
-                            onClick={handleSave}
+                            onClick={handleClick}
                             >
                             {campaign != undefined ? "update" : "next"}
                         </Button>
@@ -362,9 +363,7 @@ const handleSave = () => {
                             : "bg-green-600 hover:bg-green-700 text-white"
                     }
                     onConfirm={
-                        description.length > 0
-                            ? () => setOpenPop(false)
-                            : handleSave
+                        description.length > 0 ? () => setOpenPop(false) : handleSave
                     }
                 />
             )}

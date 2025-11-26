@@ -12,7 +12,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
     // useState that saves what will be shown on the right side
     const [updates, setUpdates] = useState(contents);
     const [selectedUpdate, setSelectedUpdate] = useState(updates[0]);
-    console.log(contents)
+
     const handleAddUpdate = () => {
         const date = new Date();
         setUpdates((prev) => {

@@ -20,8 +20,6 @@ const CampaignLocation = ({ open, setCampaignLocation, onClose, locationData }) 
     const [address, setAddress] = useState("");
     const [coords, setCoords] = useState({ lat:-6.200284252332842, lng: 106.78547062682863});
 
-
-
     useEffect(() => {
         if(locationData != null){
             setLocation(locationData)
@@ -116,7 +114,6 @@ function SearchBar() {
     const LocationMarker = ({ setCoords }) => {
         useMapEvents({
             click(e) {
-                console.log(e.latlng)
                 setCoords(e.latlng)
             },
         });

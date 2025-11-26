@@ -77,16 +77,16 @@ export default function Navbar_User() {
 
     const handleStart = () => {
         if(draft){
-            router.get(`campaigns/create/detailsPreview/${draft.id}`)
+            router.get(`/campaigns/create/detailsPreview/${draft.id}`)
         }else{
-            router.get('campaigns/create')
+            router.get('/campaigns/create')
         }
     }
 
     return (
-        <header className="sticky top-0 left-0 right-0 z-50 flex justify-between items-center bg-purple-800">
+        <header className="sticky top-0 left-0 right-0 z-50 flex justify-between items-center bg-[#7A338C] dark:bg-purple-800">
 
-            <nav className="flex justify-between items-center px-6 py-4 top-0 z-50 w-full bg-purple-800">
+            <nav className="flex justify-between items-center px-6 py-4 top-0 z-50 w-full bg-[#7A338C] dark:bg-purple-800">
                 <div className="flex gap-4 items-center">
                     {/* HOME */}
                     <Link

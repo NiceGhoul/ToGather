@@ -25,7 +25,6 @@ const CampaignList = () => {
 
         if (campaigns.images && images.thumbnail === null) {
             campaigns.images.map((dat) => {
-                console.log(dat);
                 dat.url.includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
                     : setImages((prev) => ({ ...prev, logo: dat.url }));
@@ -219,10 +218,7 @@ const CampaignList = () => {
             <div className="w-full flex flex-col">
                 <div
                     className="relative h-72 w-full bg-cover bg-center"
-                    style={{
-                        backgroundImage:
-                            "url('http://127.0.0.1:8000/images/handshake.jpg')",
-                    }}
+                    style={{backgroundImage: "url('http://127.0.0.1:8000/images/handshake.jpg')" }}
                 >
                     <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full">
                         <h1 className="text-4xl font-bold text-white text-center dark:text-white">

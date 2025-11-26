@@ -242,7 +242,7 @@ export default function Campaign_List() {
                                 filteredCampaign.map((a) => (
                                     <tr
                                         key={a.id}
-                                        class="dark:border-gray-700 px-4 py-2 dark:text-gray-200 dark:hover:bg-gray-800"
+                                        class="dark:border-gray-700 px-4 py-2 dark:text-gray-200 dark:hover:bg-gray-600 hover:bg-gray-200"
                                     >
                                         <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200 text-center">
                                             <input

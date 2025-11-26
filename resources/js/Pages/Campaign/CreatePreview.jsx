@@ -12,7 +12,7 @@ import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const PreviewLayout = ({ user, campaign, images }) => {
-    console.log(campaign)
+    // console.log(campaign)
     return (
         <div className="flex container px-4 py-4 flex-row gap-16 justify-center items-center mx-auto scale-90 border-2 rounded-xl border-gray-300">
             <div className="flex flex-col w-[600px] h-[400px]">

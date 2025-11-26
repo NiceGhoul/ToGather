@@ -9,6 +9,7 @@ import { router } from "@inertiajs/react";
 import { Alert, AlertTitle } from "@mui/material";
 import { toast } from "sonner";
 import { Toaster } from "@/Components/ui/sonner";
+import Popup from "@/Components/Popup";
 
 
 export const FaqBuilder = ({campaign, contents}) => {
@@ -138,12 +139,11 @@ const handleDelete = (itemToDelete, idx) => {
                                                         e.stopPropagation()
                                                     }
                                                     onKeyDown={(e) => {
-                                                        // extra defense: prevent space from toggling
                                                         if (e.code === "Space")
                                                             e.nativeEvent.stopImmediatePropagation();
                                                     }}
                                                     value={dat.question}
-                                                    // placeholder={"Write your answer on this text box"}
+                                                    placeholder={"Write your Question on this text box"}
                                                     onChange={(e) =>
                                                         handleChange(
                                                             idx,
@@ -155,7 +155,7 @@ const handleDelete = (itemToDelete, idx) => {
                                                 />
                                             ) : (
                                                 <span className="text-xl font-semibold">
-                                                    {dat.question}
+                                                    {dat.question != "" ? dat.question : "Edit Your Question"}
                                                 </span>
                                             )}
                                         </AccordionTrigger>
@@ -181,11 +181,12 @@ const handleDelete = (itemToDelete, idx) => {
                                                         )
                                                     }
                                                     className="w-full mt-2 dark:text-gray-200"
+                                                    placeholder={"Write your answer here"}
                                                     rows={3}
                                                 />
                                             ) : (
                                                 <p className="mt-2 text-gray-700 dark:text-gray-200 text-base">
-                                                    {dat.answer}
+                                                    {dat.answer != "" ? dat.answer : "Edit your Answer"}
                                                 </p>
                                             )}
                                         </AccordionContent>
@@ -211,11 +212,20 @@ const handleDelete = (itemToDelete, idx) => {
                                             className="cursor-pointer rounded-md p-1 hover:bg-gray-200 text-gray-600 hover:text-blue-600 transition-colors"
                                         />
                                     )}
-
-                                    <Trash
-                                        size={35}
-                                        onClick={() => handleDelete(dat, idx)}
-                                        className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
+                                    <Popup
+                                        triggerText={
+                                            <Trash
+                                                size={35}
+                                                className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
+                                            />
+                                        }
+                                        title="Delete FAQ?"
+                                        description="This action cannot be undone.FAQ will be deleted permanently."
+                                        confirmText="Yes, Delete"
+                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
+                                        // disabledValue={selectedIds.length === 0}
+                                        onConfirm={handleDelete}
                                     />
                                 </div>
                             </div>

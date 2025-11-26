@@ -7,9 +7,9 @@ export default function Navbar_Guest() {
     const isActive = (path) => window.location.pathname.startsWith(path);
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 w-full [transform:none!important] bg-purple-800">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full [transform:none!important] bg-[#7A338C]">
 
-            <nav className="flex justify-between items-center px-6 py-4 top-0 z-50 w-full bg-purple-800">
+            <nav className="flex justify-between items-center px-6 py-4 top-0 z-50 w-full bg-[#7A338C]">
                 {/* 🔹 LEFT SIDE (Home, Campaign, Article) */}
                 <div className="flex items-center gap-4">
                     {/* HOME */}
@@ -41,20 +41,21 @@ export default function Navbar_Guest() {
                         </button>
 
                         <div
-                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white text-gray-900 shadow-lg py-2 px-2 z-50
+                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white dark:bg-gray-800
+                                text-gray-900 dark:text-white shadow-lg py-2 px-2 z-50
                                 opacity-0 translate-y-1 pointer-events-none
                                 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
                                 transition-all duration-150"
                         >
                             <Link
                                 href="/campaigns/list"
-                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Browse Campaigns
                             </Link>
                             <Link
                                 href="/login"
-                                className="block px-3 py-2 text-sm rounded-md font-semibold hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm rounded-md font-semibold hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Start a Campaign
                             </Link>
@@ -76,20 +77,20 @@ export default function Navbar_Guest() {
                         </button>
 
                         <div
-                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white text-gray-900 shadow-lg py-2 px-2 z-50
-                                opacity-0 translate-y-1 pointer-events-none
+                            className="absolute left-0 top-full min-w-[260px] rounded-xl bg-white text-gray-900 shadow-lg py-2 px-2 z-50 dark:bg-gray-800
+                                opacity-0 translate-y-1 dark:text-white pointer-events-none
                                 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
                                 transition-all duration-150"
                         >
                             <Link
                                 href="/articles/list"
-                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Browse Articles
                             </Link>
                             <Link
                                 href="/login"
-                                className="block px-3 py-2 text-sm font-semibold rounded-md hover:bg-slate-100"
+                                className="block px-3 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                             >
                                 Write an Article
                             </Link>

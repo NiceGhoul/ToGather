@@ -206,7 +206,7 @@ const CreateDetailsPreview = () => {
             });
         }
     }, [campaign]);
-
+    console.log(campaign)
     return (
         <Layout_User>
             <Card className="rounded-none border-0 border-b">
@@ -224,7 +224,7 @@ const CreateDetailsPreview = () => {
                             Edit Campaign Details
                         </CardTitle>
                         <CardDescription className="w-full text-center text-md justify-center flex items-center">
-                            Edit everything about your campaign here! preview what your campaign details would looked like prior to publishing!
+                           {campaign.status === "draft" ? "Edit everything about your campaign here! preview what your campaign details would looked like prior to publishing!" : " Edit everything about your campaign here! Add ne campaign updates on the Updates Tab!"}
                         </CardDescription>
                     </div>
                     <div className="justify-center items-center">

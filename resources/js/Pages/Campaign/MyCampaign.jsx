@@ -41,7 +41,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
     const [searchTerm, setSearchTerm] = useState("")
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc")
     const [images, setImages] = useState({thumbnail: null})
-    const [openPop, setOpenPop] = useState(false)
+    const [openPop, setOpenPop] = useState(-1)
 
     useEffect(() => {
         if (campaigns.images && (images.thumbnail === null)) {
@@ -118,8 +118,8 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
         router.get(`/campaigns/create/detailsPreview/${id}`)
     }
 
-    const handleDeleteCampaign = (campaignId) => {
-        router.post()
+    const handleDeleteCampaign = (id) => {
+        router.post(`/campaigns/deleteCampaign/${id}`)
     }
 
     const cardRepeater = (data) => {
@@ -214,14 +214,22 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                                     {campaign.status === "draft" &&
                                     <Button
                                         className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg"
-                                        onClick={() => setOpenPop(true)}
-                                    >
+                                        onClick={() => setOpenPop(campaign.id)}>
                                         ✖ Cancel
-                                    </Button >}
+                                    </Button >
+                                    }
                                     {campaign.status != "rejected" &&
+                                    <>
+                                    {campaign.status === "active" && <Link
+                                        href={`/campaigns/details/${campaign.id}`}
+                                        className="text-purple-700 dark:text-purple-500 hover:underline text-lg font-medium"
+                                    >
+                                    View Details →
+                                    </Link>}
                                     <Button onClick={() => handleMoveToEdit(campaign.id)} className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg">
-                                            Edit →
+                                         Edit →
                                     </Button>
+                                    </>
                                     }
                                 </div>
                             ) : (
@@ -453,7 +461,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                 </CardContent>
             </div>
             <Popup
-                open={openPop}
+                open={openPop === -1 ? false : true}
                 triggerText={null}
                 title={"you are about to delete a campaign!"}
                 description={"This will remove all instances of data associated to this campaign. Are you sure to continue?"}
@@ -461,7 +469,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                 cancelText="Cancel"
                 showCancel={true}
                 confirmColor={"bg-red-600 hover:bg-red-700 text-white"}
-                onConfirm={() => setOpenPop(false)}
+                onConfirm={() => handleDeleteCampaign(openPop)}
             />
         </Layout_User>
     );

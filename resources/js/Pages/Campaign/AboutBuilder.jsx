@@ -84,14 +84,13 @@ export const AboutBuilder = ({campaign, contents}) => {
                     campaign_id: block.campaign_id,
                     type: block.type,
                     content: block.type === "paragraph" ? block.content : block.content?.file,
-                    // content: block.content,
                     // file: block.type === "media" ? block.content?.file ?? null : null,
                     existing:  block.type === "media" && typeof block.content === "string" ? block.content : null,
                     order_y: block.order_y,
                 };
             })
-            // console.log(prepared)
              router.post("/campaigns/insertAbout", prepared)
+             
          }
      };
 
