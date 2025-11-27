@@ -21,8 +21,6 @@ export default function Navbar_User() {
     const [loading, setLoading] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
 
-
-
     const handleLogout = () => {
         router.post("/logout");
     };
@@ -30,7 +28,6 @@ export default function Navbar_User() {
     const toggleDropdown = () => {
         setOpen(!open);
     };
-
 
     const fetchNotifications = async () => {
         setLoading(true);
@@ -47,11 +44,8 @@ export default function Navbar_User() {
         }
     };
 
-
     const markAllAsRead = async () => {
         try {
-            await fetch('/notifications/read-all', {
-                method: 'POST',
             await fetch("/notifications/read-all", {
                 method: "POST",
                 headers: {
@@ -67,13 +61,13 @@ export default function Navbar_User() {
         }
     };
 
-
     useEffect(() => {
         fetchNotifications();
     }, []);
 
     const { url, props } = usePage();
     const auth = props.auth;
+<<<<<<< Updated upstream
     const draft = props.draft_campaign
     const isActive = (path) => url.startsWith(path);
 
@@ -91,8 +85,8 @@ export default function Navbar_User() {
             router.get(`campaigns/create/detailsPreview/${draft.id}`);
         } else {
             router.get("campaigns/create");
+>>>>>>> Stashed changes
         }
-    }
     };
 
     return (
@@ -156,7 +150,6 @@ export default function Navbar_User() {
                                 <div className="border-t dark:border-gray-700 my-2" />
                                 <Button
                                     onClick={() => handleStart()}
-                                    className="bg-color-none text-black dark:text-white w-full text-start block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700">
                                     className="bg-color-none text-black dark:text-white w-full text-start block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
                                 >
                                     Start a Campaign
@@ -260,9 +253,6 @@ export default function Navbar_User() {
                                 ) : (
                                     notifications.map((notification, index) => (
                                         <div key={notification.id}>
-                                            <DropdownMenuItem
-                                                className="flex-col items-start p-3"
-                                            >
                                             <DropdownMenuItem className="flex-col items-start p-3">
                                                 <div className="font-medium">
                                                     {notification.title}
@@ -276,7 +266,6 @@ export default function Navbar_User() {
                                                     ).toLocaleDateString()}
                                                 </div>
                                             </DropdownMenuItem>
-                                            {index < notifications.length - 1 && (
                                             {index <
                                                 notifications.length - 1 && (
                                                 <Separator />
