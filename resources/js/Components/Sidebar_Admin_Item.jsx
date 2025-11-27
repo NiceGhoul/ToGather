@@ -20,7 +20,7 @@ import {
     SidebarFooter,
     SidebarHeader,
     SidebarRail,
-} from "@/components/ui/sidebar";
+} from "@/Components/ui/sidebar";
 import { usePage } from "@inertiajs/react";
 
 // Data for the main navigation
