@@ -30,7 +30,8 @@ export default function Edit() {
         (article.contents || []).map((c) => ({
             id: c.id ?? null,
             type: c.type,
-            content: c.content,
+            content: c.image_url || c.content || null,
+
             order_x: Number(c.order_x),
             order_y: Number(c.order_y),
             newFile: null,
@@ -133,15 +134,19 @@ export default function Edit() {
         const fd = new FormData();
 
         blocks.forEach((b, i) => {
+            fd.append(`contents[${i}][id]`, b.id ?? "");
             fd.append(`contents[${i}][type]`, b.type);
             fd.append(`contents[${i}][order_x]`, b.order_x);
             fd.append(`contents[${i}][order_y]`, b.order_y);
 
-            if (b.type === "text") {
+            if (b.type === "text" || b.type === "paragraph") {
+                // === TEXT ===
                 fd.append(`contents[${i}][content]`, b.content ?? "");
             } else if (b.newFile) {
-                fd.append(`contents[${i}][content]`, b.newFile, b.newFile.name);
+                // === IMAGE (NEW FILE) ===
+                fd.append(`contents[${i}][content]`, b.newFile);
             } else {
+                // === IMAGE (USE OLD URL) ===
                 fd.append(`contents[${i}][content]`, b.content ?? "");
             }
         });
@@ -164,7 +169,8 @@ export default function Edit() {
             (article.contents || []).map((c) => ({
                 id: c.id ?? null,
                 type: c.type,
-                content: c.content,
+                content: c.image_url || c.content || null,
+                preview: c.image_url || null,
                 order_x: Number(c.order_x),
                 order_y: Number(c.order_y),
                 newFile: null,
@@ -282,7 +288,7 @@ export default function Edit() {
             );
         }
 
-        if (block.type === "text") {
+        if (block.type === "text" || block.type === "paragraph") {
             return (
                 <div className="flex gap-2 mt-2">
                     <Button

@@ -677,7 +677,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 9
-                'user_id' => 23,
+                'user_id' => 22,
                 'title' => 'Jangan Salah, Ini 4 Tips Memilih Platform Donasi Tepat',
                 'category' => 'Donation',
                 'thumbnail' => '9Thumb.jpg',
@@ -779,7 +779,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 10
-                'user_id' => 23,
+                'user_id' => 22,
                 'title' => 'Rumah Yatim Salurkan Bantuan Biaya Hidup di Pandowoharjo Sleman, Nek Tinah "Alhamdulillah Sangat Membantu!"',
                 'category' => 'Donation',
                 'thumbnail' => '10Thumb.jpg',

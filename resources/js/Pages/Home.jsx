@@ -533,7 +533,9 @@ export default function Home() {
                                         {article.contents
                                             ?.find(
                                                 (c) =>
-                                                    c.type === "text" &&
+                                                    (c.type === "text" ||
+                                                        c.type ===
+                                                            "paragraph") &&
                                                     c.order_x === 1 &&
                                                     c.order_y === 1
                                             )
