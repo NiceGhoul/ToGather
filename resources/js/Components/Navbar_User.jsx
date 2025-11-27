@@ -52,6 +52,8 @@ export default function Navbar_User() {
         try {
             await fetch('/notifications/read-all', {
                 method: 'POST',
+            await fetch("/notifications/read-all", {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document
@@ -80,8 +82,18 @@ export default function Navbar_User() {
             router.get(`/campaigns/create/detailsPreview/${draft.id}`)
         }else{
             router.get('/campaigns/create')
+=======
+    const draft = props.draft_campaign;
+    const isActive = (path) => url.startsWith(path);
+
+    const handleStart = () => {
+        if (draft) {
+            router.get(`campaigns/create/detailsPreview/${draft.id}`);
+        } else {
+            router.get("campaigns/create");
         }
     }
+    };
 
     return (
         <header className="sticky top-0 left-0 right-0 z-50 flex justify-between items-center bg-[#7A338C] dark:bg-purple-800">
@@ -145,6 +157,8 @@ export default function Navbar_User() {
                                 <Button
                                     onClick={() => handleStart()}
                                     className="bg-color-none text-black dark:text-white w-full text-start block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700">
+                                    className="bg-color-none text-black dark:text-white w-full text-start block px-4 py-2 text-sm font-semibold rounded-md hover:bg-slate-100 dark:hover:bg-gray-700"
+                                >
                                     Start a Campaign
                                 </Button>
                             </div>
@@ -249,6 +263,7 @@ export default function Navbar_User() {
                                             <DropdownMenuItem
                                                 className="flex-col items-start p-3"
                                             >
+                                            <DropdownMenuItem className="flex-col items-start p-3">
                                                 <div className="font-medium">
                                                     {notification.title}
                                                 </div>
@@ -262,6 +277,8 @@ export default function Navbar_User() {
                                                 </div>
                                             </DropdownMenuItem>
                                             {index < notifications.length - 1 && (
+                                            {index <
+                                                notifications.length - 1 && (
                                                 <Separator />
                                             )}
                                         </div>

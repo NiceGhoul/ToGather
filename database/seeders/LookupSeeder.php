@@ -35,6 +35,30 @@ class LookupSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'lookup_type' => 'ArticleCategory',
+                'lookup_code' => 'DON',
+                'lookup_description' => 'Article Category Dropdown Donation (Temporary)',
+                'lookup_value' => 'Donation',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'lookup_type' => 'ArticleCategory',
+                'lookup_code' => 'COMMUNITY',
+                'lookup_description' => 'Article Category Dropdown Community (Temporary)',
+                'lookup_value' => 'Community',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'lookup_type' => 'ArticleCategory',
+                'lookup_code' => 'CHARITY',
+                'lookup_description' => 'Article Category Dropdown Charity (Temporary)',
+                'lookup_value' => 'Charity',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
             // campaigns
             [
                 'lookup_type' => 'CampaignCategory',
@@ -44,7 +68,7 @@ class LookupSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-             [
+            [
                 'lookup_type' => 'CampaignCategory',
                 'lookup_code' => 'B&C',
                 'lookup_description' => 'category for create or filter',
@@ -52,7 +76,7 @@ class LookupSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-             [
+            [
                 'lookup_type' => 'CampaignCategory',
                 'lookup_code' => 'C&F',
                 'lookup_description' => 'category for create or filter',
@@ -60,7 +84,7 @@ class LookupSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-             [
+            [
                 'lookup_type' => 'CampaignCategory',
                 'lookup_code' => 'SERVICE',
                 'lookup_description' => 'category for create or filter',
@@ -68,7 +92,7 @@ class LookupSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-             [
+            [
                 'lookup_type' => 'CampaignCategory',
                 'lookup_code' => 'LIFE',
                 'lookup_description' => 'category for create or filter',
@@ -76,7 +100,7 @@ class LookupSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-             [
+            [
                 'lookup_type' => 'CampaignCategory',
                 'lookup_code' => 'LOG',
                 'lookup_description' => 'category for create or filter',

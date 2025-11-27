@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('article_contents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('article_id')->constrained()->onDelete('cascade');
-            $table->enum('type', ['text', 'image']);
+            $table->enum('type', ['image', 'paragraph', 'text']);
             $table->longText('content')->nullable(); // text content / image URL
             $table->integer('order_x')->default(1); // 1 = left, 2 = right
             $table->integer('order_y')->default(1); // row order

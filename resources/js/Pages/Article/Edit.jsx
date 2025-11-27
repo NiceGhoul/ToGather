@@ -15,17 +15,17 @@ import {
     Image as ImageIcon,
 } from "lucide-react";
 import { useState, useMemo } from "react";
-
-// 🔥 IMPORT MINI QUILL EDITOR
 import MiniEditor from "@/Components/MiniEditor";
 
 export default function Edit() {
     const { article } = usePage().props;
 
-    // -------- STATES --------
+    // ------------------------ STATES ------------------------
     const [editingMode, setEditingMode] = useState(false);
+    const [isDirty, setIsDirty] = useState(false); // track unsaved changes
+    const [confirmExitOpen, setConfirmExitOpen] = useState(false);
+    const [exitAction, setExitAction] = useState(() => null);
 
-    // All blocks
     const [blocks, setBlocks] = useState(() =>
         (article.contents || []).map((c) => ({
             id: c.id ?? null,
@@ -39,12 +39,12 @@ export default function Edit() {
     );
 
     const [extraRows, setExtraRows] = useState(0);
-    const [editingIndex, setEditingIndex] = useState(null); // which block is being edited
+    const [editingIndex, setEditingIndex] = useState(null);
 
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
 
-    // -------- GRID STRUCTURE --------
+    // ------------------------ GRID STRUCTURE ------------------------
     const { maxY, gridCells } = useMemo(() => {
         const ys = blocks.map((b) => b.order_y || 1);
         const rawMaxY = Math.max(1, ...(ys.length ? ys : [1]));
@@ -58,9 +58,11 @@ export default function Edit() {
         return { maxY: computedMaxY, gridCells: cells };
     }, [blocks, extraRows]);
 
-    // -------- IMAGE HANDLING --------
+    // ------------------------ IMAGE HANDLING ------------------------
     const onSelectImageForBlock = (file, idx) => {
+        setIsDirty(true);
         const url = URL.createObjectURL(file);
+
         setBlocks((prev) => {
             const copy = [...prev];
             copy[idx] = { ...copy[idx], newFile: file, preview: url };
@@ -68,8 +70,10 @@ export default function Edit() {
         });
     };
 
-    // -------- ADD BLOCK --------
+    // ------------------------ ADD BLOCK ------------------------
     const addBlock = (type) => {
+        setIsDirty(true);
+
         const nextY = blocks.length + 1;
         setBlocks((prev) => [
             ...prev,
@@ -83,10 +87,13 @@ export default function Edit() {
                 preview: null,
             },
         ]);
+
         setEditingMode(true);
     };
 
     const removeBlock = (idx) => {
+        setIsDirty(true);
+
         setBlocks((prev) => {
             const removedY = prev[idx].order_y;
             let updated = prev.filter((_, i) => i !== idx);
@@ -99,25 +106,29 @@ export default function Edit() {
         });
     };
 
-    const addRow = () => setExtraRows((r) => r + 1);
-
-    // -------- START EDIT --------
-    const startEdit = (idx) => {
-        setEditingIndex(idx);
+    const addRow = () => {
+        setIsDirty(true);
+        setExtraRows((r) => r + 1);
     };
 
+    // ------------------------ EDIT TEXT ------------------------
+    const startEdit = (idx) => setEditingIndex(idx);
+
     const applyEdit = (idx, value) => {
+        setIsDirty(true);
+
         setBlocks((prev) => {
             const copy = [...prev];
             copy[idx] = { ...copy[idx], content: value };
             return copy;
         });
+
         setEditingIndex(null);
     };
 
     const cancelEdit = () => setEditingIndex(null);
 
-    // -------- SAVE --------
+    // ------------------------ SAVE ------------------------
     const saveAllChanges = () => {
         const fd = new FormData();
 
@@ -142,10 +153,12 @@ export default function Edit() {
                 setSuccessPopupOpen(true);
                 setEditingMode(false);
                 setEditingIndex(null);
+                setIsDirty(false);
             },
         });
     };
 
+    // ------------------------ CANCEL ALL ------------------------
     const cancelAll = () => {
         setBlocks(
             (article.contents || []).map((c) => ({
@@ -158,23 +171,34 @@ export default function Edit() {
                 preview: c.image_url || null,
             }))
         );
-        setEditingIndex(null);
+
         setEditingMode(false);
+        setEditingIndex(null);
+        setIsDirty(false);
     };
 
-    // -------- CELL UI --------
+    // ------------------------ REQUEST EXIT ------------------------
+    const requestExit = (callback) => {
+        if (editingMode && isDirty) {
+            setExitAction(() => callback);
+            setConfirmExitOpen(true);
+        } else {
+            callback();
+        }
+    };
+
+    // ------------------------ RENDER CELL CONTENT ------------------------
     const renderCellContent = (block, idx) => {
         if (!block) return <div className="text-gray-400">Empty</div>;
 
-        // TEXT BLOCK
-        if (block.type === "text") {
-            // If this block is being edited → Show QUILL
+        if (block.type === "text" || block.type === "paragraph") {
             if (editingIndex === idx) {
                 return (
                     <div>
                         <MiniEditor
                             value={block.content}
                             onChange={(html) => {
+                                setIsDirty(true);
                                 setBlocks((prev) => {
                                     const copy = [...prev];
                                     copy[idx] = { ...copy[idx], content: html };
@@ -182,6 +206,7 @@ export default function Edit() {
                                 });
                             }}
                         />
+
                         <div className="flex gap-2 mt-2">
                             <Button
                                 onClick={() => applyEdit(idx, block.content)}
@@ -200,7 +225,6 @@ export default function Edit() {
                 );
             }
 
-            // Normal view
             return (
                 <div
                     className="prose max-w-none text-sm"
@@ -211,7 +235,6 @@ export default function Edit() {
             );
         }
 
-        // IMAGE BLOCK
         return (
             <div className="mt-2">
                 {block.preview ? (
@@ -235,12 +258,12 @@ export default function Edit() {
                 <div className="flex gap-2 mt-2">
                     <Button
                         onClick={() => addBlock("text")}
-                        className="text-sm px-3 py-1"
+                        className="bg-purple-800 text-white hover:bg-purple-700"
                     >
                         <CaseSensitive />
                     </Button>
 
-                    <Button className="relative px-3 py-1 text-sm">
+                    <Button className="relative bg-purple-800 text-white hover:bg-purple-700">
                         <ImageIcon />
                         <input
                             type="file"
@@ -263,17 +286,17 @@ export default function Edit() {
             return (
                 <div className="flex gap-2 mt-2">
                     <Button
-                        className="bg-purple-700 text-white text-sm"
+                        className="bg-purple-800 text-white hover:bg-purple-700"
                         onClick={() => startEdit(idx)}
                     >
                         <Pencil />
                     </Button>
 
                     <Button
-                        className="bg-red-600 hover:bg-red-700 text-white text-sm"
+                        className="bg-red-600 hover:bg-red-700 text-white"
                         onClick={() => removeBlock(idx)}
                     >
-                        <Trash className="bg-red-600 hover:bg-red-700" />
+                        <Trash />
                     </Button>
                 </div>
             );
@@ -282,7 +305,7 @@ export default function Edit() {
         if (block.type === "image") {
             return (
                 <div className="flex gap-2 mt-2">
-                    <Button className="relative bg-purple-700 text-white text-sm">
+                    <Button className="relative bg-purple-800 text-white hover:bg-purple-700">
                         <ImageIcon />
                         <input
                             type="file"
@@ -296,17 +319,17 @@ export default function Edit() {
                     </Button>
 
                     <Button
-                        className="bg-red-600 hover:bg-red-700 text-white text-sm"
+                        className="bg-red-600 hover:bg-red-700 text-white"
                         onClick={() => removeBlock(idx)}
                     >
-                        <X className="bg-red-600 hover:bg-red-700" />
+                        <Trash />
                     </Button>
                 </div>
             );
         }
     };
 
-    // -------- RENDER --------
+    // ------------------------ RENDER ------------------------
     return (
         <Layout_User>
             <div className="p-6 max-w-4xl mx-auto space-y-6">
@@ -315,43 +338,74 @@ export default function Edit() {
                     <h1 className="text-2xl font-bold">{article.title}</h1>
 
                     <div className="flex gap-2">
-                        <Button onClick={() => setEditingMode(!editingMode)}>
+                        {/* EXIT EDIT BUTTON */}
+                        <Button
+                            onClick={() =>
+                                requestExit(() => {
+                                    setEditingMode(!editingMode);
+                                    setEditingIndex(null);
+                                    router.reload();
+                                })
+                            }
+                            className="bg-purple-800 text-white hover:bg-purple-700"
+                        >
                             {editingMode ? (
-                                <div className="flex items-center gap-2 text-xs">
-                                    <PencilOff className="w-4 h-4" />
-                                    Exit Edit
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-2 text-xs">
-                                    <Pencil className="w-4 h-4" />
+                                <>
+                                    <PencilOff className="w-4 h-4 mr-1" /> Exit
                                     Edit
-                                </div>
+                                </>
+                            ) : (
+                                <>
+                                    <Pencil className="w-4 h-4 mr-1" /> Edit
+                                </>
                             )}
                         </Button>
 
                         {editingMode && (
                             <>
                                 <Button
-                                    className="bg-green-600 text-white"
+                                    className="bg-green-600 text-white hover:bg-green-700"
                                     onClick={saveAllChanges}
                                 >
                                     <Save className="w-4 h-4 mr-1" /> Save
                                 </Button>
 
                                 <Button
-                                    className="bg-gray-400 text-white"
-                                    onClick={cancelAll}
+                                    className="bg-red-600 text-white hover:bg-red-700"
+                                    onClick={() =>
+                                        requestExit(() => {
+                                            cancelAll();
+                                            setEditingIndex(null); // ⬅️ FIX
+                                            router.reload();
+                                        })
+                                    }
                                 >
                                     <Ban className="w-4 h-4 mr-1" /> Cancel
                                 </Button>
 
-                                <Button onClick={addRow}>Add Row</Button>
+                                <Button
+                                    onClick={() => {
+                                        setIsDirty(true);
+                                        addRow();
+                                    }}
+                                    className="bg-purple-800 hover:bg-purple-700"
+                                >
+                                    Add Row
+                                </Button>
                             </>
                         )}
 
+                        {/* BACK BUTTON */}
                         <Button
-                            className="bg-purple-800 text-white"
-                            onClick={() => router.get("/articles/myArticles")}
+                            className="bg-purple-800 text-white hover:bg-purple-700"
+                            onClick={() =>
+                                requestExit(() => {
+                                    router.get(
+                                        `/articles/${article.id}/details`
+                                    );
+                                    router.reload();
+                                })
+                            }
                         >
                             <ArrowBigLeft />
                         </Button>
@@ -360,8 +414,7 @@ export default function Edit() {
 
                 {/* GRID */}
                 <div className="space-y-6">
-                    {gridCells.map(({ x, y }, i) => {
-                        // find block at order_y = y
+                    {gridCells.map(({ y }, i) => {
                         const idx = blocks.findIndex((b) => b.order_y === y);
                         const block = idx >= 0 ? blocks[idx] : null;
 
@@ -371,9 +424,10 @@ export default function Edit() {
                                 className="p-4 border rounded-md bg-white shadow-sm"
                             >
                                 <div className="mb-2 text-xs text-gray-400">
-                                    Grid (1, {y}) —
+                                    Block ({y}) —{" "}
                                     {block
-                                        ? block.type === "text"
+                                        ? block.type === "text" ||
+                                          block.type === "paragraph"
                                             ? "Text"
                                             : "Image"
                                         : "Empty"}
@@ -386,16 +440,38 @@ export default function Edit() {
                     })}
                 </div>
 
-                <Popup
-                    triggerText=""
-                    title={successPopupMessage}
-                    confirmText="OK"
-                    open={successPopupOpen}
-                    onConfirm={() => {
-                        setSuccessPopupOpen(false);
-                        router.reload();
-                    }}
-                />
+                {/* SUCCESS POPUP (UNCONTROLLED) */}
+                {successPopupOpen && (
+                    <Popup
+                        title={successPopupMessage}
+                        confirmText="OK"
+                        showCancel={false}
+                        description="Article has been saved and is now pending verification."
+                        onConfirm={() => {
+                            setSuccessPopupOpen(false);
+                            router.reload();
+                        }}
+                        onClose={() => setSuccessPopupOpen(false)}
+                    />
+                )}
+
+                {/* EXIT CONFIRMATION POPUP (UNCONTROLLED, ALWAYS WORKS) */}
+                {confirmExitOpen && (
+                    <Popup
+                        title="Unsaved Changes"
+                        confirmText="Exit"
+                        cancelText="Stay"
+                        description="Are you sure you want to exit editing mode? All unsaved changes will be lost."
+                        onConfirm={() => {
+                            setConfirmExitOpen(false);
+                            exitAction?.();
+                            cancelAll();
+                            router.reload();
+                            setIsDirty(false);
+                        }}
+                        onClose={() => setConfirmExitOpen(false)}
+                    />
+                )}
             </div>
         </Layout_User>
     );

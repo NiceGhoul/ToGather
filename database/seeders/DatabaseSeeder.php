@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create Articles and Campaigns.
         // Their factories will now automatically pick from the 20 existing users.
-        $articles = Article::factory(40)->create()->each(function ($article) {
+        $articles = Article::factory(0)->create()->each(function ($article) {
             // blok pertama wajib teks (1,1)
             ArticleContent::factory()
                 ->firstTextBlock()
@@ -54,8 +54,9 @@ class DatabaseSeeder extends Seeder
                     // order_x dan order_y akan diacak
                 ]);
         });
+        $this->call(ArticleSeeder::class);
         $campaigns = Campaign::factory(20)->create();
-        Likes::factory(20) -> create();
+        Likes::factory(20)->create();
 
         // 4. Create Comments and Replies Polymorphically
         $commentable = $articles->merge($campaigns);

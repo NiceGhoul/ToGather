@@ -32,13 +32,13 @@ class ArticleContentFactory extends Factory
             'article_id' => Article::factory(),
             'type' => $type,
             'content' => $content,
-            'order_x' => $orderX,
+            'order_x' => 0,
             'order_y' => $orderY,
         ];
     }
     public function firstTextBlock()
     {
-        return $this->state(fn () => [
+        return $this->state(fn() => [
             'type' => 'text',
             'order_x' => 1,
             'order_y' => 1,

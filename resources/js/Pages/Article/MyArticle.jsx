@@ -164,7 +164,7 @@ export default function MyArticle({
                 const previewText =
                     article.contents?.find(
                         (c) =>
-                            c.type === "text" &&
+                            (c.type === "text" || c.type === "paragraph") &&
                             c.order_x === 1 &&
                             c.order_y === 1
                     )?.content || "";
@@ -198,7 +198,7 @@ export default function MyArticle({
                             {article.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="h-[80px] text-sm text-gray-700 mb-4 text-justify dark:text-white">
+                        <p className="h-[8rem] text-sm text-gray-700 mb-4 text-justify dark:text-white">
                             {previewText
                                 .replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 180) || "No preview text."}
@@ -300,7 +300,7 @@ export default function MyArticle({
                             className={`${
                                 chosenCategory === item
                                     ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
-                                    : " text-white hover:bg-purple-70 bg-purple-800"
+                                    : " text-white hover:bg-purple-700 bg-purple-800"
                             }`}
                         >
                             {item}

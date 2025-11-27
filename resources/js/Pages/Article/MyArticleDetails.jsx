@@ -44,7 +44,7 @@ export default function MyArticleDetails() {
                         onClick={() =>
                             router.visit(`/articles/${article.id}/edit`)
                         }
-                        className="bg-purple-600 text-white"
+                        className="bg-purple-800 text-white hover:bg-purple-700"
                     >
                         Edit Article
                     </Button>
@@ -135,7 +135,8 @@ export default function MyArticleDetails() {
                                             }}
                                         >
                                             {block ? (
-                                                block.type === "text" ? (
+                                                block.type === "text" ||
+                                                block.type === "paragraph" ? (
                                                     <div
                                                         className="max-w-none text-justify leading-relaxed tracking-normal"
                                                         style={{

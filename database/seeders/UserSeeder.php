@@ -35,5 +35,17 @@ class UserSeeder extends Seeder
                 'status' => 'active',
             ]
         );
+
+        // ToGather Author Team
+        User::updateOrCreate(
+            ['email' => 'togather_author@email.com'],
+            [
+                'nickname' => 'ToGather Author',
+                'address' => 'ToGather HQ',
+                'password' => Hash::make('Author1234'),
+                'role' => 'user',
+                'status' => 'active',
+            ]
+        );
     }
 }

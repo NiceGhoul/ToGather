@@ -84,7 +84,9 @@ export default function Details() {
 
                 {/* TITLE & AUTHOR */}
                 <div className="w-full max-w-4xl text-left mb-4">
-                    <h1 className="text-3xl font-bold dark:text-white">{article.title}</h1>
+                    <h1 className="text-3xl font-bold dark:text-white">
+                        {article.title}
+                    </h1>
                 </div>
 
                 <div className="w-full max-w-4xl flex items-center gap-3 text-gray-500 mb-6 dark:text-gray-400">
@@ -149,6 +151,7 @@ export default function Details() {
                                             }}
                                         >
                                             {block ? (
+                                                block.type === "paragraph" ||
                                                 block.type === "text" ? (
                                                     <div
                                                         className="max-w-none text-justify leading-relaxed tracking-normal"

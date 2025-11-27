@@ -20,7 +20,7 @@ const ArticleList = () => {
         sortOrder: initialSortOrder,
         auth,
     } = usePage().props;
-    const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     // 🟣 Inisialisasi state lokal
     const [visibleArticles, setVisibleArticles] = useState(8);
@@ -28,7 +28,7 @@ const ArticleList = () => {
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
-    const [isLogin, setIsLogin] = useState(false)
+    const [isLogin, setIsLogin] = useState(false);
 
     // 🟣 Check authentication status
     useEffect(() => {
@@ -127,9 +127,9 @@ const ArticleList = () => {
     };
 
     const handleShowMore = () => {
-        setIsShowMoreloading(true)
+        setIsShowMoreloading(true);
         setVisibleArticles((prev) => prev + 8);
-        setIsShowMoreloading(false)
+        setIsShowMoreloading(false);
     };
 
     // Skeleton card component
@@ -158,7 +158,7 @@ const ArticleList = () => {
                 const previewText =
                     article.contents?.find(
                         (c) =>
-                            c.type === "text" &&
+                            (c.type === "text" || c.type === "paragraph") &&
                             c.order_x === 1 &&
                             c.order_y === 1
                     )?.content || "";
@@ -408,7 +408,9 @@ const ArticleList = () => {
                                 onClick={handleShowMore}
                                 className=" text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
                             >
-                                {isShowMoreLoading && <Spinner className="w-4 h-4" />}
+                                {isShowMoreLoading && (
+                                    <Spinner className="w-4 h-4" />
+                                )}
                                 Show More
                             </p>
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />

@@ -159,7 +159,9 @@ export default function Create() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* TITLE */}
                             <div>
-                                <Label className="mb-1 dark:text-white">Title</Label>
+                                <Label className="mb-1 dark:text-white">
+                                    Title
+                                </Label>
                                 <Input
                                     value={data.title}
                                     onChange={(e) =>
@@ -170,7 +172,9 @@ export default function Create() {
 
                             {/* CATEGORY */}
                             <div>
-                                <Label className="mb-1 dark:text-white">Category</Label>
+                                <Label className="mb-1 dark:text-white">
+                                    Category
+                                </Label>
                                 <select
                                     className="border rounded px-3 py-2 w-full"
                                     value={data.category}
@@ -189,7 +193,9 @@ export default function Create() {
 
                             {/* THUMBNAIL */}
                             <div>
-                                <Label className="mb-1 dark:text-white">Thumbnail</Label>
+                                <Label className="mb-1 dark:text-white">
+                                    Thumbnail
+                                </Label>
                                 <Input
                                     type="file"
                                     accept="image/*"
@@ -371,6 +377,7 @@ export default function Create() {
                         title="Submit Article?"
                         confirmText="Yes, Submit"
                         cancelText="Cancel"
+                        description="Article will be submitted for validation"
                         onConfirm={confirmSubmit}
                         onClose={() => setShowConfirm(false)}
                     />
@@ -380,6 +387,7 @@ export default function Create() {
                     <Popup
                         title="Article Submitted!"
                         confirmText="Okay"
+                        description="Article has been submitted and awaiting verification"
                         showCancel={false}
                         onConfirm={() => {
                             setShowSuccess(false);
@@ -402,6 +410,7 @@ export default function Create() {
                     <Popup
                         title="Missing Title"
                         confirmText="OK"
+                        description="Please fill the title section"
                         showCancel={false}
                         onConfirm={() => setShowTitleError(false)}
                     />
@@ -411,6 +420,7 @@ export default function Create() {
                     <Popup
                         title="Missing Category"
                         confirmText="OK"
+                        description="Please select a category"
                         showCancel={false}
                         onConfirm={() => setShowCategoryError(false)}
                     />
