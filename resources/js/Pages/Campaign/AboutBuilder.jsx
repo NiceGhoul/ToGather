@@ -102,10 +102,10 @@ export const AboutBuilder = ({campaign, contents}) => {
      };
 
     return (
-        <Card className="w-full p-6 border border-gray-300 shadow-sm justify-center flex flex-col">
+        <Card className="w-full p-6 border border-gray-300 dark:border-gray-700 shadow-sm justify-center flex flex-col dark:bg-gray-800">
             <CardHeader className="flex flex-col gap-4">
                 <div className="flex flex-row w-full justify-between items-center">
-                    <CardTitle className="text-xl font-semibold">
+                    <CardTitle className="text-xl font-semibold dark:text-white">
                         About Us
                     </CardTitle>
                 </div>
@@ -191,7 +191,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                             <Label className="text-3xl font-bold text-[#7C4789] dark: text-[#9A5CAA]">
                                                 {block.content.split("~;")[0]}
                                             </Label>
-                                            <p className="break-words font-normal text-base mt-4 text-justify">
+                                            <p className="break-words font-normal text-base mt-4 text-justify dark:text-gray-200">
                                                 {block.content.split("~;")[1]}
                                             </p>
                                             <div className="w-full flex justify-end">
@@ -264,7 +264,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                     </div>
                 </CardContent>
             ) : (
-                <CardContent className="flex h-[100px] w-full justify-center items-center text-gray-300 italic">
+                <CardContent className="flex h-[100px] w-full justify-center items-center text-gray-300 dark:text-gray-500 italic">
                     <h3>
                         Add explanation for your business before continuing!
                     </h3>

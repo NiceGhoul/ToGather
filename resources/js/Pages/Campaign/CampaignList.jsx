@@ -1,6 +1,6 @@
 import { Button } from "@/Components/ui/button";
 import Layout_User from "@/Layouts/Layout_User";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@/Components/ui/separator";
 import { useEffect, useState } from "react";

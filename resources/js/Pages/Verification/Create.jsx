@@ -6,11 +6,11 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 import { Spinner } from "@/Components/ui/spinner";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 import { useState } from "react";
 
 export default function Create() {
@@ -56,17 +56,17 @@ export default function Create() {
                     </CardHeader>
                     <CardContent>
                         {flash?.message && (
-                            <div className="mb-4 p-3 bg-blue-100 text-blue-700 rounded">
+                            <div className="mb-4 p-3 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
                                 {flash.message}
                             </div>
                         )}
                         {flash?.success && (
-                            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
+                            <div className="mb-4 p-3 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
                                 {flash.success}
                             </div>
                         )}
                         {flash?.error && (
-                            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded">
                                 {flash.error}
                             </div>
                         )}

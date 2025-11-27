@@ -15,7 +15,7 @@ import {
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
-} from "@/components/ui/empty";
+} from "@/Components/ui/empty";
 import Popup from "@/Components/Popup";
 import { toast } from "sonner";
 
@@ -144,7 +144,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 items-center justify-center flex text-center min-h-[3rem] max-h-[3rem] overflow-hidden leading-snug">
+                        <h2 className="text-lg font-semibold mb-2 items-center justify-center flex text-center min-h-[3rem] max-h-[3rem] overflow-hidden leading-snug dark:text-white">
                             {campaign.title.length > 50
                                 ? campaign.title.substring(0, 50) + "..."
                                 : campaign.title}

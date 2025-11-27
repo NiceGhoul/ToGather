@@ -6,7 +6,7 @@ import {
     CardDescription,
     CardContent,
     CardFooter,
-} from "@/components/ui/card";
+} from "@/Components/ui/card";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -15,8 +15,8 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { Spinner } from "@/components/ui/spinner";
+} from "@/Components/ui/alert-dialog";
+import { Spinner } from "@/Components/ui/spinner";
 import Layout_L from "../../Layouts/Layout_Login";
 import { Link, useForm } from "@inertiajs/react";
 
