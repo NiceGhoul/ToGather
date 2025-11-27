@@ -170,7 +170,6 @@ export default function Edit() {
                 id: c.id ?? null,
                 type: c.type,
                 content: c.image_url || c.content || null,
-                preview: c.image_url || null,
                 order_x: Number(c.order_x),
                 order_y: Number(c.order_y),
                 newFile: null,

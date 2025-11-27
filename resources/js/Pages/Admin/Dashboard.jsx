@@ -3,7 +3,7 @@ import { usePage, router } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
-import { Bar, BarChart, Line, LineChart, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Calendar } from "lucide-react";
@@ -56,23 +56,10 @@ export default function Dashboard() {
         }).format(amount);
     };
 
-    const getStatusColor = (status) => {
-        const colors = {
-            pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-            approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-            active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-            rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-            disabled: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-            banned: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-        };
-        return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-    };
-
     return (
         <Layout_Admin title={"Welcome, " + user.nickname}>
             <div className="p-6 space-y-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
                 </div>
 
