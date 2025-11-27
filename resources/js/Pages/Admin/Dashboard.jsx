@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Bar, BarChart, Line, LineChart, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Calendar } from "lucide-react";
 import { useState } from "react";
 
 export default function Dashboard() {
@@ -18,18 +21,19 @@ export default function Dashboard() {
         articleStats 
     } = usePage().props;
 
-    const [dailyYear, setDailyYear] = useState(new Date().getFullYear());
-    const [dailyMonth, setDailyMonth] = useState(new Date().getMonth() + 1);
-    const [dailyWeek, setDailyWeek] = useState(1);
+    const [dailyStartDate, setDailyStartDate] = useState("");
+    const [dailyEndDate, setDailyEndDate] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [monthlyYear, setMonthlyYear] = useState(new Date().getFullYear());
 
-    const handleDailyChange = (year, month, week) => {
-        setDailyYear(year);
-        setDailyMonth(month);
-        setDailyWeek(week);
-        router.get('/admin/dashboard', { daily_year: year, daily_month: month, daily_week: week }, { preserveState: true });
+    const handleDailyDateChange = (start, end) => {
+        setDailyStartDate(start);
+        setDailyEndDate(end);
+        router.get('/admin/dashboard', {
+            daily_start: start,
+            daily_end: end
+        }, { preserveState: true });
     };
 
     const handleWeeklyChange = (year, month) => {
@@ -148,44 +152,73 @@ export default function Dashboard() {
                             </TabsList>
                             
                             <TabsContent value="daily" className="mt-6">
-                                <div className="h-[500px] w-full">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-lg font-medium">
-                                            Daily Donations - Week {dailyWeek}, {new Date(dailyYear, dailyMonth - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}
-                                        </h3>
-                                        <div className="flex gap-2">
-                                            <select
-                                                value={dailyYear}
-                                                onChange={(e) => handleDailyChange(parseInt(e.target.value), dailyMonth, dailyWeek)}
-                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                                            >
-                                                {Array.from({length: 5}, (_, i) => new Date().getFullYear() - i).map(year => (
-                                                    <option key={year} value={year}>{year}</option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                value={dailyMonth}
-                                                onChange={(e) => handleDailyChange(dailyYear, parseInt(e.target.value), dailyWeek)}
-                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                                            >
-                                                {Array.from({length: 12}, (_, i) => i + 1).map(month => (
-                                                    <option key={month} value={month}>
-                                                        {new Date(2024, month - 1).toLocaleString('default', { month: 'long' })}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                value={dailyWeek}
-                                                onChange={(e) => handleDailyChange(dailyYear, dailyMonth, parseInt(e.target.value))}
-                                                className="px-3 py-1 border rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                                            >
-                                                <option value={1}>Week 1</option>
-                                                <option value={2}>Week 2</option>
-                                                <option value={3}>Week 3</option>
-                                                <option value={4}>Week 4</option>
-                                            </select>
+                                <div className="w-full">
+                                    <div className="mb-4 space-y-4">
+                                        <h3 className="text-lg font-medium dark:text-white">Daily Donations</h3>
+                                        <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="flex-1">
+                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                    From Date
+                                                </label>
+                                                <div className="relative">
+                                                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                                    <Input
+                                                        type="date"
+                                                        value={dailyStartDate}
+                                                        onChange={(e) => setDailyStartDate(e.target.value)}
+                                                        className="pl-10 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                    To Date
+                                                </label>
+                                                <div className="relative">
+                                                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                                    <Input
+                                                        type="date"
+                                                        value={dailyEndDate}
+                                                        onChange={(e) => setDailyEndDate(e.target.value)}
+                                                        className="pl-10 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-end gap-2">
+                                                <Button
+                                                    onClick={() => handleDailyDateChange(dailyStartDate, dailyEndDate)}
+                                                    disabled={!dailyStartDate || !dailyEndDate}
+                                                    className="dark:bg-blue-600 dark:hover:bg-blue-700"
+                                                >
+                                                    Apply Filter
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        setDailyStartDate("");
+                                                        setDailyEndDate("");
+                                                        handleDailyDateChange("", "");
+                                                    }}
+                                                    className="dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+                                                >
+                                                    Clear
+                                                </Button>
+                                            </div>
                                         </div>
+                                        {(dailyStartDate || dailyEndDate) && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                                <span className="font-medium">Showing:</span>
+                                                {dailyStartDate && dailyEndDate && (
+                                                    <Badge variant="secondary" className="dark:bg-gray-700 dark:text-gray-300">
+                                                        {new Date(dailyStartDate).toLocaleDateString()} - {new Date(dailyEndDate).toLocaleDateString()}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
+                                    <div className="h-[400px] w-full">
                                     {dailyDonations && dailyDonations.length === 0 ? (
                                         <div className="h-full flex items-center justify-center">
                                             <p className="text-center text-gray-500 dark:text-gray-400">No donation data available</p>
@@ -210,9 +243,10 @@ export default function Dashboard() {
                                             </BarChart>
                                         </ResponsiveContainer>
                                     )}
+                                    </div>
                                 </div>
                             </TabsContent>
-                            
+
                             <TabsContent value="weekly" className="mt-6">
                                 <div className="h-[500px] w-full">
                                     <div className="flex justify-between items-center mb-4">

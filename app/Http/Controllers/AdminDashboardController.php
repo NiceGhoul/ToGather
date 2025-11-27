@@ -28,16 +28,28 @@ class AdminDashboardController extends Controller
             'pending_articles' => Article::where('status', 'pending')->count(),
         ];
 
-        // Daily donation trends (7 days for selected week)
+        // Daily donation trends (custom date range)
         // TODO: Change back to 'successful' when Midtrans callback is working
-        $dailyYear = request('daily_year', Carbon::now()->year);
-        $dailyMonth = request('daily_month', Carbon::now()->month);
-        $dailyWeek = request('daily_week', 1);
-        
-        $dailyDonations = Donation::whereIn('status', ['successful', 'pending'])
-        ->whereYear('created_at', $dailyYear)
-        ->whereMonth('created_at', $dailyMonth)
-        ->whereRaw('LEAST(CEILING(DAY(created_at) / 7), 4) = ?', [$dailyWeek])
+        $dailyStart = request('daily_start');
+        $dailyEnd = request('daily_end');
+
+        $dailyQuery = Donation::whereIn('status', ['successful', 'pending']);
+
+        // Apply date range filter if provided
+        if ($dailyStart && $dailyEnd) {
+            $dailyQuery->whereBetween('created_at', [
+                Carbon::parse($dailyStart)->startOfDay(),
+                Carbon::parse($dailyEnd)->endOfDay()
+            ]);
+        } else {
+            // Default to current week if no range specified
+            $dailyQuery->whereBetween('created_at', [
+                Carbon::now()->startOfWeek(),
+                Carbon::now()->endOfWeek()
+            ]);
+        }
+
+        $dailyDonations = $dailyQuery
         ->select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('SUM(amount) as total_amount'),
