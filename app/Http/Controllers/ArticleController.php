@@ -409,15 +409,25 @@ class ArticleController extends Controller
             ->withCount('likes')
             ->findOrFail($id);
 
-        // Transform article to include image URLs and like status
+        if ($article->thumbnail) {
+            $article->thumbnail_url = Storage::disk('minio')->url($article->thumbnail);
+        }
+
+        // Thumbnail from images morph (if exists)
         if ($article->thumbnailImage) {
             $article->thumbnail_url = $article->thumbnailImage->url;
         }
         $article->contents->transform(function ($content) {
-            if ($content->type === 'image' && $content->image) {
-                $content->image_url = $content->image->url;
-            }
-            return $content;
+            return [
+                'id' => $content->id,
+                'type' => $content->type,
+                'content' => $content->content,  // WAJIB!
+                'order_x' => (int) $content->order_x,
+                'order_y' => (int) $content->order_y,
+                'image_url' => $content->type === 'image' && $content->image
+                    ? $content->image->url
+                    : null,
+            ];
         });
 
         // Add like status
@@ -465,7 +475,7 @@ class ArticleController extends Controller
 
         $validated = $request->validate([
             'contents' => 'required|array|min:1',
-            'contents.*.type' => 'required|in:text,image',
+            'contents.*.type' => 'required|in:text,image,paragraph',
             'contents.*.content' => 'nullable',
             'contents.*.order_x' => 'required|integer',
             'contents.*.order_y' => 'required|integer',
@@ -483,19 +493,50 @@ class ArticleController extends Controller
 
             foreach ($request->input('contents', []) as $i => $block) {
                 $type = $block['type'];
+
+                if ($type === 'text') {
+                    $type = 'paragraph';
+                }
+
                 $content = ArticleContent::create([
                     'article_id' => $article->id,
                     'type' => $type,
-                    'content' => $type === 'text' ? $block['content'] ?? null : null,
+                    'content' => in_array($type, ['text', 'paragraph'])
+                        ? ($block['content'] ?? null)
+                        : null,
                     'order_x' => $block['order_x'],
                     'order_y' => $block['order_y'],
                 ]);
 
-                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
-                    $path = $request->file("contents.$i.content")->store('article/content', 'minio');
-                    $content->image()->create(['path' => $path]);
+                if ($type === 'image') {
+
+                    // CASE 1 — Upload New Image
+                    if ($request->hasFile("contents.$i.content")) {
+
+                        $path = $request->file("contents.$i.content")
+                            ->store('article/content', 'minio');
+
+                        $content->image()->create([
+                            'path' => $path
+                        ]);
+                    }
+
+                    // CASE 2 — Existing Image
+                    else if (!empty($block['content'])) {
+
+                        $url = $block['content'];
+
+
+                        $relativePath = preg_replace('/^https?:\/\/[^\/]+\/togather\//', '', $url);
+
+                        $content->image()->create([
+                            'path' => $relativePath
+                        ]);
+                    }
                 }
             }
+
+
 
         });
 
@@ -608,7 +649,11 @@ class ArticleController extends Controller
             },
         ])->findOrFail($id);
 
-        // Transform article to include image URLs
+        if ($article->thumbnail) {
+            $article->thumbnail_url = Storage::disk('minio')->url($article->thumbnail);
+        }
+
+        // Thumbnail from images morph (if exists)
         if ($article->thumbnailImage) {
             $article->thumbnail_url = $article->thumbnailImage->url;
         }

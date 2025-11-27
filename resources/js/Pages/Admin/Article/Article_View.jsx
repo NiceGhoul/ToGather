@@ -114,7 +114,8 @@ export default function ArticleView() {
     // ---------------- TEXT EDITOR (QUILL) --------------------
     const startEdit = (idx) => {
         const block = blocks[idx];
-        if (!block || block.type !== "text") return;
+        if (!block || (block.type !== "text" && block.type !== "paragraph"))
+            return;
 
         setEditingId(block.id ?? `new-${idx}`);
         setQuillValue(block.content ?? "");
@@ -302,7 +303,7 @@ export default function ArticleView() {
             fd.append(`contents[${i}][order_x]`, b.order_x);
             fd.append(`contents[${i}][order_y]`, b.order_y);
 
-            if (b.type === "text") {
+            if (b.type === "text" || b.type === "paragraph") {
                 fd.append(`contents[${i}][content]`, b.content ?? "");
             } else if (b.newFile) {
                 fd.append(`contents[${i}][content]`, b.newFile);
@@ -389,7 +390,7 @@ export default function ArticleView() {
 
         const block = blocks[idxInBlocks];
 
-        if (block.type === "text") {
+        if (block.type === "text" || block.type === "paragraph") {
             if (editingId === (block.id ?? `new-${idxInBlocks}`)) {
                 return null;
             }
@@ -568,9 +569,10 @@ export default function ArticleView() {
                                 >
                                     <div className="flex justify-between mb-2">
                                         <div className="text-xs text-gray-500">
-                                            Grid ({x},{y}) –{" "}
+                                            Block ({y}) –{" "}
                                             {block
-                                                ? block.type === "text"
+                                                ? block.type === "text" ||
+                                                  block.type === "paragraph"
                                                     ? "Text"
                                                     : "Image"
                                                 : "Empty"}
@@ -581,7 +583,8 @@ export default function ArticleView() {
 
                                     {/* RENDER CONTENT */}
                                     {block ? (
-                                        block.type === "text" ? (
+                                        block.type === "text" ||
+                                        block.type === "paragraph" ? (
                                             editingId ===
                                             (block.id ?? `new-${blockIdx}`) ? (
                                                 <div>
@@ -612,7 +615,7 @@ export default function ArticleView() {
                                                 </div>
                                             ) : (
                                                 <div
-                                                    className="prose max-w-none text-sm"
+                                                    className="prose prose-purple max-w-none text-sm dark:prose-invert"
                                                     dangerouslySetInnerHTML={{
                                                         __html:
                                                             block.content ||

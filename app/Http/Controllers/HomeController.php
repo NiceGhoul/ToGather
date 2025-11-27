@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Campaign;
 use App\Models\Lookup;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -46,19 +47,26 @@ class HomeController extends Controller
 
 
 
-        $recommendedArticles = Article::with(['user', 'thumbnailImage'])
-            ->where('status', 'approved')
-            ->withCount('likes') // hitung jumlah like
-            ->orderByDesc('likes_count') // urutkan dari yang paling banyak disukai
+        $recommendedArticles = Article::with([
+            'user',
+            'thumbnailImage',
+            'contents' => fn($q) =>
+                $q->where('type', 'paragraph')->orderBy('order_y')->limit(1)
+        ])->where('status', 'approved')
+            ->withCount('likes')
+            ->orderByDesc('likes_count')
             ->take(4)
             ->get()
             ->map(function ($article) {
-                // Tambahkan field 'thumbnail_url'
-                $article->thumbnail_url = $article->thumbnailImage
-                    ? $article->thumbnailImage->url
-                    : asset('images/articleBook.jpg');
+                if ($article->thumbnail) {
+                    $article->thumbnail_url = Storage::disk('minio')->url($article->thumbnail);
+                }
+                if ($article->thumbnailImage) {
+                    $article->thumbnail_url = $article->thumbnailImage->url;
+                }
                 return $article;
             });
+
 
 
 
