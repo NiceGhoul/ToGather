@@ -71,7 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/likedArticles', [ArticleController::class, 'showLiked'])->name('articles.liked');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
-    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
+    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticleDetails');
     Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
