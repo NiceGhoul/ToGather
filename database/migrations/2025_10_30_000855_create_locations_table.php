@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('suburb')->nullable();
             $table->string('city')->nullable();
             $table->string('region')->nullable();
+            $table->string('country')->nullable();
             $table->string('postcode')->nullable();
             $table->timestamps();
         });

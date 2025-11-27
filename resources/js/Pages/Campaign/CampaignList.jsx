@@ -127,19 +127,14 @@ const CampaignList = () => {
                         </p>
                         <div className="flex justify-center gap-2 mb-4">
                             <span
-                                className={`text-sm font-semibold text-gray-100 rounded-sm text-center px-4 py-1 mb-2 ${colorCoder(
-                                    campaign.category
-                                )}`}
+                                className={`text-sm font-semibold dark:text-gray-100 rounded-sm text-center px-4 py-1 mb-2 text-gray-600`}
                             >
                                 {campaign.category ?? "Uncategorized"}
                             </span>
                         </div>
 
                         <p className="h-[80px] text-sm text-gray-700 mb-3 text-justify dark:text-gray-300">
-                            {campaign.description
-                                ?.replace(/(<([^>]+)>)/gi, "")
-                                .slice(0, 150) || "No description available."}
-                            ...
+                            {campaign.description?.replace(/(<([^>]+)>)/gi, "").slice(0, 150) || "No description available."}{"..."}
                         </p>
 
                         <div className="w-full bg-gray-200 rounded-full h-3 mb-3 dark:bg-gray-700">

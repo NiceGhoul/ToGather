@@ -17,6 +17,7 @@ class Location extends Model
         'suburb', // kecamatan
         'city',
         'region', // provinsi
+        'country', // negara
         'postcode',
     ];
 
