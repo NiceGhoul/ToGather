@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             '/api/upload-video',
+            '/midtrans/callback'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
