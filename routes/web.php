@@ -55,7 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
     Route::post('/campaigns/upload-image', [CampaignController::class, 'uploadSupportingMedia'])->name('campaigns.uploadImages');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
-    Route::post('/campaigns/deleteContent', [CampaignController::class, 'deleteCampaignInfo'])->name('campaigns.delete');
+    Route::post('/campaigns/deleteContent/{id}', [CampaignController::class, 'deleteCampaignInfo'])->name('campaigns.delete');
     Route::post('/campaigns/deleteCampaign/{id}', [CampaignController::class, 'deleteCampaignData'])->name('campaigns.deleteCampaign');
     Route::post('/campaigns/toggleLike', [CampaignController::class, 'ToggleLike'])->name('campaigns.toggleLikes');
     Route::post('/campaigns/insertAbout', [CampaignController::class, 'insertAboutContent'])->name('campaigns.insertAbout');

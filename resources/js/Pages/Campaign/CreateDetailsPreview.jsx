@@ -174,21 +174,20 @@ const CreateDetailsPreview = () => {
     const tabsRepeater = (data, index) => {
         // console.log(data, index)
         return (
-            <>
-                <TabsTrigger
-                    key={index}
-                    value={index + 1}
-                    className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
-                >
-                    {data}
-                </TabsTrigger>
-            </>
+            <TabsTrigger
+                key={index}
+                value={index + 1}
+                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
+            >
+                {data}
+            </TabsTrigger>
         );
     };
 
     const tabsContentRepeater = (data, campaign, index) => {
         return (
             <TabsContent
+                key={index}
                 value={index + 1}
                 className="w-[90%] h-[100%] text-lg text-center py-4"
             >
@@ -206,7 +205,6 @@ const CreateDetailsPreview = () => {
             });
         }
     }, [campaign]);
-    console.log(campaign)
     return (
         <Layout_User>
             <Card className="rounded-none border-0 border-b">

@@ -329,7 +329,7 @@ const handleSave = () => {
                         <div className="w-1/6 justify-end flex">
                             {campaign != undefined ? (
                                 <Button
-                                    className="bg-transparent text-purple-700 hover:bg-purple-100 text-lg"
+                                    className="bg-transparent text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900 text-lg"
                                     onClick={handleEditCancel}
                                 >
                                     go to media →
@@ -349,6 +349,8 @@ const handleSave = () => {
             />
             {openPop && (
                 <Popup
+                open={openPop}
+                onClose={() => setOpenPop(false)}
                     triggerText={null}
                     title={description.length > 0 ? "Warning" : campaign != undefined ? "Update data?" : "Submit data?"}
                     description={
@@ -362,9 +364,7 @@ const handleSave = () => {
                             ? "bg-red-600 hover:bg-red-700 text-white"
                             : "bg-green-600 hover:bg-green-700 text-white"
                     }
-                    onConfirm={
-                        description.length > 0 ? () => setOpenPop(false) : handleSave
-                    }
+                    onConfirm={description.length > 0 ? () => setOpenPop(false) : handleSave}
                 />
             )}
         </Layout_User>

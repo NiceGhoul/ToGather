@@ -528,9 +528,10 @@ class CampaignController extends Controller
         return redirect()->route('campaigns.showMyCampaigns')->with('success', 'Campaign deleted!');
     }
 
-    public function deleteCampaignInfo(Request $request)
+    public function deleteCampaignInfo($id)
     {
-        $content = CampaignContent::findOrFail($request->id);
+        $content = CampaignContent::find($id);
+        // dd($content);
         $tab = match ($content->type) {
             'updates' => 2,
             'faqs' => 1,
@@ -539,7 +540,7 @@ class CampaignController extends Controller
 
         $content->delete();
 
-        return redirect()->route('campaigns.detailsPreview')->with('activeTab', $tab);
+        return redirect()->route('campaigns.detailsPreview', $content->campaign_id)->with('activeTab', $tab);
     }
 
     public function insertCampaignUpdate(Request $request)

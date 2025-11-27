@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
-import { SearchIcon, RotateCcw } from "lucide-react";
+import { SearchIcon, RotateCcw, Currency } from "lucide-react";
 import { useEffect, useState } from "react";
 import { IconFolderCode } from "@tabler/icons-react";
 import {
@@ -17,6 +17,7 @@ import {
     EmptyTitle,
 } from "@/components/ui/empty";
 import Popup from "@/Components/Popup";
+import { toast } from "sonner";
 
 export default function MyCampaign({campaigns = [], categories = [], sortOrder: initialSortOrder}) {
     const [visibleCampaigns, setVisibleCampaigns] = useState(8)
@@ -35,8 +36,6 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
         });
         return sorted
     })
-
-    console.log(campaigns)
     const [chosenCategory, setChosenCategory] = useState("All")
     const [searchTerm, setSearchTerm] = useState("")
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc")
@@ -98,7 +97,6 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
     };
 
     const colorCoder = (data) => {
-        console.log(data)
         if(data === 'Foods & Beverage'){
             return "bg-[#B8DF5D]"
         }else if(data === 'Beauty & Cosmetic'){
@@ -119,7 +117,9 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
     }
 
     const handleDeleteCampaign = (id) => {
-        router.post(`/campaigns/deleteCampaign/${id}`)
+        setCampaignList(campaignList.filter(dat => dat.id != id))
+        router.post(`/campaigns/deleteCampaign/${id}`);
+        setOpenPop(-1)
     }
 
     const cardRepeater = (data) => {
@@ -129,13 +129,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
             return data.slice(0, visibleCampaigns).map((campaign, idx) => {
                 const progress =
                     campaign.goal_amount > 0
-                        ? Math.min(
-                              (campaign.collected_amount /
-                                  campaign.goal_amount) *
-                                  100,
-                              100
-                          ).toFixed(1)
-                        : 0;
+                        ? Math.round((campaign.collected_amount /campaign.goal_amount) * 100) : 0;
 
                 return (
                     <div
@@ -180,15 +174,19 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                         <div className="w-full bg-gray-200 dark:bg-gray-400 rounded-full h-3 mb-3">
                             <div
                                 className="bg-purple-700 h-3 rounded-full"
-                                style={{ width: `${progress}%` }}
+                                style={{ width: `${Math.min(progress, 100).toFixed(1)}%` }}
                             ></div>
                         </div>
+                        <div className="flex flex-row gap-2 justify-center">
+
                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 text-center">
-                            Raised Rp{" "}
-                            {campaign.collected_amount?.toLocaleString("id-ID")}{" "}
-                            / Rp {campaign.goal_amount?.toLocaleString("id-ID")}{" "}
-                            ({progress}%)
+                            Raised{" "}
+                            {parseInt(campaign.collected_amount)?.toLocaleString("id-ID", {style:"currency" ,currency:'IDR', minimumFractionDigits:2})} / {parseInt(campaign.goal_amount)?.toLocaleString("id-ID", {style:"currency" ,currency:"IDR",minimumFractionDigits: 2})}{" "}({progress}%)
                         </p>
+                            {/* <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">
+                                ({progress}%)
+                                </p> */}
+                        </div>
 
                         <div className="flex justify-center gap-2 mb-4">
                             <span
@@ -462,6 +460,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
             </div>
             <Popup
                 open={openPop === -1 ? false : true}
+                onClose={() => setOpenPop(-1)}
                 triggerText={null}
                 title={"you are about to delete a campaign!"}
                 description={"This will remove all instances of data associated to this campaign. Are you sure to continue?"}

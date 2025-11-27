@@ -1,17 +1,21 @@
+import Popup from "@/Components/Popup";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Carousel,CarouselNext, CarouselItem, CarouselPrevious, CarouselContent } from "@/Components/ui/carousel";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
+import { router } from "@inertiajs/react";
 import { Trash } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
     const [editMode, setEditMode] = useState(false);
+    const [openPopUp, setOpenPopUp] = useState(-1)
     // useState that saves what will be shown on the right side
     const [updates, setUpdates] = useState(contents);
-    const [selectedUpdate, setSelectedUpdate] = useState(updates[0]);
+    const [selectedUpdate, setSelectedUpdate] = useState(updates[updates.length - 1]);
 
     const handleAddUpdate = () => {
         const date = new Date();
@@ -41,12 +45,12 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
 
     const handleSaveUpdate = () => {
         if (!formData.title || formData.title.trim() === "") {
-            alert("Title cannot be empty!");
+            () => toast("Title cannot be empty!");
             return;
         }
 
         if (!formData.content || formData.content.trim() === "") {
-            alert("description cannot be empty!");
+            toast("description cannot be empty!");
             return;
         }
 
@@ -60,7 +64,6 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
 
         const updatesPreview = { ...selectedUpdate, content: `${formData.title}~;${formData.content ?? ""}`, media: formData.media, };
 
-        console.log(contents)
         setUpdates(updatedList)
         setSelectedUpdate(updatesPreview)
         setEditMode(false)
@@ -81,7 +84,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
         setFormData({ ...formData, media: previews });
     };
 
-    const handleUpdatesDelete = () => {
+    const handleUpdatesDelete = async (openPopUp) => {
         setUpdates(prev => {
         const index = prev.findIndex(u => u.id === selectedUpdate.id);
         const filtered = prev.filter(u => u.id !== selectedUpdate.id);
@@ -100,10 +103,13 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
         setSelectedUpdate(nextSelected);
         return filtered;
     });
+    if (openPopUp != undefined) {
+        await router.post(`/campaigns/deleteContent/${openPopUp}`);
+        setUpdates(contents)
+        setOpenPopUp(-1);
+    }
     };
-
-    console.log(selectedUpdate)
-
+    // console.log(selectedUpdate.id)
     return (
         <>
             <Label className="text-3xl justify-center items-center font-bold text-[#7C4789]">
@@ -141,9 +147,14 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                 {!editMode && (
                                     <p className="text-left text-base text-gray-400 my-2">
                                         {!selectedUpdate.created_at
-                                            ? new Date().toLocaleDateString("en-GB").replaceAll("/", "-")
-                                            : new Date(selectedUpdate.created_at).toLocaleDateString("en-GB").replaceAll("/", "-")
-                                        }
+                                            ? new Date()
+                                                  .toLocaleDateString("en-GB")
+                                                  .replaceAll("/", "-")
+                                            : new Date(
+                                                  selectedUpdate.created_at
+                                              )
+                                                  .toLocaleDateString("en-GB")
+                                                  .replaceAll("/", "-")}
                                     </p>
                                 )}
                                 {/* media carousel */}
@@ -157,18 +168,28 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                             key={idx}
                                                             className="flex justify-center"
                                                         >
-                                                            {
-                                                            m.filetype === "image" ? (
-                                                                <img src={m.url} alt={`Media ${idx + 1}`} className="rounded-lg min-w-[100%] max-h-[450px] object-contain"/>
+                                                            {m.filetype ===
+                                                            "image" ? (
+                                                                <img
+                                                                    src={m.url}
+                                                                    alt={`Media ${
+                                                                        idx + 1
+                                                                    }`}
+                                                                    className="rounded-lg min-w-[100%] max-h-[450px] object-contain"
+                                                                />
                                                             ) : (
-                                                                <video controls className="rounded-lg w-full min-h-[400px] object-content">
+                                                                <video
+                                                                    controls
+                                                                    className="rounded-lg w-full min-h-[400px] object-content"
+                                                                >
                                                                     <source
-                                                                        src={m.url}
+                                                                        src={
+                                                                            m.url
+                                                                        }
                                                                         type="video/mp4"
                                                                     />
                                                                 </video>
-                                                            )
-                                                            }
+                                                            )}
                                                         </CarouselItem>
                                                     )
                                                 )}
@@ -187,7 +208,8 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                         key={idx}
                                                         className="relative"
                                                     >
-                                                        {m.filetype === "image" ? (
+                                                        {m.filetype ===
+                                                        "image" ? (
                                                             <img
                                                                 src={m.url}
                                                                 alt=""
@@ -275,9 +297,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                         <div className="flex flex-row justify-between w-full">
                                             <Trash
                                                 size={30}
-                                                onClick={() =>
-                                                    handleUpdatesDelete()
-                                                }
+                                                onClick={() => setOpenPopUp(selectedUpdate.id)}
                                                 className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
                                             />
 
@@ -313,7 +333,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
 
                     {/* kanan */}
                     <div className="w-[280px] bg-purple-100 rounded-2xl p-4 flex flex-col gap-3 h-fit dark:bg-purple-900/50">
-                        {updates.map((upd) => (
+                        {[...updates].reverse().map((upd) => (
                             <Card
                                 key={upd.id}
                                 className={`cursor-pointer p-3 rounded-xl transition-all ${
@@ -365,6 +385,20 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                         </Button>
                     </div>
                 </div>
+                <Popup
+                    open={openPopUp === -1 ? false : true}
+                    onClose={() => setOpenPopUp(-1)}
+                    triggerText={null}
+                    title={"you are about to delete a campaign updates!"}
+                    description={
+                        "This will remove the chosen updates. Are you sure to continue?"
+                    }
+                    confirmText={"Confirm"}
+                    cancelText="Cancel"
+                    showCancel={true}
+                    confirmColor={"bg-red-600 hover:bg-red-700 text-white"}
+                    onConfirm={() => handleUpdatesDelete(openPopUp)}
+                />
             </div>
         </>
     );
