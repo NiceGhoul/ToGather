@@ -531,7 +531,6 @@ class CampaignController extends Controller
     public function deleteCampaignInfo($id)
     {
         $content = CampaignContent::find($id);
-        // dd($content);
         $tab = match ($content->type) {
             'updates' => 2,
             'faqs' => 1,

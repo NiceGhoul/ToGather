@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/Components/ui/sonner";
 import { router } from "@inertiajs/react";
+import Popup from "@/Components/Popup";
+import { Description } from "@radix-ui/react-dialog";
 
 
 export const AboutBuilder = ({campaign, contents}) => {
@@ -67,8 +69,13 @@ export const AboutBuilder = ({campaign, contents}) => {
         );
     };
 
-     const handleRemove = (index) => {
-         setDescription((prev) => prev.filter((_, i) => i !== index));
+     const handleRemove = (id, index) => {
+         if (id != undefined) {
+             setDescription((prev) => prev.filter((_, i) => i !== index));
+             router.post(`/campaigns/deleteContent/${id}`);
+         } else {
+             setDescription((prev) => prev.filter((_, i) => i !== index));
+         }
      };
 
      const handleSave = () => {
@@ -90,7 +97,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                 };
             })
              router.post("/campaigns/insertAbout", prepared)
-             
+
          }
      };
 
@@ -103,7 +110,10 @@ export const AboutBuilder = ({campaign, contents}) => {
                     </CardTitle>
                 </div>
                 <div className="flex justify-center gap-4 mt-2">
-                    <Button onClick={addParagraphBlock}> + Add Paragraph </Button>
+                    <Button onClick={addParagraphBlock}>
+                        {" "}
+                        + Add Paragraph{" "}
+                    </Button>
                     <Button onClick={addMediaBlock}> + Add Media </Button>
                 </div>
             </CardHeader>
@@ -199,9 +209,12 @@ export const AboutBuilder = ({campaign, contents}) => {
                                     )
                                 ) : (
                                     <>
-                                        {block.content    ? (
+                                        {block.content ? (
                                             <img
-                                                src={block.content.preview ?? block.media[0].url}
+                                                src={
+                                                    block.content.preview ??
+                                                    block.media[0].url
+                                                }
                                                 alt="Preview"
                                                 className="w-full max-h-[400px] object-contain rounded"
                                             />
@@ -214,24 +227,38 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                 const file =
                                                     e.target.files?.[0];
                                                 if (file) {
-                                                    handleChange(index, {file: file, preview: URL.createObjectURL(file)});
+                                                    handleChange(index, {
+                                                        file: file,
+                                                        preview:
+                                                            URL.createObjectURL(
+                                                                file
+                                                            ),
+                                                    });
                                                 }
                                             }}
                                         />
                                     </>
                                 )}
-
-                                <Button
-                                    variant="destructive"
-                                    size="icon"
-                                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
-                                    onClick={() => handleRemove(index)}
-                                >
-                                    <Trash2
-                                        className="w-30 h-30 text-white p-0"
-                                        strokeWidth={2.5}
+                                    <Popup
+                                        triggerText={
+                                            <Button
+                                                variant="destructive"
+                                                size="icon"
+                                                // className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
+                                            >
+                                                <Trash2
+                                                    className="w-30 h-30 text-white p-0"
+                                                    strokeWidth={2.5}
+                                                />
+                                            </Button>
+                                        }
+                                        title={"Delete " + block.type + " ?"}
+                                        description={"This " + block.type + " will be removed permanently, are you sure?"}
+                                        confirmText="Yes, Confirm"
+                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                        triggerClass="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
+                                        onConfirm={() => handleRemove(block.id, index)}
                                     />
-                                </Button>
                             </div>
                         ))}
                     </div>
@@ -250,7 +277,11 @@ export const AboutBuilder = ({campaign, contents}) => {
             ) : (
                 <></>
             )}
-            <Toaster className="text-xl" toastOptions={{ duration:1500 }} position="top-center"/>
+            <Toaster
+                className="text-xl"
+                toastOptions={{ duration: 1500 }}
+                position="top-center"
+            />
         </Card>
     );
 };

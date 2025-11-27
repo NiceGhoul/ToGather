@@ -37,7 +37,7 @@ const handleDelete = (itemToDelete, idx) => {
     setUserQuestions((prev) => prev.filter((_, i) => i !== idx))
 
     if (contents?.some((c) => c.id === itemToDelete.id)) {
-        router.post('/campaigns/deleteContent', { id: itemToDelete.id })
+        router.post(`/campaigns/deleteContent/${id}`)
     }
 }
 
@@ -81,6 +81,14 @@ const handleDelete = (itemToDelete, idx) => {
         const data = userQuestions.map((_, idx) => ({id:userQuestions[idx].id ,campaign_id: campaign.id, type:'faqs', content:userQuestions[idx].question + "~;" + userQuestions[idx].answer, order_y: idx + 1}))
         router.post('/campaigns/insertFAQ', data)
     }
+
+    const handleRemove = (id, index) => {
+        if (id != undefined) {
+            router.post(`/campaigns/deleteContent/${id}`);
+        } else {
+            setUserQuestions((prev) => prev.filter((_, i) => i !== idx));
+        }
+    };
 
 
 
@@ -143,7 +151,9 @@ const handleDelete = (itemToDelete, idx) => {
                                                             e.nativeEvent.stopImmediatePropagation();
                                                     }}
                                                     value={dat.question}
-                                                    placeholder={"Write your Question on this text box"}
+                                                    placeholder={
+                                                        "Write your Question on this text box"
+                                                    }
                                                     onChange={(e) =>
                                                         handleChange(
                                                             idx,
@@ -155,7 +165,9 @@ const handleDelete = (itemToDelete, idx) => {
                                                 />
                                             ) : (
                                                 <span className="text-xl font-semibold">
-                                                    {dat.question != "" ? dat.question : "Edit Your Question"}
+                                                    {dat.question != ""
+                                                        ? dat.question
+                                                        : "Edit Your Question"}
                                                 </span>
                                             )}
                                         </AccordionTrigger>
@@ -181,12 +193,16 @@ const handleDelete = (itemToDelete, idx) => {
                                                         )
                                                     }
                                                     className="w-full mt-2 dark:text-gray-200"
-                                                    placeholder={"Write your answer here"}
+                                                    placeholder={
+                                                        "Write your answer here"
+                                                    }
                                                     rows={3}
                                                 />
                                             ) : (
                                                 <p className="mt-2 text-gray-700 dark:text-gray-200 text-base">
-                                                    {dat.answer != "" ? dat.answer : "Edit your Answer"}
+                                                    {dat.answer != ""
+                                                        ? dat.answer
+                                                        : "Edit your Answer"}
                                                 </p>
                                             )}
                                         </AccordionContent>
@@ -203,29 +219,34 @@ const handleDelete = (itemToDelete, idx) => {
                                             className="cursor-pointer rounded-md p-1 hover:bg-blue-200 text-blue-600 transition-colors"
                                         />
                                     ) : (
-                                        <Edit
-                                            size={35}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleEdit(idx);
-                                            }}
-                                            className="cursor-pointer rounded-md p-1 hover:bg-gray-200 text-gray-600 hover:text-blue-600 transition-colors"
-                                        />
+                                        <Button className="p-0 bg-transparent w-12 h-12 cursor-pointer rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 transition-colors">
+                                            <Edit
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleEdit(idx);
+                                                }}
+                                                className="w-12 h-12 mr-2 hover:bg-gray-100 hover:text-gray-600 text-gray-600"
+                                            />
+                                        </Button>
                                     )}
+                                    {/* <Trash
+                                        size={35}
+                                        onClick={(e) => {
+                                            setOpenPop(true);
+                                        }}
+                                        className="w-full h-full cursor-pointer rounded-md p-1 hover:bg-gray-200 text-gray-600 hover:text-blue-600 transition-colors"
+                                    /> */}
+                                    {/* shadcn buttonnya sampah banget ajg */}
                                     <Popup
                                         triggerText={
-                                            <Trash
-                                                size={35}
-                                                className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
-                                            />
+                                            <Trash className="w-12 h-12 mr-2 hover:bg-red-100 hover:text-red-600 text-gray-600" />
                                         }
                                         title="Delete FAQ?"
-                                        description="This action cannot be undone.FAQ will be deleted permanently."
+                                        description="This action cannot be undone, FAQ will be deleted permanently."
                                         confirmText="Yes, Delete"
                                         confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
-                                        // disabledValue={selectedIds.length === 0}
-                                        onConfirm={handleDelete}
+                                        triggerClass="p-0 bg-transparent w-12 h-12 cursor-pointer rounded-md hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
+                                        onConfirm={() => handleRemove(dat.id, idx)}
                                     />
                                 </div>
                             </div>
