@@ -159,8 +159,9 @@ class CampaignController extends Controller
                     return inertia('Campaign/CampaignPending');
                     // If user already has a campaign with the status draft
                 } else if ($usersCampaign->status->value === 'draft' || $usersCampaign->status->value === 'active') {
-                    $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())->first();
-                    $location = Location::where('campaign_id', $id)->first();
+                    $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())->latest()->first();
+                    $location = Location::where('campaign_id', $id)->latest()->first();
+                    // dd($location);
                     return Inertia::render('Campaign/Create', [
                         'user_Id' => Auth::id(),
                         'campaign' => $draft,
@@ -180,7 +181,7 @@ class CampaignController extends Controller
 
     public function showList()
     {
-        $campaigns = Campaign::where('status', ['active'])->get();
+        $campaigns = Campaign::where('status', ['active', 'completed'])->get();
         $lookups = Lookup::all();
 
         return inertia('Campaign/CampaignList', [
@@ -253,31 +254,55 @@ class CampaignController extends Controller
         if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
             return back()->with('error', 'Your account has been banned. You cannot create campaigns.');
         }
-
-        $draft = Campaign::where('user_id', Auth::id())->where('status', 'draft')->first();
         $data = $request->all();
 
-        if ($draft) {
-            $draft->update($data);
-            $campaign = $draft;
-        } else {
-            $data['user_id'] = Auth::id();
-            $data['status'] = 'draft';
-            $campaign = Campaign::create($data);
+        // $draft = Campaign::where('id', $request->id)->where('user_id', Auth::id())->first();
+        // dd($draft);
+        // if ($draft) {
+        //     $draft->update($data);
+        //     $campaign = $draft;
+        // } else {
+        //     $data['user_id'] = Auth::id();
+        //     $data['status'] = 'draft';
+        //     $campaign = Campaign::create($data);
 
-        }
+        // }
+
+        $campaign = Campaign::updateOrCreate(
+        [
+            'id' => $request->id,
+            'user_id' => Auth::id(),
+        ],
+        array_merge($data, [
+            'user_id' => Auth::id(),
+            'status' => 'draft',
+        ])
+    );
         // dd($request->all());
-        if ($campaign && $request->has('location')) {
-            $location = $request->input('location');
-            $location['campaign_id'] = $campaign->id;
+        // if ($campaign && $request->has('location')) {
+        //     $location = $request->input('location');
+        //     $location['campaign_id'] = $campaign->id;
 
-            $existingLocation = Location::where('campaign_id', $campaign->id)->first();
+        //     $existingLocation = Location::where('campaign_id', $campaign->id)->first();
 
-            if ($existingLocation) {
-                $existingLocation->update($location);
-            } else {
-                Location::create($location);
-            }
+        //     if ($existingLocation) {
+        //         $existingLocation->update($location);
+        //     } else {
+        //         Location::create($location);
+        //     }
+        // }
+
+        if ($request->has('location')) {
+            $locationData = $request->input('location');
+
+            Location::updateOrCreate(
+                [
+                    'campaign_id' => $campaign->id,
+                ],
+                array_merge($locationData, [
+                    'campaign_id' => $campaign->id,
+                ])
+            );
         }
 
         // Notify admins about new campaign
@@ -287,7 +312,7 @@ class CampaignController extends Controller
             "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",
             ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
         );
-
+        // dd($campaign);
         return redirect()->route('campaigns.createPreview',$campaign->id);
     }
 

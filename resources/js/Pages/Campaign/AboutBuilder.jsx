@@ -15,8 +15,6 @@ import { Description } from "@radix-ui/react-dialog";
 export const AboutBuilder = ({campaign, contents}) => {
     const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
 
-    // console.log(description.map((tai) => console.log(tai)))
-
     const addParagraphBlock = () => {
         setDescription((prev) => {
             const lastOrder =
@@ -54,6 +52,10 @@ export const AboutBuilder = ({campaign, contents}) => {
     };
 
     const handleChange = (index, value) => {
+     const file = value.file
+     console.log(value)
+     if (!file) return
+
         setDescription((prev) =>
             prev.map((block, i) =>
                 i === index ? { ...block, content: value } : block
@@ -80,10 +82,7 @@ export const AboutBuilder = ({campaign, contents}) => {
 
      const handleSave = () => {
          if (description.some((dat) => dat.content === "")) {
-             toast.error("there are empty descriptions!", {
-                 description:
-                     "please double check your description before submitting.",
-             });
+             toast.error("there are empty descriptions!", {description:"please double check your description before submitting."});
          } else {
             const prepared = description.map((block, index) => {
                 return {

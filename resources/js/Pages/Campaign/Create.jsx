@@ -97,11 +97,11 @@ const errorDescription = () => {
     if (!campaignData.address.trim()) errors.push("Address cannot be empty.");
     if (!campaignData.goal_amount || campaignData.goal_amount <= 0)
         errors.push("Goal amount must be greater than 0.");
-    if (campaignData.goal_amount && campaignData.goal_amount > 50000000)
-        errors.push("Goal amount must be less than Rp. 50.000.000,00.");
+    // if (campaignData.goal_amount && campaignData.goal_amount > 50000000)
+    //     errors.push("Goal amount must be less than Rp. 50.000.000,00.");
     if (!campaignData.duration) errors.push("Duration cannot be empty");
-    if (campaignData.duration && campaignData.duration < 15) errors.push("Duration must be greater than or equals to 15 days");
-    if (campaignData.duration && campaignData.duration > 90) errors.push("Duration must be less than or equals to 90 days");
+    if (campaignData.duration && campaignData.duration < 0) errors.push("Duration must be greater than or equals to 1 day");
+    // if (campaignData.duration && campaignData.duration > 90) errors.push("Duration must be less than or equals to 90 days");
 
     return errors;
 };
@@ -256,7 +256,7 @@ const handleSave = () => {
 
                                     >
                                         <InputGroupInput
-                                            placeholder="max: Rp. 50.000.000,00"
+                                            placeholder="Input your target funding"
                                             value={
                                                 campaignData.goal_amount === 0 ? "" : campaignData.goal_amount
                                             }
@@ -296,7 +296,7 @@ const handleSave = () => {
                                 </Label>
                                 <InputGroup className="h-[40px] w-full">
                                     <InputGroupInput
-                                        placeholder="range: 15 - 90 days"
+                                        placeholder="Input your campaign's duration"
                                         value={campaignData.duration}
                                         onChange={(e) =>
                                             setCampaignData({
