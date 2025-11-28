@@ -1,7 +1,7 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { usePage, router } from "@inertiajs/react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { Heart, ArrowLeft } from "lucide-react";
 
 export default function MyArticleDetails() {
@@ -20,11 +20,11 @@ export default function MyArticleDetails() {
     // ---------- STATUS COLOR ----------
     const statusColor =
         {
-            approved: "bg-green-100 text-green-700 border-green-300",
-            pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
-            rejected: "bg-red-100 text-red-700 border-red-300",
-            disabled: "bg-gray-100 text-gray-700 border-gray-300",
-        }[article.status] || "bg-gray-100 text-gray-700 border-gray-300";
+            approved: "bg-green-100 text-green-700 border-green-300 dark:bg-green-900 dark:text-green-300 dark:border-green-700",
+            pending: "bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-700",
+            rejected: "bg-red-100 text-red-700 border-red-300 dark:bg-red-900 dark:text-red-300 dark:border-red-700",
+            disabled: "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600",
+        }[article.status] || "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600";
 
     return (
         <Layout_User>
@@ -86,10 +86,10 @@ export default function MyArticleDetails() {
 
                 {/* TITLE & AUTHOR */}
                 <div className="w-full max-w-4xl text-left mb-4">
-                    <h1 className="text-3xl font-bold">{article.title}</h1>
+                    <h1 className="text-3xl font-bold dark:text-white">{article.title}</h1>
                 </div>
 
-                <div className="w-full max-w-4xl text-gray-500 mb-6">
+                <div className="w-full max-w-4xl text-gray-500 dark:text-gray-400 mb-6">
                     <p>
                         by {article.user?.nickname ?? "Unknown"} ·{" "}
                         {new Date(article.created_at).toLocaleDateString()}

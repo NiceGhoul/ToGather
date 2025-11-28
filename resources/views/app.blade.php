@@ -13,18 +13,13 @@
         }
       } catch (e) {}
     </script>
-    <script 
+
+    <script
       type="text/javascript"
       src="https://app.sandbox.midtrans.com/snap/snap.js"
       data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"
     ></script>
-    
-    <!-- Midtrans Snap -->
-    <script type="text/javascript"
-            src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}">
-    </script>
-    
+
     @viteReactRefresh
     @vite(['resources/js/app.jsx', 'resources/css/app.css'])
     @inertiaHead

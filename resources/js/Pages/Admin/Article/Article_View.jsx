@@ -1,6 +1,6 @@
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import { usePage, router } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import Popup from "@/Components/Popup";
 import Cropper from "react-easy-crop";
 import { useMemo, useState, useRef, useEffect, useCallback } from "react";

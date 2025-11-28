@@ -1,6 +1,6 @@
 import { usePage, router } from "@inertiajs/react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import Popup from "@/Components/Popup";
 import { useState, useEffect } from "react";
 import {

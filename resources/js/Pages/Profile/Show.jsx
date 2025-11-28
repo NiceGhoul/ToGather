@@ -1,19 +1,19 @@
 import { Head, router, useForm } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 import Layout_User from "@/Layouts/Layout_User";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Separator } from "@/Components/ui/separator";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/Components/ui/dialog";
 import {
     User,
     Mail,
@@ -54,6 +54,7 @@ export default function Show({
         user.profile_image || null
     );
     const [uploadingImage, setUploadingImage] = useState(false);
+    const [passwordErrors, setPasswordErrors] = useState({});
 
     const { data, setData, post, processing, errors, reset } = useForm({
         nickname: user.nickname || "",
@@ -84,13 +85,51 @@ export default function Show({
         setData("profile_image", file);
     };
 
+    const validatePassword = () => {
+        const newErrors = {};
+
+        // Only validate if user is trying to change password
+        if (data.password || data.password_confirmation || data.current_password) {
+            if (!data.current_password) {
+                newErrors.current_password = "Current password is required to change password.";
+            }
+
+            if (data.password) {
+                if (data.password.length < 8) {
+                    newErrors.password = "Password must be at least 8 characters.";
+                } else if (!/[A-Z]/.test(data.password)) {
+                    newErrors.password = "Password must include at least one uppercase letter.";
+                } else if (!/[a-z]/.test(data.password)) {
+                    newErrors.password = "Password must include at least one lowercase letter.";
+                } else if (!/\d/.test(data.password)) {
+                    newErrors.password = "Password must include at least one number.";
+                }
+            }
+
+            if (data.password && !data.password_confirmation) {
+                newErrors.password_confirmation = "Please confirm your new password.";
+            } else if (data.password !== data.password_confirmation) {
+                newErrors.password_confirmation = "Passwords do not match.";
+            }
+        }
+
+        setPasswordErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleEditSubmit = (e) => {
         e.preventDefault();
+
+        if (!validatePassword()) {
+            return;
+        }
+
         post("/profile/update", {
             onSuccess: () => {
                 setIsEditOpen(false);
                 reset();
                 setProfileImage(null);
+                setPasswordErrors({});
                 // Refresh the page to show updated profile image
                 window.location.reload();
             },
@@ -472,7 +511,7 @@ export default function Show({
 
                         <div>
                             <Label htmlFor="current_password" className="dark:text-white">
-                                Current Password
+                                Current Password (leave blank to keep unchanged)
                             </Label>
                             <Input
                                 id="current_password"
@@ -483,15 +522,17 @@ export default function Show({
                                 }
                                 className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                             />
-                            {errors.current_password && (
+                            {(passwordErrors.current_password || errors.current_password) && (
                                 <p className="text-sm text-red-600 mt-1">
-                                    {errors.current_password}
+                                    {passwordErrors.current_password || errors.current_password}
                                 </p>
                             )}
                         </div>
 
                         <div>
-                            <Label htmlFor="password" className="dark:text-white">New Password</Label>
+                            <Label htmlFor="password" className="dark:text-white">
+                                New Password
+                            </Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -501,10 +542,26 @@ export default function Show({
                                 }
                                 className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                             />
-                            {errors.password && (
+                            {(passwordErrors.password || errors.password) && (
                                 <p className="text-sm text-red-600 mt-1">
-                                    {errors.password}
+                                    {passwordErrors.password || errors.password}
                                 </p>
+                            )}
+                            {data.password && (
+                                <div className="mt-2 space-y-1 text-xs">
+                                    <p className={data.password.length >= 8 ? "text-green-600" : "text-gray-500"}>
+                                        {data.password.length >= 8 ? "✓" : "○"} At least 8 characters
+                                    </p>
+                                    <p className={/[A-Z]/.test(data.password) ? "text-green-600" : "text-gray-500"}>
+                                        {/[A-Z]/.test(data.password) ? "✓" : "○"} One uppercase letter
+                                    </p>
+                                    <p className={/[a-z]/.test(data.password) ? "text-green-600" : "text-gray-500"}>
+                                        {/[a-z]/.test(data.password) ? "✓" : "○"} One lowercase letter
+                                    </p>
+                                    <p className={/\d/.test(data.password) ? "text-green-600" : "text-gray-500"}>
+                                        {/\d/.test(data.password) ? "✓" : "○"} One number
+                                    </p>
+                                </div>
                             )}
                         </div>
 
@@ -522,11 +579,29 @@ export default function Show({
                                         e.target.value
                                     )
                                 }
-                                className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                                className={`mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
+                                    data.password_confirmation && data.password
+                                        ? data.password === data.password_confirmation
+                                            ? "border-green-500 focus:ring-green-500"
+                                            : "border-red-500 focus:ring-red-500"
+                                        : ""
+                                }`}
                             />
-                            {errors.password_confirmation && (
+                            {data.password_confirmation && data.password && (
+                                <p className={`text-sm mt-1 flex items-center gap-1 ${
+                                    data.password === data.password_confirmation
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                }`}>
+                                    {data.password === data.password_confirmation ? "✔" : "✖"}{" "}
+                                    {data.password === data.password_confirmation
+                                        ? "Passwords match"
+                                        : "Passwords do not match"}
+                                </p>
+                            )}
+                            {(passwordErrors.password_confirmation || errors.password_confirmation) && (
                                 <p className="text-sm text-red-600 mt-1">
-                                    {errors.password_confirmation}
+                                    {passwordErrors.password_confirmation || errors.password_confirmation}
                                 </p>
                             )}
                         </div>

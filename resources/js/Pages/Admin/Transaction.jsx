@@ -1,10 +1,10 @@
 import { Head } from "@inertiajs/react";
 import { useState } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Input } from "@/Components/ui/input";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
 import { Search, DollarSign, Calendar, Target } from "lucide-react";
 
 export default function Transaction({ donations, stats }) {

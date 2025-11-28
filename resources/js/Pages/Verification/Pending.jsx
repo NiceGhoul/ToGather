@@ -1,6 +1,6 @@
 import Layout_User from "@/Layouts/Layout_User";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 import { Link } from "@inertiajs/react";
 
 export default function Pending() {
@@ -15,12 +15,12 @@ export default function Pending() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="text-center">
-                        <div className="mb-4 p-4 bg-yellow-100 text-yellow-700 rounded">
+                        <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded">
                             <p className="font-medium">Your verification is still pending</p>
                             <p className="text-sm mt-1">Please wait for admin approval</p>
                         </div>
-                        <p className="text-sm text-gray-600 mb-4">
-                            We are currently reviewing your verification documents. 
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            We are currently reviewing your verification documents.
                             You will be notified once the review is complete.
                         </p>
                         <Button asChild className="w-full">

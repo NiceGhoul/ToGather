@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { usePage, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/Layout_Admin";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import Popup from "@/Components/Popup";
 import { Trash, Pencil } from "lucide-react";
 

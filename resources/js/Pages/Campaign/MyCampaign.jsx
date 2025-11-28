@@ -1,10 +1,10 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { Link, router, usePage } from "@inertiajs/react";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { Input } from "@/components/ui/input";
+import { CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
+import { Separator } from "@/Components/ui/separator";
+import { ButtonGroup } from "@/Components/ui/button-group";
+import { Input } from "@/Components/ui/input";
 import { SearchIcon, RotateCcw, Currency } from "lucide-react";
 import { useEffect, useState } from "react";
 import { IconFolderCode } from "@tabler/icons-react";
@@ -15,7 +15,7 @@ import {
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
-} from "@/components/ui/empty";
+} from "@/Components/ui/empty";
 import Popup from "@/Components/Popup";
 import { toast } from "sonner";
 
@@ -144,7 +144,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 items-center justify-center flex text-center min-h-[3rem] max-h-[3rem] overflow-hidden leading-snug">
+                        <h2 className="text-lg font-semibold mb-2 items-center justify-center flex text-center min-h-[3rem] max-h-[3rem] overflow-hidden leading-snug dark:text-white">
                             {campaign.title.length > 50
                                 ? campaign.title.substring(0, 50) + "..."
                                 : campaign.title}

@@ -1,7 +1,7 @@
 import { usePage, Link } from "@inertiajs/react";
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 import { Clock } from "lucide-react";
 import Layout_User from "../Layouts/Layout_User";
 import Layout_Guest from "../Layouts/Layout_Guest";
@@ -11,7 +11,7 @@ import {
     AccordionItem,
     AccordionTrigger,
     AccordionContent,
-} from "@/components/ui/accordion";
+} from "@/Components/ui/accordion";
 
 import { Pagination, Navigation } from "swiper/modules";
 

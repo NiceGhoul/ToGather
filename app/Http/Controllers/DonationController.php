@@ -2,28 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Donation;
 use App\Models\Campaign;
+use App\Models\Donation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Midtrans\Snap;
 use Midtrans\Config;
-use App\Http\Controllers\NotificationController;
+use Midtrans\Snap;
 
 class DonationController extends Controller
 {
     public function create(Request $request)
     {
         $campaign = null;
-        
+
         // If campaign_id is provided, get the campaign
         if ($request->has('campaign_id')) {
             $campaign = Campaign::find($request->campaign_id);
         }
-        
+
         return Inertia::render('Donation/Create', [
             'campaign' => $campaign,
-            'campaigns' => Campaign::select('id', 'title')->get()
+            'campaigns' => Campaign::select('id', 'title')->get(),
         ]);
     }
 
@@ -33,7 +33,7 @@ class DonationController extends Controller
             'campaign_id' => 'required|exists:campaigns,id',
             'amount' => 'required|numeric|min:1000',
             'message' => 'nullable|string|max:500',
-            'anonymous' => 'boolean'
+            'anonymous' => 'boolean',
         ]);
 
         // Configure Midtrans
@@ -48,17 +48,17 @@ class DonationController extends Controller
             'campaign_id' => $request->campaign_id,
             'amount' => $request->amount,
             'message' => $request->message,
-            'anonymous' => $request->boolean('anonymous'),
-            'status' => 'pending'
-        ]);
 
+            'anonymous' => $request->boolean('anonymous'),
+            'status' => 'pending',
+        ]);
         $campaign = Campaign::find($request->campaign_id);
         $user = auth()->user();
 
         // Midtrans transaction parameters
         $params = [
             'transaction_details' => [
-                'order_id' => 'DONATE-' . $donation->id . '-' . time(),
+                'order_id' => 'DONATE-'.$donation->id.'-'.time(),
                 'gross_amount' => (int) $request->amount,
             ],
             'customer_details' => [
@@ -67,48 +67,58 @@ class DonationController extends Controller
                 'phone' => $user->phone ?? '08111222333',
             ],
             'item_details' => [[
-                'id' => 'donation-' . $campaign->id,
+                'id' => 'donation-'.$campaign->id,
                 'price' => (int) $request->amount,
                 'quantity' => 1,
-                'name' => 'Donation for ' . $campaign->title
+                'name' => 'Donation for '.$campaign->title,
             ]],
             'callbacks' => [
                 'finish' => url('/donate?success=1'),
                 'unfinish' => url('/donate?cancelled=1'),
-                'error' => url('/donate?error=1')
-            ]
+                'error' => url('/donate?error=1'),
+            ],
         ];
 
         try {
             $snapToken = Snap::getSnapToken($params);
-            
+
             // Notify user about donation initiation
             NotificationController::notifyUser(
                 $user->id,
                 'donation_initiated',
                 'Donation Initiated',
-                "Your donation of Rp " . number_format($request->amount, 0, ',', '.') . " to '{$campaign->title}' has been initiated. Please complete the payment process.",
+                'Your donation of Rp '.number_format($request->amount, 0, ',', '.')." to '{$campaign->title}' has been initiated. Please complete the payment process.",
                 ['donation_id' => $donation->id, 'campaign_id' => $campaign->id]
             );
-            
+
             return response()->json([
                 'snap_token' => $snapToken,
-                'donation_id' => $donation->id
+                'donation_id' => $donation->id,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Payment initialization failed'], 500);
+            // This logs the full exception (message, stack trace, etc.) to your log files.
+            Log::error('Payment initialization failed.', [
+                'exception' => $e,
+                'user_id' => auth()->id() ?? 'guest', // Optional: add context
+            ]);
+
+            // Return a generic, safe error message to the user
+            return response()->json([
+                'error' => 'Payment initialization failed',
+                'message' => 'Please check the server logs for details.',
+            ], 500);
         }
     }
 
     public function searchCampaigns(Request $request)
     {
         $query = $request->get('q');
-        
+
         $campaigns = Campaign::where('title', 'like', "%{$query}%")
             ->select('id', 'title')
             ->limit(10)
             ->get();
-            
+
         return response()->json($campaigns);
     }
 
@@ -134,12 +144,13 @@ class DonationController extends Controller
     public function midtransCallback(Request $request)
     {
         \Log::info('Midtrans callback received', $request->all());
-        
+
         $serverKey = env('MIDTRANS_SERVER_KEY');
-        $hashed = hash('sha512', $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
-        
+        $hashed = hash('sha512', $request->order_id.$request->status_code.$request->gross_amount.$serverKey);
+
         if ($hashed !== $request->signature_key) {
             \Log::error('Invalid Midtrans signature');
+
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 
@@ -147,15 +158,15 @@ class DonationController extends Controller
         $donationId = explode('-', $orderId)[1];
         $donation = Donation::find($donationId);
 
-        if (!$donation) {
+        if (! $donation) {
             return response()->json(['message' => 'Donation not found'], 404);
         }
 
         $transactionStatus = $request->transaction_status;
-        
+
         if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
             $donation->update(['status' => 'successful']);
-            
+
             // Update campaign collected amount
             $campaign = $donation->campaign;
             $campaign->increment('collected_amount', $donation->amount);
