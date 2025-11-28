@@ -35,7 +35,8 @@ export default function ArticleView() {
         (article.contents || []).map((c) => ({
             id: c.id ?? null,
             type: c.type,
-            content: c.content,
+            content: c.type === "image" ? c.image_url : c.content,
+
             order_x: Number(c.order_x),
             order_y: Number(c.order_y),
             newFile: null,
@@ -328,7 +329,8 @@ export default function ArticleView() {
             (article.contents || []).map((c) => ({
                 id: c.id ?? null,
                 type: c.type,
-                content: c.content,
+                content: c.type === "image" ? c.image_url : c.content,
+
                 order_x: Number(c.order_x),
                 order_y: Number(c.order_y),
                 newFile: null,
