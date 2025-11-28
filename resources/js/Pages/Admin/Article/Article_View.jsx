@@ -69,6 +69,27 @@ export default function ArticleView() {
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
 
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    useEffect(() => {
+        // Deteksi dark mode dari body element
+        const isDark = document.documentElement.classList.contains("dark");
+        setIsDarkMode(isDark);
+
+        // Observer untuk perubahan class
+        const observer = new MutationObserver(() => {
+            const isDark = document.documentElement.classList.contains("dark");
+            setIsDarkMode(isDark);
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
     const handleImageClick = (url) => setSelectedImage(url);
     const handleCloseModal = () => setSelectedImage(null);
 
@@ -590,12 +611,22 @@ export default function ArticleView() {
                                             editingId ===
                                             (block.id ?? `new-${blockIdx}`) ? (
                                                 <div>
-                                                    <ReactQuill
-                                                        theme="snow"
-                                                        value={quillValue}
-                                                        onChange={setQuillValue}
-                                                        className="bg-white rounded border"
-                                                    />
+                                                    <div
+                                                        className={
+                                                            isDarkMode
+                                                                ? "dark"
+                                                                : ""
+                                                        }
+                                                    >
+                                                        <ReactQuill
+                                                            theme="snow"
+                                                            value={quillValue}
+                                                            onChange={
+                                                                setQuillValue
+                                                            }
+                                                            className="bg-white rounded border"
+                                                        />
+                                                    </div>
 
                                                     <div className="mt-3 flex gap-2">
                                                         <Button
@@ -617,7 +648,7 @@ export default function ArticleView() {
                                                 </div>
                                             ) : (
                                                 <div
-                                                    className="prose prose-purple max-w-none text-sm dark:prose-invert"
+                                                    className="prose prose-purple max-w-none text-sm dark:text-black"
                                                     dangerouslySetInnerHTML={{
                                                         __html:
                                                             block.content ||
