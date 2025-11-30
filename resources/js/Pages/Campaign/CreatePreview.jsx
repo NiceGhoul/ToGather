@@ -12,16 +12,15 @@ import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const PreviewLayout = ({ user, campaign, images }) => {
-    // console.log(campaign)
     return (
         <div className="flex container px-4 py-4 flex-row gap-16 justify-center items-center mx-auto scale-90 border-2 rounded-xl border-gray-300">
-            <div className="flex flex-col w-[600px] h-[400px]">
-                <div className="flex flex-row w-[600px] h-[400px] overflow-hidden border border-gray-800 rounded items-center">
+            <div className="flex flex-col min-w-[45%] max-h-[600px]  object-fit">
+                <div className="flex flex-row w-full min-h-[400px] overflow-hidden border border-gray-800 rounded items-center">
                     {images.thumbnailPreview != null ? (
                         <img
                             src={images.thumbnailPreview}
                             at="thumbnail"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full"
                         />
                     ) : (
                         <span className="text-gray-500 text-md w-full text-center italic">
@@ -29,10 +28,10 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                         </span>
                     )}
                 </div>
-                <div className="flex flex-row gap-2 my-5 justify-center items-center">
+                <div className="flex flex-row gap-4 my-5 justify-center items-center">
                     <Map />
-                    <p className="w-full text-center">
-                        {campaign.address}
+                    <p className="text-center">
+                        {campaign.locations ? campaign.locations.city + ", " + campaign.locations.country : campaign.address}
                     </p>
                 </div>
             </div>
@@ -57,7 +56,7 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
-                        {campaign.duration + " Days left"}
+                        {Math.ceil((new Date(campaign.end_campaign) - new Date()) / (1000 * 60 * 60 * 24)) + " Days left"}
                     </h1>
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -95,14 +94,14 @@ export const UploadSupportingMedia = ({handler}) => {
             <div className="flex container h-24 px-8 py-8 flex-row gap-4 justify-center items-center mx-auto border-2 rounded-xl border-gray-300">
                 <div>
                     <Label htmlFor="picture" className="mb-1 dark:text-white">Thumbnail</Label>
-                    <Input id="picture" type="file" accept=".jpg,.jpeg,.png"  onChange={(e) => handler(e, "thumbnail")} />
+                    <Input id="picture" type="file" accept="image/*"  onChange={(e) => handler(e, "thumbnail")} />
                 </div>
 
                 <Separator orientation="vertical" className="bg-gray-500 mt-2"/>
 
                 <div>
                     <Label htmlFor="logo" className="mb-1 dark:text-white">Logo</Label>
-                    <Input id="logo" type="file" accept=".jpg,.jpeg,.png"  onChange={(e) => handler(e, "logo")} />
+                    <Input id="logo" type="file" accept="image/*"  onChange={(e) => handler(e, "logo")} />
                 </div>
             </div>
         </div>
@@ -129,10 +128,6 @@ const CreatePreview = () => {
     }
 }, [campaign]);
 
-useEffect(() => {
-console.log(images)
-},[images])
-
     const handleImageChange = (e, type) => {
         const file = e.target.files[0];
         if (file) {
@@ -144,10 +139,10 @@ console.log(images)
 
     const handleNext = () => {
         // give error message
-        if (images.logo === null || images.thumbnail === null) {
+        if (images.thumbnail === null) {
             setPopupData(({
-                title: "Warning",
-                description: "Thumbnail and logo must not be empty",
+                title: "Warning!",
+                description: "Thumbnail must not be empty",
                 confText: "okay",
                 confColor: "bg-red-600 hover:bg-red-700 text-white",
             }));
@@ -163,29 +158,33 @@ console.log(images)
         }
     };
 
+    ///===================================
     const uploadErrorHandler = (errors) => {
-    let fieldName = "";
-    let errorMessage = "";
+        let fieldName = "";
+        let errorMessage = "";
 
-    if (errors.thumbnail) {
-        fieldName = "thumbnail";
-        errorMessage = errors.thumbnail;
-    } else if (errors.logo) {
-        fieldName = "logo";
-        errorMessage = errors.logo;
-    } else {
-        errorMessage = "Unknown error occurred during upload.";
-    }
+        if (errors.thumbnail) {
+            fieldName = "thumbnail";
+            errorMessage = errors.thumbnail;
+        } else if (errors.logo) {
+            fieldName = "logo";
+            errorMessage = errors.logo;
+        } else {
+            errorMessage = "Unknown error occurred during upload.";
+        }
 
-    setPopupData({
-        title: "Upload Error",
-        description: `Error found when uploading ${fieldName ? fieldName : "file"}: ${errorMessage}`,
-        confText: "Okay",
-        confColor: "bg-red-600 hover:bg-red-700 text-white",
-    });
+        setPopupData({
+            title: "Upload Error",
+            description: `Error found when uploading ${
+                fieldName ? fieldName : "file"
+            }: ${errorMessage}`,
+            confText: "Okay",
+            confColor: "bg-red-600 hover:bg-red-700 text-white",
+        });
 
-    setOpenPopUp(true);
-};
+        setOpenPopUp(true);
+    };
+    ///===================================
 
     const handleSave = () => {
         const formData = new FormData();
@@ -195,7 +194,7 @@ console.log(images)
             formData.append('campaign_id', campaign.id)
 
             router.post("/campaigns/upload-image", formData, {
-                forceFormData: true,
+                // forceFormData: true,
                 onError: (errors) => uploadErrorHandler(errors),
             });
         }

@@ -71,10 +71,10 @@ class Campaign extends Model
     }
 
     // a campaign has one location set
-    public function location()
-{
-    return $this->hasOne(Location::class);
-}
+    public function locations()
+    {
+        return $this->hasOne(Location::class, 'campaign_id', 'id');
+    }
 
     protected $casts = [
         'status' => CampaignStatus::class, // 2. Add the cast

@@ -11,7 +11,7 @@ import Layout_User from "@/Layouts/Layout_User";
 import { router, usePage } from "@inertiajs/react";
 import { IconFolderCode } from "@tabler/icons-react";
 import { Heart, Map } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
@@ -20,17 +20,19 @@ export const UpperPreview = ({campaign, user, images}) => {
     const [like, setLike] = useState(false)
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
-            <div className="flex flex-col w-[600px] h-[400px]">
-                <div className="flex flex-row min-w-3/6 h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0">
-                    <img
+            <div className="flex flex-col min-w-[50%] max-h-full">
+                <div className="flex flex-row min-w-full min-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
+                    {images.thumbnail ? <img
                         src={images.thumbnail}
                         alt="Campaign"
-                        className="w-full h-full object-cover mb-4 rounded"
-                    />
+                        className="w-full h-full object-contain"
+                    /> : <span className="text-gray-500 text-md w-full text-center italic">
+                            No image available
+                        </span>}
                 </div>
-                <div className="flex flex-row gap-2 my-5 justify-center items-center">
+                <div className="flex flex-row gap-4 my-5 justify-center items-center">
                     <Map />
-                    <p className="w-full text-center">{campaign.address}</p>
+                    <p className="text-center">{campaign.location ? campaign.locations.region + ", " + campaign.locations.country: campaign.address}</p>
                 </div>
             </div>
 
@@ -57,7 +59,7 @@ export const UpperPreview = ({campaign, user, images}) => {
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
-                        {campaign.duration + " Days left"}
+                         {Math.ceil((new Date(campaign.end_campaign) - new Date()) / (1000 * 60 * 60 * 24)) + " Days left"}
                     </h1>
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -66,7 +68,7 @@ export const UpperPreview = ({campaign, user, images}) => {
                         value={0}
                     />
                     <span
-                        className="absolute inset-0 flex items-start justify-center text-md font-medium dark:text-white"
+                        className="absolute inset-0 flex items-start justify-center text-md font-medium text-gray-200 dark:text-white"
                     >
                         0%
                     </span>
@@ -114,7 +116,7 @@ const CreateDetailsPreview = () => {
     const { campaign, user, contents, flash } = usePage().props
     const [images, setImages] = useState({thumbnail: null, logo: null})
     const [openPopUp, setOpenPopUp] = useState(false)
-    const [popUpData, setPopupData] = useState({ title:"", description: "", confText: "", confColor:""})
+    const [popUpData, setPopupData] = useState({ title: "", description: "", confText: "", confColor: ""})
 
     const handleBack = () => {
         router.get(`/campaigns/create/createPreview/${campaign.id}`)
@@ -131,8 +133,17 @@ const CreateDetailsPreview = () => {
     const contentDivider = (data) => {
         if (data === "About") {
             return (
-                <div className="flex flex-col gap-8 px-8 py-4 text-left min-h-[500px]">
-                    <AboutBuilder campaign={campaign} contents={contents.filter((dat) => dat.type === 'paragraph' || dat.type === 'media')}/>
+                <div>
+                    <div className="flex flex-col gap-8 px-8 py-4 text-left min-h-[500px]">
+                        <AboutBuilder
+                            campaign={campaign}
+                            contents={contents.filter(
+                                (dat) =>
+                                    dat.type === "paragraph" ||
+                                    dat.type === "media"
+                            )}
+                        />
+                    </div>
                 </div>
             );
         } else if (data === "FAQ") {
@@ -189,8 +200,7 @@ const CreateDetailsPreview = () => {
             <TabsContent
                 key={index}
                 value={index + 1}
-                className="w-[90%] h-[100%] text-lg text-center py-4"
-            >
+                className="w-[90%] text-lg text-center py-4">
                 {contentDivider(data, campaign)}
             </TabsContent>
         );
@@ -199,7 +209,7 @@ const CreateDetailsPreview = () => {
     useEffect(() => {
         if (campaign.images && (images.thumbnail === null || images.logo === null)) {
             campaign.images.map((dat) => {
-                dat.url.includes("thumbnail")
+                dat.url.toLowerCase().includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
                     : setImages((prev) => ({ ...prev, logo: dat.url }));
             });
@@ -207,7 +217,7 @@ const CreateDetailsPreview = () => {
     }, [campaign]);
     return (
         <Layout_User>
-            <Card className="rounded-none border-0 border-b">
+            <Card className="rounded-none border-0 border-b-1 border-gray-700">
                 <CardHeader className="flex flex-row">
                     <div className="justify-center items-center">
                         <Button
@@ -222,7 +232,9 @@ const CreateDetailsPreview = () => {
                             Edit Campaign Details
                         </CardTitle>
                         <CardDescription className="w-full text-center text-md justify-center flex items-center">
-                           {campaign.status === "draft" ? "Edit everything about your campaign here! preview what your campaign details would looked like prior to publishing!" : " Edit everything about your campaign here! Add ne campaign updates on the Updates Tab!"}
+                            {campaign.status === "draft"
+                                ? "Edit everything about your campaign here! preview what your campaign details would looked like prior to publishing!"
+                                : " Edit everything about your campaign here! Add ne campaign updates on the Updates Tab!"}
                         </CardDescription>
                     </div>
                     <div className="justify-center items-center">
@@ -236,19 +248,27 @@ const CreateDetailsPreview = () => {
                 </CardHeader>
 
                 <CardContent className="border-none">
-                    <UpperPreview campaign={campaign } user={user} images={images} />
+                    <UpperPreview
+                        campaign={campaign}
+                        user={user}
+                        images={images}
+                    />
                 </CardContent>
             </Card>
 
             <div>
-                <Tabs defaultValue={flash?.activeTab ?? 1} className="w-full mt-20">
-                    {/* Tabs Header */}
-                    <TabsList className="flex gap-40 bg-transparent border-b-2 border-gray-700 w-fit mx-auto rounded-none">
-                        {data.map((dat, idx) => {
-                            return tabsRepeater(dat, idx);
-                        })}
-                    </TabsList>
-                    <div className="flex justify-center items-center gap-2 bg-transparent border-b border-gray-300 rounded-none">
+                <Tabs
+                    defaultValue={flash?.activeTab ?? 1}
+                    className="w-full"
+                >
+                    <div className="sticky top-[72px] z-40 bg-white py-2 rounded dark:bg-[#171717]">
+                        <TabsList className="flex gap-40 bg-transparent border-b-1 border-gray-700 w-full mx-auto rounded-none">
+                            {data.map((dat, idx) => {
+                                return tabsRepeater(dat, idx);
+                            })}
+                        </TabsList>
+                    </div>
+                    <div className="flex justify-center items-center gap-2 bg-transparent border-b border-gray-300 rounded-none mb-0">
                         {data.map((dat, idx) => {
                             return tabsContentRepeater(dat, campaign, idx);
                         })}
@@ -256,17 +276,17 @@ const CreateDetailsPreview = () => {
                 </Tabs>
             </div>
             <Popup
-                    open={openPopUp}
-                    onClose={() => setOpenPopUp(false)}
-                    triggerText={null}
-                    title={popUpData.title}
-                    description={popUpData.description}
-                    confirmText={popUpData.confText}
-                    cancelText="Cancel"
-                    showCancel={popUpData.title === "Upload Error" ? false : true}
-                    confirmColor={popUpData.confColor}
-                    // onConfirm={popUpData.title === "Upload Error" ? () => setOpenPopUp(false) : setOpenPopUp(true)}
-                />
+                open={openPopUp}
+                onClose={() => setOpenPopUp(false)}
+                triggerText={null}
+                title={popUpData.title}
+                description={popUpData.description}
+                confirmText={popUpData.confText}
+                cancelText="Cancel"
+                showCancel={popUpData.title === "Upload Error" ? false : true}
+                confirmColor={popUpData.confColor}
+                // onConfirm={popUpData.title === "Upload Error" ? () => setOpenPopUp(false) : setOpenPopUp(true)}
+            />
         </Layout_User>
     );
 };

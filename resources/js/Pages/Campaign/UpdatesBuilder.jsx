@@ -14,7 +14,8 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
     const [editMode, setEditMode] = useState(false);
     const [openPopUp, setOpenPopUp] = useState(-1)
     // useState that saves what will be shown on the right side
-    const [updates, setUpdates] = useState(contents);
+    const [updates, setUpdates] = useState(contents)
+    const [oldUpdates, setOldUpdates] = useState(contents)
     const [selectedUpdate, setSelectedUpdate] = useState(updates[updates.length - 1]);
 
     const handleAddUpdate = () => {
@@ -85,29 +86,31 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
     };
 
     const handleUpdatesDelete = async (openPopUp) => {
-        setUpdates(prev => {
-        const index = prev.findIndex(u => u.id === selectedUpdate.id);
-        const filtered = prev.filter(u => u.id !== selectedUpdate.id);
-
-        let nextSelected = null;
-
-        if (filtered.length > 0) {
-            if (index - 1 >= 0) {
-                nextSelected = filtered[index - 1];
-            }
-            else {
-                nextSelected = filtered[0];
-            }
+        if (contents.some((dat) => dat.id === openPopUp)) {
+            await router.post(`/campaigns/deleteContent/${openPopUp}`);
+            setUpdates(contents)
+            console.log(openPopUp);
+            setOpenPopUp(-1);
+            return
         }
+            setUpdates((prev) => {
+                const index = prev.findIndex((u) => u.id === selectedUpdate.id);
+                const filtered = prev.filter((u) => u.id !== selectedUpdate.id);
 
-        setSelectedUpdate(nextSelected);
-        return filtered;
-    });
-    if (openPopUp != undefined) {
-        await router.post(`/campaigns/deleteContent/${openPopUp}`);
-        setUpdates(contents)
-        setOpenPopUp(-1);
-    }
+                let nextSelected = null;
+
+                if (filtered.length > 0) {
+                    if (index - 1 >= 0) {
+                        nextSelected = filtered[index - 1];
+                    } else {
+                        nextSelected = filtered[0];
+                    }
+                }
+
+                setSelectedUpdate(nextSelected);
+                return filtered;
+            });
+
     };
     // console.log(selectedUpdate.id)
     return (
@@ -325,20 +328,21 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                 </div>
                             </>
                         ) : (
-                            <Label className="text-lg italic text-gray-400 dark:text-gray-500">
+                            <Label className="w-full h-full items-center justiff-center text-lg italic text-gray-400 dark:text-gray-500">
                                 No updates have been made.
                             </Label>
                         )}
                     </div>
 
                     {/* kanan */}
-                    <div className="w-[280px] bg-purple-100 rounded-2xl p-4 flex flex-col gap-3 h-fit dark:bg-purple-900/50">
+                    <div className="w-[280px] rounded-2xl p-4 flex flex-col gap-3 h-fit shadow-md justify-center dark:bg-gray-900 ">
+                          <Label className="w-full justify-center dark:text-white font-semibold text-xl py-3 border-b-1 border-black dark: border-gray-400">Campaign Updates</Label>
                         {[...updates].reverse().map((upd) => (
                             <Card
                                 key={upd.id}
                                 className={`cursor-pointer p-3 rounded-xl transition-all ${
                                     selectedUpdate?.id === upd.id
-                                        ? "bg-[#7C4789] text-white dark:bg-purple-900"
+                                        ? "bg-[#7C4789] text-white dark:bg-purple-900 dark:text-white"
                                         : "hover:bg-[#7C4789]/10 dark:bg-purple-900/50"
                                 }`}
                                 onClick={() => {
@@ -378,7 +382,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                         ))}
                         <Button
                             variant={"outline"}
-                            className="text-light dark:bg-purple-900/80"
+                            className="text-light border-dotted"
                             onClick={handleAddUpdate}
                         >
                             + Add Project Update

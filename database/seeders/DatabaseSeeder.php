@@ -11,6 +11,7 @@ use App\Models\CampaignComment;
 use App\Models\CampaignReply;
 use App\Models\ArticleComment;
 use App\Models\ArticleReply;
+use App\Models\CampaignContent;
 use App\Models\Comment;
 use App\Models\Image;
 use App\Models\Donation;
@@ -55,29 +56,29 @@ class DatabaseSeeder extends Seeder
                 ]);
         });
         $this->call(ArticleSeeder::class);
-        $campaigns = Campaign::factory(20)->create();
+        $this->call(CampaignSeeder::class);
         Likes::factory(20)->create();
 
         // 4. Create Comments and Replies Polymorphically
-        $commentable = $articles->merge($campaigns);
+        // $commentable = $articles->merge($campaigns);
 
-        foreach ($commentable as $model) {
-            Comment::factory(rand(2, 5))->create([
-                'commentable_id' => $model->id,
-                'commentable_type' => get_class($model),
-            ]);
-        }
+        // foreach ($commentable as $model) {
+        //     Comment::factory(rand(2, 5))->create([
+        //         'commentable_id' => $model->id,
+        //         'commentable_type' => get_class($model),
+        //     ]);
+        // }
 
-        $comments = Comment::all();
-        foreach ($comments as $comment) {
-            if (rand(0, 1)) {
-                Comment::factory(rand(1, 3))->create([
-                    'commentable_id' => $comment->commentable_id,
-                    'commentable_type' => $comment->commentable_type,
-                    'parent_id' => $comment->id,
-                ]);
-            }
-        }
+        // $comments = Comment::all();
+        // foreach ($comments as $comment) {
+        //     if (rand(0, 1)) {
+        //         Comment::factory(rand(1, 3))->create([
+        //             'commentable_id' => $comment->commentable_id,
+        //             'commentable_type' => $comment->commentable_type,
+        //             'parent_id' => $comment->id,
+        //         ]);
+        //     }
+        // }
 
         // 5. Create Donations
         Donation::factory(100)->create();

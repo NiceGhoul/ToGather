@@ -16,16 +16,21 @@ const CampaignList = () => {
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
-    const [images, setImages] = useState({thumbnail: null})
+    const [images, setImages] = useState({thumbnail: null, logo: null})
+
+    console.log(campaigns)
+        const handleShowMore = () => {
+            setVisibleCampaign((prev) => prev + 8);
+            setIsShowMoreloading(false);
+        };
 
     useEffect(() => {
-        if (campaigns?.length) {
-            setCampaignList(campaigns);
-        }
-
-        if (campaigns.images && images.thumbnail === null) {
+        if (
+            campaigns.images &&
+            (images.thumbnail === null || images.logo === null)
+        ) {
             campaigns.images.map((dat) => {
-                dat.url.includes("thumbnail")
+                dat.url.toLowerCase().includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
                     : setImages((prev) => ({ ...prev, logo: dat.url }));
             });
@@ -82,7 +87,8 @@ const CampaignList = () => {
             return "bg-[#80BDF6]"
         }
     }
-    const cardRepeater = (data) => {
+    const cardRepeater = (data, images) => {
+
         if (!data || data.length === 0) {
             return <p>No campaigns available.</p>;
         } else {
@@ -102,11 +108,11 @@ const CampaignList = () => {
                         key={idx}
                         className="border rounded-lg p-4 shadow-md flex flex-col justify-between dark:bg-gray-800 dark:border-gray-700"
                     >
-                        {!campaign.thumbnail_url && (
+                        {campaign.images && (
                             <img
-                                src="http://127.0.0.1:8000/images/boat.jpg"
+                                src={campaign?.images[0]?.url}
                                 alt={campaign.title}
-                                className="w-full h-64 object-cover mb-4 rounded"
+                                className="w-full h-[200px] object-fit mb-4 rounded"
                             />
                         )}
 
@@ -116,7 +122,7 @@ const CampaignList = () => {
                                 : campaign.title}
                         </h2>
 
-                        <p className="text-sm text-gray-600 text-center mb-2 dark:text-gray-400">
+                        {/* <p className="text-sm text-gray-600 text-center mb-2 dark:text-gray-400">
                             {new Date(
                                 campaign.start_campaign
                             ).toLocaleDateString() +
@@ -124,7 +130,7 @@ const CampaignList = () => {
                                 new Date(
                                     campaign.end_campaign
                                 ).toLocaleDateString()}
-                        </p>
+                        </p> */}
                         <div className="flex justify-center gap-2 mb-4">
                             <span
                                 className={`text-sm font-semibold dark:text-gray-100 rounded-sm text-center px-4 py-1 mb-2 text-gray-600`}
@@ -163,7 +169,7 @@ const CampaignList = () => {
                                     minimumFractionDigits: 2,
                                 }
                             )}{" "}
-                            ({progress}%)
+                            {/* ({progress}%) */}
                         </p>
 
                         <div className="flex justify-center gap-2 mb-4">
@@ -199,12 +205,6 @@ const CampaignList = () => {
                 );
             });
         }
-    };
-
-    const handleShowMore = () => {
-        setIsShowMoreLoading(true)
-        setVisibleCampaign((prev) => prev + 8);
-        setIsShowMoreloading(false)
     };
 
     return (
@@ -301,14 +301,14 @@ const CampaignList = () => {
                 <CardContent>
                     {campaigns?.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {cardRepeater(campaignList)}
+                            {cardRepeater(campaignList, images)}
                         </div>
                     ) : (
                         <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20 dark:text-gray-400">
                             No campaigns found.
                         </p>
                     )}
-                    {visibleCampaign < campaigns?.length && (
+                    {visibleCampaign < campaigns?.length ? (
                         <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                             <p
@@ -320,7 +320,7 @@ const CampaignList = () => {
                             </p>
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                         </div>
-                    )}
+                    ) : <></>}
                 </CardContent>
             </div>
         </Layout_User>
