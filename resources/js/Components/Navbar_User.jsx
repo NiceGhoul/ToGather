@@ -72,9 +72,9 @@ export default function Navbar_User() {
 
     const handleStart = () => {
         if (draft) {
-            router.get(`campaigns/create/detailsPreview/${draft.id}`);
+            router.get(`/campaigns/create/detailsPreview/${draft.id}`);
         } else {
-            router.get("campaigns/create");
+            router.get("/campaigns/create");
         }
     };
 

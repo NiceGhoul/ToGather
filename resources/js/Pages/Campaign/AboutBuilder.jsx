@@ -1,4 +1,4 @@
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
@@ -13,9 +13,17 @@ import { Description } from "@radix-ui/react-dialog";
 
 
 export const AboutBuilder = ({campaign, contents}) => {
-    const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
+    const [description, setDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
+    const [oldDescription, setOldDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
+    const [isChanged, setIsChanged] = useState(false)
+
+
 
     const addParagraphBlock = () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "instant",
+        });
         setDescription((prev) => {
             const lastOrder =
                 prev.length > 0 ? prev[prev.length - 1].order_y : 0;
@@ -34,6 +42,10 @@ export const AboutBuilder = ({campaign, contents}) => {
     };
 
     const addMediaBlock = () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "instant",
+        });
         setDescription((prev) => {
             const lastOrder =
                 prev.length > 0 ? prev[prev.length - 1].order_y : 0;
@@ -52,15 +64,12 @@ export const AboutBuilder = ({campaign, contents}) => {
     };
 
     const handleChange = (index, value) => {
-     const file = value.file
-     console.log(value)
-     if (!file) return
-
         setDescription((prev) =>
             prev.map((block, i) =>
                 i === index ? { ...block, content: value } : block
             )
         );
+        setIsChanged(true)
     };
 
     const toggleBlockEdit = (index) => {
@@ -101,23 +110,22 @@ export const AboutBuilder = ({campaign, contents}) => {
      };
 
     return (
-        <Card className="w-full p-6 border border-gray-300 dark:border-gray-700 shadow-sm justify-center flex flex-col dark:bg-gray-800">
-            <CardHeader className="flex flex-col gap-4">
+        <Card className="w-full h-full p-6 border border-gray-300 dark:border-gray-700 shadow-sm justify-center flex flex-col dark:bg-gray-800">
+            <CardHeader className="relative bottom-0 top-0 flex flex-col gap-4">
                 <div className="flex flex-row w-full justify-between items-center">
                     <CardTitle className="text-xl font-semibold dark:text-white">
                         About Us
                     </CardTitle>
                 </div>
-                <div className="flex justify-center gap-4 mt-2">
+                <div className="sticky flex justify-center gap-4 mt-2 top-[80px] z-35">
                     <Button onClick={addParagraphBlock}>
-                        {" "}
-                        + Add Paragraph{" "}
+                        {" "} + Add Paragraph {" "}
                     </Button>
                     <Button onClick={addMediaBlock}> + Add Media </Button>
                 </div>
             </CardHeader>
             {description && description.length > 0 ? (
-                <CardContent className="flex flex-col gap-4 ">
+                <CardContent className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4 justify-center">
                         {description?.map((block, index) => (
                             <div
@@ -160,12 +168,9 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                             "~;"
                                                         );
                                                     parts[1] = e.target.value;
-                                                    handleChange(
-                                                        index,
-                                                        parts.join("~;")
-                                                    );
+                                                    handleChange(index, parts.join("~;"));
                                                 }}
-                                                className="resize-none min-h-[120px]"
+                                                className="resize-none min-h-[120px] dark:text-gray-100"
                                             />
                                             <div className="flex gap-2">
                                                 <Button
@@ -207,7 +212,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                         </div>
                                     )
                                 ) : (
-                                    <>
+                                    <div className="items-center flex flex-col">
                                         {block.content ? (
                                             <img
                                                 src={
@@ -215,7 +220,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                     block.media[0].url
                                                 }
                                                 alt="Preview"
-                                                className="w-full max-h-[400px] object-contain rounded"
+                                                className="w-[600px] min-h-[400px] object-fit rounded border-1 my-5"
                                             />
                                         ) : null}
                                         <Input
@@ -236,7 +241,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                 }
                                             }}
                                         />
-                                    </>
+                                    </div>
                                 )}
                                     <Popup
                                         triggerText={
@@ -269,10 +274,10 @@ export const AboutBuilder = ({campaign, contents}) => {
                     </h3>
                 </CardContent>
             )}
-            {description.length > 0 ? (
-                <CardAction className="mt-10 justify-end flex items-end w-full">
+            {description.length != oldDescription.length || description.some((dat) => oldDescription.map((a) => a === dat)) ? (
+                <CardFooter className="bottom-0 mt-10 justify-end flex items-end w-full">
                     <Button onClick={handleSave}> Save Changes </Button>
-                </CardAction>
+                </CardFooter>
             ) : (
                 <></>
             )}
