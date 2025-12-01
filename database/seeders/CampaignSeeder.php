@@ -15,14 +15,18 @@ class CampaignSeeder extends Seeder
 {
     public function run(): void
     {
-        // User::factory(15)->create();
-        // User::factory(5)->admin()->create();
-        // $this->call(UserSeeder::class);
+        // Get user IDs from database
+        $adminId = User::where('email', 'admin@email.com')->first()->id;
+        $userId = User::where('email', 'user@email.com')->first()->id;
+        $authorId = User::where('email', 'togather_author@email.com')->first()->id;
+
+        // Use array of available user IDs for campaigns
+        $userIds = [$adminId, $userId, $authorId];
 
         $mainCampaign = [
             [
-                'user_id'           => 11,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'Dragon Roast Coffee - Coffee For Adventurers',
                 'description'       => 'Level up your game sessions with Dragon Roast Coffee, your new favorite gaming accessory! And yes, its actual coffee.',
                 'category'          => 'Foods & Beverage',
@@ -38,8 +42,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 1,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'From My Cambodian Kitchen: Home Recipes from the Heart',
                 'description'       => 'A cookbook preserving Cambodia\'s heritage with authentic family recipes, vibrant flavors, and stories of culture.',
                 'category'          => 'Foods & Beverage',
@@ -55,8 +59,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 2,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'Real Protein Snacks made from 100% Wild Irish Venison',
                 'description'       => 'Real food protein snacks. Wild Irish venison. Clean, sustainable, delicious.',
                 'category'          => 'Foods & Beverage',
@@ -72,8 +76,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 3,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'S A Y A Designs',
                 'description'       => 'The Passionate Pursuit of Ethical Hairpins',
                 'category'          => 'Beauty & Cosmetic',
@@ -89,8 +93,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 4,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'Visible Classical Architecture — Chiming Watch',
                 'description'       => 'Hourly Chime/Sapphire Crystal/ Automatic/Sunburst Dial-built for function and style in the Delcona.',
                 'category'          => 'Clothes & Fashion',
@@ -106,8 +110,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 5,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'THOTHER Ossyn G1 — One-Piece 3D Printed Footwear',
                 'description'       => 'A one-piece 3D printed sneaker inspired by skeletal design and future mobility. Crafted with flexible polymers for balance and comfort.',
                 'category'          => 'Clothes & Fashion',
@@ -123,8 +127,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 6,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'The Wax on Our Fingers',
                 'description'       => 'From the Javanese village of Kebon: help us celebrate the lives and hands behind batik through this social-relational art project.',
                 'category'          => 'Clothes & Fashion',
@@ -140,8 +144,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 7,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'Help Renee & 16-Year-Old Son Through Their Darkest Time',
                 'description'       => 'My name is Zike Zhou, a 16-year-old high school sophomore. I\'m here to ask for help for the person I love most—my mom, Renee.',
                 'category'          => 'Lifestyle',
@@ -157,8 +161,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 8,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'Bangun & Renovasi Rumah Qur\'an di Pelosok',
                 'description'       => 'From the Javanese village of Kebon: help us celebrate the lives and hands behind batik through this social-relational art project.',
                 'category'          => 'Lifestyle',
@@ -174,8 +178,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 9,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'Kirim Bantuan Untuk Korban Banjir Sumatra',
                 'description'       => 'Pulau Sumatera menghadapi cobaan berat di akhir November 2025, saat dua wilayahnya, Sumatera Barat dan Aceh Utara, serentak dihantam bencana hidrometeorologi parah akibat intensitas hujan yang ekstrem.',
                 'category'          => 'Logistics',
@@ -191,8 +195,8 @@ class CampaignSeeder extends Seeder
                 'updated_at'        => now(),
             ],
             [
-                'user_id'           => 10,
-                'verified_by'       => 22,
+                'user_id'           => $userIds[array_rand($userIds)],
+                'verified_by'       => $adminId,
                 'title'             => 'SUMUT DARURAT! Krisis Bantuan Korban Pengungsian',
                 'description'       => 'Total LEBIH DARI 2.000 warga terkepung banjir dan longsor. Bencana meluas capai 7 daerah, akses jalan dan jembatan utama terputus akibat longsor setinggi 9,5 meter!',
                 'category'          => 'Logistics',
