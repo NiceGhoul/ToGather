@@ -251,7 +251,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                 <div
                     className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden"
                     style={{
-                        backgroundImage: "url('/images/myCampaign.jpg')",
+                        backgroundImage: "url('/images/celenganWang.jpg')",
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                     }}

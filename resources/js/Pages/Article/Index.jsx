@@ -241,7 +241,7 @@ const ArticleList = () => {
                 <div
                     className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden"
                     style={{
-                        backgroundImage: "url('/images/browseArticle.jpg')",
+                        backgroundImage: "url('/images/articleBook.jpg')",
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                     }}

@@ -214,7 +214,7 @@ const CampaignList = () => {
                 <div
                     className="relative h-72 w-full bg-cover bg-center"
                     style={{
-                        backgroundImage: "url('/images/browseCampaign.jpg')",
+                        backgroundImage: "url('/images/handshake.jpg')",
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                     }}
