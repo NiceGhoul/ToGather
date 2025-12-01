@@ -248,7 +248,7 @@ export default function Dashboard() {
                                                         !dailyStartDate ||
                                                         !dailyEndDate
                                                     }
-                                                    className="dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white bg-purple-200 hover:bg-purple-300 text-purple-700"
+                                                    className="dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white bg-purple-200 hover:bg-purple-300 text-purple-700"
                                                 >
                                                     Apply Filter
                                                 </Button>

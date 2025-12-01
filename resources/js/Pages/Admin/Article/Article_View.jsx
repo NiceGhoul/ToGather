@@ -241,11 +241,6 @@ export default function ArticleView() {
         setExtraRows((r) => r + 1);
     };
 
-    const addColumn = () => {
-        if (maxX >= 2) return;
-        setExtraCols((c) => c + 1);
-    };
-
     // ---------------- IMAGE CROP --------------------
     const onSelectImageForBlock = (file, idx) => {
         setCropFile(file);
@@ -371,13 +366,13 @@ export default function ArticleView() {
             return (
                 <div className="mt-2 flex gap-2">
                     <Button
-                        className="text-white text-sm px-3 py-1 h-auto bg-purple-800  hover:bg-purple-700"
+                        className="text-sm px-3 py-1 h-auto dark:bg-purple-700 dark:text-white  dark:hover:bg-purple-600 bg-purple-200 hover:bg-purple-300 text-purple-700"
                         onClick={() => addBlockAt(cell.x, cell.y, "text")}
                     >
                         <CaseSensitive />
                     </Button>
 
-                    <Button className="relative px-3 py-1 text-sm h-auto bg-purple-800 text-white hover:bg-purple-700">
+                    <Button className="relative px-3 py-1 text-sm h-auto dark:bg-purple-700 dark:text-white  dark:hover:bg-purple-600 bg-purple-200 hover:bg-purple-300 text-purple-700">
                         <ImageIcon />
                         <input
                             type="file"
@@ -421,14 +416,14 @@ export default function ArticleView() {
             return (
                 <div className="mt-2 flex gap-2">
                     <Button
-                        className="bg-purple-700 text-white text-sm px-3 py-1 h-auto hover:bg-purple-600"
+                        className="dark:bg-purple-700 dark:text-white text-sm px-3 py-1 h-auto dark:hover:bg-purple-600 bg-purple-200 hover:bg-purple-300 text-purple-700"
                         onClick={() => startEdit(idxInBlocks)}
                     >
                         <Pencil className="w-4 h-4" />
                     </Button>
 
                     <Button
-                        className="bg-red-600 text-white text-sm px-3 py-1 h-auto hover:bg-red-500"
+                        className="dark:bg-red-600 dark:text-white dark:hover:bg-red-500 bg-red-200 hover:bg-red-300 text-red-700 text-sm px-3 py-1 h-auto "
                         onClick={() => removeBlock(idxInBlocks)}
                     >
                         <X className="w-4 h-4" />
@@ -439,7 +434,7 @@ export default function ArticleView() {
 
         return (
             <div className="mt-2 flex gap-2">
-                <Button className="bg-purple-800 text-white hover:bg-purple-700  text-sm px-3 py-1 h-auto relative">
+                <Button className="dark:bg-purple-700 dark:text-white text-sm px-3 py-1 h-auto dark:hover:bg-purple-600 bg-purple-200 hover:bg-purple-300 text-purple-700 relative">
                     <ImageIcon />
                     <input
                         type="file"
@@ -454,7 +449,7 @@ export default function ArticleView() {
                 </Button>
 
                 <Button
-                    className="bg-red-600 text-white text-sm px-3 py-1 h-auto"
+                    className="dark:bg-red-600 dark:text-white dark:hover:bg-red-500 bg-red-200 hover:bg-red-300 text-red-700 text-sm px-3 py-1 h-auto"
                     onClick={() => removeBlock(idxInBlocks)}
                 >
                     <X className="w-4 h-4" />
@@ -471,7 +466,7 @@ export default function ArticleView() {
                     triggerText=""
                     title={successPopupMessage}
                     description=""
-                    confirmText="OK"
+                    confirmText="Okay"
                     confirmColor="bg-purple-800 text-white"
                     open={successPopupOpen}
                     onConfirm={() => {
@@ -484,68 +479,149 @@ export default function ArticleView() {
                 />
 
                 {/* HEADER */}
-                <div className="flex flex-col gap-3">
-                    <h1 className="text-2xl font-bold">{article.title}</h1>
+                <div className="relative">
+                    {/* status badge di pojok kiri atas */}
 
-                    <div className="flex gap-2 justify-end">
-                        <Button
-                            onClick={() =>
-                                editingMode
-                                    ? (setPendingAction("exit"),
-                                      setUnsavedPopupOpen(true))
-                                    : setEditingMode(true)
-                            }
-                            className="bg-purple-800 text-white hover:bg-purple-700"
-                        >
-                            {!editingMode ? (
-                                <div className="flex items-center gap-2">
-                                    <Pencil className="w-4 h-4" />
-                                    Edit
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <PencilOff className="w-4 h-4" />
-                                    Exit Edit
-                                </div>
+                    <div className="flex flex-col gap-3 pt-8">
+                        <h1 className="text-2xl font-bold">{article.title}</h1>
+
+                        <div className="flex gap-2 justify-end items-center">
+                            <span className="text-sm px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-medium">
+                                {String(article.status || "unknown")
+                                    .charAt(0)
+                                    .toUpperCase() +
+                                    String(article.status || "unknown").slice(
+                                        1
+                                    )}
+                            </span>
+                            {/* conditional action buttons based on status (hidden in edit mode) */}
+                            {!editingMode && (
+                                <>
+                                    {article.status === "pending" ? (
+                                        <>
+                                            <Button
+                                                className="dark:bg-green-700 dark:text-white dark:hover:bg-green-600 bg-green-200 hover:bg-green-300 text-green-700"
+                                                onClick={() =>
+                                                    handleApprove(article.id)
+                                                }
+                                            >
+                                                <Check className="w-4 h-4 mr-2" />
+                                                Approve
+                                            </Button>
+
+                                            <Button
+                                                className="dark:bg-red-600 dark:text-white dark:hover:bg-red-500 bg-red-200 hover:bg-red-300 text-red-700"
+                                                onClick={() =>
+                                                    setRejectModalOpen(true)
+                                                }
+                                            >
+                                                <X className="w-4 h-4 mr-2" />
+                                                Reject
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        (article.status === "approved" ||
+                                            article.status === "disabled") && (
+                                            <>
+                                                {article.status ===
+                                                "approved" ? (
+                                                    <Button
+                                                        className="bg-yellow-200 hover:bg-yellow-300 text-yellow-700 dark:bg-yellow-500 dark:text-white dark:hover:bg-yellow-600    "
+                                                        onClick={() =>
+                                                            handleDisable(
+                                                                article.id
+                                                            )
+                                                        }
+                                                    >
+                                                        <EyeOff className="w-4 h-4 mr-2" />
+                                                        Disable
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        className="dark:bg-green-700 dark:text-white dark:hover:bg-green-600 bg-green-200 hover:bg-green-300 text-green-700"
+                                                        onClick={() =>
+                                                            handleEnable(
+                                                                article.id
+                                                            )
+                                                        }
+                                                    >
+                                                        <Eye className="w-4 h-4 mr-2" />
+                                                        Enable
+                                                    </Button>
+                                                )}
+                                            </>
+                                        )
+                                    )}
+
+                                    {/* delete button (left of Edit) */}
+                                    <Button
+                                        className="dark:bg-red-600 dark:text-white dark:hover:bg-red-500 bg-red-200 hover:bg-red-300 text-red-700"
+                                        onClick={() => handleDelete(article.id)}
+                                    >
+                                        <Trash className="w-4 h-4" /> Delete
+                                    </Button>
+                                </>
                             )}
-                        </Button>
 
-                        {editingMode && (
-                            <>
-                                <Button
-                                    className="bg-green-700 text-white hover:bg-green-600"
-                                    onClick={saveAllChanges}
-                                >
-                                    <Save className="w-4 h-4" /> Save
-                                </Button>
+                            <Button
+                                onClick={() =>
+                                    editingMode
+                                        ? (setPendingAction("exit"),
+                                          setUnsavedPopupOpen(true))
+                                        : setEditingMode(true)
+                                }
+                                className="dark:bg-purple-700 dark:text-white  dark:hover:bg-purple-600 bg-purple-200 hover:bg-purple-300 text-purple-700"
+                            >
+                                {!editingMode ? (
+                                    <div className="flex items-center gap-2">
+                                        <Pencil className="w-4 h-4" />
+                                        Edit
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <PencilOff className="w-4 h-4" />
+                                        Exit Edit
+                                    </div>
+                                )}
+                            </Button>
 
-                                <Button
-                                    className="bg-red-600 text-white hover:bg-red-500"
-                                    onClick={cancelAll}
-                                >
-                                    <Ban className="w-4 h-4" /> Cancel
-                                </Button>
+                            {editingMode && (
+                                <>
+                                    <Button
+                                        className="dark:bg-green-700 dark:text-white dark:hover:bg-green-600 bg-green-200 hover:bg-green-300 text-green-700"
+                                        onClick={saveAllChanges}
+                                    >
+                                        <Save className="w-4 h-4" /> Save
+                                    </Button>
 
-                                <Button
-                                    className="bg-purple-800 text-white hover:bg-purple-700"
-                                    onClick={addRow}
-                                >
-                                    <Rows2 className="w-4 h-4" /> Add Row
-                                </Button>
-                            </>
-                        )}
+                                    <Button
+                                        className="dark:bg-red-600 dark:text-white dark:hover:bg-red-500 bg-red-200 hover:bg-red-300 text-red-700"
+                                        onClick={cancelAll}
+                                    >
+                                        <Ban className="w-4 h-4" /> Cancel
+                                    </Button>
 
-                        <Button
-                            className="bg-purple-800 text-white hover:bg-purple-700"
-                            onClick={() => {
-                                if (editingMode) {
-                                    setPendingAction("back");
-                                    setUnsavedPopupOpen(true);
-                                } else handleBack();
-                            }}
-                        >
-                            <ArrowBigLeft className="w-4 h-4" />
-                        </Button>
+                                    <Button
+                                        className="dark:bg-purple-700 dark:text-white  dark:hover:bg-purple-600 bg-purple-200 hover:bg-purple-300 text-purple-700"
+                                        onClick={addRow}
+                                    >
+                                        <Rows2 className="w-4 h-4" /> Add Row
+                                    </Button>
+                                </>
+                            )}
+
+                            <Button
+                                className="dark:bg-purple-700 dark:text-white  dark:hover:bg-purple-600 bg-purple-200 hover:bg-purple-300 text-purple-700"
+                                onClick={() => {
+                                    if (editingMode) {
+                                        setPendingAction("back");
+                                        setUnsavedPopupOpen(true);
+                                    } else handleBack();
+                                }}
+                            >
+                                <ArrowBigLeft className="w-4 h-4" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -635,13 +711,13 @@ export default function ArticleView() {
                                                                     blockIdx
                                                                 )
                                                             }
-                                                            className="bg-green-700 text-white hover:bg-green-600"
+                                                            className="dark:bg-green-700 dark:text-white dark:hover:bg-green-600 bg-green-200 hover:bg-green-300 text-green-700"
                                                         >
                                                             Apply
                                                         </Button>
                                                         <Button
                                                             onClick={cancelEdit}
-                                                            className="bg-red-600 hover:bg-red-500 text-white"
+                                                            className="dark:bg-red-600 dark:text-white dark:hover:bg-red-500 bg-red-200 hover:bg-red-300 text-red-700"
                                                         >
                                                             Cancel
                                                         </Button>
@@ -738,7 +814,7 @@ export default function ArticleView() {
                 title="Unsaved Changes"
                 description="You have unsaved changes. Are you sure you want to leave?"
                 confirmText="Proceed"
-                confirmColor="bg-red-600 text-white"
+                confirmColor="bg-red-600 text-white hover:bg-red-500"
                 open={unsavedPopupOpen}
                 onConfirm={() => {
                     setUnsavedPopupOpen(false);
@@ -759,7 +835,7 @@ export default function ArticleView() {
                     title="Reject Article"
                     description=""
                     confirmText="Submit Rejection"
-                    confirmColor="bg-red-600 text-white"
+                    confirmColor="bg-red-600 hover:bg-red-500 text-white"
                     open={rejectModalOpen}
                     onConfirm={() => {
                         if (!rejectReason.trim()) {

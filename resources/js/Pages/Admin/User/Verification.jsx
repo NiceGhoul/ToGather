@@ -265,13 +265,21 @@ export default function Verification({ requests }) {
                                         </th>
                                     )}
 
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Email</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID Photo</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    ID
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Email
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    ID Photo
+                                </th>
                                 <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
                                     Selfie with ID
                                 </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Status</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Status
+                                </th>
                                 <th className="px-4 py-2 border dark:border-gray-700 text-center dark:text-gray-200">
                                     Actions
                                 </th>
@@ -280,7 +288,10 @@ export default function Verification({ requests }) {
                         <tbody>
                             {currentRequests.length > 0 ? (
                                 currentRequests.map((r) => (
-                                    <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <tr
+                                        key={r.id}
+                                        className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    >
                                         {statusFilter !== "all" &&
                                             statusFilter !== "rejected" && (
                                                 <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
@@ -358,46 +369,57 @@ export default function Verification({ requests }) {
                                             {r.status}
                                         </td>
                                         <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
-                                            <div className="flex justify-center gap-2">
-                                                {r.status === "pending" && (
-                                                    <>
-                                                        <Popup
-                                                            triggerText={
-                                                                <div className="flex items-center gap-2 cursor-pointer">
-                                                                    <CheckCircle className="w-4 h-4 text-green-700" />
-                                                                </div>
-                                                            }
-                                                            title="Approve User Verification?"
-                                                            description="Approve this user's verification?"
-                                                            confirmText="Approve"
-                                                            confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                                            triggerClass="bg-green-200 hover:bg-green-300 text-green-700 px-3 py-1 rounded-md"
-                                                            onConfirm={() =>
-                                                                handleVerification(
-                                                                    r.user.id,
-                                                                    "accepted"
-                                                                )
-                                                            }
-                                                        />
-                                                        <Popup
-                                                            triggerText={
-                                                                <div className="flex items-center gap-2 cursor-pointer">
-                                                                    <XCircle className="w-4 h-4" />
-                                                                </div>
-                                                            }
-                                                            title="Reject User?"
-                                                            description="Reject this user's verification?"
-                                                            confirmText="Reject"
-                                                            confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700 px-3 py-1 rounded-md"
-                                                            onConfirm={() =>
-                                                                handleVerification(
-                                                                    r.user.id,
-                                                                    "rejected"
-                                                                )
-                                                            }
-                                                        />
-                                                    </>
+                                            <div className="flex items-center justify-center gap-2">
+                                                {/* APPROVE BUTTON */}
+                                                {r.status === "pending" ? (
+                                                    <Popup
+                                                        triggerText={
+                                                            <div className="flex items-center gap-2 ">
+                                                                <CheckCircle className="w-4 h-4 text-green-700" />
+                                                            </div>
+                                                        }
+                                                        title="Approve User Verification?"
+                                                        description="Approve this user's verification?"
+                                                        confirmText="Approve"
+                                                        confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                                        triggerClass="bg-green-200 hover:bg-green-300 text-green-700 px-3 py-1 rounded-md cursor-pointer"
+                                                        onConfirm={() =>
+                                                            handleVerification(
+                                                                r.user.id,
+                                                                "accepted"
+                                                            )
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <div className="bg-green-200/60 text-green-700 px-3 py-2.5 rounded-md  cursor-not-allowed flex items-center">
+                                                        <CheckCircle className="w-4 h-4" />
+                                                    </div>
+                                                )}
+
+                                                {/* REJECT BUTTON */}
+                                                {r.status === "pending" ? (
+                                                    <Popup
+                                                        triggerText={
+                                                            <div className="flex items-center gap-2 ">
+                                                                <XCircle className="w-4 h-4 text-red-700" />
+                                                            </div>
+                                                        }
+                                                        title="Reject User?"
+                                                        description="Reject this user's verification?"
+                                                        confirmText="Reject"
+                                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700 px-3 py-1 rounded-md cursor-pointer"
+                                                        onConfirm={() =>
+                                                            handleVerification(
+                                                                r.user.id,
+                                                                "rejected"
+                                                            )
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <div className="bg-red-200/60 text-red-700 px-3 py-2.5 rounded-md  cursor-not-allowed flex items-center">
+                                                        <XCircle className="w-4 h-4" />
+                                                    </div>
                                                 )}
                                             </div>
                                         </td>

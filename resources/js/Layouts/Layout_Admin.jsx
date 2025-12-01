@@ -91,7 +91,12 @@ export default function Page({ children, title }) {
                                 </h1>
                             </div>
                             <div className="flex items-center gap-2">
-                                <ThemeToggle />
+                                <Button
+                                    size="sm"
+                                    className="relative h-10 w-10 flex items-center justify-center rounded-md bg-white  hover:bg-purple-800 dark:hover:bg-purple-800 dark:bg-purple-200"
+                                >
+                                    <ThemeToggle />
+                                </Button>
                                 <DropdownMenu
                                     onOpenChange={(open) => {
                                         if (open) {
@@ -104,11 +109,11 @@ export default function Page({ children, title }) {
                                 >
                                     <DropdownMenuTrigger asChild>
                                         <Button
-                                            variant="outline"
+                                            variant="ghost"
                                             size="sm"
-                                            className="relative dark:bg-purple-200 dark:text-black"
+                                            className="relative h-10 px-3 flex items-center justify-center rounded-md bg-white text-black hover:bg-purple-800 dark:bg-purple-200"
                                         >
-                                            <Bell className="h-4 w-4" />
+                                            <Bell className="h-4 w-4 mr-2" />
                                             Notifications
                                             {unreadCount > 0 && (
                                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">

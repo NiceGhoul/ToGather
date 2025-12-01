@@ -96,7 +96,7 @@ export default function Lookup() {
                         variant="default"
                         size="sm"
                         onClick={() => handleAdd()}
-                        className="bg-purple-800 hover:bg-purple-700 text-white"
+                        className="dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white bg-purple-200 hover:bg-purple-300 text-purple-700"
                     >
                         + Add New Lookup
                     </Button>

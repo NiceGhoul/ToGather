@@ -23,7 +23,7 @@ export function ThemeToggle() {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="relative p-2 bg-white text-black hover:bg-purple-800 dark:bg-purple-200"
+            className="relative p-2 bg-white text-black hover:bg-purple-800 dark:hover:bg-purple-800 dark:bg-purple-200"
         >
             {isDark ? (
                 <Sun className="h-[1.2rem] w-[1.2rem]" />

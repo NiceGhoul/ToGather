@@ -201,7 +201,13 @@ export default function Navbar_User() {
                     <span className="nav-link font-semibold">
                         Welcome {auth?.user?.nickname ?? "Guest"}
                     </span>
-                    <ThemeToggle />
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="relative h-10 w-10 flex items-center justify-center rounded-md bg-white text-black hover:bg-purple-800 dark:bg-purple-200"
+                    >
+                        <ThemeToggle />
+                    </Button>
                     <DropdownMenu
                         onOpenChange={(open) => {
                             if (open) {
@@ -216,9 +222,9 @@ export default function Navbar_User() {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="relative p-2 bg-white text-black hover:bg-purple-800 dark:bg-purple-200"
+                                className="relative h-10 w-10 flex items-center justify-center rounded-md bg-white text-black hover:bg-purple-800 dark:bg-purple-200"
                             >
-                                <Bell className="h-5 w-5" />
+                                <Bell />
                                 {unreadCount > 0 && (
                                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                                         {unreadCount > 9 ? "9+" : unreadCount}
