@@ -29,10 +29,8 @@ export default function Transaction({ donations, stats }) {
 
     const getStatusBadge = (status) => {
         const variants = {
-            successful:
-                "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-            pending:
-                "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+            successful: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+            pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
             failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
         };
         return (
@@ -79,19 +77,19 @@ export default function Transaction({ donations, stats }) {
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                             Transaction Management
                         </h1>
-                        <p className="text-gray-600 dark:text-purple-200 mt-2">
+                        <p className="text-gray-600 dark:text-gray-400 mt-2">
                             Monitor all donation transactions
                         </p>
                     </div>
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <Card className="bg-purple-200  text-purple-700 dark:bg-purple-800 dark:text-white">
+                        <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium ">
+                                <CardTitle className="text-sm font-medium">
                                     Total Transactions
                                 </CardTitle>
-                                <DollarSign className="h-4 w-4 dark:text-white text-purple-700" />
+                                <DollarSign className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
@@ -100,12 +98,12 @@ export default function Transaction({ donations, stats }) {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-purple-200  text-purple-700 dark:bg-purple-800 dark:text-white">
+                        <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
                                     Total Amount
                                 </CardTitle>
-                                <DollarSign className="h-4 w-4 dark:text-white text-purple-700" />
+                                <DollarSign className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
@@ -114,12 +112,12 @@ export default function Transaction({ donations, stats }) {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-purple-200  text-purple-700 dark:bg-purple-800 dark:text-white">
+                        <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
                                     Successful
                                 </CardTitle>
-                                <Target className="h-4 w-4  dark:text-white text-purple-700" />
+                                <Target className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold text-green-600">
@@ -128,12 +126,12 @@ export default function Transaction({ donations, stats }) {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-purple-200  text-purple-700 dark:bg-purple-800 dark:text-white">
+                        <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
                                     Pending
                                 </CardTitle>
-                                <Calendar className="h-4 w-4 dark:text-white text-purple-700" />
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold text-yellow-600">
@@ -144,8 +142,8 @@ export default function Transaction({ donations, stats }) {
                     </div>
 
                     {/* Search */}
-                    <Card className="mb-6 bg-purple-200  text-purple-700 dark:bg-purple-800 dark:text-white">
-                        <CardContent>
+                    <Card className="mb-6">
+                        <CardContent className="pt-6">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                                 <Input
@@ -155,24 +153,24 @@ export default function Transaction({ donations, stats }) {
                                         setSearchTerm(e.target.value);
                                         setCurrentPage(1); // reset ke halaman 1 pas search
                                     }}
-                                    className="pl-10 bg-white dark:bg-purple-200 dark:placeholder:text-purple-700"
+                                    className="pl-10"
                                 />
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Transactions List */}
-                    <Card className="bg-purple-200  text-black dark:bg-purple-800 dark:text-white min-h-[53rem] flex flex-col">
+                    <Card>
                         <CardHeader>
                             <CardTitle>Recent Transactions</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex-1 flex flex-col justify-between">
+                        <CardContent>
                             <div className="space-y-4">
                                 {paginatedDonations.length > 0 ? (
                                     paginatedDonations.map((donation) => (
                                         <div
                                             key={donation.id}
-                                            className="flex items-center justify-between p-4 border rounded-lg dark:bg-purple-200 bg-white"
+                                            className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -180,7 +178,7 @@ export default function Transaction({ donations, stats }) {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <p className="font-semibold text-gray-900 dark:text-black">
+                                                        <p className="font-semibold text-gray-900 dark:text-white">
                                                             {donation.anonymous
                                                                 ? "Anonymous"
                                                                 : donation.user
@@ -191,13 +189,13 @@ export default function Transaction({ donations, stats }) {
                                                             donation.status
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-600 dark:text-gray-900">
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
                                                         Donated to:{" "}
                                                         {donation.campaign
                                                             ?.title ||
                                                             "Unknown Campaign"}
                                                     </p>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-600">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-500">
                                                         {formatDate(
                                                             donation.created_at
                                                         )}
@@ -205,13 +203,13 @@ export default function Transaction({ donations, stats }) {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-lg font-bold text-gray-900 dark:text-black">
+                                                <p className="text-lg font-bold text-gray-900 dark:text-white">
                                                     {formatCurrency(
                                                         donation.amount
                                                     )}
                                                 </p>
                                                 {donation.message && (
-                                                    <p className="text-xs text-gray-500 dark:text-gray-600 max-w-xs truncate">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-500 max-w-xs truncate">
                                                         "{donation.message}"
                                                     </p>
                                                 )}
@@ -234,18 +232,16 @@ export default function Transaction({ donations, stats }) {
                                         variant="outline"
                                         disabled={currentPage === 1}
                                         onClick={handlePrevPage}
-                                        className="dark:text-black dark:bg-purple-200 dark:hover:bg-purple-300"
                                     >
                                         Prev
                                     </Button>
-                                    <span className="text-sm text-gray-600 dark:text-purple-200">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
                                         Page {currentPage} of {totalPages}
                                     </span>
                                     <Button
                                         variant="outline"
                                         disabled={currentPage === totalPages}
                                         onClick={handleNextPage}
-                                        className="dark:text-black dark:bg-purple-200 dark:hover:bg-purple-300"
                                     >
                                         Next
                                     </Button>

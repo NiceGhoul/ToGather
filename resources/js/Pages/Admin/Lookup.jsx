@@ -88,61 +88,44 @@ export default function Lookup() {
     return (
         <AdminLayout title="Lookup Table">
             <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4 dark:text-white">
-                    Lookup Table
-                </h1>
+                <h1 className="text-2xl font-bold mb-4 dark:text-white">Lookup Table</h1>
                 <div className="btnContainer mb-4 flex justify-end">
                     <Button
                         variant="default"
                         size="sm"
                         onClick={() => handleAdd()}
-                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-700 dark:hover:bg-purple-800 dark:text-white"
+                        className="bg-purple-800 hover:bg-purple-700 text-white"
                     >
                         + Add New Lookup
                     </Button>
                 </div>
-                <table className="min-w-full border dark:border-gray-700 dark:bg-purple-200 bg-purple-200">
-                    <thead className="bg-purple-100 dark:bg-purple-600">
-                        <tr className="bg-purple-100 dark:bg-purple-600">
-                            <th className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">
-                                ID
-                            </th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
-                                Type
-                            </th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
-                                Code
-                            </th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
-                                Value
-                            </th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
-                                Description
-                            </th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
-                                Action
-                            </th>
+                <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
+                    <thead>
+                        <tr className="bg-gray-100 dark:bg-gray-700">
+                            <th className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">ID</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Type</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Code</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Value</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Description</th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {lookups.map((lookup) => (
-                            <tr
-                                key={lookup.id}
-                                className="hover:bg-gray-50 dark:hover:bg-purple-300"
-                            >
-                                <td className="border px-4 py-2 hidden dark:border-gray-700 dark:text-black">
+                            <tr key={lookup.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">
                                     {lookup.id}
                                 </td>
-                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-black">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_type}
                                 </td>
-                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-black">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_code}
                                 </td>
-                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-black">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_value}
                                 </td>
-                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-black">
+                                <td className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
                                     {lookup.lookup_description}
                                 </td>
                                 <td className="border px-4 py-2 text-center space-x-2 dark:border-gray-700 dark:text-gray-200">
@@ -151,9 +134,9 @@ export default function Lookup() {
                                         variant="outline"
                                         size="icon"
                                         onClick={() => handleEdit(lookup)}
-                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
+                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700"
                                     >
-                                        <Pencil />
+                                        <Pencil className="w-4 h-4 text-purple-700 hover:text-purple-700" />
                                     </Button>
 
                                     {/* Tombol Delete */}
@@ -165,7 +148,7 @@ export default function Lookup() {
                                         description="This action cannot be undone. The Lookup will be removed permanently."
                                         confirmText="Yes, Delete"
                                         confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
+                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                                         onConfirm={() =>
                                             handleDelete(lookup.id)
                                         }

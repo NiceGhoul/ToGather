@@ -155,8 +155,8 @@ export default function User_List() {
             />
 
             <div className="p-6 space-y-6">
-                {/* Filter + Bulk Section */}
-                <div className="bg-purple-200 dark:bg-purple-800 p-4 rounded-lg shadow-md space-y-4">
+                {/* 🔎 Filter + Bulk Section */}
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Search & Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -168,11 +168,11 @@ export default function User_List() {
                                     setSearch(e.target.value);
                                     setCurrentPage(1);
                                 }}
-                                className="w-[260px] focus-visible:ring-purple-700 bg-white dark:bg-purple-200 dark:placeholder-purple-600"
+                                className="w-[260px] focus-visible:ring-purple-700"
                             />
                             <Button
                                 onClick={() => setSearch("")}
-                                className="bg-purple-800 hover:bg-purple-700 text-white dark:bg-purple-400 dark:text-black dark:hover:bg-purple-300"
+                                className="bg-purple-800 hover:bg-purple-700 text-white"
                             >
                                 <RotateCcw className="w-4 h-4" />
                             </Button>
@@ -184,9 +184,9 @@ export default function User_List() {
                                     key={f}
                                     className={`${
                                         statusFilter === f
-                                            ? "bg-purple-800 text-white dark:bg-purple-400 dark:text-black"
-                                            : "bg-purple-400 text-white dark:bg-purple-300 dark:text-black"
-                                    } hover:bg-purple-800 dark:hover:bg-purple-400 `}
+                                            ? "bg-purple-800 text-white"
+                                            : "bg-purple-400"
+                                    } hover:bg-purple-800`}
                                     onClick={() => {
                                         setStatusFilter(f);
                                         setCurrentPage(1);
@@ -199,8 +199,8 @@ export default function User_List() {
                     </div>
 
                     {/* Bulk actions */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-purple-800 dark:border-white pt-3">
-                        <div className="text-sm text-gray-600 dark:text-gray-200 mr-2">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-t dark:border-gray-700 pt-3">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mr-2">
                             {selectedIds.length} selected
                         </div>
                         <div className="flex items-center gap-2">
@@ -215,7 +215,7 @@ export default function User_List() {
                                 description="All selected users will be unbanned."
                                 confirmText="Yes, Unban"
                                 confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                triggerClass="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
+                                triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                                 disabledValue={selectedIds.length === 0}
                                 onConfirm={() => handleBulkAction("unban")}
                             />
@@ -230,7 +230,7 @@ export default function User_List() {
                                 description="All selected users will lose access."
                                 confirmText="Yes, Ban"
                                 confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                triggerClass="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
+                                triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                                 disabledValue={selectedIds.length === 0}
                                 onConfirm={() => handleBulkAction("ban")}
                             />
@@ -239,9 +239,9 @@ export default function User_List() {
                 </div>
 
                 {/* 🧾 Table */}
-                <div className="bg-purple-200 dark:bg-purple-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
-                    <table className="min-w-full border  dark:border-gray-700 dark:bg-purple-200">
-                        <thead className="bg-purple-100 dark:bg-purple-600">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
+                    <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
+                        <thead className="bg-gray-100 dark:bg-gray-700">
                             <tr>
                                 <th className="px-4 py-2 border dark:border-gray-700 w-12 text-center dark:text-gray-200">
                                     <input
@@ -256,24 +256,12 @@ export default function User_List() {
                                         }
                                     />
                                 </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
-                                    ID
-                                </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
-                                    Nickname
-                                </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
-                                    Email
-                                </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
-                                    Address
-                                </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
-                                    Role
-                                </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
-                                    Status
-                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Nickname</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Email</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Address</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Role</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Status</th>
                                 <th className="px-4 py-2 border dark:border-gray-700 text-center dark:text-gray-200">
                                     Actions
                                 </th>
@@ -282,10 +270,7 @@ export default function User_List() {
                         <tbody>
                             {currentUsers.length > 0 ? (
                                 currentUsers.map((u) => (
-                                    <tr
-                                        key={u.id}
-                                        className="hover:bg-gray-50 dark:hover:bg-purple-300"
-                                    >
+                                    <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"
@@ -297,19 +282,19 @@ export default function User_List() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {u.id}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {u.nickname}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {u.email}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 truncate max-w-xs dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 truncate max-w-xs dark:text-gray-200">
                                             {u.address}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 capitalize dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 capitalize dark:text-gray-200">
                                             {u.role}
                                         </td>
                                         <td
@@ -325,15 +310,15 @@ export default function User_List() {
                                             <Popup
                                                 triggerText={
                                                     u.status === "banned" ? (
-                                                        <CheckCircle />
+                                                        <CheckCircle className="text-green-700" />
                                                     ) : (
-                                                        <XCircle />
+                                                        <XCircle className="text-red-700" />
                                                     )
                                                 }
                                                 triggerClass={`${
                                                     u.status === "banned"
-                                                        ? "bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
-                                                        : "bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
+                                                        ? "bg-green-200 hover:bg-green-300 text-green-700"
+                                                        : "bg-red-200 hover:bg-red-300 text-red-700"
                                                 } p-2 rounded-md`}
                                                 description={
                                                     u.status === "banned"
@@ -372,7 +357,7 @@ export default function User_List() {
 
                     {/* Pagination */}
                     <div className="flex items-center justify-between mt-4">
-                        <div className="text-sm text-gray-500 dark:text-purple-200">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                             Page {currentPage} of {totalPages || 1}
                         </div>
                         <div className="flex gap-2">
@@ -382,7 +367,6 @@ export default function User_List() {
                                 onClick={() =>
                                     handlePageChange(currentPage - 1)
                                 }
-                                className="bg-white text-black hover:bg-gray-100 dark:bg-purple-200 dark:text-black dark:hover:bg-purple-300"
                             >
                                 <ChevronLeft className="w-4 h-4 mr-1" /> Prev
                             </Button>
@@ -392,8 +376,8 @@ export default function User_List() {
                                     onClick={() => handlePageChange(i + 1)}
                                     className={`${
                                         currentPage === i + 1
-                                            ? "bg-purple-800 text-white hover:bg-purple-800 dark:bg-purple-400 dark:text-black dark:hover:bg-purple-400 "
-                                            : "bg-purple-300 text-white hover:bg-purple-800 hover:text-white dark:bg-purple-300 dark:text-black dark:hover:bg-purple-400"
+                                            ? "bg-purple-800 text-white hover:bg-purple-800"
+                                            : "bg-purple-300 text-white hover:bg-purple-800 hover:text-white"
                                     }
                                                 font-medium transition-colors duration-200`}
                                 >
@@ -406,7 +390,6 @@ export default function User_List() {
                                 onClick={() =>
                                     handlePageChange(currentPage + 1)
                                 }
-                                className="bg-white text-black hover:bg-gray-100 dark:bg-purple-200 dark:text-black dark:hover:bg-purple-300"
                             >
                                 Next <ChevronRight className="w-4 h-4 ml-1" />
                             </Button>
