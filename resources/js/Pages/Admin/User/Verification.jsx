@@ -106,8 +106,8 @@ export default function Verification({ requests }) {
     return (
         <Layout_Admin title="User Verification List">
             <div className="p-6 space-y-6">
-                {/* 🔎 Filter Section */}
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
+                {/*  Filter Section */}
+                <div className="bg-purple-200 dark:bg-purple-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Search + Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
@@ -119,21 +119,15 @@ export default function Verification({ requests }) {
                                     setSearch(e.target.value);
                                     setCurrentPage(1);
                                 }}
-                                className="w-[260px] focus-visible:ring-purple-700"
+                                className="w-[260px] focus-visible:ring-purple-700 bg-white dark:bg-purple-200 dark:placeholder-purple-600"
                             />
-                            <Button
-                                onClick={() => setSearch(search)}
-                                className="bg-purple-800 hover:bg-purple-700 text-white"
-                            >
-                                <Search className="w-4 h-4" />
-                            </Button>
                             <Button
                                 onClick={() => {
                                     setSearch("");
                                     setStatusFilter("all");
                                     setCurrentPage(1);
                                 }}
-                                className="bg-purple-800 hover:bg-purple-700 text-white"
+                                className="bg-purple-800 hover:bg-purple-700 text-white dark:bg-purple-400 dark:text-black dark:hover:bg-purple-300"
                             >
                                 <RotateCcw className="w-4 h-4" />
                             </Button>
@@ -146,9 +140,9 @@ export default function Verification({ requests }) {
                                         key={status}
                                         className={`${
                                             statusFilter === status
-                                                ? "bg-purple-800 text-white"
-                                                : "bg-purple-400"
-                                        } hover:bg-purple-800`}
+                                                ? "bg-purple-800 text-white dark:bg-purple-400 dark:text-black"
+                                                : "bg-purple-400 text-white dark:bg-purple-300 dark:text-black"
+                                        } hover:bg-purple-800 dark:hover:bg-purple-400 `}
                                         onClick={() => {
                                             setStatusFilter(status);
                                             setCurrentPage(1);
@@ -166,8 +160,8 @@ export default function Verification({ requests }) {
 
                     {/* Bulk Actions */}
                     {statusFilter !== "all" && statusFilter !== "rejected" && (
-                        <div className="flex flex-wrap items-center justify-between gap-2 border-t dark:border-gray-700 pt-3">
-                            <div className="text-sm mr-2 dark:text-gray-200">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-purple-800 dark:border-white pt-3">
+                            <div className="text-sm mr-2 text-gray-600 dark:text-gray-200">
                                 {selectedIds.length} selected
                             </div>
                             <div className="flex items-center gap-2">
@@ -186,7 +180,7 @@ export default function Verification({ requests }) {
                                             description="All selected users will be approved."
                                             confirmText="Approve All"
                                             confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                            triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
+                                            triggerClass="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
                                             disabledValue={
                                                 selectedIds.length === 0
                                             }
@@ -206,7 +200,7 @@ export default function Verification({ requests }) {
                                             description="All selected users will be rejected."
                                             confirmText="Reject All"
                                             confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
+                                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
                                             disabledValue={
                                                 selectedIds.length === 0
                                             }
@@ -228,7 +222,7 @@ export default function Verification({ requests }) {
                                         description="All selected users will be rejected."
                                         confirmText="Reject All"
                                         confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
+                                        triggerClass="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
                                         disabledValue={selectedIds.length === 0}
                                         onConfirm={() =>
                                             handleBulkAction("rejected")
@@ -241,9 +235,9 @@ export default function Verification({ requests }) {
                 </div>
 
                 {/* 🧾 Table */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
-                    <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
-                        <thead className="bg-gray-100 dark:bg-gray-700">
+                <div className="bg-purple-200 dark:bg-purple-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[42rem]">
+                    <table className="min-w-full border dark:border-gray-700 dark:bg-purple-200">
+                        <thead className="bg-purple-100 dark:bg-purple-600">
                             <tr>
                                 {statusFilter !== "all" &&
                                     statusFilter !== "rejected" && (
@@ -265,13 +259,21 @@ export default function Verification({ requests }) {
                                         </th>
                                     )}
 
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Email</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">ID Photo</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    ID
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Email
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    ID Photo
+                                </th>
                                 <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
                                     Selfie with ID
                                 </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Status</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Status
+                                </th>
                                 <th className="px-4 py-2 border dark:border-gray-700 text-center dark:text-gray-200">
                                     Actions
                                 </th>
@@ -280,7 +282,10 @@ export default function Verification({ requests }) {
                         <tbody>
                             {currentRequests.length > 0 ? (
                                 currentRequests.map((r) => (
-                                    <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <tr
+                                        key={r.id}
+                                        className="hover:bg-gray-50 dark:hover:bg-purple-300"
+                                    >
                                         {statusFilter !== "all" &&
                                             statusFilter !== "rejected" && (
                                                 <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
@@ -298,16 +303,16 @@ export default function Verification({ requests }) {
                                                 </td>
                                             )}
 
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
                                             {r.id}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
                                             {r.user.email}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-black">
                                             {r.id_photo_url ? (
                                                 <Button
-                                                    className="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm"
+                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white text-sm"
                                                     onClick={() => {
                                                         setModalImage(
                                                             r.id_photo_url
@@ -328,7 +333,7 @@ export default function Verification({ requests }) {
                                         <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             {r.selfie_url ? (
                                                 <Button
-                                                    className="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm"
+                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white text-sm"
                                                     onClick={() => {
                                                         setModalImage(
                                                             r.selfie_url
@@ -364,14 +369,14 @@ export default function Verification({ requests }) {
                                                         <Popup
                                                             triggerText={
                                                                 <div className="flex items-center gap-2 cursor-pointer">
-                                                                    <CheckCircle className="w-4 h-4 text-green-700" />
+                                                                    <CheckCircle />
                                                                 </div>
                                                             }
                                                             title="Approve User Verification?"
                                                             description="Approve this user's verification?"
                                                             confirmText="Approve"
                                                             confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                                            triggerClass="bg-green-200 hover:bg-green-300 text-green-700 px-3 py-1 rounded-md"
+                                                            triggerClass="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white px-3 py-1 rounded-md"
                                                             onConfirm={() =>
                                                                 handleVerification(
                                                                     r.user.id,
@@ -389,7 +394,7 @@ export default function Verification({ requests }) {
                                                             description="Reject this user's verification?"
                                                             confirmText="Reject"
                                                             confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700 px-3 py-1 rounded-md"
+                                                            triggerClass="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white px-3 py-1 rounded-md"
                                                             onConfirm={() =>
                                                                 handleVerification(
                                                                     r.user.id,
@@ -428,6 +433,7 @@ export default function Verification({ requests }) {
                                 onClick={() =>
                                     handlePageChange(currentPage - 1)
                                 }
+                                className="bg-white text-black hover:bg-gray-100 dark:bg-purple-200 dark:text-black dark:hover:bg-purple-300"
                             >
                                 <ChevronLeft className="w-4 h-4 mr-1" /> Prev
                             </Button>
@@ -435,12 +441,11 @@ export default function Verification({ requests }) {
                                 <Button
                                     key={i}
                                     onClick={() => handlePageChange(i + 1)}
-                                    className={`
-                                        ${
-                                            currentPage === i + 1
-                                                ? "bg-purple-800 text-white hover:bg-purple-800"
-                                                : "bg-purple-300 text-purple-900 hover:bg-purple-800 hover:text-white"
-                                        }
+                                    className={`${
+                                        currentPage === i + 1
+                                            ? "bg-purple-800 text-white hover:bg-purple-800 dark:bg-purple-400 dark:text-black dark:hover:bg-purple-400 "
+                                            : "bg-purple-300 text-white hover:bg-purple-800 hover:text-white dark:bg-purple-300 dark:text-black dark:hover:bg-purple-400"
+                                    }
                                         font-medium transition-colors duration-200
                                     `}
                                 >
@@ -453,6 +458,7 @@ export default function Verification({ requests }) {
                                 onClick={() =>
                                     handlePageChange(currentPage + 1)
                                 }
+                                className="bg-white text-black hover:bg-gray-100 dark:bg-purple-200 dark:text-black dark:hover:bg-purple-300"
                             >
                                 Next <ChevronRight className="w-4 h-4 ml-1" />
                             </Button>
