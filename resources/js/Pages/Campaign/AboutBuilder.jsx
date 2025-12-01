@@ -17,6 +17,11 @@ export const AboutBuilder = ({campaign, contents}) => {
     const [oldDescription, setOldDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
     const [isChanged, setIsChanged] = useState(false)
 
+    useEffect(() => {
+        if(contents.length > 0){
+            setDescription(contents)
+        }
+    },[contents])
 
 
     const addParagraphBlock = () => {
@@ -105,7 +110,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                 };
             })
              router.post("/campaigns/insertAbout", prepared)
-
+             setDescription(contents)
          }
      };
 

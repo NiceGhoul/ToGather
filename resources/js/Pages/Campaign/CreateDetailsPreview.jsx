@@ -17,22 +17,33 @@ import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
 
 export const UpperPreview = ({campaign, user, images}) => {
+    console.log(campaign)
     const [like, setLike] = useState(false)
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
             <div className="flex flex-col min-w-[50%] max-h-full">
                 <div className="flex flex-row min-w-full min-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
-                    {images.thumbnail ? <img
-                        src={images.thumbnail}
-                        alt="Campaign"
-                        className="w-full h-full object-contain"
-                    /> : <span className="text-gray-500 text-md w-full text-center italic">
+                    {images.thumbnail ? (
+                        <img
+                            src={images.thumbnail}
+                            alt="Campaign"
+                            className="w-full h-full object-contain"
+                        />
+                    ) : (
+                        <span className="text-gray-500 text-md w-full text-center italic">
                             No image available
-                        </span>}
+                        </span>
+                    )}
                 </div>
                 <div className="flex flex-row gap-4 my-5 justify-center items-center">
                     <Map />
-                    <p className="text-center">{campaign.location ? campaign.locations.region + ", " + campaign.locations.country: campaign.address}</p>
+                    <p className="text-center">
+                        {campaign.locations
+                            ? campaign.locations.region +
+                              ", " +
+                              campaign.locations.country
+                            : campaign.address}
+                    </p>
                 </div>
             </div>
 
@@ -59,7 +70,13 @@ export const UpperPreview = ({campaign, user, images}) => {
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
-                         {Math.ceil((new Date(campaign.end_campaign) - new Date()) / (1000 * 60 * 60 * 24)) + " Days left"}
+                        {campaign.end_campaign
+                            ? Math.ceil(
+                                  (new Date(campaign.end_campaign) -
+                                      new Date()) /
+                                      (1000 * 60 * 60 * 24)
+                              ) + " Days left"
+                            : "- Days left"}
                     </h1>
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -67,9 +84,7 @@ export const UpperPreview = ({campaign, user, images}) => {
                         className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789] dark:[&>div]: bg-[#aaaaaa]"
                         value={0}
                     />
-                    <span
-                        className="absolute inset-0 flex items-start justify-center text-md font-medium text-gray-200 dark:text-white"
-                    >
+                    <span className="absolute inset-0 flex items-start justify-center text-md font-medium text-gray-200 dark:text-white">
                         0%
                     </span>
                 </div>
@@ -188,8 +203,7 @@ const CreateDetailsPreview = () => {
             <TabsTrigger
                 key={index}
                 value={index + 1}
-                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
-            >
+                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200">
                 {data}
             </TabsTrigger>
         );
@@ -261,7 +275,7 @@ const CreateDetailsPreview = () => {
                     defaultValue={flash?.activeTab ?? 1}
                     className="w-full"
                 >
-                    <div className="sticky top-[72px] z-40 bg-white py-2 rounded dark:bg-[#171717]">
+                    <div className="sticky top-[72px] z-40 bg-white rounded dark:bg-[#171717]">
                         <TabsList className="flex gap-40 bg-transparent border-b-1 border-gray-700 w-full mx-auto rounded-none">
                             {data.map((dat, idx) => {
                                 return tabsRepeater(dat, idx);

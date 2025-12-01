@@ -19,7 +19,6 @@ import { DonationsDetails } from "./DonationsDetails";
 import axios from "axios";
 
 const scrollDonations = (data, idx) => {
-    console.log(data)
     return (
         <Card
             key={idx}
@@ -84,7 +83,7 @@ const tabsRepeater = (data, index) => {
         <>
             <TabsTrigger
                 value={index + 1}
-                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
+                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm"
             >
                 {data}
             </TabsTrigger>
@@ -106,7 +105,7 @@ const tabsContentRepeater = (data, campaign, index, contents, donations) => {
 export default function Create() {
     const data = ["About", "FAQ", "Updates", "Donations"];
 
-    const { campaign, donations, liked, user, contents } = usePage().props;
+    const { campaign, donations, liked, user, contents, flash } = usePage().props;
     const [images, setImages] = useState({thumbnail: null, logo: null})
     const [like, setLike] = useState(liked);
 
@@ -136,11 +135,9 @@ export default function Create() {
        }
    };
 
-   console.log(campaign, images)
-
     const mainData = () => {
         return (
-            <div className="overflow-auto">
+            <div>
                 {/* scrolling donations */}
                 {/* if creator can customize this, will be very good either this or largest donator*/}
                 <h1 className="text-2xl text-center font-semibold mb-5 mt-10">
@@ -224,7 +221,7 @@ export default function Create() {
                             />
                             <span
                                 className="absolute inset-0 flex items-start justify-center text-md font-medium dark:text-white"
-                                style={{ color: "black" }}
+                                style={{ color: "white" }}
                             >
                                 {percentage}%
                             </span>
@@ -272,14 +269,15 @@ export default function Create() {
                 </div>
 
                 <div>
-                    <Tabs defaultValue={1} className="w-full mt-20">
-                        {/* Tabs Header */}
-                        <TabsList className="flex gap-40 bg-transparent border-b-2 border-gray-700 w-fit mx-auto rounded-none">
+                    <Tabs defaultValue={flash?.activeTab ?? 1} className="w-full">
+                        <div className="sticky top-[72px] z-40 bg-white  rounded dark:bg-[#171717] pt-5">
+                        <TabsList className="flex gap-40 bg-transparent shadow-md w-fit mx-auto rounded-sm p-0">
                             {data.map((dat, idx) => {
                                 return tabsRepeater(dat, idx);
                             })}
                         </TabsList>
-                        <div className="flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.95]">
+                    </div>
+                        <div className="flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.90]">
                             {data.map((dat, idx) => {
                                 return tabsContentRepeater(
                                     dat,

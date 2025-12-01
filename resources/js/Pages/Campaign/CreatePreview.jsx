@@ -56,7 +56,7 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
-                        {Math.ceil((new Date(campaign.end_campaign) - new Date()) / (1000 * 60 * 60 * 24)) + " Days left"}
+                        {campaign.end_campaign ? Math.ceil((new Date(campaign.end_campaign) - new Date()) / (1000 * 60 * 60 * 24)) + " Days left" : ""}
                     </h1>
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">

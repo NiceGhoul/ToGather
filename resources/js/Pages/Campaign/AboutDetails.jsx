@@ -3,9 +3,8 @@ import { useState } from "react";
 
 export const AboutDetails = ({contents}) => {
 
-    console.log(contents)
-
     const [description, setDescription] = useState(contents)
+
     return (
         <div className="w-full p-6 justify-center flex flex-col items-center">
             {description.length > 0 ? (
