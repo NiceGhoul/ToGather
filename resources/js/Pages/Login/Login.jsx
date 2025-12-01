@@ -75,6 +75,7 @@ export default function Login() {
             } else if (validationErrors.password) {
                 passwordRef.current && passwordRef.current.focus();
             }
+            setIsSubmitLoading(false);
             return;
         }
         post("/user/login", {

@@ -117,7 +117,7 @@ export default function Create() {
      useEffect(() => {
         if (campaign.images && (images.thumbnail === null || images.logo === null)) {
             campaign.images.map((dat) => {
-                dat.url.includes("thumbnail")
+                dat.url.toLowerCase().includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
                     : setImages((prev) => ({ ...prev, logo: dat.url }));
             });
@@ -135,6 +135,8 @@ export default function Create() {
            setLike(prev);
        }
    };
+
+   console.log(campaign, images)
 
     const mainData = () => {
         return (
@@ -161,29 +163,21 @@ export default function Create() {
                 <Separator className="flex-1 bg-gray-100 h-[1px]" />
                 {/* pictures and titles */}
                 <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
-                    <div className="flex flex-col w-[600px] h-[400px]">
-                        <div
-                            className={`flex flex-row min-w-3/6 overflow-hidden border-1 rounded-md border-gray-800 shrink-0 ${images.thumbnail ? "" : "min-h-[400px]"}`}
-                        >
-                            {images.thumbnail != null ? (
-                                <img
-                                    src={images.thumbnail}
-                                    at="thumbnail"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <span className="text-gray-500 text-md w-full h-full items-center justify-center flex text-center italic">
-                                    No image available
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex flex-row gap-0 my-5 justify-center items-center">
-                            <Map />
-                            <p className="w-full text-center dark:text-gray-300">
-                                {campaign.address}
-                            </p>
-                        </div>
-                    </div>
+                    <div className="flex flex-col min-w-[50%] max-h-full">
+                <div className="flex flex-row min-w-full min-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
+                    {images.thumbnail ? <img
+                        src={images.thumbnail}
+                        alt="Campaign"
+                        className="w-full h-full object-contain"
+                    /> : <span className="text-gray-500 text-md w-full text-center italic">
+                            No image available
+                        </span>}
+                </div>
+                <div className="flex flex-row gap-4 my-5 justify-center items-center">
+                    <Map />
+                    <p className="text-center">{campaign.location ? campaign.locations.region + ", " + campaign.locations.country: campaign.address}</p>
+                </div>
+            </div>
 
                     <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
                         <div className="flex overflow-hidden item-center justify-start gap-5 flex-row">
@@ -209,15 +203,14 @@ export default function Create() {
                         </div>
                         <div className="flex flex-row justify-between">
                             <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {donations.length.toString() +
-                                    " " +
+                                {donations.length.toString() + " " +
                                     (donations.length > 1
                                         ? " Donators"
                                         : " Donator")}
                             </h1>
 
                             <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {campaign.duration + " Days left"}
+                                {Math.ceil((new Date(campaign.end_campaign) - new Date()) / (1000 * 60 * 60 * 24)) + " Days left"}
                             </h1>
                         </div>
                         <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -286,7 +279,7 @@ export default function Create() {
                                 return tabsRepeater(dat, idx);
                             })}
                         </TabsList>
-                        <div className="flex justify-center items-center gap-2 bg-transparent">
+                        <div className="flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.95]">
                             {data.map((dat, idx) => {
                                 return tabsContentRepeater(
                                     dat,

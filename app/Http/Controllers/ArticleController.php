@@ -661,6 +661,12 @@ class ArticleController extends Controller
             if ($content->type === 'image' && $content->image) {
                 $content->image_url = $content->image->url;
             }
+
+            // Tambahkan ini supaya TEXT dikirim
+            if ($content->type === 'text' || $content->type === 'paragraph') {
+                $content->content = $content->content;  // pastikan tetap dikirim
+            }
+
             return $content;
         });
 
@@ -880,64 +886,6 @@ class ArticleController extends Controller
         ]);
     }
 
-    // public function adminUpdate(Request $request, $id)
-    // {
-    //     $article = Article::findOrFail($id);
-
-    //     $validated = $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'category' => 'required|string|max:100',
-    //         'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
-    //         'contents' => 'required|array|min:1',
-    //         'contents.*.type' => 'required|in:text,image',
-    //         'contents.*.content' => 'nullable',
-    //         'contents.*.order_x' => 'required|integer',
-    //         'contents.*.order_y' => 'required|integer',
-    //     ]);
-
-    //     DB::transaction(function () use ($request, $article, $validated) {
-    //         // update thumbnail if provided
-    //         if ($request->hasFile('thumbnail')) {
-    //             $path = $request->file('thumbnail')->store('article/thumbnail', 'minio');
-    //             $article->thumbnail = $path;
-    //         }
-
-    //         $article->title = $validated['title'];
-    //         $article->category = $validated['category'];
-    //         $article->save();
-
-    //         // Replace contents: remove old then create new blocks
-    //         $article->contents()->delete();
-
-    //         // Use $request->input('contents') for data and check $request->hasFile for each index to store image files
-    //         $incomingContents = $request->input('contents', []);
-    //         foreach ($incomingContents as $i => $block) {
-    //             $type = $block['type'];
-    //             $contentValue = null;
-
-    //             if ($type === 'image' && $request->hasFile("contents.$i.content")) {
-    //                 $file = $request->file("contents.$i.content");
-    //                 $path = $file->store('article/image', 'minio');
-    //                 $contentValue = $path;
-    //             } else {
-    //                 // content may be a path string (existing) or HTML string for text
-    //                 $contentValue = $block['content'] ?? null;
-    //             }
-
-    //             ArticleContent::create([
-    //                 'article_id' => $article->id,
-    //                 'type' => $type,
-    //                 'content' => $contentValue,
-    //                 'order_x' => $block['order_x'],
-    //                 'order_y' => $block['order_y'],
-    //             ]);
-    //         }
-    //     });
-
-    //     return redirect()
-    //         ->route('admin.articles.view', ['id' => $article->id])
-    //         ->with('success', 'Article updated!');
-    // }
     public function adminUpdate(Request $request, $id)
     {
         $article = Article::findOrFail($id);
@@ -947,7 +895,7 @@ class ArticleController extends Controller
             'category' => 'required|string|max:100',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
             'contents' => 'required|array|min:1',
-            'contents.*.type' => 'required|in:text,image',
+            'contents.*.type' => 'required|in:text,image,paragraph',
             'contents.*.content' => 'nullable',
             'contents.*.order_x' => 'required|integer',
             'contents.*.order_y' => 'required|integer',
@@ -972,15 +920,41 @@ class ArticleController extends Controller
                 $content = ArticleContent::create([
                     'article_id' => $article->id,
                     'type' => $type,
-                    'content' => $type === 'text' ? $block['content'] ?? null : null,
+                    'content' => in_array($type, ['text', 'paragraph'])
+                        ? ($block['content'] ?? null)
+                        : null,
+
                     'order_x' => $block['order_x'],
                     'order_y' => $block['order_y'],
                 ]);
 
-                if ($type === 'image' && $request->hasFile("contents.$i.content")) {
-                    $path = $request->file("contents.$i.content")->store('article/content', 'minio');
-                    $content->image()->create(['path' => $path]);
+                if ($type === 'image') {
+
+                    // CASE 1 — Upload New Image
+                    if ($request->hasFile("contents.$i.content")) {
+
+                        $path = $request->file("contents.$i.content")
+                            ->store('article/content', 'minio');
+
+                        $content->image()->create([
+                            'path' => $path
+                        ]);
+                    }
+
+                    // CASE 2 — Existing Image
+                    else if (!empty($block['content'])) {
+
+                        $url = $block['content'];
+
+
+                        $relativePath = preg_replace('/^https?:\/\/[^\/]+\/togather\//', '', $url);
+
+                        $content->image()->create([
+                            'path' => $relativePath
+                        ]);
+                    }
                 }
+
             }
         });
 

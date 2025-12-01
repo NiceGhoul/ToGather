@@ -181,7 +181,7 @@ class CampaignController extends Controller
 
     public function showList()
     {
-        $campaigns = Campaign::where('status', ['active', 'completed'])->get();
+        $campaigns = Campaign::with('images')->whereIn('status', ['completed', 'active'])->get();
         $lookups = Lookup::all();
 
         return inertia('Campaign/CampaignList', [
@@ -204,7 +204,7 @@ class CampaignController extends Controller
         $user = auth()->user();
         $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
         $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
-        $campaignData = Campaign::where('id', $id)->with('images')->with('user')->latest()->first();
+        $campaignData = Campaign::where('id', $id)->with('images', 'locations')->with('user')->latest()->first();
         $content = CampaignContent::with('images', 'videos')->where('campaign_id', $campaignData->id)->get()->map(function($data){
                 $imageMedia = $data->images->map(function ($img) {
                     return [
@@ -278,7 +278,6 @@ class CampaignController extends Controller
             'status' => 'draft',
         ])
     );
-        // dd($request->all());
         // if ($campaign && $request->has('location')) {
         //     $location = $request->input('location');
         //     $location['campaign_id'] = $campaign->id;
@@ -352,17 +351,18 @@ class CampaignController extends Controller
          $user = auth()->user();
 
         if ($id != null) {
-            $usersCampaign = $user->campaigns()->with('images', 'donations')
+            $usersCampaign = $user->campaigns()->with('images', 'donations', 'locations')
                 ->where('id', $id)
                 ->where('user_id', $user->id)
                 ->firstOrFail();
             // dd($usersCampaign);
         } else {
-            $usersCampaign = $user->campaigns()
-                ->whereIn('status', ['pending', 'draft'])
-                ->with('images')
-                ->latest()
-                ->first();
+            // $usersCampaign = $user->campaigns()
+            //     ->whereIn('status', ['pending', 'draft', 'active', 'inactive'])
+            //     ->with('images', 'locations')
+            //     ->latest()
+            //     ->first();
+            return;
         }
 
 
@@ -377,15 +377,16 @@ class CampaignController extends Controller
          $user = auth()->user();
 
         if ($id != null) {
-            $usersCampaign = $user->campaigns()->with('images')
+            $usersCampaign = $user->campaigns()->with('images', 'locations')
                 ->where('id', $id)
                 ->where('user_id', $user->id)
                 ->firstOrFail();
         } else {
-            $usersCampaign = $user->campaigns()->with('images')
-                ->whereIn('status', ['pending', 'draft', 'active'])
-                ->latest()
-                ->first();
+            // $usersCampaign = $user->campaigns()->with('images', 'locations')
+            //     ->whereIn('status', ['pending', 'draft', 'active'])
+            //     ->latest()
+            //     ->first();
+            return;
         }
         $content = [];
         if($usersCampaign){
@@ -449,10 +450,10 @@ class CampaignController extends Controller
         }
 
         else if ($category === 'All') {
-            $campaigns = Campaign::with('images')->where('status', ['active'])->get();
+            $campaigns = Campaign::with('images')->whereIn('status', ['active', 'completed'])->get();
 
         } else {
-            $campaigns = Campaign::with('images')->where('category', $category)->where('status', ['active'])->get();
+            $campaigns = Campaign::with('images')->where('category', $category)->whereIn('status', ['active', 'completed'])->get();
 
         }
 
@@ -462,57 +463,58 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function uploadSupportingMedia(Request $request)
-    {
-        $user = auth()->user();
-        $request->validate([
-            'thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
-            'campaign_id' => 'required|integer|exists:campaigns,id',
-        ]);
+        public function uploadSupportingMedia(Request $request)
+        {
+            // validate gambar
+            $request->validate([
+                'thumbnail'   => ['required', 'mimetypes:image/*','max:4096'],
+                'logo'        => ['sometimes','nullable','mimetypes:image/*','max:4096'],
+                'campaign_id' => 'required|integer|exists:campaigns,id',
+            ]);
 
-        $urls = Image::where('imageable_id', $request->campaign_id)->get();
+            $urls = Image::where('imageable_id', $request->campaign_id)->get();
 
-        if($urls->isNotEmpty()){
-            foreach($urls as $path){
-                Storage::disk('minio')->delete($path->path);
-                $path->delete();
+            if($urls->isNotEmpty()){
+                foreach($urls as $path){
+                    Storage::disk('minio')->delete($path->path);
+                    $path->delete();
+                };
             };
-        };
 
-        foreach (['thumbnail', 'logo'] as $data) {
-            if ($request->hasFile($data)) {
-                $ext = $request->file($data)->getClientOriginalExtension();
-                $filename = "campaign_{$request->campaign_id}_{$data}." . $ext;
-                $path = $request->file($data)->storeAs('campaigns/image', $filename,'minio');
-                Image::create([
-                    'path' => $path,
-                    'imageable_id' => $request->campaign_id,
-                    'imageable_type' => Campaign::class,
-                ]);
+            foreach (['thumbnail', 'logo'] as $data) {
+                if ($request->hasFile($data)) {
+                    $ext = $request->file($data)->getClientOriginalExtension();
+                    $filename = "campaign_{$request->campaign_id}_{$data}." . $ext;
+                    $path = $request->file($data)->storeAs('campaigns/image', $filename,'minio');
+                    Image::create([
+                        'path' => $path,
+                        'imageable_id' => $request->campaign_id,
+                        'imageable_type' => Campaign::class,
+                    ]);
+                }
             }
-        }
 
-        $content = CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
-            $media = $data->images->map(function ($image) {
-                return [
-                    'path' => $image->path,
-                    'filetype' => 'images',
-                    'url' => $image->url,
-                ];
+            $content = CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
+                $media = $data->images->map(function ($image) {
+                    return [
+                        'path' => $image->path,
+                        'filetype' => 'images',
+                        'url' => $image->url,
+                    ];
+                });
+                $data->setAttribute('media', $media);
+                $data->unsetRelation('images');
+
+                return $data;
             });
-            $data->setAttribute('media', $media);
-            $data->unsetRelation('images');
 
-            return $data;
-        });
-
-        return Inertia::render('Campaign/CreateDetailsPreview', [
-            'campaign' => Campaign::with('images')->findOrFail($request->campaign_id),
-            'contents' => $content,
-            'user' => $user,
-        ]);
-    }
+            return redirect()->route('campaigns.detailsPreview', $request->campaign_id);
+            // return Inertia::render('Campaign/CreateDetailsPreview', [
+            //     'campaign' => Campaign::with('images')->findOrFail($request->campaign_id),
+            //     'co  ntents' => $content,
+            //     'user' => $user,
+            // ]);
+        }
 
     public function finalizeCampaign($id)
     {

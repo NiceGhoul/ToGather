@@ -184,7 +184,7 @@ export default function MyArticle({
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 min-h-[2rem] max-h-[3rem] overflow-hidden text-center leading-snug">
+                        <h2 className="text-lg font-semibold mb-2 min-h-8 max-h-12 overflow-hidden text-center leading-snug">
                             {article.title.length > 50
                                 ? article.title.substring(0, 50) + "..."
                                 : article.title}
@@ -198,7 +198,7 @@ export default function MyArticle({
                             {article.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="h-[8rem] text-sm text-gray-700 mb-4 text-justify dark:text-white">
+                        <p className="h-32 text-sm text-gray-700 mb-4 text-justify dark:text-white">
                             {previewText
                                 .replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 180) || "No preview text."}

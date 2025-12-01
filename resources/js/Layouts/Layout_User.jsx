@@ -17,7 +17,7 @@ export default function Layout_User({ children }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="pt-200 mt-[200px] w-full max-w-none !p-0 !m-0 overflow-x-hidden overflow-y-auto min-h-screen"
+                    className="pt-200 mt-[200px] w-full max-w-none !p-0 !m-0 min-h-screen"
                 >
                     {children}
                 </motion.main>
