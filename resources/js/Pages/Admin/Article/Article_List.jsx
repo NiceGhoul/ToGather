@@ -63,18 +63,46 @@ export default function Article_List() {
     };
 
     // 🔧 Aksi server (bulk & toggle)
-    const handleDisable = (id) => router.post(`/admin/articles/${id}/disable`);
-    const handleEnable = (id) => router.post(`/admin/articles/${id}/enable`);
+    const handleDisable = (id) =>
+        router.post(
+            `/admin/articles/${id}/disable`,
+            {},
+            {
+                onSuccess: () => {
+                    setAllArticles((prev) =>
+                        prev.map((a) =>
+                            a.id === id ? { ...a, status: "disabled" } : a
+                        )
+                    );
+                },
+            }
+        );
+
+    const handleEnable = (id) =>
+        router.post(
+            `/admin/articles/${id}/enable`,
+            {},
+            {
+                onSuccess: () => {
+                    setAllArticles((prev) =>
+                        prev.map((a) =>
+                            a.id === id ? { ...a, status: "approved" } : a
+                        )
+                    );
+                },
+            }
+        );
+
     const handleDelete = (id) =>
         router.post(
             `/admin/articles/${id}/delete`,
             {},
             {
                 onSuccess: () => {
+                    setAllArticles((prev) => prev.filter((a) => a.id !== id));
                     setSelectedIds((prev) => prev.filter((x) => x !== id));
                     setSuccessPopupMessage("Article deleted");
                     setSuccessPopupOpen(true);
-                    router.reload();
                 },
             }
         );
@@ -181,37 +209,41 @@ export default function Article_List() {
                         {/* Status filter buttons */}
                         <div className="flex items-center gap-2">
                             <Button
-                                className={`${status === ""
-                                    ? "bg-purple-800 text-white"
-                                    : "bg-purple-400"
-                                    } hover:bg-purple-800`}
+                                className={`${
+                                    status === ""
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
                                 onClick={() => setStatus("")}
                             >
                                 All
                             </Button>
                             <Button
-                                className={`${status === "approved"
-                                    ? "bg-purple-800 text-white"
-                                    : "bg-purple-400"
-                                    } hover:bg-purple-800`}
+                                className={`${
+                                    status === "approved"
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
                                 onClick={() => setStatus("approved")}
                             >
                                 Enabled
                             </Button>
                             <Button
-                                className={`${status === "disabled"
-                                    ? "bg-purple-800 text-white"
-                                    : "bg-purple-400"
-                                    } hover:bg-purple-800`}
+                                className={`${
+                                    status === "disabled"
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
                                 onClick={() => setStatus("disabled")}
                             >
                                 Disabled
                             </Button>
                             <Button
-                                className={`${status === "rejected"
-                                    ? "bg-purple-800 text-white"
-                                    : "bg-purple-400"
-                                    } hover:bg-purple-800`}
+                                className={`${
+                                    status === "rejected"
+                                        ? "bg-purple-800 text-white"
+                                        : "bg-purple-400"
+                                } hover:bg-purple-800`}
                                 onClick={() => setStatus("rejected")}
                             >
                                 Rejected
@@ -292,25 +324,40 @@ export default function Article_List() {
                                         checked={
                                             filteredArticles.length > 0 &&
                                             selectedIds.length ===
-                                            filteredArticles.length
+                                                filteredArticles.length
                                         }
                                         onChange={(e) =>
                                             handleSelectAll(e.target.checked)
                                         }
                                     />
                                 </th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Id</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Title</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Category</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Author</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Status</th>
-                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">Actions</th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Id
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Title
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Category
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Author
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Status
+                                </th>
+                                <th className="px-4 py-2 border dark:border-gray-700 dark:text-gray-200">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredArticles.length > 0 ? (
                                 filteredArticles.map((a) => (
-                                    <tr key={a.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <tr
+                                        key={a.id}
+                                        className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    >
                                         <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"

@@ -1,5 +1,11 @@
 import Layout_User from "@/Layouts/Layout_User";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Link } from "@inertiajs/react";
 
@@ -16,17 +22,28 @@ export default function Rejected() {
                     </CardHeader>
                     <CardContent className="text-center">
                         <div className="mb-4 p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded">
-                            <p className="font-medium">Your verification was rejected</p>
-                            <p className="text-sm mt-1">Please try again with correct documents</p>
+                            <p className="font-medium">
+                                Your verification was rejected
+                            </p>
+                            <p className="text-sm mt-1">
+                                Please try again with correct documents
+                            </p>
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                            Your verification documents did not meet our requirements.
-                            Please submit a new verification request with valid documents.
+                            Your verification documents did not meet our
+                            requirements. Please submit a new verification
+                            request with valid documents.
                         </p>
-                        <Button asChild className="w-full mb-2">
+                        <Button
+                            asChild
+                            className="w-full mb-2 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                        >
                             <Link href="/verification/create">Try Again</Link>
                         </Button>
-                        <Button variant="outline" asChild className="w-full">
+                        <Button
+                            asChild
+                            className="w-full bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                        >
                             <Link href="/">Back to Home</Link>
                         </Button>
                     </CardContent>
