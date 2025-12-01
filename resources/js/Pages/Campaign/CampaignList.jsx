@@ -213,9 +213,14 @@ const CampaignList = () => {
             <div className="w-full flex flex-col">
                 <div
                     className="relative h-72 w-full bg-cover bg-center"
-                    style={{backgroundImage: "url('http://127.0.0.1:8000/images/handshake.jpg')" }}
+                    style={{
+                        backgroundImage: "url('/images/browseCampaign.jpg')",
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                    }}
                 >
-                    <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full">
+                    <div className="absolute inset-0 bg-black opacity-30"></div>
+                    <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full relative z-10">
                         <h1 className="text-4xl font-bold text-white text-center dark:text-white">
                             <p>Together we Rise ToGather we Grow</p>
                         </h1>

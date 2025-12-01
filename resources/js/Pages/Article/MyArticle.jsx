@@ -257,13 +257,16 @@ export default function MyArticle({
         <Layout_User>
             {/* === Banner Section === */}
             <div className="w-full flex flex-col">
-                <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
-                    <img
-                        src="http://127.0.0.1:8000/images/writingArticle.jpg"
-                        alt="Article Banner"
-                        className="absolute inset-0 w-full h-full object-cover opacity-60"
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <div
+                    className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden"
+                    style={{
+                        backgroundImage: "url('/images/myArticle.jpg')",
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                    }}
+                >
+                    <div className="absolute inset-0 bg-black opacity-30"></div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10">
                         <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">
                             Manage & Review Your Own Articles
                         </h1>
