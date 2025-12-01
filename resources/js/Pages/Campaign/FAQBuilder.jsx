@@ -1,4 +1,9 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/Components/ui/accordion";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
@@ -11,10 +16,9 @@ import { toast } from "sonner";
 import { Toaster } from "@/Components/ui/sonner";
 import Popup from "@/Components/Popup";
 
-
-export const FaqBuilder = ({campaign, contents}) => {
-const [userQuestions, setUserQuestions] = useState(
-    contents.map(dat => {
+export const FaqBuilder = ({ campaign, contents }) => {
+    const [userQuestions, setUserQuestions] = useState(
+        contents.map((dat) => {
             const [question, answer] = dat.content.split("~;");
             return {
                 ...dat,
@@ -23,33 +27,33 @@ const [userQuestions, setUserQuestions] = useState(
                 isEditing: false,
             };
         })
-);
-const [openItem, setOpenItem] = useState(null)
+    );
+    const [openItem, setOpenItem] = useState(null);
 
-useEffect(() => {
-  const editingIndex = userQuestions.findIndex((q) => q.isEditing);
-  if (editingIndex !== -1) {
-    setOpenItem(`item-${editingIndex}`);
-  }
-}, [userQuestions])
+    useEffect(() => {
+        const editingIndex = userQuestions.findIndex((q) => q.isEditing);
+        if (editingIndex !== -1) {
+            setOpenItem(`item-${editingIndex}`);
+        }
+    }, [userQuestions]);
 
-const handleDelete = (itemToDelete, idx) => {
-    setUserQuestions((prev) => prev.filter((_, i) => i !== idx))
+    const handleDelete = (itemToDelete, idx) => {
+        setUserQuestions((prev) => prev.filter((_, i) => i !== idx));
 
-    if (contents?.some((c) => c.id === itemToDelete.id)) {
-        router.post(`/campaigns/deleteContent/${id}`)
-    }
-}
+        if (contents?.some((c) => c.id === itemToDelete.id)) {
+            router.post(`/campaigns/deleteContent/${id}`);
+        }
+    };
 
-  const handleChange = (index, field, value) => {
-      setUserQuestions((prev) =>
-          prev.map((item, i) =>
-              i === index ? { ...item, [field]: value } : item
-          )
-      );
-  };
+    const handleChange = (index, field, value) => {
+        setUserQuestions((prev) =>
+            prev.map((item, i) =>
+                i === index ? { ...item, [field]: value } : item
+            )
+        );
+    };
 
-     const handleAddQuestions = () => {
+    const handleAddQuestions = () => {
         setUserQuestions((prev) => [
             ...prev,
             {
@@ -57,7 +61,7 @@ const handleDelete = (itemToDelete, idx) => {
                 campaign_id: campaign.id,
                 question: "",
                 answer: "",
-                isEditing:false,
+                isEditing: false,
             },
         ]);
     };
@@ -71,26 +75,40 @@ const handleDelete = (itemToDelete, idx) => {
     };
 
     const handleSave = () => {
-        if(userQuestions.length === 0){
+        if (userQuestions.length === 0) {
             toast.error("there are empty descriptions!", {
-                 description:
-                     "please double check your description before submitting.",
-             });
-            return
+                description:
+                    "please double check your description before submitting.",
+            });
+            return;
         }
-        const data = userQuestions.map((_, idx) => ({id:userQuestions[idx].id ,campaign_id: campaign.id, type:'faqs', content:userQuestions[idx].question + "~;" + userQuestions[idx].answer, order_y: idx + 1}))
-        router.post('/campaigns/insertFAQ', data)
-    }
 
-    const handleRemove = (id, index) => {
-        if (id != undefined) {
-            router.post(`/campaigns/deleteContent/${id}`);
-        } else {
-            setUserQuestions((prev) => prev.filter((_, i) => i !== idx));
-        }
+        // turn off editing mode for all items and close accordion
+        const normalized = userQuestions.map((item) => ({
+            ...item,
+            isEditing: false,
+        }));
+        setUserQuestions(normalized);
+        setOpenItem(null);
+
+        const data = normalized.map((_, idx) => ({
+            id: normalized[idx].id,
+            campaign_id: campaign.id,
+            type: "faqs",
+            content: normalized[idx].question + "~;" + normalized[idx].answer,
+            order_y: idx + 1,
+        }));
+        router.post("/campaigns/insertFAQ", data);
     };
 
+    const handleRemove = (id, index) => {
+        // remove dari state langsung
+        setUserQuestions((prev) => prev.filter((_, i) => i !== index));
 
+        if (id != undefined) {
+            router.post(`/campaigns/deleteContent/${id}`);
+        }
+    };
 
     return (
         <div className="flex justify-center items-center flex-col gap-45 h-full">
@@ -210,43 +228,38 @@ const handleDelete = (itemToDelete, idx) => {
                                 </Accordion>
                                 <div className="flex gap-2">
                                     {dat.isEditing ? (
-                                        <Save
-                                            size={35}
+                                        <Button
+                                            className="p-0 w-12 h-12 cursor-pointer rounded-md bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white transition-colors"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleEdit(idx);
                                             }}
-                                            className="cursor-pointer rounded-md p-1 hover:bg-blue-200 text-blue-600 transition-colors"
-                                        />
+                                        >
+                                            <Save />
+                                        </Button>
                                     ) : (
-                                        <Button className="p-0 bg-transparent w-12 h-12 cursor-pointer rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 transition-colors">
-                                            <Edit
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleEdit(idx);
-                                                }}
-                                                className="w-12 h-12 mr-2 hover:bg-gray-100 hover:text-gray-600 text-gray-600"
-                                            />
+                                        <Button
+                                            className="p-0 w-12 h-12 cursor-pointer rounded-md bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white transition-colors"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleEdit(idx);
+                                            }}
+                                        >
+                                            <Edit />
                                         </Button>
                                     )}
-                                    {/* <Trash
-                                        size={35}
-                                        onClick={(e) => {
-                                            setOpenPop(true);
-                                        }}
-                                        className="w-full h-full cursor-pointer rounded-md p-1 hover:bg-gray-200 text-gray-600 hover:text-blue-600 transition-colors"
-                                    /> */}
-                                    {/* shadcn buttonnya sampah banget ajg */}
                                     <Popup
                                         triggerText={
-                                            <Trash className="w-12 h-12 mr-2 hover:bg-red-100 hover:text-red-600 text-gray-600" />
+                                            <Trash className="w-4 h-4" />
                                         }
                                         title="Delete FAQ?"
                                         description="This action cannot be undone, FAQ will be deleted permanently."
                                         confirmText="Yes, Delete"
                                         confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                        triggerClass="p-0 bg-transparent w-12 h-12 cursor-pointer rounded-md hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
-                                        onConfirm={() => handleRemove(dat.id, idx)}
+                                        triggerClass="p-0 w-12 h-12 cursor-pointer rounded-md bg-red-300 hover:bg-red-400 text-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white transition-colors"
+                                        onConfirm={() =>
+                                            handleRemove(dat.id, idx)
+                                        }
                                     />
                                 </div>
                             </div>
@@ -257,13 +270,18 @@ const handleDelete = (itemToDelete, idx) => {
             <div className="flex flex-row gap-5">
                 <Button
                     variant={"outline"}
-                    className="text-light"
                     onClick={handleAddQuestions}
+                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                 >
                     + Add Questions and answers
                 </Button>
                 {userQuestions.length > 0 && (
-                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button
+                        onClick={handleSave}
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    >
+                        Save Changes
+                    </Button>
                 )}
             </div>
             <Toaster
@@ -273,4 +291,4 @@ const handleDelete = (itemToDelete, idx) => {
             />
         </div>
     );
-}
+};

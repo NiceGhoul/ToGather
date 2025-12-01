@@ -72,9 +72,9 @@ export default function Navbar_User() {
 
     const handleStart = () => {
         if (draft) {
-            router.get(`campaigns/create/detailsPreview/${draft.id}`);
+            router.get(`/campaigns/create/detailsPreview/${draft.id}`);
         } else {
-            router.get("campaigns/create");
+            router.get("/campaigns/create");
         }
     };
 
@@ -216,9 +216,9 @@ export default function Navbar_User() {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="relative p-2"
+                                className="relative p-2 bg-white text-black hover:bg-purple-800 dark:bg-purple-200"
                             >
-                                <Bell className="h-5 w-5 text-white" />
+                                <Bell className="h-5 w-5" />
                                 {unreadCount > 0 && (
                                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                                         {unreadCount > 9 ? "9+" : unreadCount}

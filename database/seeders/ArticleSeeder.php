@@ -6,18 +6,22 @@ use Illuminate\Database\Seeder;
 use App\Models\Article;
 use App\Models\ArticleContent;
 use App\Models\Image;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 class ArticleSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get user IDs from database by email
+        $adminId = User::where('email', 'admin@email.com')->first()->id;
+        $authorId = User::where('email', 'togather_author@email.com')->first()->id;
 
         //List Articles
         $articles = [
             [
                 //Article 1
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Rumah Yatim Salurkan Bantuan Bahan Pokok, Ringankan Beban Lansia dan Dhuafa di Desa Sidomulyo',
                 'category' => 'Charity',
                 'thumbnail' => '1Thumb.jpg',
@@ -78,7 +82,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 2
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Donasi Anda Kembali Rekahkan Senyuman Kakek Zainal, Penjual Telur Asin si Seberang Padang',
                 'category' => 'Donation',
                 'thumbnail' => '2Thumb.jpg',
@@ -156,7 +160,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 3
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Kondisi Ayana Bayi Penderita Usus Bocor dan Gizi Buruk di Pariangan Semakin Membaik Berkat Uluran Tangan Donatur',
                 'category' => 'Donation',
                 'thumbnail' => '3Thumb.jpg',
@@ -245,7 +249,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 4
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Senyum Mbah Kasri Lansia Sebatang Kara Penjual Pecel Keliling Terima Bantuan Biaya Hidup Rumah Yatim',
                 'category' => 'Charity',
                 'thumbnail' => '4Thumb.jpg',
@@ -336,7 +340,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 5
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Bantuan Bahan Pokok Rumah Yatim Hangatkan Hati Yatim dan Dhuafa di MIS 7 Amal Bakti Binjai',
                 'category' => 'Charity',
                 'thumbnail' => '5Thumb.jpg',
@@ -397,7 +401,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 6
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Bagian 1: Pelatihan Kelompok Perempuan - Perjalanan Menuju Ogan Komering Ilir, Sumatera Selatan',
                 'category' => 'Community',
                 'thumbnail' => '6Thumb.jpg',
@@ -475,7 +479,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 7
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Bagian 2: Pelatihan Bersama Kelompok Perempuan Maju Jaya, Ogan Komering Ilir',
                 'category' => 'Community',
                 'thumbnail' => '7Thumb.jpg',
@@ -582,7 +586,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 8
-                'user_id' => 23,
+                'user_id' => $authorId,
                 'title' => 'Suka Cita Anak-anak Down Syndrome dan Santri Dukung Timnas U-22 di Lapangan Lawan Mali',
                 'category' => 'Community',
                 'thumbnail' => '8Thumb.jpg',
@@ -677,7 +681,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 9
-                'user_id' => 22,
+                'user_id' => $adminId,
                 'title' => 'Jangan Salah, Ini 4 Tips Memilih Platform Donasi Tepat',
                 'category' => 'Donation',
                 'thumbnail' => '9Thumb.jpg',
@@ -779,7 +783,7 @@ class ArticleSeeder extends Seeder
             ],
             [
                 //Article 10
-                'user_id' => 22,
+                'user_id' => $adminId,
                 'title' => 'Rumah Yatim Salurkan Bantuan Biaya Hidup di Pandowoharjo Sleman, Nek Tinah "Alhamdulillah Sangat Membantu!"',
                 'category' => 'Donation',
                 'thumbnail' => '10Thumb.jpg',
@@ -852,7 +856,7 @@ class ArticleSeeder extends Seeder
 
             // Create article
             $article = Article::create([
-                'user_id' => $data['user_id'] ?? 22,
+                'user_id' => $data['user_id'] ?? $adminId,
                 'title' => $data['title'],
                 'thumbnail' => $thumbnailMinio,
                 'category' => $data['category'],

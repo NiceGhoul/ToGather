@@ -22,14 +22,15 @@ return new class extends Migration
                   ->onDelete('set null');
             $table->string('title');
             $table->string('category');
-            $table->decimal('goal_amount', 10, 2);
+            $table->decimal('goal_amount', 50, 2);
             $table->enum('status', ['draft','pending', 'active', 'completed', 'rejected', 'banned', 'inactive'])->default('pending');
             $table->dateTime('start_campaign')->nullable();
             $table->dateTime('end_campaign')->nullable();
             $table->string('address');
-            $table->string('duration');
-            $table->text('description');
-            $table->decimal('collected_amount', 10, 2)->default(0.00);
+            $table->integer('duration');
+            $table->text('description')->nullable();
+            $table->text('rejected_reason')->nullable();
+            $table->decimal('collected_amount', 50, 2)->default(0.00);
             $table->timestamps();
         });
     }

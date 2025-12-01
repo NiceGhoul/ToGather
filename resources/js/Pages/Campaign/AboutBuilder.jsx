@@ -1,4 +1,11 @@
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import {
+    Card,
+    CardAction,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
@@ -11,11 +18,42 @@ import { router } from "@inertiajs/react";
 import Popup from "@/Components/Popup";
 import { Description } from "@radix-ui/react-dialog";
 
-
-export const AboutBuilder = ({campaign, contents}) => {
-    const [description, setDescription] = useState( contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
+export const AboutBuilder = ({ campaign, contents }) => {
+    const [description, setDescription] = useState(
+        contents.length > 0
+            ? contents
+            : [
+                  {
+                      id: null,
+                      campaign_id: campaign.id,
+                      type: "paragraph",
+                      content: "Our Story~;" + campaign.description,
+                      order_y: 1,
+                      isEditing: false,
+                  },
+              ]
+    );
+    const [oldDescription, setOldDescription] = useState(
+        contents.length > 0
+            ? contents
+            : [
+                  {
+                      id: null,
+                      campaign_id: campaign.id,
+                      type: "paragraph",
+                      content: "Our Story~;" + campaign.description,
+                      order_y: 1,
+                      isEditing: false,
+                  },
+              ]
+    );
+    const [isChanged, setIsChanged] = useState(false);
 
     const addParagraphBlock = () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "instant",
+        });
         setDescription((prev) => {
             const lastOrder =
                 prev.length > 0 ? prev[prev.length - 1].order_y : 0;
@@ -34,6 +72,10 @@ export const AboutBuilder = ({campaign, contents}) => {
     };
 
     const addMediaBlock = () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "instant",
+        });
         setDescription((prev) => {
             const lastOrder =
                 prev.length > 0 ? prev[prev.length - 1].order_y : 0;
@@ -52,15 +94,12 @@ export const AboutBuilder = ({campaign, contents}) => {
     };
 
     const handleChange = (index, value) => {
-     const file = value.file
-     console.log(value)
-     if (!file) return
-
         setDescription((prev) =>
             prev.map((block, i) =>
                 i === index ? { ...block, content: value } : block
             )
         );
+        setIsChanged(true);
     };
 
     const toggleBlockEdit = (index) => {
@@ -71,53 +110,71 @@ export const AboutBuilder = ({campaign, contents}) => {
         );
     };
 
-     const handleRemove = (id, index) => {
-         if (id != undefined) {
-             setDescription((prev) => prev.filter((_, i) => i !== index));
-             router.post(`/campaigns/deleteContent/${id}`);
-         } else {
-             setDescription((prev) => prev.filter((_, i) => i !== index));
-         }
-     };
+    const handleRemove = (id, index) => {
+        if (id != undefined) {
+            setDescription((prev) => prev.filter((_, i) => i !== index));
+            router.post(`/campaigns/deleteContent/${id}`);
+        } else {
+            setDescription((prev) => prev.filter((_, i) => i !== index));
+        }
+    };
 
-     const handleSave = () => {
-         if (description.some((dat) => dat.content === "")) {
-             toast.error("there are empty descriptions!", {description:"please double check your description before submitting."});
-         } else {
+    const handleSave = () => {
+        if (description.some((dat) => dat.content === "")) {
+            toast.error("there are empty descriptions!", {
+                description:
+                    "please double check your description before submitting.",
+            });
+        } else {
             const prepared = description.map((block, index) => {
                 return {
                     id: block.id ?? null,
                     campaign_id: block.campaign_id,
                     type: block.type,
-                    content: block.type === "paragraph" ? block.content : block.content?.file,
+                    content:
+                        block.type === "paragraph"
+                            ? block.content
+                            : block.content?.file,
                     // file: block.type === "media" ? block.content?.file ?? null : null,
-                    existing:  block.type === "media" && typeof block.content === "string" ? block.content : null,
+                    existing:
+                        block.type === "media" &&
+                        typeof block.content === "string"
+                            ? block.content
+                            : null,
                     order_y: block.order_y,
                 };
-            })
-             router.post("/campaigns/insertAbout", prepared)
-
-         }
-     };
+            });
+            router.post("/campaigns/insertAbout", prepared);
+        }
+    };
 
     return (
-        <Card className="w-full p-6 border border-gray-300 dark:border-gray-700 shadow-sm justify-center flex flex-col dark:bg-gray-800">
-            <CardHeader className="flex flex-col gap-4">
+        <Card className="w-full h-full p-6 border border-gray-300 dark:border-gray-700 shadow-sm justify-center flex flex-col dark:bg-gray-800">
+            <CardHeader className="relative bottom-0 top-0 flex flex-col gap-4">
                 <div className="flex flex-row w-full justify-between items-center">
                     <CardTitle className="text-xl font-semibold dark:text-white">
                         About Us
                     </CardTitle>
                 </div>
-                <div className="flex justify-center gap-4 mt-2">
-                    <Button onClick={addParagraphBlock}>
+                <div className="sticky flex justify-center gap-4 mt-2 top-[80px] z-35">
+                    <Button
+                        onClick={addParagraphBlock}
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    >
                         {" "}
                         + Add Paragraph{" "}
                     </Button>
-                    <Button onClick={addMediaBlock}> + Add Media </Button>
+                    <Button
+                        onClick={addMediaBlock}
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    >
+                        {" "}
+                        + Add Media{" "}
+                    </Button>
                 </div>
             </CardHeader>
             {description && description.length > 0 ? (
-                <CardContent className="flex flex-col gap-4 ">
+                <CardContent className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4 justify-center">
                         {description?.map((block, index) => (
                             <div
@@ -165,21 +222,22 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                         parts.join("~;")
                                                     );
                                                 }}
-                                                className="resize-none min-h-[120px]"
+                                                className="resize-none min-h-[120px] dark:text-gray-100"
                                             />
                                             <div className="flex gap-2">
                                                 <Button
                                                     onClick={() => {
                                                         toggleBlockEdit(index);
                                                     }}
+                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                                                 >
                                                     Save
                                                 </Button>
                                                 <Button
-                                                    variant="secondary"
                                                     onClick={() =>
                                                         toggleBlockEdit(index)
                                                     }
+                                                    className="bg-red-600 hover:bg-red-500 text-white"
                                                 >
                                                     Cancel
                                                 </Button>
@@ -195,7 +253,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                             </p>
                                             <div className="w-full flex justify-end">
                                                 <Button
-                                                    className="w-[10%]"
+                                                    className="w-[10%] bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                                                     size="sm"
                                                     onClick={() =>
                                                         toggleBlockEdit(index)
@@ -207,7 +265,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                         </div>
                                     )
                                 ) : (
-                                    <>
+                                    <div className="items-center flex flex-col">
                                         {block.content ? (
                                             <img
                                                 src={
@@ -215,7 +273,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                     block.media[0].url
                                                 }
                                                 alt="Preview"
-                                                className="w-full max-h-[400px] object-contain rounded"
+                                                className="w-[600px] min-h-[400px] object-fit rounded border-1 my-5"
                                             />
                                         ) : null}
                                         <Input
@@ -236,28 +294,34 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                 }
                                             }}
                                         />
-                                    </>
+                                    </div>
                                 )}
-                                    <Popup
-                                        triggerText={
-                                            <Button
-                                                variant="destructive"
-                                                size="icon"
-                                                // className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
-                                            >
-                                                <Trash2
-                                                    className="w-30 h-30 text-white p-0"
-                                                    strokeWidth={2.5}
-                                                />
-                                            </Button>
-                                        }
-                                        title={"Delete " + block.type + " ?"}
-                                        description={"This " + block.type + " will be removed permanently, are you sure?"}
-                                        confirmText="Yes, Confirm"
-                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                        triggerClass="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
-                                        onConfirm={() => handleRemove(block.id, index)}
-                                    />
+                                <Popup
+                                    triggerText={
+                                        <Button
+                                            size="icon"
+                                            className="bg-red-600 hover:bg-red-500 text-white"
+                                            // className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
+                                        >
+                                            <Trash2
+                                                className="w-30 h-30 text-white p-0"
+                                                strokeWidth={2.5}
+                                            />
+                                        </Button>
+                                    }
+                                    title={"Delete " + block.type + " ?"}
+                                    description={
+                                        "This " +
+                                        block.type +
+                                        " will be removed permanently, are you sure?"
+                                    }
+                                    confirmText="Yes, Confirm"
+                                    confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                    triggerClass="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
+                                    onConfirm={() =>
+                                        handleRemove(block.id, index)
+                                    }
+                                />
                             </div>
                         ))}
                     </div>
@@ -269,10 +333,17 @@ export const AboutBuilder = ({campaign, contents}) => {
                     </h3>
                 </CardContent>
             )}
-            {description.length > 0 ? (
-                <CardAction className="mt-10 justify-end flex items-end w-full">
-                    <Button onClick={handleSave}> Save Changes </Button>
-                </CardAction>
+            {description.length != oldDescription.length ||
+            description.some((dat) => oldDescription.map((a) => a === dat)) ? (
+                <CardFooter className="bottom-0 mt-10 justify-end flex items-end w-full">
+                    <Button
+                        onClick={handleSave}
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    >
+                        {" "}
+                        Save Changes{" "}
+                    </Button>
+                </CardFooter>
             ) : (
                 <></>
             )}

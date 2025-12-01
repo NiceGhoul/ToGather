@@ -12,7 +12,7 @@ export const AboutDetails = ({contents}) => {
                 <div className="flex flex-col gap-10 w-[80%]">
                     <div className="flex flex-col gap-4">
                         {description.map((block, index) => (
-                            <div key={index}className="rounded-lg p-3 flex flex-col gap-5 relative">
+                            <div key={index}className="rounded-lg p-3 flex flex-col gap-2 relative">
                                 {block.type === "paragraph" ? (
                                         <div className="flex flex-col gap-4 flex">
                                             <Label className="text-3xl font-bold text-[#7C4789]">

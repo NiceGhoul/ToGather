@@ -45,8 +45,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
     useEffect(() => {
         if (campaigns.images && (images.thumbnail === null)) {
             campaigns.images.map((dat) => {
-                console.log(dat)
-                dat.url.includes("thumbnail")
+                dat.url.toLowerCase().includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
                     : setImages((prev) => ({ ...prev, logo: dat.url }));
             });

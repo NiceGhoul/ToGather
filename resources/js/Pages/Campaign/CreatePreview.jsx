@@ -1,7 +1,13 @@
 import Popup from "@/Components/Popup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
-import {Card,CardContent, CardDescription, CardHeader, CardTitle,} from "@/Components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";
@@ -12,16 +18,15 @@ import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const PreviewLayout = ({ user, campaign, images }) => {
-    // console.log(campaign)
     return (
         <div className="flex container px-4 py-4 flex-row gap-16 justify-center items-center mx-auto scale-90 border-2 rounded-xl border-gray-300">
-            <div className="flex flex-col w-[600px] h-[400px]">
-                <div className="flex flex-row w-[600px] h-[400px] overflow-hidden border border-gray-800 rounded items-center">
+            <div className="flex flex-col min-w-[45%] max-h-[600px]  object-fit">
+                <div className="flex flex-row w-full min-h-[400px] overflow-hidden border border-gray-800 dark:border-gray-100 rounded items-center">
                     {images.thumbnailPreview != null ? (
                         <img
                             src={images.thumbnailPreview}
                             at="thumbnail"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full"
                         />
                     ) : (
                         <span className="text-gray-500 text-md w-full text-center italic">
@@ -29,17 +34,24 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                         </span>
                     )}
                 </div>
-                <div className="flex flex-row gap-2 my-5 justify-center items-center">
+                <div className="flex flex-row gap-4 my-5 justify-center items-center">
                     <Map />
-                    <p className="w-full text-center">
-                        {campaign.address}
+                    <p className="text-center">
+                        {campaign.locations
+                            ? campaign.locations.city +
+                              ", " +
+                              campaign.locations.country
+                            : campaign.address}
                     </p>
                 </div>
             </div>
             <div className="flex w-1/2 h-full overflow-hidden justify-center flex-col">
                 <div className="flex overflow-hidden item-center justify-start gap-5 flex-row">
                     <Avatar className="w-20 h-20 border-2 border-gray-700">
-                        <AvatarImage src={images.logoPreview} alt={campaign.title} />
+                        <AvatarImage
+                            src={images.logoPreview}
+                            alt={campaign.title}
+                        />
                         <AvatarFallback>{campaign.title[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col gap-1 justify-center">
@@ -57,7 +69,10 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
-                        {campaign.duration + " Days left"}
+                        {Math.ceil(
+                            (new Date(campaign.end_campaign) - new Date()) /
+                                (1000 * 60 * 60 * 24)
+                        ) + " Days left"}
                     </h1>
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -67,7 +82,8 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                     />
                     <span
                         className="absolute inset-0 flex items-start justify-center text-md font-medium "
-                        style={{ color: "black" }}>
+                        style={{ color: "black" }}
+                    >
                         0%
                     </span>
                 </div>
@@ -86,130 +102,164 @@ export const PreviewLayout = ({ user, campaign, images }) => {
     );
 };
 
-
-export const UploadSupportingMedia = ({handler}) => {
+export const UploadSupportingMedia = ({ handler }) => {
     return (
         <div className="w-3/6 flex container flex-col gap-4 justify-center items-start mx-auto scale-90 mt-5">
-            <Label className="text-xl dark:text-white">Upload Supporting Media</Label>
+            <Label className="text-xl dark:text-white">
+                Upload Supporting Media
+            </Label>
 
             <div className="flex container h-24 px-8 py-8 flex-row gap-4 justify-center items-center mx-auto border-2 rounded-xl border-gray-300">
                 <div>
-                    <Label htmlFor="picture" className="mb-1 dark:text-white">Thumbnail</Label>
-                    <Input id="picture" type="file" accept=".jpg,.jpeg,.png"  onChange={(e) => handler(e, "thumbnail")} />
+                    <Label htmlFor="picture" className="mb-1 dark:text-white">
+                        Thumbnail
+                    </Label>
+                    <Input
+                        id="picture"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handler(e, "thumbnail")}
+                    />
                 </div>
 
-                <Separator orientation="vertical" className="bg-gray-500 mt-2"/>
+                <Separator
+                    orientation="vertical"
+                    className="bg-gray-500 mt-2"
+                />
 
                 <div>
-                    <Label htmlFor="logo" className="mb-1 dark:text-white">Logo</Label>
-                    <Input id="logo" type="file" accept=".jpg,.jpeg,.png"  onChange={(e) => handler(e, "logo")} />
+                    <Label htmlFor="logo" className="mb-1 dark:text-white">
+                        Logo
+                    </Label>
+                    <Input
+                        id="logo"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handler(e, "logo")}
+                    />
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 const CreatePreview = () => {
     const { campaign, user } = usePage().props;
-    const [images, setImages] = useState({thumbnail: null, logo: null, thumbnailPreview: null, logoPreview: null})
-    const [openPopUp, setOpenPopUp] = useState(false)
-    const [popUpData, setPopupData] = useState({ title:"", description: "", confText: "", confColor:""})
+    const [images, setImages] = useState({
+        thumbnail: null,
+        logo: null,
+        thumbnailPreview: null,
+        logoPreview: null,
+    });
+    const [openPopUp, setOpenPopUp] = useState(false);
+    const [popUpData, setPopupData] = useState({
+        title: "",
+        description: "",
+        confText: "",
+        confColor: "",
+    });
 
     useEffect(() => {
-    if (campaign?.images && campaign.images.length > 0) {
-        const thumb = campaign.images.find(img => img.path.includes("thumbnail"));
-        const logo = campaign.images.find(img => img.path.includes("logo"));
-        console.log("im running here")
-        setImages(prev => ({
-            ...prev,
-            thumbnailPreview: thumb ? thumb.url : null,
-            logoPreview: logo ? logo.url : null,
-        }));
-
-    }
-}, [campaign]);
-
-useEffect(() => {
-console.log(images)
-},[images])
+        if (campaign?.images && campaign.images.length > 0) {
+            const thumb = campaign.images.find((img) =>
+                img.path.includes("thumbnail")
+            );
+            const logo = campaign.images.find((img) =>
+                img.path.includes("logo")
+            );
+            console.log("im running here");
+            setImages((prev) => ({
+                ...prev,
+                thumbnailPreview: thumb ? thumb.url : null,
+                logoPreview: logo ? logo.url : null,
+            }));
+        }
+    }, [campaign]);
 
     const handleImageChange = (e, type) => {
         const file = e.target.files[0];
         if (file) {
             const previewUrl = URL.createObjectURL(file);
-            setImages((prev) => ({...prev, [type]: file, [`${type}Preview`]: previewUrl}))
+            setImages((prev) => ({
+                ...prev,
+                [type]: file,
+                [`${type}Preview`]: previewUrl,
+            }));
         }
     };
-
 
     const handleNext = () => {
         // give error message
-        if (images.logo === null || images.thumbnail === null) {
-            setPopupData(({
-                title: "Warning",
-                description: "Thumbnail and logo must not be empty",
-                confText: "okay",
+        if (images.thumbnail === null) {
+            setPopupData({
+                title: "Warning!",
+                description: "Thumbnail must not be empty",
+                confText: "Okay",
                 confColor: "bg-red-600 hover:bg-red-700 text-white",
-            }));
+            });
             setOpenPopUp(true);
         } else {
-            setPopupData(({
+            setPopupData({
                 title: "Save Media?",
-                description: "save chosen media? you can change it later on",
-                confText: "confirm",
+                description: "Save chosen media? You can change it later on",
+                confText: "Confirm",
                 confColor: "bg-green-600 hover:bg-green-700 text-white",
-            }));
+            });
             setOpenPopUp(true);
         }
     };
 
+    ///===================================
     const uploadErrorHandler = (errors) => {
-    let fieldName = "";
-    let errorMessage = "";
+        let fieldName = "";
+        let errorMessage = "";
 
-    if (errors.thumbnail) {
-        fieldName = "thumbnail";
-        errorMessage = errors.thumbnail;
-    } else if (errors.logo) {
-        fieldName = "logo";
-        errorMessage = errors.logo;
-    } else {
-        errorMessage = "Unknown error occurred during upload.";
-    }
+        if (errors.thumbnail) {
+            fieldName = "thumbnail";
+            errorMessage = errors.thumbnail;
+        } else if (errors.logo) {
+            fieldName = "logo";
+            errorMessage = errors.logo;
+        } else {
+            errorMessage = "Unknown error occurred during upload.";
+        }
 
-    setPopupData({
-        title: "Upload Error",
-        description: `Error found when uploading ${fieldName ? fieldName : "file"}: ${errorMessage}`,
-        confText: "Okay",
-        confColor: "bg-red-600 hover:bg-red-700 text-white",
-    });
+        setPopupData({
+            title: "Upload Error",
+            description: `Error found when uploading ${
+                fieldName ? fieldName : "file"
+            }: ${errorMessage}`,
+            confText: "Okay",
+            confColor: "bg-red-600 hover:bg-red-700 text-white",
+        });
 
-    setOpenPopUp(true);
-};
+        setOpenPopUp(true);
+    };
+    ///===================================
 
     const handleSave = () => {
         const formData = new FormData();
         if (campaign && images) {
-            formData.append('thumbnail', images.thumbnail)
-            formData.append('logo', images.logo)
-            formData.append('campaign_id', campaign.id)
+            formData.append("thumbnail", images.thumbnail);
+            formData.append("logo", images.logo);
+            formData.append("campaign_id", campaign.id);
 
             router.post("/campaigns/upload-image", formData, {
-                forceFormData: true,
+                // forceFormData: true,
                 onError: (errors) => uploadErrorHandler(errors),
             });
         }
     };
 
     const handleBack = () => {
-        router.get(`/campaigns/create/${campaign.id}`)
-    }
+        router.get(`/campaigns/create/${campaign.id}`);
+    };
 
     const handleToPreview = () => {
-        router.get(`/campaigns/create/detailsPreview/${campaign.id}`)
-    }
+        router.get(`/campaigns/create/detailsPreview/${campaign.id}`);
+    };
 
-    console.log(campaign)
+    console.log(campaign);
     return (
         <Layout_User>
             <div>
@@ -218,7 +268,8 @@ console.log(images)
                         <div className="justify-center items-center">
                             <Button
                                 className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
-                                onClick={() => handleBack()}>
+                                onClick={() => handleBack()}
+                            >
                                 ← Back
                             </Button>
                         </div>
@@ -233,13 +284,12 @@ console.log(images)
                             </CardDescription>
                         </div>
                         <div className="justify-center items-center">
-                        <Button
-                            className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
-                            onClick={() => handleToPreview()}
-                        >
-                            Go to preview →
-                        </Button>
-
+                            <Button
+                                className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
+                                onClick={() => handleToPreview()}
+                            >
+                                Go to Preview →
+                            </Button>
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -254,7 +304,10 @@ console.log(images)
                             />
                         </div>
                         <div className="items-center text-center justify-center flex gap-5">
-                            <Button className="mt-5 w-20" onClick={handleNext}>
+                            <Button
+                                className="mt-5 w-20 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                onClick={handleNext}
+                            >
                                 Next
                             </Button>
                         </div>
@@ -270,9 +323,15 @@ console.log(images)
                     description={popUpData.description}
                     confirmText={popUpData.confText}
                     cancelText="Cancel"
-                    showCancel={popUpData.title === "Upload Error" ? false : true}
+                    showCancel={
+                        popUpData.title === "Upload Error" ? false : true
+                    }
                     confirmColor={popUpData.confColor}
-                    onConfirm={popUpData.title === "Upload Error" ? () => setOpenPopUp(false) : handleSave}
+                    onConfirm={
+                        popUpData.title === "Upload Error"
+                            ? () => setOpenPopUp(false)
+                            : handleSave
+                    }
                 />
             )}
         </Layout_User>
