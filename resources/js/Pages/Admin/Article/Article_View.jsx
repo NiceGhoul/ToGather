@@ -27,14 +27,6 @@ import "react-quill/dist/quill.snow.css";
 
 export default function ArticleView() {
     const { article } = usePage().props;
-    // local copy untuk hot-reload UI setelah action
-    const [localArticle, setLocalArticle] = useState(article);
-
-    // sync jika props berubah (contoh: reload dari server)
-    useEffect(() => {
-        setLocalArticle(article);
-    }, [article]);
-
     const from = new URL(window.location.href).searchParams.get("from");
 
     const [editingMode, setEditingMode] = useState(false);
@@ -106,31 +98,8 @@ export default function ArticleView() {
         else router.get("/admin/articles/list");
     };
 
-    const handleEnable = (id) =>
-        router.post(
-            `/admin/articles/${id}/enable`,
-            {},
-            {
-                onSuccess: () =>
-                    setLocalArticle((prev) => ({
-                        ...prev,
-                        status: "approved",
-                    })),
-            }
-        );
-
-    const handleDisable = (id) =>
-        router.post(
-            `/admin/articles/${id}/disable`,
-            {},
-            {
-                onSuccess: () =>
-                    setLocalArticle((prev) => ({
-                        ...prev,
-                        status: "disabled",
-                    })),
-            }
-        );
+    const handleEnable = (id) => router.post(`/admin/articles/${id}/approve`);
+    const handleDisable = (id) => router.post(`/admin/articles/${id}/disable`);
 
     const handleDelete = (id) => {
         router.post(
@@ -146,18 +115,7 @@ export default function ArticleView() {
         );
     };
 
-    const handleApprove = (id) =>
-        router.post(
-            `/admin/articles/${id}/approve`,
-            {},
-            {
-                onSuccess: () =>
-                    setLocalArticle((prev) => ({
-                        ...prev,
-                        status: "approved",
-                    })),
-            }
-        );
+    const handleApprove = (id) => router.post(`/admin/articles/${id}/approve`);
 
     const handleReject = (id, reason) => {
         router.post(
@@ -283,6 +241,11 @@ export default function ArticleView() {
         setExtraRows((r) => r + 1);
     };
 
+    const addColumn = () => {
+        if (maxX >= 2) return;
+        setExtraCols((c) => c + 1);
+    };
+
     // ---------------- IMAGE CROP --------------------
     const onSelectImageForBlock = (file, idx) => {
         setCropFile(file);
@@ -354,8 +317,8 @@ export default function ArticleView() {
     const saveAllChanges = () => {
         const fd = new FormData();
 
-        fd.append("title", localArticle.title);
-        fd.append("category", localArticle.category);
+        fd.append("title", article.title);
+        fd.append("category", article.category);
 
         blocks.forEach((b, i) => {
             fd.append(`contents[${i}][type]`, b.type);
@@ -371,7 +334,7 @@ export default function ArticleView() {
             }
         });
 
-        router.post(`/admin/articles/${localArticle.id}/update`, fd, {
+        router.post(`/admin/articles/${article.id}/update`, fd, {
             forceFormData: true,
             onSuccess: () => {
                 setSuccessPopupMessage("Article updated successfully!");
@@ -408,13 +371,13 @@ export default function ArticleView() {
             return (
                 <div className="mt-2 flex gap-2">
                     <Button
-                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
+                        className="text-white text-sm px-3 py-1 h-auto bg-purple-700"
                         onClick={() => addBlockAt(cell.x, cell.y, "text")}
                     >
                         <CaseSensitive />
                     </Button>
 
-                    <Button className="relative px-3 py-1 text-sm h-auto bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white">
+                    <Button className="relative px-3 py-1 text-sm h-auto bg-purple-700 text-white">
                         <ImageIcon />
                         <input
                             type="file"
@@ -458,14 +421,14 @@ export default function ArticleView() {
             return (
                 <div className="mt-2 flex gap-2">
                     <Button
-                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
+                        className="bg-purple-700 text-white text-sm px-3 py-1 h-auto"
                         onClick={() => startEdit(idxInBlocks)}
                     >
                         <Pencil className="w-4 h-4" />
                     </Button>
 
                     <Button
-                        className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white text-sm px-3 py-1 h-auto"
+                        className="bg-red-600 text-white text-sm px-3 py-1 h-auto"
                         onClick={() => removeBlock(idxInBlocks)}
                     >
                         <X className="w-4 h-4" />
@@ -491,7 +454,7 @@ export default function ArticleView() {
                 </Button>
 
                 <Button
-                    className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white text-sm px-3 py-1 h-auto"
+                    className="bg-red-600 text-white text-sm px-3 py-1 h-auto"
                     onClick={() => removeBlock(idxInBlocks)}
                 >
                     <X className="w-4 h-4" />
@@ -501,7 +464,7 @@ export default function ArticleView() {
     };
 
     return (
-        <Layout_Admin title={`View Article: ${localArticle.title}`}>
+        <Layout_Admin title={`View Article: ${article.title}`}>
             <div className="p-6 space-y-6">
                 {/* POPUPS */}
                 <Popup
@@ -509,7 +472,7 @@ export default function ArticleView() {
                     title={successPopupMessage}
                     description=""
                     confirmText="OK"
-                    confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
+                    confirmColor="bg-purple-800 text-white"
                     open={successPopupOpen}
                     onConfirm={() => {
                         setSuccessPopupOpen(false);
@@ -522,211 +485,88 @@ export default function ArticleView() {
 
                 {/* HEADER */}
                 <div className="flex flex-col gap-3">
-                    <h1 className="text-2xl font-bold">{localArticle.title}</h1>
+                    <h1 className="text-2xl font-bold">{article.title}</h1>
 
-                    <div className="flex items-center justify-between gap-2 bg-purple-200 dark:bg-purple-800 rounded-lg shadow-md p-4">
-                        {/* Status */}
-                        <div>
-                            <div
-                                className={
-                                    "px-3 py-1 rounded-md text-sm font-medium " +
-                                    (localArticle.status === "pending"
-                                        ? "bg-yellow-200 text-yellow-700 dark:bg-yellow-400 dark:text-white"
-                                        : localArticle.status === "disabled"
-                                        ? "bg-yellow-200 text-yellow-700 dark:bg-yellow-400 dark:text-white"
-                                        : localArticle.status === "approved" ||
-                                          localArticle.status === "active"
-                                        ? "bg-green-200 text-green-700 dark:bg-green-700 dark:text-white"
-                                        : localArticle.status === "rejected"
-                                        ? "bg-red-200 text-red-700 dark:bg-red-600 dark:text-white"
-                                        : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-white")
-                                }
-                            >
-                                Status:{" "}
-                                {localArticle.status.charAt(0).toUpperCase() +
-                                    localArticle.status.slice(1)}
-                            </div>
-                        </div>
-                        <div className="flex gap-2">
-                            {!editingMode && (
-                                <div className="flex gap-2">
-                                    {/* Pending */}
-                                    {localArticle.status === "pending" ? (
-                                        <>
-                                            <Button
-                                                className="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
-                                                onClick={() =>
-                                                    handleApprove(
-                                                        localArticle.id
-                                                    )
-                                                }
-                                            >
-                                                <Check className="w-4 h-4" />{" "}
-                                                Approve
-                                            </Button>
-
-                                            <Button
-                                                className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        localArticle.id
-                                                    )
-                                                }
-                                            >
-                                                <Trash className="w-4 h-4" />{" "}
-                                                Delete
-                                            </Button>
-                                        </>
-                                    ) : localArticle.status === "disabled" ? (
-                                        <>
-                                            {/* Disabled */}
-                                            <Button
-                                                className="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
-                                                onClick={() =>
-                                                    handleEnable(
-                                                        localArticle.id
-                                                    )
-                                                }
-                                            >
-                                                <Eye className="w-4 h-4" />{" "}
-                                                Enable
-                                            </Button>
-
-                                            <Button
-                                                className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        localArticle.id
-                                                    )
-                                                }
-                                            >
-                                                <Trash className="w-4 h-4" />{" "}
-                                                Delete
-                                            </Button>
-                                        </>
-                                    ) : localArticle.status === "approved" ? (
-                                        <>
-                                            {/* Enabled */}
-                                            <Button
-                                                className="bg-yellow-200 hover:bg-yellow-300 text-yellow-700 dark:bg-yellow-400 dark:hover:bg-yellow-600 dark:text-white"
-                                                onClick={() =>
-                                                    handleDisable(
-                                                        localArticle.id
-                                                    )
-                                                }
-                                            >
-                                                <EyeOff className="w-4 h-4" />{" "}
-                                                Disable
-                                            </Button>
-
-                                            <Button
-                                                className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        localArticle.id
-                                                    )
-                                                }
-                                            >
-                                                <Trash className="w-4 h-4" />{" "}
-                                                Delete
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {/* Rejected */}
-                                            <Button
-                                                className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        localArticle.id
-                                                    )
-                                                }
-                                            >
-                                                <Trash className="w-4 h-4" />{" "}
-                                                Delete
-                                            </Button>
-                                        </>
-                                    )}
+                    <div className="flex gap-2 justify-end">
+                        <Button
+                            onClick={() =>
+                                editingMode
+                                    ? (setPendingAction("exit"),
+                                      setUnsavedPopupOpen(true))
+                                    : setEditingMode(true)
+                            }
+                            className="bg-purple-800 text-white"
+                        >
+                            {!editingMode ? (
+                                <div className="flex items-center gap-2">
+                                    <Pencil className="w-4 h-4" />
+                                    Edit
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <PencilOff className="w-4 h-4" />
+                                    Exit Edit
                                 </div>
                             )}
-                            <Button
-                                onClick={() =>
-                                    editingMode
-                                        ? (setPendingAction("exit"),
-                                          setUnsavedPopupOpen(true))
-                                        : setEditingMode(true)
-                                }
-                                className="bg-purple-300 hover:bg-purple-400 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
-                            >
-                                {!editingMode ? (
-                                    <div className="flex items-center gap-2">
-                                        <Pencil className="w-4 h-4" />
-                                        Edit
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <PencilOff className="w-4 h-4" />
-                                        Exit Edit
-                                    </div>
-                                )}
-                            </Button>
-                            {editingMode && (
-                                <>
-                                    <Button
-                                        className="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
-                                        onClick={saveAllChanges}
-                                    >
-                                        <Save className="w-4 h-4" /> Save
-                                    </Button>
+                        </Button>
 
-                                    <Button
-                                        className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
-                                        onClick={cancelAll}
-                                    >
-                                        <Ban className="w-4 h-4" /> Cancel
-                                    </Button>
+                        {editingMode && (
+                            <>
+                                <Button
+                                    className="bg-green-700 text-white"
+                                    onClick={saveAllChanges}
+                                >
+                                    <Save className="w-4 h-4" /> Save
+                                </Button>
 
-                                    <Button
-                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
-                                        onClick={addRow}
-                                    >
-                                        <Rows2 className="w-4 h-4" /> Add Row
-                                    </Button>
-                                </>
-                            )}
-                            <Button
-                                className="bg-purple-300 hover:bg-purple-400 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
-                                onClick={() => {
-                                    if (editingMode) {
-                                        setPendingAction("back");
-                                        setUnsavedPopupOpen(true);
-                                    } else handleBack();
-                                }}
-                            >
-                                <ArrowBigLeft className="w-4 h-4" />
-                            </Button>
-                        </div>
+                                <Button
+                                    className="bg-red-600 text-white"
+                                    onClick={cancelAll}
+                                >
+                                    <Ban className="w-4 h-4" /> Cancel
+                                </Button>
+
+                                <Button
+                                    className="bg-purple-800 text-white"
+                                    onClick={addRow}
+                                >
+                                    <Rows2 className="w-4 h-4" /> Add Row
+                                </Button>
+                            </>
+                        )}
+
+                        <Button
+                            className="bg-purple-800 text-white"
+                            onClick={() => {
+                                if (editingMode) {
+                                    setPendingAction("back");
+                                    setUnsavedPopupOpen(true);
+                                } else handleBack();
+                            }}
+                        >
+                            <ArrowBigLeft className="w-4 h-4" />
+                        </Button>
                     </div>
                 </div>
 
                 {/* THUMBNAIL */}
-                {localArticle.thumbnail_url && (
-                    <div className="bg-purple-200 dark:bg-purple-800 rounded-lg shadow-md p-4">
+                {article.thumbnail_url && (
+                    <div>
                         <h2 className="font-semibold text-lg mb-2">
                             Thumbnail
                         </h2>
                         <img
-                            src={localArticle.thumbnail_url}
+                            src={article.thumbnail_url}
                             className="max-w-sm rounded shadow cursor-pointer"
                             onClick={() =>
-                                handleImageClick(localArticle.thumbnail_url)
+                                handleImageClick(article.thumbnail_url)
                             }
                         />
                     </div>
                 )}
 
                 {/* CONTENT GRID */}
-                <div className="bg-purple-200 dark:bg-purple-800 rounded-lg shadow-md p-4">
+                <div className="">
                     <h2 className="font-semibold text-lg mb-4">Content</h2>
 
                     <div
@@ -748,10 +588,10 @@ export default function ArticleView() {
                             return (
                                 <div
                                     key={`${y}-${x}`}
-                                    className="p-4 border rounded dark:bg-purple-200 bg-white "
+                                    className="p-4 border rounded bg-white"
                                 >
                                     <div className="flex justify-between mb-2">
-                                        <div className="text-xs text-gray-500 dark:text-purple-600">
+                                        <div className="text-xs text-gray-500">
                                             Block ({y}) –{" "}
                                             {block
                                                 ? block.type === "text" ||
@@ -774,8 +614,8 @@ export default function ArticleView() {
                                                     <div
                                                         className={
                                                             isDarkMode
-                                                                ? "dark:bg-green-800"
-                                                                : "dark:bg-yellow-800"
+                                                                ? "dark"
+                                                                : ""
                                                         }
                                                     >
                                                         <ReactQuill
@@ -784,7 +624,7 @@ export default function ArticleView() {
                                                             onChange={
                                                                 setQuillValue
                                                             }
-                                                            className="bg-white rounded border text-black"
+                                                            className="bg-white rounded border"
                                                         />
                                                     </div>
 
@@ -795,13 +635,12 @@ export default function ArticleView() {
                                                                     blockIdx
                                                                 )
                                                             }
-                                                            className="dark:bg-green-600 dark:hover:bg-green-500 dark:text-white bg-green-200 hover:bg-green-300 text-green-700"
                                                         >
                                                             Apply
                                                         </Button>
                                                         <Button
                                                             onClick={cancelEdit}
-                                                            className="dark:bg-red-600 dark:hover:bg-red-500 dark:text-white bg-red-200 hover:bg-red-300 text-red-700"
+                                                            className="bg-gray-400 text-white"
                                                         >
                                                             Cancel
                                                         </Button>
@@ -898,7 +737,7 @@ export default function ArticleView() {
                 title="Unsaved Changes"
                 description="You have unsaved changes. Are you sure you want to leave?"
                 confirmText="Proceed"
-                confirmColor="bg-red-600 hover:bg-red-500 text-white"
+                confirmColor="bg-red-600 text-white"
                 open={unsavedPopupOpen}
                 onConfirm={() => {
                     setUnsavedPopupOpen(false);

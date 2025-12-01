@@ -173,7 +173,7 @@ export default function ArticleRequestList() {
                 </h1>
 
                 {/* 🔹 Bulk Actions */}
-                <div className="mb-4 flex items-center gap-3 flex-row justify-end border-b bg-purple-200 dark:bg-purple-800 pb-3 pt-3 px-5 rounded-lg">
+                <div className="mb-4 flex items-center gap-3 flex-row justify-end border-b dark:border-gray-700 pb-3">
                     <div className="text-sm mr-auto dark:text-gray-200">
                         {selectedIds.length} selected
                     </div>
@@ -181,7 +181,7 @@ export default function ArticleRequestList() {
                     <Popup
                         triggerText={
                             <div className="flex items-center gap-2 cursor-pointer">
-                                <CheckCircle />
+                                <CheckCircle className="w-4 h-4 text-green-700" />
                                 <span>Approve Selected</span>
                             </div>
                         }
@@ -189,13 +189,13 @@ export default function ArticleRequestList() {
                         description="This will approve all selected articles."
                         confirmText="Yes, Approve"
                         confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                        triggerClass="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
+                        triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                         disabledValue={selectedIds.length === 0}
                         onConfirm={() => handleBulkApprove()}
                     />
 
                     <Button
-                        className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
+                        className="bg-red-200 hover:bg-red-300 text-red-700"
                         disabled={selectedIds.length === 0}
                         onClick={() => setBulkRejectModalOpen(true)}
                     >
@@ -207,10 +207,10 @@ export default function ArticleRequestList() {
                 </div>
 
                 {/* 🧾 Table + Pagination wrapper */}
-                <div className="bg-purple-200 dark:bg-purple-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[45rem]">
-                    <table className="min-w-full border dark:border-gray-700 text-sm dark:bg-purple-200">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[45rem]">
+                    <table className="min-w-full border dark:border-gray-700 text-sm dark:bg-gray-800">
                         <thead>
-                            <tr className="bg-purple-100 dark:bg-purple-600 text-left">
+                            <tr className="bg-gray-100 dark:bg-gray-700 text-left">
                                 <th className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                     <input
                                         type="checkbox"
@@ -224,21 +224,11 @@ export default function ArticleRequestList() {
                                         }
                                     />
                                 </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Id
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Title
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Author
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Category
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Created At
-                                </th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Id</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Title</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Author</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Category</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Created At</th>
                                 <th className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                     Action
                                 </th>
@@ -247,10 +237,7 @@ export default function ArticleRequestList() {
                         <tbody>
                             {currentArticles.length > 0 ? (
                                 currentArticles.map((a) => (
-                                    <tr
-                                        key={a.id}
-                                        className="hover:bg-gray-50 dark:hover:bg-purple-300"
-                                    >
+                                    <tr key={a.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"
@@ -262,24 +249,24 @@ export default function ArticleRequestList() {
                                                 }
                                             />
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 font-medium dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 font-medium dark:text-gray-200">
                                             {a.id}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 font-medium dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 font-medium dark:text-gray-200">
                                             {a.title}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.user?.nickname || a.user?.name}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {a.category}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {new Date(
                                                 a.created_at
                                             ).toLocaleString()}
                                         </td>
-                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-black">
+                                        <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <div className="flex flex-row justify-center gap-3">
                                                 <Button
                                                     onClick={() =>
@@ -287,7 +274,7 @@ export default function ArticleRequestList() {
                                                             `/admin/articles/${a.id}/view?from=verification`
                                                         )
                                                     }
-                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
+                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700"
                                                 >
                                                     <File />
                                                 </Button>
@@ -300,14 +287,14 @@ export default function ArticleRequestList() {
                                                     description="The article will be approved and shown publicly."
                                                     confirmText="Yes, Approve"
                                                     confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                                    triggerClass="bg-green-200 hover:bg-green-300 text-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
+                                                    triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                                                     onConfirm={() =>
                                                         handleApprove(a.id)
                                                     }
                                                 />
 
                                                 <Button
-                                                    className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
+                                                    className="bg-red-200 hover:bg-red-300 text-red-700"
                                                     onClick={() => {
                                                         setTargetRejectId(a.id);
                                                         setRejectModalOpen(
