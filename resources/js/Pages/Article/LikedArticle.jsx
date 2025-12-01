@@ -1,10 +1,10 @@
 import Layout_User from "@/Layouts/Layout_User";
 import { Link, usePage } from "@inertiajs/react";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Toggle } from "@/components/ui/toggle";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
+import { CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Toggle } from "@/Components/ui/toggle";
+import { Button } from "@/Components/ui/button";
+import { Separator } from "@/Components/ui/separator";
+import { Input } from "@/Components/ui/input";
 import { SearchIcon, Heart, RotateCcw } from "lucide-react";
 import { IconFolderCode } from "@tabler/icons-react";
 import {
@@ -14,7 +14,7 @@ import {
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
-} from "@/components/ui/empty";
+} from "@/Components/ui/empty";
 import { useMemo, useState } from "react";
 
 export default function LikedArticlesPage() {

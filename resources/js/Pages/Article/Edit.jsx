@@ -170,7 +170,6 @@ export default function Edit() {
                 id: c.id ?? null,
                 type: c.type,
                 content: c.image_url || c.content || null,
-                preview: c.image_url || null,
                 order_x: Number(c.order_x),
                 order_y: Number(c.order_y),
                 newFile: null,
@@ -195,7 +194,10 @@ export default function Edit() {
 
     // ------------------------ RENDER CELL CONTENT ------------------------
     const renderCellContent = (block, idx) => {
-        if (!block) return <div className="text-gray-400 dark:text-gray-500">Empty</div>;
+        if (!block)
+            return (
+                <div className="text-gray-400 dark:text-gray-500">Empty</div>
+            );
 
         if (block.type === "text" || block.type === "paragraph") {
             if (editingIndex === idx) {
@@ -221,7 +223,7 @@ export default function Edit() {
                                 <Check className="text-white" />
                             </Button>
                             <Button
-                                className="bg-red-600 hover:bg-red-700"
+                                className="bg-red-600 hover:bg-red-700 text-white"
                                 onClick={cancelEdit}
                             >
                                 <X />
@@ -249,7 +251,9 @@ export default function Edit() {
                         className="w-full rounded-md shadow"
                     />
                 ) : (
-                    <div className="text-gray-400 dark:text-gray-500">No Image</div>
+                    <div className="text-gray-400 dark:text-gray-500">
+                        No Image
+                    </div>
                 )}
             </div>
         );
@@ -394,7 +398,7 @@ export default function Edit() {
                                         setIsDirty(true);
                                         addRow();
                                     }}
-                                    className="bg-purple-800 hover:bg-purple-700"
+                                    className="bg-purple-800 hover:bg-purple-700 text-whtie"
                                 >
                                     Add Row
                                 </Button>
@@ -427,7 +431,7 @@ export default function Edit() {
                         return (
                             <div
                                 key={i}
-                                className="p-4 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 shadow-sm"
+                                className="p-4 border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 dark:text-purple-600 shadow-sm"
                             >
                                 <div className="mb-2 text-xs text-gray-400">
                                     Block ({y}) —{" "}
@@ -458,6 +462,7 @@ export default function Edit() {
                             router.reload();
                         }}
                         onClose={() => setSuccessPopupOpen(false)}
+                        confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
                     />
                 )}
 
@@ -476,6 +481,7 @@ export default function Edit() {
                             setIsDirty(false);
                         }}
                         onClose={() => setConfirmExitOpen(false)}
+                        confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
                     />
                 )}
             </div>

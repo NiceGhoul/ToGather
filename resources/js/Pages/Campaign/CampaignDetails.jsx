@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Toggle } from "@/Components/ui/toggle";
 import Layout_User from "@/Layouts/Layout_User";
 import Layout_Admin from "@/Layouts/Layout_Admin";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Heart, Map } from "lucide-react";

@@ -5,11 +5,16 @@ import { useState, useEffect } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Popup from "@/Components/Popup";
 import { Eye, EyeOff, Trash, RotateCcw, File, Ban } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 import { Label } from "@/Components/ui/label";
 
 export default function Campaign_List() {
-
     const { campaigns, filters, categories } = usePage().props;
     const [filteredCampaign, setFilteredCampaigns] = useState(campaigns || []);
     const [category, setCategory] = useState("All");
@@ -18,16 +23,24 @@ export default function Campaign_List() {
     const [selectedIds, setSelectedIds] = useState([]);
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
-    const statuses = ["active", "inactive", "pending", "draft", "rejected", "banned", "completed"]
-       const handleResetFilter = () => {
-           setCategory("All");
-           setStatus("All");
-           setSearch("");
-       };
+    const statuses = [
+        "active",
+        "inactive",
+        "pending",
+        "draft",
+        "rejected",
+        "banned",
+        "completed",
+    ];
+    const handleResetFilter = () => {
+        setCategory("All");
+        setStatus("All");
+        setSearch("");
+    };
 
     const handleDelete = (id) => {
-        router.post(`/admin/campaigns/delete/${id}`)
-    }
+        router.post(`/admin/campaigns/delete/${id}`);
+    };
 
     useEffect(() => {
         let result = campaigns;
@@ -40,7 +53,14 @@ export default function Campaign_List() {
         }
 
         if (search.trim() != "") {
-            result = result.filter((a) => a.title.toLowerCase().includes(search.toLowerCase()) || a.user.nickname.toLowerCase().includes(search.toLowerCase())) || a.user.name.toLowerCase().includes(search.toLowerCase())
+            result =
+                result.filter(
+                    (a) =>
+                        a.title.toLowerCase().includes(search.toLowerCase()) ||
+                        a.user.nickname
+                            .toLowerCase()
+                            .includes(search.toLowerCase())
+                ) || a.user.name.toLowerCase().includes(search.toLowerCase());
         }
 
         setFilteredCampaigns(result);
@@ -61,12 +81,12 @@ export default function Campaign_List() {
     };
 
     const handleView = (id) => {
-        router.get(`/admin/campaigns/view/${id}`)
-    }
+        router.get(`/admin/campaigns/view/${id}`);
+    };
 
     const handleChangeStatus = (id, status) => {
-        router.post(`/admin/campaigns/changeStatus/${id}`, {status: status})
-    }
+        router.post(`/admin/campaigns/changeStatus/${id}`, { status: status });
+    };
 
     return (
         <Layout_Admin title="Manage Campaigns">
@@ -111,7 +131,9 @@ export default function Campaign_List() {
 
                         {/* Status filter buttons */}
                         <div className="flex items-center gap-2">
-                            <Label className="dark:text-white text-base">Filter By Status: </Label>
+                            <Label className="dark:text-white text-base">
+                                Filter By Status:{" "}
+                            </Label>
                             <Select
                                 className="h-10 w-[250px] rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700 shadow-sm focus:border-purple-700 focus:ring-2 focus:ring-purple-700/50 focus:outline-none"
                                 onValueChange={(value) => setStatus(value)}
@@ -291,14 +313,18 @@ export default function Campaign_List() {
                                                     onClick={() =>
                                                         handleView(a.id)
                                                     }
-                                                    className="bg-purple-200 hover:bg-purple-300 dark:bg-purple-900 dark:hover:bg-purple-300">
-                                                    <File className="text-purple-700 dark:text-purple-300" />
+                                                    className="bg-purple-200 hover:bg-purple-300 "
+                                                >
+                                                    <File className="text-purple-700 " />
                                                 </Button>
                                                 {a.status === "active" && (
                                                     <Button
                                                         className="bg-yellow-200 hover:bg-yellow-300"
                                                         onClick={() =>
-                                                            handleChangeStatus(a.id,"inactive")
+                                                            handleChangeStatus(
+                                                                a.id,
+                                                                "inactive"
+                                                            )
                                                         }
                                                     >
                                                         <EyeOff className="text-yellow-700" />
@@ -308,7 +334,10 @@ export default function Campaign_List() {
                                                     <Button
                                                         className="bg-green-200 hover:bg-green-300"
                                                         onClick={() =>
-                                                            handleChangeStatus(a.id, "active")
+                                                            handleChangeStatus(
+                                                                a.id,
+                                                                "active"
+                                                            )
                                                         }
                                                     >
                                                         <Eye className="text-green-700" />

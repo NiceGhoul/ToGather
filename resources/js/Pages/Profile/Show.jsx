@@ -89,25 +89,35 @@ export default function Show({
         const newErrors = {};
 
         // Only validate if user is trying to change password
-        if (data.password || data.password_confirmation || data.current_password) {
+        if (
+            data.password ||
+            data.password_confirmation ||
+            data.current_password
+        ) {
             if (!data.current_password) {
-                newErrors.current_password = "Current password is required to change password.";
+                newErrors.current_password =
+                    "Current password is required to change password.";
             }
 
             if (data.password) {
                 if (data.password.length < 8) {
-                    newErrors.password = "Password must be at least 8 characters.";
+                    newErrors.password =
+                        "Password must be at least 8 characters.";
                 } else if (!/[A-Z]/.test(data.password)) {
-                    newErrors.password = "Password must include at least one uppercase letter.";
+                    newErrors.password =
+                        "Password must include at least one uppercase letter.";
                 } else if (!/[a-z]/.test(data.password)) {
-                    newErrors.password = "Password must include at least one lowercase letter.";
+                    newErrors.password =
+                        "Password must include at least one lowercase letter.";
                 } else if (!/\d/.test(data.password)) {
-                    newErrors.password = "Password must include at least one number.";
+                    newErrors.password =
+                        "Password must include at least one number.";
                 }
             }
 
             if (data.password && !data.password_confirmation) {
-                newErrors.password_confirmation = "Please confirm your new password.";
+                newErrors.password_confirmation =
+                    "Please confirm your new password.";
             } else if (data.password !== data.password_confirmation) {
                 newErrors.password_confirmation = "Passwords do not match.";
             }
@@ -187,9 +197,9 @@ export default function Show({
 
                                 <div className="flex gap-2">
                                     <Button
-                                        variant="outline"
                                         size="sm"
                                         onClick={() => setIsEditOpen(true)}
+                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
                                     >
                                         <Edit className="h-4 w-4 mr-2" />
                                         Edit Profile
@@ -427,8 +437,8 @@ export default function Show({
 
                             <div className="flex justify-end gap-3">
                                 <Button
-                                    variant="destructive"
                                     onClick={handleLogout}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
                                 >
                                     <LogOut className="h-4 w-4 mr-2" />
                                     Logout
@@ -441,9 +451,11 @@ export default function Show({
 
             {/* Edit Profile Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent className="max-w-md dark:bg-gray-800">
+                <DialogContent className="max-w-md dark:bg-gray-800 ">
                     <DialogHeader>
-                        <DialogTitle className="dark:text-white">Edit Profile</DialogTitle>
+                        <DialogTitle className="dark:text-white ">
+                            Edit Profile
+                        </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit} className="space-y-4">
                         {/* Profile Image Upload */}
@@ -493,7 +505,12 @@ export default function Show({
                         </div>
 
                         <div>
-                            <Label htmlFor="nickname" className="dark:text-white">Nickname</Label>
+                            <Label
+                                htmlFor="nickname"
+                                className="dark:text-white"
+                            >
+                                Nickname
+                            </Label>
                             <Input
                                 id="nickname"
                                 value={data.nickname}
@@ -510,7 +527,10 @@ export default function Show({
                         </div>
 
                         <div>
-                            <Label htmlFor="current_password" className="dark:text-white">
+                            <Label
+                                htmlFor="current_password"
+                                className="dark:text-white"
+                            >
                                 Current Password (leave blank to keep unchanged)
                             </Label>
                             <Input
@@ -522,15 +542,20 @@ export default function Show({
                                 }
                                 className="mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                             />
-                            {(passwordErrors.current_password || errors.current_password) && (
+                            {(passwordErrors.current_password ||
+                                errors.current_password) && (
                                 <p className="text-sm text-red-600 mt-1">
-                                    {passwordErrors.current_password || errors.current_password}
+                                    {passwordErrors.current_password ||
+                                        errors.current_password}
                                 </p>
                             )}
                         </div>
 
                         <div>
-                            <Label htmlFor="password" className="dark:text-white">
+                            <Label
+                                htmlFor="password"
+                                className="dark:text-white"
+                            >
                                 New Password
                             </Label>
                             <Input
@@ -549,24 +574,59 @@ export default function Show({
                             )}
                             {data.password && (
                                 <div className="mt-2 space-y-1 text-xs">
-                                    <p className={data.password.length >= 8 ? "text-green-600" : "text-gray-500"}>
-                                        {data.password.length >= 8 ? "✓" : "○"} At least 8 characters
+                                    <p
+                                        className={
+                                            data.password.length >= 8
+                                                ? "text-green-600"
+                                                : "text-gray-500"
+                                        }
+                                    >
+                                        {data.password.length >= 8 ? "✓" : "○"}{" "}
+                                        At least 8 characters
                                     </p>
-                                    <p className={/[A-Z]/.test(data.password) ? "text-green-600" : "text-gray-500"}>
-                                        {/[A-Z]/.test(data.password) ? "✓" : "○"} One uppercase letter
+                                    <p
+                                        className={
+                                            /[A-Z]/.test(data.password)
+                                                ? "text-green-600"
+                                                : "text-gray-500"
+                                        }
+                                    >
+                                        {/[A-Z]/.test(data.password)
+                                            ? "✓"
+                                            : "○"}{" "}
+                                        One uppercase letter
                                     </p>
-                                    <p className={/[a-z]/.test(data.password) ? "text-green-600" : "text-gray-500"}>
-                                        {/[a-z]/.test(data.password) ? "✓" : "○"} One lowercase letter
+                                    <p
+                                        className={
+                                            /[a-z]/.test(data.password)
+                                                ? "text-green-600"
+                                                : "text-gray-500"
+                                        }
+                                    >
+                                        {/[a-z]/.test(data.password)
+                                            ? "✓"
+                                            : "○"}{" "}
+                                        One lowercase letter
                                     </p>
-                                    <p className={/\d/.test(data.password) ? "text-green-600" : "text-gray-500"}>
-                                        {/\d/.test(data.password) ? "✓" : "○"} One number
+                                    <p
+                                        className={
+                                            /\d/.test(data.password)
+                                                ? "text-green-600"
+                                                : "text-gray-500"
+                                        }
+                                    >
+                                        {/\d/.test(data.password) ? "✓" : "○"}{" "}
+                                        One number
                                     </p>
                                 </div>
                             )}
                         </div>
 
                         <div>
-                            <Label htmlFor="password_confirmation" className="dark:text-white">
+                            <Label
+                                htmlFor="password_confirmation"
+                                className="dark:text-white"
+                            >
                                 Confirm New Password
                             </Label>
                             <Input
@@ -581,27 +641,37 @@ export default function Show({
                                 }
                                 className={`mt-1 dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                                     data.password_confirmation && data.password
-                                        ? data.password === data.password_confirmation
+                                        ? data.password ===
+                                          data.password_confirmation
                                             ? "border-green-500 focus:ring-green-500"
                                             : "border-red-500 focus:ring-red-500"
                                         : ""
                                 }`}
                             />
                             {data.password_confirmation && data.password && (
-                                <p className={`text-sm mt-1 flex items-center gap-1 ${
-                                    data.password === data.password_confirmation
-                                        ? "text-green-600"
-                                        : "text-red-600"
-                                }`}>
-                                    {data.password === data.password_confirmation ? "✔" : "✖"}{" "}
-                                    {data.password === data.password_confirmation
+                                <p
+                                    className={`text-sm mt-1 flex items-center gap-1 ${
+                                        data.password ===
+                                        data.password_confirmation
+                                            ? "text-green-600"
+                                            : "text-red-600"
+                                    }`}
+                                >
+                                    {data.password ===
+                                    data.password_confirmation
+                                        ? "✔"
+                                        : "✖"}{" "}
+                                    {data.password ===
+                                    data.password_confirmation
                                         ? "Passwords match"
                                         : "Passwords do not match"}
                                 </p>
                             )}
-                            {(passwordErrors.password_confirmation || errors.password_confirmation) && (
+                            {(passwordErrors.password_confirmation ||
+                                errors.password_confirmation) && (
                                 <p className="text-sm text-red-600 mt-1">
-                                    {passwordErrors.password_confirmation || errors.password_confirmation}
+                                    {passwordErrors.password_confirmation ||
+                                        errors.password_confirmation}
                                 </p>
                             )}
                         </div>
@@ -614,7 +684,11 @@ export default function Show({
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={processing}>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="bg-purple-800 hover:bg-purple-700 text-white"
+                            >
                                 {processing ? "Saving..." : "Save Changes"}
                             </Button>
                         </div>

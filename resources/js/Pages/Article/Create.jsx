@@ -28,25 +28,18 @@ export default function Create() {
         contents: [],
     });
 
-    // =====================================================
-    //                 BLOCK STATE (1 column)
-    // =====================================================
     const [blocks, setBlocks] = useState([
         { type: "text", content: "", order_x: 1, order_y: 1 },
     ]);
 
-    // =====================================================
-    //                    POPUP STATES
-    // =====================================================
+    //Popup states
     const [showConfirm, setShowConfirm] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [showError, setShowError] = useState(false);
     const [showTitleError, setShowTitleError] = useState(false);
     const [showCategoryError, setShowCategoryError] = useState(false);
 
-    // =====================================================
-    //                     THUMBNAIL
-    // =====================================================
+    // Thumbnail preview
     const [thumbPreview, setThumbPreview] = useState(null);
     const handleThumbnailChange = (e) => {
         const file = e.target.files[0];
@@ -56,16 +49,13 @@ export default function Create() {
         }
     };
 
-    // =====================================================
-    //                     BLOCK LOGIC
-    // =====================================================
+    // Block logic
     const updateBlockContent = (index, newContent) => {
         const updated = [...blocks];
         updated[index].content = newContent;
         setBlocks(updated);
     };
 
-    // ALWAYS add block below
     const addBlockAt = (order_x, order_y, type) => {
         const nextY = blocks.length + 1;
         setBlocks([
@@ -88,9 +78,6 @@ export default function Create() {
         setBlocks(updated);
     };
 
-    // =====================================================
-    //                      SUBMIT
-    // =====================================================
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -140,24 +127,19 @@ export default function Create() {
         });
     };
 
-    // =====================================================
-    //                     UI STARTS HERE
-    // =====================================================
     return (
         <Layout_User>
             <div className="container mx-auto px-4 py-8 space-y-8">
-                {/* FORM */}
+                {/* Form */}
                 <Card className="w-full my-5">
                     <CardHeader>
                         <CardTitle>Create New Article</CardTitle>
-                        <CardDescription>
-                            Add content blocks vertically (1 column).
-                        </CardDescription>
+                        <CardDescription>Create a new </CardDescription>
                     </CardHeader>
 
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* TITLE */}
+                            {/* Title */}
                             <div>
                                 <Label className="mb-1 dark:text-white">
                                     Title
@@ -170,7 +152,7 @@ export default function Create() {
                                 />
                             </div>
 
-                            {/* CATEGORY */}
+                            {/* Category */}
                             <div>
                                 <Label className="mb-1 dark:text-white">
                                     Category
@@ -182,9 +164,18 @@ export default function Create() {
                                         setData("category", e.target.value)
                                     }
                                 >
-                                    <option value="">Choose Category</option>
+                                    <option
+                                        value=""
+                                        className="dark:text-black"
+                                    >
+                                        Choose Category
+                                    </option>
                                     {categories.map((cat, i) => (
-                                        <option key={i} value={cat}>
+                                        <option
+                                            key={i}
+                                            value={cat}
+                                            className="dark:text-black"
+                                        >
                                             {cat}
                                         </option>
                                     ))}
@@ -213,14 +204,13 @@ export default function Create() {
                                 )}
                             </div>
 
-                            {/* ================================================= */}
-                            {/*                 BLOCK LIST (1 COLUMN)            */}
-                            {/* ================================================= */}
+                            {/* BLOCK LIST */}
+
                             <div className="space-y-5">
                                 {blocks.map((block, idx) => (
                                     <div
                                         key={idx}
-                                        className="border rounded-lg p-3 bg-gray-50 relative shadow-sm"
+                                        className="border rounded-lg p-3 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-purple-600 relative shadow-sm"
                                     >
                                         <p className="text-xs text-gray-500 mb-2">
                                             Block {idx + 1} – {block.type}
@@ -264,9 +254,8 @@ export default function Create() {
                                         {idx !== 0 && (
                                             <Button
                                                 type="button"
-                                                variant="destructive"
                                                 size="sm"
-                                                className="absolute top-2 right-2"
+                                                className="absolute top-2 right-2 bg-red-600 text-white hover:bg-red-500"
                                                 onClick={() => removeBlock(idx)}
                                             >
                                                 ✕
@@ -283,6 +272,7 @@ export default function Create() {
                                         onClick={() =>
                                             addBlockAt(1, 999, "text")
                                         }
+                                        className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
                                     >
                                         <CaseSensitive className="mr-1" />
                                         Add Text Block
@@ -294,6 +284,7 @@ export default function Create() {
                                         onClick={() =>
                                             addBlockAt(1, 999, "image")
                                         }
+                                        className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
                                     >
                                         <Image className="mr-1" />
                                         Add Image Block
@@ -302,7 +293,11 @@ export default function Create() {
                             </div>
 
                             <div className="flex justify-end">
-                                <Button type="submit" disabled={processing}>
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                                >
                                     {processing
                                         ? "Saving..."
                                         : "Submit Article"}
@@ -312,9 +307,7 @@ export default function Create() {
                     </CardContent>
                 </Card>
 
-                {/* ================================================= */}
-                {/*                     LIVE PREVIEW                */}
-                {/* ================================================= */}
+                {/* Live Preview*/}
                 <Card className="w-full sticky top-20 h-fit">
                     <CardHeader>
                         <CardTitle>Live Preview</CardTitle>
@@ -380,6 +373,7 @@ export default function Create() {
                         description="Article will be submitted for validation"
                         onConfirm={confirmSubmit}
                         onClose={() => setShowConfirm(false)}
+                        confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
                     />
                 )}
 
@@ -393,6 +387,7 @@ export default function Create() {
                             setShowSuccess(false);
                             router.get("/articles/list");
                         }}
+                        confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
                     />
                 )}
 
@@ -400,29 +395,32 @@ export default function Create() {
                     <Popup
                         title="Error"
                         description="Please fill title & category"
-                        confirmText="OK"
+                        confirmText="Okay"
                         showCancel={false}
                         onConfirm={() => setShowError(false)}
+                        confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
                     />
                 )}
 
                 {showTitleError && (
                     <Popup
                         title="Missing Title"
-                        confirmText="OK"
+                        confirmText="Okay"
                         description="Please fill the title section"
                         showCancel={false}
                         onConfirm={() => setShowTitleError(false)}
+                        confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
                     />
                 )}
 
                 {showCategoryError && (
                     <Popup
                         title="Missing Category"
-                        confirmText="OK"
+                        confirmText="Okay"
                         description="Please select a category"
                         showCancel={false}
                         onConfirm={() => setShowCategoryError(false)}
+                        confirmColor="bg-purple-800 hover:bg-purple-700 text-white"
                     />
                 )}
             </div>
