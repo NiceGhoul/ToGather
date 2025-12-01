@@ -371,13 +371,13 @@ export default function ArticleView() {
             return (
                 <div className="mt-2 flex gap-2">
                     <Button
-                        className="text-white text-sm px-3 py-1 h-auto bg-purple-700"
+                        className="text-white text-sm px-3 py-1 h-auto bg-purple-800  hover:bg-purple-700"
                         onClick={() => addBlockAt(cell.x, cell.y, "text")}
                     >
                         <CaseSensitive />
                     </Button>
 
-                    <Button className="relative px-3 py-1 text-sm h-auto bg-purple-700 text-white">
+                    <Button className="relative px-3 py-1 text-sm h-auto bg-purple-800 text-white hover:bg-purple-700">
                         <ImageIcon />
                         <input
                             type="file"
@@ -421,14 +421,14 @@ export default function ArticleView() {
             return (
                 <div className="mt-2 flex gap-2">
                     <Button
-                        className="bg-purple-700 text-white text-sm px-3 py-1 h-auto"
+                        className="bg-purple-700 text-white text-sm px-3 py-1 h-auto hover:bg-purple-600"
                         onClick={() => startEdit(idxInBlocks)}
                     >
                         <Pencil className="w-4 h-4" />
                     </Button>
 
                     <Button
-                        className="bg-red-600 text-white text-sm px-3 py-1 h-auto"
+                        className="bg-red-600 text-white text-sm px-3 py-1 h-auto hover:bg-red-500"
                         onClick={() => removeBlock(idxInBlocks)}
                     >
                         <X className="w-4 h-4" />
@@ -439,7 +439,7 @@ export default function ArticleView() {
 
         return (
             <div className="mt-2 flex gap-2">
-                <Button className="bg-purple-700 text-white text-sm px-3 py-1 h-auto relative">
+                <Button className="bg-purple-800 text-white hover:bg-purple-700  text-sm px-3 py-1 h-auto relative">
                     <ImageIcon />
                     <input
                         type="file"
@@ -495,7 +495,7 @@ export default function ArticleView() {
                                       setUnsavedPopupOpen(true))
                                     : setEditingMode(true)
                             }
-                            className="bg-purple-800 text-white"
+                            className="bg-purple-800 text-white hover:bg-purple-700"
                         >
                             {!editingMode ? (
                                 <div className="flex items-center gap-2">
@@ -513,21 +513,21 @@ export default function ArticleView() {
                         {editingMode && (
                             <>
                                 <Button
-                                    className="bg-green-700 text-white"
+                                    className="bg-green-700 text-white hover:bg-green-600"
                                     onClick={saveAllChanges}
                                 >
                                     <Save className="w-4 h-4" /> Save
                                 </Button>
 
                                 <Button
-                                    className="bg-red-600 text-white"
+                                    className="bg-red-600 text-white hover:bg-red-500"
                                     onClick={cancelAll}
                                 >
                                     <Ban className="w-4 h-4" /> Cancel
                                 </Button>
 
                                 <Button
-                                    className="bg-purple-800 text-white"
+                                    className="bg-purple-800 text-white hover:bg-purple-700"
                                     onClick={addRow}
                                 >
                                     <Rows2 className="w-4 h-4" /> Add Row
@@ -536,7 +536,7 @@ export default function ArticleView() {
                         )}
 
                         <Button
-                            className="bg-purple-800 text-white"
+                            className="bg-purple-800 text-white hover:bg-purple-700"
                             onClick={() => {
                                 if (editingMode) {
                                     setPendingAction("back");
@@ -635,12 +635,13 @@ export default function ArticleView() {
                                                                     blockIdx
                                                                 )
                                                             }
+                                                            className="bg-green-700 text-white hover:bg-green-600"
                                                         >
                                                             Apply
                                                         </Button>
                                                         <Button
                                                             onClick={cancelEdit}
-                                                            className="bg-gray-400 text-white"
+                                                            className="bg-red-600 hover:bg-red-500 text-white"
                                                         >
                                                             Cancel
                                                         </Button>

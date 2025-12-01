@@ -88,7 +88,9 @@ export default function Lookup() {
     return (
         <AdminLayout title="Lookup Table">
             <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4 dark:text-white">Lookup Table</h1>
+                <h1 className="text-2xl font-bold mb-4 dark:text-white">
+                    Lookup Table
+                </h1>
                 <div className="btnContainer mb-4 flex justify-end">
                     <Button
                         variant="default"
@@ -102,17 +104,32 @@ export default function Lookup() {
                 <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
                     <thead>
                         <tr className="bg-gray-100 dark:bg-gray-700">
-                            <th className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">ID</th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Type</th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Code</th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Value</th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Description</th>
-                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">Action</th>
+                            <th className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">
+                                ID
+                            </th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
+                                Type
+                            </th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
+                                Code
+                            </th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
+                                Value
+                            </th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
+                                Description
+                            </th>
+                            <th className="border px-4 py-2 dark:border-gray-700 dark:text-gray-200">
+                                Action
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {lookups.map((lookup) => (
-                            <tr key={lookup.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <tr
+                                key={lookup.id}
+                                className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
                                 <td className="border px-4 py-2 hidden dark:border-gray-700 dark:text-gray-200">
                                     {lookup.id}
                                 </td>
@@ -134,7 +151,7 @@ export default function Lookup() {
                                         variant="outline"
                                         size="icon"
                                         onClick={() => handleEdit(lookup)}
-                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700"
+                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-200 dark:hover:bg-purple-300 dark:text-purple-700   "
                                     >
                                         <Pencil className="w-4 h-4 text-purple-700 hover:text-purple-700" />
                                     </Button>
