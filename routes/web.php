@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Inertia\Inertia;
 
-
+// Guest accessible routes
 Route::get('/', function () {
     return redirect('/home');
 });
@@ -32,7 +32,7 @@ Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDe
 
 
 // --- Guest Routes ---
-// Only accessible by users who are NOT logged in.
+// Only accessible by users who are NOT logged in. Ini Buat Login
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('/login', [UserController::class, 'showLogin'])->name('login');
     Route::post('/user/login', [UserController::class, 'login']);
@@ -43,7 +43,9 @@ Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::post('/users/verify-otp', [UserController::class, 'verifyOtp']);
 });
 
-// --- Authenticated Routes ---
+
+
+// --- Authenticated Routes --- USER
 // Must be logged in to access.
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
@@ -86,7 +88,7 @@ Route::middleware('auth')->group(function () {
 
 
 
-
+    // User Verification
     Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
     Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
     Route::post('/upload-image', [ImageController::class, 'upload'])->name('image.upload');
