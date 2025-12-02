@@ -79,6 +79,7 @@ class CampaignController extends Controller
         );
 
         return redirect()->route('admin.campaign.adminIndex')->with('success', 'Campaign deleted!');
+
     }
 
 
@@ -116,7 +117,6 @@ class CampaignController extends Controller
     public function create($id = null)
     {
         $user = auth()->user();
-
         // Check if user is banned first
         if ($user->status->value === 'banned' || $user->status === 'banned') {
             return inertia('Verification/Banned');
@@ -184,7 +184,7 @@ class CampaignController extends Controller
         $campaigns = Campaign::with('images')->whereIn('status', ['completed', 'active'])->get();
         $lookups = Lookup::all();
 
-        return inertia('Campaign/CampaignList', [
+        return inertia::render('Campaign/CampaignList', [
             'campaigns' => $campaigns,
             'lookups' => $lookups,
         ]);

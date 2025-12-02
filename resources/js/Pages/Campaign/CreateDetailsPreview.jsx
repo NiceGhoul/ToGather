@@ -101,9 +101,15 @@ export const UpperPreview = ({ campaign, user, images }) => {
                     </span>
                 </div>
                 <p className="text-lg font-normal flex justify-end mt-2">
-                    {"Rp. " +
-                        campaign.collected_amount +
-                        ",00 / Rp. " +
+                    {parseInt(campaign.collected_amount).toLocaleString(
+                        "id-ID",
+                        {
+                            style: "currency",
+                            currency: "IDR",
+                            minimumFractionDigits: 2,
+                        }
+                    ) +
+                        " / " +
                         parseInt(campaign.goal_amount).toLocaleString("id-ID", {
                             style: "currency",
                             currency: "IDR",
@@ -115,7 +121,6 @@ export const UpperPreview = ({ campaign, user, images }) => {
                         pressed={like}
                         onPressedChange={() => setLike(!like)}
                         size="lg"
-                        // variant="outline"
                         variant={"outline"}
                         className="
                         data-[state=on]:bg-transparent
@@ -231,7 +236,8 @@ const CreateDetailsPreview = () => {
             <TabsTrigger
                 key={index}
                 value={index + 1}
-                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200">
+                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
+            >
                 {data}
             </TabsTrigger>
         );
@@ -283,14 +289,16 @@ const CreateDetailsPreview = () => {
                                 : " Edit everything about your campaign here! Add new campaign updates on the Updates Tab!"}
                         </CardDescription>
                     </div>
-                    <div className="justify-center items-center">
-                        <Button
-                            className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl "
-                            onClick={() => handleFinalize()}
-                        >
-                            Finalize →
-                        </Button>
-                    </div>
+                    {campaign.status === "draft" && (
+                        <div className="justify-center items-center">
+                            <Button
+                                className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl "
+                                onClick={() => handleFinalize()}
+                            >
+                                Finalize →
+                            </Button>
+                        </div>
+                    )}
                 </CardHeader>
 
                 <CardContent className="border-none">
@@ -303,10 +311,7 @@ const CreateDetailsPreview = () => {
             </Card>
 
             <div>
-                <Tabs
-                    defaultValue={flash?.activeTab ?? 1}
-                    className="w-full"
-                >
+                <Tabs defaultValue={flash?.activeTab ?? 1} className="w-full">
                     <div className="sticky top-[72px] z-40 bg-white rounded dark:bg-[#171717]">
                         <TabsList className="flex gap-40 bg-transparent border-b-1 border-gray-700 w-full mx-auto rounded-none">
                             {data.map((dat, idx) => {

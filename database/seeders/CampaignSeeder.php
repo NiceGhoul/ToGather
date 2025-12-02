@@ -670,9 +670,9 @@ class CampaignSeeder extends Seeder
             [
                 'campaign_id' => 1,
                 'type' => 'paragraph',
-                'content' => 'Our Second Year~;n our second year of business we have only grown... exponentially! We quickly outgrew our small roasting space and moved into a bigger warehouse location with a MUCH bigger coffee roaster and more space for order fulfillment to  help with our growing needs.
+                'content' => 'Our Second Year~;In our second year of business we have only grown... exponentially! We quickly outgrew our small roasting space and moved into a bigger warehouse location with a MUCH bigger coffee roaster and more space for order fulfillment to  help with our growing needs.
 
-                We have also more than doubled our amount of events we have been going to, with over 24 events we will have done by the end of the year. We are not slowing down any time soon and are on a quest to bring better coffee to gamers everywhere! Our goals are to continue to grow and this will only be our  first of hopefully MANY more Kickstarter campaigns to come!',
+                We have also more than doubled our amount of events we have been going to, with over 24 events we will have done by the end of the year. We are not slowing down any time soon and are on a quest to bring better coffee to gamers everywhere! Our goals are to continue to grow and this will only be our  first of hopefully MANY more campaigns to come!',
                 'order_y' => 9,
             ],
             [
@@ -778,7 +778,6 @@ class CampaignSeeder extends Seeder
                 Ascorbic Acid, Garlic Powder, Ground Black Pepper, Onion Powder.
 
                 Chilli & Garlic
-
                 INGREDIENTS: Venison (88%), Water, Salt, Smoked Paprika, Hot Chilli
                 Powder (chilli (60%), Paprika), Natural Flavor, Salt, Antioxidant Ascorbic
                 Acid, Garlic Powder, Onion Granules, Cayenne Pepper, Oregano, Ground

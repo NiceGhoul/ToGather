@@ -93,9 +93,11 @@ export const DonationsDetails = ({ donations }) => {
                     <EmptyMedia variant="icon">
                         <BanknoteArrowUp />
                     </EmptyMedia>
-                    <EmptyTitle>Feature not available</EmptyTitle>
+                    <EmptyTitle>This is the donation page</EmptyTitle>
                     <EmptyDescription>
-                        This feature is currently under maintainance
+                        Every donation this campaign obtained will be displayed
+                        here! You can see the donations amount, as well as the
+                        message left by donators!
                     </EmptyDescription>
                 </EmptyHeader>
                 <EmptyContent>{/* <Button>Add data</Button> */}</EmptyContent>

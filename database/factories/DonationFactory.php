@@ -24,7 +24,7 @@ class DonationFactory extends Factory
         return [
             'user_id' => $isAnonymous ? null : User::inRandomOrder()->first()->id,
             'campaign_id' => $this->faker->randomNumber(1, 11),
-            'amount' => $this->faker->numberBetween(1, 5000) * 10000,
+            'amount' => $this->faker->randomFloat(0, 10000, 50000000),
             'message' => $this->faker->boolean(70) ? $this->faker->sentence() : null,
             'anonymous' => $isAnonymous,
             'status' => $this->faker->randomElement(DonationStatus::cases()),
