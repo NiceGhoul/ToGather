@@ -1,7 +1,11 @@
-import { Accordion, AccordionContent, AccordionItem,AccordionTrigger} from "@/Components/ui/accordion";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/Components/ui/accordion";
 import { Label } from "@/Components/ui/label";
 import { useEffect, useState } from "react";
-
 
 export const FaqDetails = ({ contents }) => {
     const [userQuestions, setUserQuestions] = useState(
@@ -78,9 +82,9 @@ export const FaqDetails = ({ contents }) => {
             </div>
             <div className="flex flex-col">
                 <p>
-                    have any questions? send them{" "}
-                    <a href="/profile" className="text-blue-500 underline">
-                        here!
+                    Have any questions? Send them{" "}
+                    <a href="/profile" className="text-purple-500 underline">
+                        Here!
                     </a>
                 </p>
             </div>

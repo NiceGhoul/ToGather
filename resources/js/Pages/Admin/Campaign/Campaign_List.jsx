@@ -4,7 +4,15 @@ import { Button } from "@/Components/ui/button";
 import { useState, useEffect } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Popup from "@/Components/Popup";
-import { Eye, EyeOff, Trash, RotateCcw, File, Ban } from "lucide-react";
+import {
+    Eye,
+    EyeOff,
+    Trash,
+    RotateCcw,
+    File,
+    Ban,
+    EyeClosed,
+} from "lucide-react";
 import {
     Select,
     SelectContent,
@@ -81,7 +89,7 @@ export default function Campaign_List() {
     };
 
     const handleView = (id) => {
-        router.get(`/admin/campaigns/view/${id}`);
+        router.get(`/admin/campaigns/view/${id}?from=list`);
     };
 
     const handleChangeStatus = (id, status) => {
@@ -139,13 +147,14 @@ export default function Campaign_List() {
                                 onValueChange={(value) => setStatus(value)}
                             >
                                 <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Select a status" />
+                                    <SelectValue placeholder="Select a Status" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value={"All"}>All</SelectItem>
                                     {statuses.map((dat, idx) => (
                                         <SelectItem key={idx} value={dat}>
-                                            {dat}
+                                            {dat.charAt(0).toUpperCase() +
+                                                dat.slice(1)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -313,13 +322,13 @@ export default function Campaign_List() {
                                                     onClick={() =>
                                                         handleView(a.id)
                                                     }
-                                                    className="bg-purple-200 hover:bg-purple-300 "
+                                                    className="bg-purple-200 hover:bg-purple-300 cursor-pointer"
                                                 >
                                                     <File className="text-purple-700 " />
                                                 </Button>
                                                 {a.status === "active" && (
                                                     <Button
-                                                        className="bg-yellow-200 hover:bg-yellow-300"
+                                                        className="bg-yellow-200 hover:bg-yellow-300 cursor-pointer"
                                                         onClick={() =>
                                                             handleChangeStatus(
                                                                 a.id,
@@ -332,7 +341,7 @@ export default function Campaign_List() {
                                                 )}
                                                 {a.status === "inactive" && (
                                                     <Button
-                                                        className="bg-green-200 hover:bg-green-300"
+                                                        className="bg-green-200 hover:bg-green-300 cursor-pointer"
                                                         onClick={() =>
                                                             handleChangeStatus(
                                                                 a.id,
@@ -343,6 +352,13 @@ export default function Campaign_List() {
                                                         <Eye className="text-green-700" />
                                                     </Button>
                                                 )}
+                                                {(a.status === "completed" ||
+                                                    a.status === "rejected" ||
+                                                    a.status === "banned") && (
+                                                    <Button className="bg-gray-300/60 cursor-not-allowed text-gray-700 hover:bg-gray-300/60">
+                                                        <EyeClosed />
+                                                    </Button>
+                                                )}
                                                 <Popup
                                                     triggerText={
                                                         <Trash className="w-4 h-4" />
@@ -351,7 +367,7 @@ export default function Campaign_List() {
                                                     description="This action cannot be undone. The campaign will be permanently removed."
                                                     confirmText="Yes, Delete"
                                                     confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                                    triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
+                                                    triggerClass="bg-red-200 hover:bg-red-300 text-red-700 cursor-pointer"
                                                     onConfirm={() =>
                                                         handleDelete(a.id)
                                                     }

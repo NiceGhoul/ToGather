@@ -15,14 +15,14 @@ const CampaignList = () => {
     const [campaignList, setCampaignList] = useState(campaigns || []);
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
-    const [isShowMoreLoading, setIsShowMoreloading] = useState(false)
-    const [images, setImages] = useState({thumbnail: null, logo: null})
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
+    const [images, setImages] = useState({ thumbnail: null, logo: null });
 
-    console.log(campaigns)
-        const handleShowMore = () => {
-            setVisibleCampaign((prev) => prev + 8);
-            setIsShowMoreloading(false);
-        };
+    console.log(campaigns);
+    const handleShowMore = () => {
+        setVisibleCampaign((prev) => prev + 8);
+        setIsShowMoreloading(false);
+    };
 
     useEffect(() => {
         if (
@@ -73,22 +73,21 @@ const CampaignList = () => {
     };
 
     const colorCoder = (data) => {
-        if(data === 'Foods & Beverage'){
-            return "bg-[#B8DF5D]"
-        }else if(data === 'Beauty & Cosmetic'){
-            return "bg-[#FB84B2]"
-        }else if(data === 'Clothes & Fashion'){
-            return "bg-[#CDADF1]"
-        }else if(data === 'Services'){
-            return "bg-[#EDAC6B]"
-        }else if(data === 'Lifestyle'){
-            return "bg-[#D3DE5D]"
-        }else if(data === 'Logistics'){
-            return "bg-[#80BDF6]"
+        if (data === "Foods & Beverage") {
+            return "bg-[#B8DF5D]";
+        } else if (data === "Beauty & Cosmetic") {
+            return "bg-[#FB84B2]";
+        } else if (data === "Clothes & Fashion") {
+            return "bg-[#CDADF1]";
+        } else if (data === "Services") {
+            return "bg-[#EDAC6B]";
+        } else if (data === "Lifestyle") {
+            return "bg-[#D3DE5D]";
+        } else if (data === "Logistics") {
+            return "bg-[#80BDF6]";
         }
-    }
+    };
     const cardRepeater = (data, images) => {
-
         if (!data || data.length === 0) {
             return <p>No campaigns available.</p>;
         } else {
@@ -140,7 +139,10 @@ const CampaignList = () => {
                         </div>
 
                         <p className="h-[80px] text-sm text-gray-700 mb-3 text-justify dark:text-gray-300">
-                            {campaign.description?.replace(/(<([^>]+)>)/gi, "").slice(0, 150) || "No description available."}{"..."}
+                            {campaign.description
+                                ?.replace(/(<([^>]+)>)/gi, "")
+                                .slice(0, 150) || "No description available."}
+                            {"..."}
                         </p>
 
                         <div className="w-full bg-gray-200 rounded-full h-3 mb-3 dark:bg-gray-700">
@@ -173,11 +175,14 @@ const CampaignList = () => {
                         </p>
 
                         <div className="flex justify-center gap-2 mb-4">
-                            <span className={`inline-block text-sm font-semibold px-2 py-1 rounded-full ${campaign.duration}
+                            <span
+                                className={`inline-block text-sm font-semibold px-2 py-1 rounded-full ${
+                                    campaign.duration
+                                }
                             ${
                                 campaign.status === "active"
-                                    ? "bg-gray-100 text-gray-700"
-                                    : "bg-purple-100 text-purple-700"
+                                    ? "bg-gray-100 text-gray-700 dark:bg-gray-500 dark:text-white"
+                                    : "bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-white"
                             }`}
                             >
                                 {campaign.status === "completed"
@@ -189,13 +194,13 @@ const CampaignList = () => {
                                                   (1000 * 60 * 60 * 24)
                                           ),
                                           0
-                                      )} days left`}
+                                      )} Days left`}
                             </span>
                         </div>
 
                         <div className="flex justify-center mt-auto">
                             <Link
-                                href={`/campaigns/details/${campaign.id}`}
+                                href={`/campaigns/details/${campaign.id}?from=campaignList`}
                                 className="text-purple-700 hover:underline font-medium"
                             >
                                 View Details →
@@ -213,7 +218,10 @@ const CampaignList = () => {
             <div className="w-full flex flex-col">
                 <div
                     className="relative h-72 w-full bg-cover bg-center"
-                    style={{backgroundImage: "url('http://127.0.0.1:8000/images/handshake.jpg')" }}
+                    style={{
+                        backgroundImage:
+                            "url('http://127.0.0.1:8000/images/handshake.jpg')",
+                    }}
                 >
                     <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full">
                         <h1 className="text-4xl font-bold text-white text-center dark:text-white">
@@ -248,28 +256,26 @@ const CampaignList = () => {
                                 onClick={() =>
                                     handleCategoryChange(item.lookup_value)
                                 }
-                                className={
-                                    `px-4 py-2 rounded-md text-white transition-all duration-200 ${
+                                className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
                                     chosenCategory === item.lookup_value
                                         ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
-                                        : `text-white hover:bg-purple-700 ${colorCoder(item.lookup_value)}`
-                                }`
-                            }
+                                        : `text-white hover:bg-purple-700 bg-purple-800`
+                                }`}
                             >
                                 {item.lookup_value}
                             </Button>
                         ))}
-                        <Button
-                            key={999}
-                            onClick={() => handleCategoryChange("Completed")}
-                            className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
-                                chosenCategory === "Completed"
-                                    ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
-                                    : " text-white hover:bg-purple-700 bg-purple-800"
-                            }`}
-                        >
-                            Completed
-                        </Button>
+                    <Button
+                        key={999}
+                        onClick={() => handleCategoryChange("Completed")}
+                        className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
+                            chosenCategory === "Completed"
+                                ? "bg-white text-purple-700 font-semibold shadow-md hover:bg-white"
+                                : " text-white hover:bg-purple-700 bg-purple-800"
+                        }`}
+                    >
+                        Completed
+                    </Button>
                 </div>
             </div>
 
@@ -315,12 +321,16 @@ const CampaignList = () => {
                                 onClick={handleShowMore}
                                 className="text-sm text-gray-400 font-thin"
                             >
-                                {isShowMoreLoading && <Spinner className="w-4 h-4" />}
+                                {isShowMoreLoading && (
+                                    <Spinner className="w-4 h-4" />
+                                )}
                                 show more
                             </p>
                             <Separator className="flex-1 bg-gray-400 h-[1px]" />
                         </div>
-                    ) : <></>}
+                    ) : (
+                        <></>
+                    )}
                 </CardContent>
             </div>
         </Layout_User>

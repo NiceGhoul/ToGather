@@ -428,10 +428,7 @@ export default function Article_List() {
                                                     </Button>
                                                 )}
                                                 {a.status === "rejected" && (
-                                                    <Button
-                                                        className="bg-gray-300/60 cursor-not-allowed text-gray-700 hover:bg-gray-300/60"
-                                                        disabled
-                                                    >
+                                                    <Button className="bg-gray-300/60 cursor-not-allowed text-gray-700 hover:bg-gray-300/60">
                                                         <EyeClosed />
                                                     </Button>
                                                 )}

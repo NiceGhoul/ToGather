@@ -31,6 +31,7 @@ import { UpdateBuilder } from "./UpdatesBuilder";
 
 export const UpperPreview = ({ campaign, user, images }) => {
     const [like, setLike] = useState(false);
+
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
             <div className="flex flex-col min-w-[50%] max-h-full">
@@ -155,7 +156,17 @@ const CreateDetailsPreview = () => {
     });
 
     const handleBack = () => {
-        router.get(`/campaigns/create/createPreview/${campaign.id}`);
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+
+        if (from === "myCampaigns") {
+            router.get(
+                `/campaigns/create/createPreview/${campaign.id}` +
+                    "?from=myCampaigns"
+            );
+        } else {
+            router.get(`/campaigns/create/createPreview/${campaign.id}`);
+        }
     };
 
     const handleFinalize = () => {

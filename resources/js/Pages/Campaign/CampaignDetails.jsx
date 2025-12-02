@@ -26,9 +26,7 @@ const scrollDonations = (data, idx) => {
         >
             <div className="overflow-hidden flex items-center justify-center shrink-0">
                 <Avatar className="w-14 h-14 border-2 dark:bg-white">
-                    <AvatarImage
-                        src={data.user ?? data?.user?.images[0].url}
-                    />
+                    <AvatarImage src={data.user ?? data?.user?.images[0].url} />
                     <AvatarFallback>
                         {data.anonymous === 0 ? data.user.nickname[0] : "A"}
                     </AvatarFallback>
@@ -97,7 +95,7 @@ const tabsContentRepeater = (data, campaign, index, contents, donations) => {
     return (
         <TabsContent
             value={index + 1}
-            className="w-[90%] h-[100%] text-lg text-center py-4"
+            className="w-[90%] h-full text-lg text-center py-4"
         >
             {contentDivider(data, campaign, contents, donations)}
         </TabsContent>
@@ -115,7 +113,16 @@ export default function Create() {
     const percentage = Math.round(
         (campaign.collected_amount / campaign.goal_amount) * 100
     );
+    const from = new URL(window.location.href).searchParams.get("from");
 
+    const backRoutes = {
+        verification: "/admin/campaigns/verification",
+        myCampaigns: "/campaigns/myCampaigns",
+        list: "/admin/campaigns/list",
+        campaignList: "/campaigns/list",
+        likedCampaign: "/campaigns/likedCampaign",
+    };
+    const backUrl = backRoutes[from];
     useEffect(() => {
         if (
             campaign.images &&
@@ -164,13 +171,19 @@ export default function Create() {
 
     const mainData = () => {
         return (
-            <div>
+            <div className="max-w-6xl mx-auto px-4">
+                <Button
+                    className="mt-8 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white cursor-pointer"
+                    onClick={() => router.get(backUrl)}
+                >
+                    Back
+                </Button>
                 <h1 className="text-2xl text-center font-semibold mb-5 mt-10">
                     {/* Recent Donations */}
                 </h1>
                 <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
-                <div className="flex-col flex gap-2 m-4">
-                    <div className="w-full overflow-hidden p-2 scrollbar-hide">
+                <div className="flex flex-col gap-2 my-4">
+                    <div className="w-full overflow-hidden p-2">
                         <div className="auto-scroll-horizontal">
                             {donations.length > 0 ? (
                                 donations
@@ -188,8 +201,8 @@ export default function Create() {
                 </div>
                 <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
                 {/* pictures and titles */}
-                <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
-                    <div className="flex flex-col min-w-[50%] max-h-full">
+                <div className="flex flex-col lg:flex-row px-4 py-8 gap-8 items-start w-full">
+                    <div className="flex flex-col lg:w-1/2 w-full max-h-full">
                         <div className="flex flex-row min-w-full min-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
                             {images.thumbnail ? (
                                 <img
@@ -215,8 +228,8 @@ export default function Create() {
                         </div>
                     </div>
 
-                    <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
-                        <div className="flex overflow-hidden item-center justify-start gap-5 flex-row">
+                    <div className="flex flex-col lg:w-1/2 w-full h-full overflow-hidden justify-center">
+                        <div className="flex items-center gap-5">
                             <Avatar className="w-20 h-20 border-2 border-gray-700">
                                 <AvatarImage
                                     src={images.logo}
@@ -295,16 +308,16 @@ export default function Create() {
                                 onPressedChange={() => handleLikes(campaign.id)}
                                 size="lg"
                                 variant="outline"
-                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
+                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500 hover:bg-red-100 dark:hover:bg-red-600"
                             >
                                 <Heart />
                                 {!like
-                                    ? "like this campaign"
-                                    : "campaign liked"}
+                                    ? "Like This Campaign"
+                                    : "Campaign Liked"}
                             </Toggle>
 
                             <Link href={`/donate?campaign_id=${campaign.id}`}>
-                                <Button className="min-h-10 min-w-56 font-semibold text-lg">
+                                <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
                                     Donate
                                 </Button>
                             </Link>
@@ -317,13 +330,13 @@ export default function Create() {
                         defaultValue={flash?.activeTab ?? 1}
                         className="w-full"
                     >
-                        <div className="dark:border-t-1 sticky top-[72px] z-40 bg-none pt-3 dark:pt-2 h-[50px]">
-                            <TabsList className="text-gray-500 flex gap-40 bg-[#fcfcfc] dark:bg-gray-800 p-2 shadow-md w-fit mx-auto rounded-md dark:text-white h-[48px] ">
+                        <div className="dark:border-t-1 sticky top-[72px] z-40 bg-none pt-3 dark:pt-2 h-auto">
+                            <TabsList className="text-gray-500 flex gap-6 bg-[#fcfcfc] dark:bg-gray-800 p-2 shadow-md w-full max-w-3xl mx-auto rounded-md dark:text-white h-[48px] ">
                                 {data.map((dat, idx) => {
                                     return (
                                         <TabsTrigger
                                             value={idx + 1}
-                                            className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm"
+                                            className="flex px-4 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm"
                                         >
                                             {dat}
                                         </TabsTrigger>
@@ -332,6 +345,17 @@ export default function Create() {
                             </TabsList>
                         </div>
                         <div className="mt-10 flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.90]">
+                            {data.map((dat, idx) => {
+                                return tabsContentRepeater(
+                                    dat,
+                                    campaign,
+                                    idx,
+                                    contents,
+                                    donations
+                                );
+                            })}
+                        </div>
+                        <div className="mt-8 w-full">
                             {data.map((dat, idx) => {
                                 return tabsContentRepeater(
                                     dat,
@@ -354,19 +378,9 @@ export default function Create() {
         ) : (
             <Layout_Admin
                 title={
-                    <Button
-                        className=""
-                        onClick={() => {
-                            router.get(
-                                "/admin/campaigns/list",
-                                {},
-                                { replace: true }
-                            );
-                        }}
-                    >
-                        {" "}
-                        Back{" "}
-                    </Button>
+                    campaign
+                        ? `Campaign Details - ${campaign.title}`
+                        : "Campaign Details"
                 }
             >
                 {mainData()}
