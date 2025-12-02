@@ -12,6 +12,7 @@ import {
 import { CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { IconFolderCode } from "@tabler/icons-react";
+import { Skeleton } from "@/Components/ui/skeleton";
 import { useMemo, useState } from "react";
 import { Separator } from "@/Components/ui/separator";
 import { SearchIcon, RotateCcw } from "lucide-react";
@@ -36,17 +37,44 @@ export default function LikedCampaign() {
         return ["All", ...unique];
     }, [likedCampaign]);
 
+    // Skeleton component
+    const CampaignSkeleton = () => (
+        <div className="border dark:border-gray-700 rounded-lg p-4 shadow-md flex flex-col justify-between bg-white dark:bg-gray-800">
+            <Skeleton className="w-full h-64 mb-4 rounded" />
+            <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/2 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/3 mx-auto mb-2" />
+            <Skeleton className="h-3 w-full mb-3" />
+            <Skeleton className="h-4 w-full mb-4" />
+            <div className="flex justify-center gap-2 mb-4">
+                <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <div className="flex justify-between items-center mt-auto">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-16" />
+            </div>
+        </div>
+    );
+
     // SEARCH / RESET
     const handleSearch = () => {
-        setSearchQuery(searchTerm);
-        setVisibleItems(8);
+        setIsLoading(true);
+        setTimeout(() => {
+            setSearchQuery(searchTerm);
+            setVisibleItems(8);
+            setIsLoading(false);
+        }, 500);
     };
     const handleReset = () => {
-        setSearchTerm("");
-        setSearchQuery("");
-        setChosenCategory("All");
-        setSortOrder("desc");
-        setVisibleItems(8);
+        setIsLoading(true);
+        setTimeout(() => {
+            setSearchTerm("");
+            setSearchQuery("");
+            setChosenCategory("All");
+            setSortOrder("desc");
+            setVisibleItems(8);
+            setIsLoading(false);
+        }, 500);
     };
 
     const handleShowMore = () => {
@@ -254,8 +282,12 @@ export default function LikedCampaign() {
                         <Button
                             key={idx}
                             onClick={() => {
-                                setChosenCategory(item);
-                                setVisibleItems(8);
+                                setIsLoading(true);
+                                setTimeout(() => {
+                                    setChosenCategory(item);
+                                    setVisibleItems(8);
+                                    setIsLoading(false);
+                                }, 500);
                             }}
                             className={`${
                                 chosenCategory === item
@@ -274,8 +306,12 @@ export default function LikedCampaign() {
                 <select
                     value={sortOrder}
                     onChange={(e) => {
-                        setSortOrder(e.target.value);
-                        setVisibleItems(8);
+                        setIsLoading(true);
+                        setTimeout(() => {
+                            setSortOrder(e.target.value);
+                            setVisibleItems(8);
+                            setIsLoading(false);
+                        }, 500);
                     }}
                     className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 >
@@ -322,7 +358,13 @@ export default function LikedCampaign() {
                 </CardHeader>
 
                 <CardContent>
-                    {filteredList.length === 0 ? (
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {[...Array(8)].map((_, idx) => (
+                                <CampaignSkeleton key={idx} />
+                            ))}
+                        </div>
+                    ) : filteredList.length === 0 ? (
                         emptyView
                     ) : (
                         <>
