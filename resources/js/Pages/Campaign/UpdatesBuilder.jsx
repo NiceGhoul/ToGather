@@ -143,10 +143,10 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
             <Label className="text-3xl justify-center items-center font-bold text-[#7C4789] dark:text-purple-400">
                 Project Updates
             </Label>
-            <div className="flex flex-col justify-center items-center gap-8 h-full w-full p-6">
+            <div className="flex w-full h-screen justify-center items-center gap-8 h-full w-full p-6">
                 <div className="flex flex-row gap-8 justify-between w-full h-full">
                     {/* kiri */}
-                    <div className="flex-1 flex flex-col gap-4 min-h-[100%]">
+                    <div className="flex-1 overflow-y-auto p-4 flex-col gap-4 min-h-[100%]">
                         {selectedUpdate ? (
                             <>
                                 {/* Title */}
@@ -357,14 +357,16 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                                 </div>
                             </>
                         ) : (
-                            <Label className="w-full h-full items-center justiff-center text-lg italic text-gray-400 dark:text-gray-500">
-                                No updates have been made.
-                            </Label>
+                            <div className="w-full h-full">
+                                <Label className="w-full h-full items-center justify-center text-lg italic text-gray-400 dark:text-gray-500">
+                                    No updates have been made.
+                                </Label>
+                            </div>
                         )}
                     </div>
 
                     {/* kanan */}
-                    <div className="w-[280px] rounded-2xl p-4 flex flex-col gap-3 h-fit shadow-md justify-center dark:bg-gray-900 ">
+                    <div className="w-[280px] rounded-2xl p-4 flex flex-col gap-3 h-fit shadow-md justify-center dark:bg-gray-900 w-80 p-4 sticky top-30">
                         <Label className="w-full justify-center dark:text-white font-semibold text-xl py-3 border-b-1 border-black dark: border-gray-400">
                             Campaign Updates
                         </Label>

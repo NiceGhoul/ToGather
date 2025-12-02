@@ -18,36 +18,18 @@ import { router } from "@inertiajs/react";
 import Popup from "@/Components/Popup";
 import { Description } from "@radix-ui/react-dialog";
 
-export const AboutBuilder = ({ campaign, contents }) => {
-    const [description, setDescription] = useState(
-        contents.length > 0
-            ? contents
-            : [
-                  {
-                      id: null,
-                      campaign_id: campaign.id,
-                      type: "paragraph",
-                      content: "Our Story~;" + campaign.description,
-                      order_y: 1,
-                      isEditing: false,
-                  },
-              ]
-    );
-    const [oldDescription, setOldDescription] = useState(
-        contents.length > 0
-            ? contents
-            : [
-                  {
-                      id: null,
-                      campaign_id: campaign.id,
-                      type: "paragraph",
-                      content: "Our Story~;" + campaign.description,
-                      order_y: 1,
-                      isEditing: false,
-                  },
-              ]
-    );
-    const [isChanged, setIsChanged] = useState(false);
+
+export const AboutBuilder = ({campaign, contents}) => {
+    const [description, setDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
+    const [oldDescription, setOldDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
+    const [isChanged, setIsChanged] = useState(false)
+
+    useEffect(() => {
+        if(contents.length > 0){
+            setDescription(contents)
+        }
+    },[contents])
+
 
     const addParagraphBlock = () => {
         window.scrollTo({
@@ -143,10 +125,11 @@ export const AboutBuilder = ({ campaign, contents }) => {
                             : null,
                     order_y: block.order_y,
                 };
-            });
-            router.post("/campaigns/insertAbout", prepared);
-        }
-    };
+            })
+             router.post("/campaigns/insertAbout", prepared)
+             setDescription(contents)
+         }
+     };
 
     return (
         <Card className="w-full h-full p-6 border border-gray-300 dark:border-gray-700 shadow-sm justify-center flex flex-col dark:bg-gray-800">

@@ -15,7 +15,7 @@ class HomeController extends Controller
 
         $userId = auth()->id();
         // 🟣 Ambil campaign yang status-nya active (misal 6 teratas)
-        $featuredCampaign = Campaign::with('user')
+        $featuredCampaign = Campaign::with('user', 'images')
             ->where('status', 'active')
             ->withCount([
                 'likes as likes_count' => function ($query) {
@@ -27,7 +27,7 @@ class HomeController extends Controller
 
 
         // 🟣 Ambil recommended campaign (acak)
-        $recommendedCampaigns = Campaign::with('user')
+        $recommendedCampaigns = Campaign::with('user', 'images')
             ->where('status', 'active')
             ->inRandomOrder()
             ->take(18) // buat 3 page, 4 item per page

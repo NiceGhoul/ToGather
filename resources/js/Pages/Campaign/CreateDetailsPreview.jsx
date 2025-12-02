@@ -31,6 +31,7 @@ import { UpdateBuilder } from "./UpdatesBuilder";
 
 export const UpperPreview = ({ campaign, user, images }) => {
     const [like, setLike] = useState(false);
+
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
             <div className="flex flex-col min-w-[50%] max-h-full">
@@ -50,7 +51,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                 <div className="flex flex-row gap-4 my-5 justify-center items-center">
                     <Map />
                     <p className="text-center">
-                        {campaign.location
+                        {campaign.locations
                             ? campaign.locations.region +
                               ", " +
                               campaign.locations.country
@@ -82,10 +83,13 @@ export const UpperPreview = ({ campaign, user, images }) => {
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
-                        {Math.ceil(
-                            (new Date(campaign.end_campaign) - new Date()) /
-                                (1000 * 60 * 60 * 24)
-                        ) + " Days left"}
+                        {campaign.end_campaign
+                            ? Math.ceil(
+                                  (new Date(campaign.end_campaign) -
+                                      new Date()) /
+                                      (1000 * 60 * 60 * 24)
+                              ) + " Days left"
+                            : "- Days left"}
                     </h1>
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -98,9 +102,15 @@ export const UpperPreview = ({ campaign, user, images }) => {
                     </span>
                 </div>
                 <p className="text-lg font-normal flex justify-end mt-2">
-                    {"Rp. " +
-                        campaign.collected_amount +
-                        ",00 / Rp. " +
+                    {parseInt(campaign.collected_amount).toLocaleString(
+                        "id-ID",
+                        {
+                            style: "currency",
+                            currency: "IDR",
+                            minimumFractionDigits: 2,
+                        }
+                    ) +
+                        " / " +
                         parseInt(campaign.goal_amount).toLocaleString("id-ID", {
                             style: "currency",
                             currency: "IDR",
@@ -112,7 +122,6 @@ export const UpperPreview = ({ campaign, user, images }) => {
                         pressed={like}
                         onPressedChange={() => setLike(!like)}
                         size="lg"
-                        // variant="outline"
                         variant={"outline"}
                         className="
                         data-[state=on]:bg-transparent
@@ -147,7 +156,17 @@ const CreateDetailsPreview = () => {
     });
 
     const handleBack = () => {
-        router.get(`/campaigns/create/createPreview/${campaign.id}`);
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+
+        if (from === "myCampaigns") {
+            router.get(
+                `/campaigns/create/createPreview/${campaign.id}` +
+                    "?from=myCampaigns"
+            );
+        } else {
+            router.get(`/campaigns/create/createPreview/${campaign.id}`);
+        }
     };
 
     const handleFinalize = () => {
@@ -281,14 +300,16 @@ const CreateDetailsPreview = () => {
                                 : " Edit everything about your campaign here! Add new campaign updates on the Updates Tab!"}
                         </CardDescription>
                     </div>
-                    <div className="justify-center items-center">
-                        <Button
-                            className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl "
-                            onClick={() => handleFinalize()}
-                        >
-                            Finalize →
-                        </Button>
-                    </div>
+                    {campaign.status === "draft" && (
+                        <div className="justify-center items-center">
+                            <Button
+                                className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl "
+                                onClick={() => handleFinalize()}
+                            >
+                                Finalize →
+                            </Button>
+                        </div>
+                    )}
                 </CardHeader>
 
                 <CardContent className="border-none">
@@ -302,7 +323,7 @@ const CreateDetailsPreview = () => {
 
             <div>
                 <Tabs defaultValue={flash?.activeTab ?? 1} className="w-full">
-                    <div className="sticky top-[72px] z-40 bg-white py-2 rounded dark:bg-[#171717]">
+                    <div className="sticky top-[72px] z-40 bg-white rounded dark:bg-[#171717]">
                         <TabsList className="flex gap-40 bg-transparent border-b-1 border-gray-700 w-full mx-auto rounded-none">
                             {data.map((dat, idx) => {
                                 return tabsRepeater(dat, idx);

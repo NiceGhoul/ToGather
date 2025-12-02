@@ -69,10 +69,13 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789]">
-                        {Math.ceil(
-                            (new Date(campaign.end_campaign) - new Date()) /
-                                (1000 * 60 * 60 * 24)
-                        ) + " Days left"}
+                        {campaign.end_campaign
+                            ? Math.ceil(
+                                  (new Date(campaign.end_campaign) -
+                                      new Date()) /
+                                      (1000 * 60 * 60 * 24)
+                              ) + " Days left"
+                            : ""}
                     </h1>
                 </div>
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -252,11 +255,20 @@ const CreatePreview = () => {
     };
 
     const handleBack = () => {
-        router.get(`/campaigns/create/${campaign.id}`);
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+
+        if (from === "myCampaigns") {
+            router.get("/campaigns/myCampaigns");
+        } else {
+            router.get(`/campaigns/create/${campaign.id}`);
+        }
     };
 
     const handleToPreview = () => {
-        router.get(`/campaigns/create/detailsPreview/${campaign.id}`);
+        router.get(
+            `/campaigns/create/detailsPreview/${campaign.id}?from=createPreview`
+        );
     };
 
     console.log(campaign);

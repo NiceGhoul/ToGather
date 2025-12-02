@@ -1,5 +1,5 @@
 import { usePage, Link } from "@inertiajs/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Clock } from "lucide-react";
@@ -224,7 +224,7 @@ export default function Home() {
                         <div className="lg:w-1/3 w-full flex flex-col">
                             <div className="rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 flex flex-col h-full">
                                 <img
-                                    src="http://127.0.0.1:8000/images/boat.jpg"
+                                    src={featuredCampaign?.images[0].url}
                                     alt={featuredCampaign.title}
                                     className="w-full h-64 object-cover"
                                 />
@@ -349,7 +349,7 @@ export default function Home() {
                                 >
                                     <Card className="overflow-hidden shadow-sm bg-white dark:bg-gray-800 transition-transform duration-200 hover:scale-[1.02] hover:shadow-md rounded-xl pt-0 cursor-pointer">
                                         <img
-                                            src="http://127.0.0.1:8000/images/boat.jpg"
+                                            src={c?.images[0].url}
                                             alt={c.title}
                                             className="w-full h-30 object-cover"
                                         />
@@ -398,7 +398,7 @@ export default function Home() {
 
                         {/* 🟤 Pagination */}
                         <div className="flex justify-center mt-8 gap-2">
-                            {[1, 2, 3].map((p) => (
+                            {[1,2].map((p) => (
                                 <button
                                     key={p}
                                     onClick={() => setPage(p)}
@@ -430,16 +430,16 @@ export default function Home() {
                     slidesPerView={1}
                     loop={true}
                     speed={500}
-                    className="w-full"
+                    className="w-full h-[400px]"
                 >
                     {groupedCampaigns.map((category, index) => (
                         <SwiperSlide key={index}>
-                            <div className="bg-purple-200 dark:bg-purple-800/30 p-6 rounded-xl shadow-sm">
+                            <div className="bg-purple-200 dark:bg-purple-800/30 p-6 rounded-xl shadow-sm h-full">
                                 <h3 className="text-lg md:text-xl font-bold mb-4 text-center">
                                     {category.name}
                                 </h3>
 
-                                <div className="flex justify-center gap-6">
+                                <div className="flex flex-row justify-center gap-6 items-center">
                                     {category.campaigns.length > 0 ? (
                                         category.campaigns.map((c, idx) => (
                                             <Link
@@ -449,7 +449,7 @@ export default function Home() {
                                             >
                                                 <div className="w-[250px] bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-pointer">
                                                     <img
-                                                        src="http://127.0.0.1:8000/images/boat.jpg"
+                                                        src={c?.images[0].url}
                                                         alt={c.title}
                                                         className="w-full h-32 object-cover"
                                                     />

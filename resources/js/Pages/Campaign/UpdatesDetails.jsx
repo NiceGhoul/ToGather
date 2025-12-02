@@ -12,14 +12,14 @@ import { useState } from "react";
 
 export const UpdatesDetails = ({ contents }) => {
 
-    console.log(contents)
+    const [selectedUpdate, setSelectedUpdate] = useState(contents[contents.length - 1]);
+    const [oldUpdates, setOldUpdates] = useState(contents)
 
-    const [selectedUpdate, setSelectedUpdate] = useState(contents[0]);
     return (
         <>
             <div className="flex flex-col justify-center items-center gap-8 h-full w-full p-6">
                 <div className="flex flex-row gap-8 justify-between w-full h-full">
-                    <div className="flex-1 flex flex-col gap-4 min-h-[100%]">
+                    <div className="flex-1 flex flex-col gap-4 max-h-[100%]">
                         {selectedUpdate ? (
                             <>
                                 <Label className="text-2xl font-bold text-[#7C4789]">
@@ -88,7 +88,7 @@ export const UpdatesDetails = ({ contents }) => {
                     <div className="w-[280px] rounded-2xl p-4 flex flex-col gap-3 h-fit shadow-md justify-center">
                         <Label className="w-full justify-center dark:text-white font-semibold text-xl py-3 border-b-1 border-black dark: border-gray-400">Campaign Updates</Label>
                         {contents.length > 0 ?
-                        contents.map((upd) => (
+                        [...contents].reverse().map((upd) => (
                             <Card
                                 key={upd.id}
                                 className={`cursor-pointer border-1 border-gray-400 p-3 rounded-xl transition-all ${

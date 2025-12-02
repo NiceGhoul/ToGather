@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Heart, Map } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AboutDetails } from "./AboutDetails";
 import { UpdatesDetails } from "./UpdatesDetails";
 import { FaqDetails } from "./FAQDetails";
@@ -19,28 +19,34 @@ import { DonationsDetails } from "./DonationsDetails";
 import axios from "axios";
 
 const scrollDonations = (data, idx) => {
-    console.log(data)
     return (
         <Card
             key={idx}
-            className="w-[300px] h-[100px] mx-auto flex flex-row items-center justify-between px-4 dark:bg-gray-800 dark:border-gray-700"
+            className="w-[300px] h-[100px] mx-auto flex flex-row items-center justify-between px-4 dark:bg-gray-800 dark:border-gray-800"
         >
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gray-800 shrink-0">
-                <img
-                    src="http://127.0.0.1:8000/images/boat.jpg"
-                    alt="Campaign"
-                    className="w-full h-full object-cover mb-4 rounded"
-                />
+            <div className="overflow-hidden flex items-center justify-center shrink-0">
+                <Avatar className="w-14 h-14 border-2 dark:bg-white">
+                    <AvatarImage src={data.user ?? data?.user?.images[0].url} />
+                    <AvatarFallback>
+                        {data.anonymous === 0 ? data.user.nickname[0] : "A"}
+                    </AvatarFallback>
+                </Avatar>
             </div>
 
             <div className="flex flex-col items-center text-right gap-1 flex-1">
                 <CardHeader className="flex text-center justify-center">
                     <CardTitle className="text-xl font-bold dark:text-white">
-                        {data.user ? data.user.nickname : "anonymous"}
+                        {data.anonymous === 0
+                            ? data.user.nickname
+                            : "anonymous"}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="text-lg font-normal dark:text-gray-300">
-                    {"Rp. " + data.amount + ",00"}
+                    {parseInt(data.amount).toLocaleString("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 2,
+                    })}
                 </CardContent>
             </div>
         </Card>
@@ -50,28 +56,34 @@ const scrollDonations = (data, idx) => {
 const contentDivider = (data, campaign, contents, donation) => {
     if (data === "About") {
         return (
-            // this will be editable i think, if creator is the one opening the page, the edit section will be activated
             <div>
-                <AboutDetails campaign={campaign} contents={contents.filter((dat) => dat.type === "paragraph" || dat.type === "media")} />
+                <AboutDetails
+                    campaign={campaign}
+                    contents={contents.filter(
+                        (dat) =>
+                            dat.type === "paragraph" || dat.type === "media"
+                    )}
+                />
             </div>
         );
     } else if (data === "FAQ") {
         return (
-            // has a dropdown box
             <div>
-                <FaqDetails contents={contents.filter((dat) => dat.type === "faqs")} />
+                <FaqDetails
+                    contents={contents.filter((dat) => dat.type === "faqs")}
+                />
             </div>
         );
     } else if (data === "Updates") {
         return (
-            // navigation bar on the side, with the updates on the inside  (make new table in xampp)
             <div>
-                <UpdatesDetails contents={contents.filter((dat) => dat.type === "updates")} />
+                <UpdatesDetails
+                    contents={contents.filter((dat) => dat.type === "updates")}
+                />
             </div>
         );
     } else if (data === "Donations") {
         return (
-            // get all of the donation this project has received
             <div>
                 <DonationsDetails donations={donation} />
             </div>
@@ -79,24 +91,11 @@ const contentDivider = (data, campaign, contents, donation) => {
     }
 };
 
-const tabsRepeater = (data, index) => {
-    return (
-        <>
-            <TabsTrigger
-                value={index + 1}
-                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
-            >
-                {data}
-            </TabsTrigger>
-        </>
-    );
-};
-
 const tabsContentRepeater = (data, campaign, index, contents, donations) => {
     return (
         <TabsContent
             value={index + 1}
-            className="w-[90%] h-[100%] text-lg text-center py-4"
+            className="w-[90%] h-full text-lg text-center py-4"
         >
             {contentDivider(data, campaign, contents, donations)}
         </TabsContent>
@@ -105,17 +104,30 @@ const tabsContentRepeater = (data, campaign, index, contents, donations) => {
 
 export default function Create() {
     const data = ["About", "FAQ", "Updates", "Donations"];
-
-    const { campaign, donations, liked, user, contents } = usePage().props;
-    const [images, setImages] = useState({thumbnail: null, logo: null})
+    const { campaign, donations, liked, user, contents, flash } =
+        usePage().props;
+    const [images, setImages] = useState({ thumbnail: null, logo: null });
     const [like, setLike] = useState(liked);
+    const scrollRef = useRef(null);
 
     const percentage = Math.round(
         (campaign.collected_amount / campaign.goal_amount) * 100
     );
+    const from = new URL(window.location.href).searchParams.get("from");
 
-     useEffect(() => {
-        if (campaign.images && (images.thumbnail === null || images.logo === null)) {
+    const backRoutes = {
+        verification: "/admin/campaigns/verification",
+        myCampaigns: "/campaigns/myCampaigns",
+        list: "/admin/campaigns/list",
+        campaignList: "/campaigns/list",
+        likedCampaign: "/campaigns/likedCampaign",
+    };
+    const backUrl = backRoutes[from];
+    useEffect(() => {
+        if (
+            campaign.images &&
+            (images.thumbnail === null || images.logo === null)
+        ) {
             campaign.images.map((dat) => {
                 dat.url.toLowerCase().includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
@@ -124,63 +136,100 @@ export default function Create() {
         }
     }, [campaign]);
 
-   const handleLikes = async (id) => {
-       const prev = like;
-       setLike(!prev);
-       try {
-           await axios.post("/campaigns/toggleLike", {
-               campaign_id: id,
-           });
-       } catch (err) {
-           setLike(prev);
-       }
-   };
+    // scrolling donation effect
+    // useEffect(() => {
+    //     const container = scrollRef.current;
 
-   console.log(campaign, images)
+    //     let timer = setInterval(() => {
+    //         container.scrollBy({
+    //             left: 1,
+    //             behavior: "smooth",
+    //         });
+
+    //         if (
+    //             container.scrollLeft + container.clientWidth >=
+    //             container.scrollWidth - 1
+    //         ) {
+    //             container.scrollTo({ left: 0, behavior: "auto" });
+    //         }
+    //     }, 30);
+
+    //     return () => clearInterval(timer);
+    // }, []);
+
+    const handleLikes = async (id) => {
+        const prev = like;
+        setLike(!prev);
+        try {
+            await axios.post("/campaigns/toggleLike", {
+                campaign_id: id,
+            });
+        } catch (err) {
+            setLike(prev);
+        }
+    };
 
     const mainData = () => {
         return (
-            <div className="overflow-auto">
-                {/* scrolling donations */}
-                {/* if creator can customize this, will be very good either this or largest donator*/}
+            <div className="max-w-6xl mx-auto px-4">
+                <Button
+                    className="mt-8 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white cursor-pointer"
+                    onClick={() => router.get(backUrl)}
+                >
+                    Back
+                </Button>
                 <h1 className="text-2xl text-center font-semibold mb-5 mt-10">
                     {/* Recent Donations */}
                 </h1>
-                <Separator className="flex-1 bg-gray-200 h-[1px]" />
-                <div className="flex-col flex gap-2 m-4">
-                    <div className="flex-row flex gap-2 flex justify-center items-center ">
-                        {donations.length > 0 ? (
-                            donations.map((donation) =>
-                                scrollDonations(donation)
-                            )
-                        ) : (
-                            <p key={0} className="text-lg text-center">
-                                No Donations, yet...
-                            </p>
-                        )}
+                <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
+                <div className="flex flex-col gap-2 my-4">
+                    <div className="w-full overflow-hidden p-2">
+                        <div className="auto-scroll-horizontal">
+                            {donations.length > 0 ? (
+                                donations
+                                    .slice(0, 10)
+                                    .map((donation) =>
+                                        scrollDonations(donation)
+                                    )
+                            ) : (
+                                <p key={0} className="text-lg text-center">
+                                    No Donations, yet...
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
-                <Separator className="flex-1 bg-gray-100 h-[1px]" />
+                <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
                 {/* pictures and titles */}
-                <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto">
-                    <div className="flex flex-col min-w-[50%] max-h-full">
-                <div className="flex flex-row min-w-full min-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
-                    {images.thumbnail ? <img
-                        src={images.thumbnail}
-                        alt="Campaign"
-                        className="w-full h-full object-contain"
-                    /> : <span className="text-gray-500 text-md w-full text-center italic">
-                            No image available
-                        </span>}
-                </div>
-                <div className="flex flex-row gap-4 my-5 justify-center items-center">
-                    <Map />
-                    <p className="text-center">{campaign.location ? campaign.locations.region + ", " + campaign.locations.country: campaign.address}</p>
-                </div>
-            </div>
+                <div className="flex flex-col lg:flex-row px-4 py-8 gap-8 items-start w-full">
+                    <div className="flex flex-col lg:w-1/2 w-full max-h-full">
+                        <div className="flex flex-row min-w-full min-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
+                            {images.thumbnail ? (
+                                <img
+                                    src={images.thumbnail}
+                                    alt="Campaign"
+                                    className="w-full h-full object-contain"
+                                />
+                            ) : (
+                                <span className="text-gray-500 text-md w-full text-center italic">
+                                    No image available
+                                </span>
+                            )}
+                        </div>
+                        <div className="flex flex-row gap-4 my-5 justify-center items-center">
+                            <Map />
+                            <p className="text-center">
+                                {campaign.location
+                                    ? campaign.locations.region +
+                                      ", " +
+                                      campaign.locations.country
+                                    : campaign.address}
+                            </p>
+                        </div>
+                    </div>
 
-                    <div className="flex min-w-3/6 h-full overflow-hidden justify-center flex-col">
-                        <div className="flex overflow-hidden item-center justify-start gap-5 flex-row">
+                    <div className="flex flex-col lg:w-1/2 w-full h-full overflow-hidden justify-center">
+                        <div className="flex items-center gap-5">
                             <Avatar className="w-20 h-20 border-2 border-gray-700">
                                 <AvatarImage
                                     src={images.logo}
@@ -203,14 +252,19 @@ export default function Create() {
                         </div>
                         <div className="flex flex-row justify-between">
                             <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {donations.length.toString() + " " +
+                                {donations.length.toString() +
+                                    " " +
                                     (donations.length > 1
                                         ? " Donators"
                                         : " Donator")}
                             </h1>
 
                             <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {Math.ceil((new Date(campaign.end_campaign) - new Date()) / (1000 * 60 * 60 * 24)) + " Days left"}
+                                {Math.ceil(
+                                    (new Date(campaign.end_campaign) -
+                                        new Date()) /
+                                        (1000 * 60 * 60 * 24)
+                                ) + " Days left"}
                             </h1>
                         </div>
                         <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -224,7 +278,7 @@ export default function Create() {
                             />
                             <span
                                 className="absolute inset-0 flex items-start justify-center text-md font-medium dark:text-white"
-                                style={{ color: "black" }}
+                                style={{ color: "white" }}
                             >
                                 {percentage}%
                             </span>
@@ -254,16 +308,16 @@ export default function Create() {
                                 onPressedChange={() => handleLikes(campaign.id)}
                                 size="lg"
                                 variant="outline"
-                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500"
+                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500 hover:bg-red-100 dark:hover:bg-red-600"
                             >
                                 <Heart />
                                 {!like
-                                    ? "like this campaign"
-                                    : "campaign liked"}
+                                    ? "Like This Campaign"
+                                    : "Campaign Liked"}
                             </Toggle>
 
                             <Link href={`/donate?campaign_id=${campaign.id}`}>
-                                <Button className="min-h-10 min-w-56 font-semibold text-lg">
+                                <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
                                     Donate
                                 </Button>
                             </Link>
@@ -272,14 +326,36 @@ export default function Create() {
                 </div>
 
                 <div>
-                    <Tabs defaultValue={1} className="w-full mt-20">
-                        {/* Tabs Header */}
-                        <TabsList className="flex gap-40 bg-transparent border-b-2 border-gray-700 w-fit mx-auto rounded-none">
+                    <Tabs
+                        defaultValue={flash?.activeTab ?? 1}
+                        className="w-full"
+                    >
+                        <div className="dark:border-t-1 sticky top-[72px] z-40 bg-none pt-3 dark:pt-2 h-auto">
+                            <TabsList className="text-gray-500 flex gap-6 bg-[#fcfcfc] dark:bg-gray-800 p-2 shadow-md w-full max-w-3xl mx-auto rounded-md dark:text-white h-[48px] ">
+                                {data.map((dat, idx) => {
+                                    return (
+                                        <TabsTrigger
+                                            value={idx + 1}
+                                            className="flex px-4 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm"
+                                        >
+                                            {dat}
+                                        </TabsTrigger>
+                                    );
+                                })}
+                            </TabsList>
+                        </div>
+                        <div className="mt-10 flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.90]">
                             {data.map((dat, idx) => {
-                                return tabsRepeater(dat, idx);
+                                return tabsContentRepeater(
+                                    dat,
+                                    campaign,
+                                    idx,
+                                    contents,
+                                    donations
+                                );
                             })}
-                        </TabsList>
-                        <div className="flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.95]">
+                        </div>
+                        <div className="mt-8 w-full">
                             {data.map((dat, idx) => {
                                 return tabsContentRepeater(
                                     dat,
@@ -297,10 +373,18 @@ export default function Create() {
     };
 
     {
-    return user.role === "user" ? (
-        <Layout_User>{mainData()}</Layout_User>
-    ) : (
-        <Layout_Admin title={<Button className="" onClick={() => {router.get('/admin/campaigns/list', {}, {replace: true})}}> Back </Button>}>{mainData()}</Layout_Admin>
-    );
-}
+        return user.role === "user" ? (
+            <Layout_User>{mainData()}</Layout_User>
+        ) : (
+            <Layout_Admin
+                title={
+                    campaign
+                        ? `Campaign Details - ${campaign.title}`
+                        : "Campaign Details"
+                }
+            >
+                {mainData()}
+            </Layout_Admin>
+        );
+    }
 }

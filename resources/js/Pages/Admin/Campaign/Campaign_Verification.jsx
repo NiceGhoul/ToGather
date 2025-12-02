@@ -4,13 +4,29 @@ import { Button } from "@/Components/ui/button";
 import { useState, useEffect } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Popup from "@/Components/Popup";
-import { Eye, EyeOff, Trash, RotateCcw, File, Ban, CheckCircle, XCircle, ChevronRight, ChevronLeft } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import {
+    Eye,
+    EyeOff,
+    Trash,
+    RotateCcw,
+    File,
+    Ban,
+    CheckCircle,
+    XCircle,
+    ChevronRight,
+    ChevronLeft,
+} from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Tooltip } from "@/Components/ui/tooltip";
 
 export default function Campaign_Verification() {
-
     const { campaigns, filters, categories } = usePage().props;
     const [filteredCampaign, setFilteredCampaigns] = useState(campaigns || []);
     const [category, setCategory] = useState("");
@@ -36,11 +52,11 @@ export default function Campaign_Verification() {
         }
     };
 
-       const handleResetFilter = () => {
-           setCategory("");
-           setSearch("");
-       };
-       console.log(campaigns)
+    const handleResetFilter = () => {
+        setCategory("");
+        setSearch("");
+    };
+    console.log(campaigns);
 
     useEffect(() => {
         let result = campaigns;
@@ -49,7 +65,14 @@ export default function Campaign_Verification() {
         }
 
         if (search.trim() != "") {
-            result = result.filter((a) => a.title.toLowerCase().includes(search.toLowerCase()) || a.user.nickname.toLowerCase().includes(search.toLowerCase())) || a.user.name.toLowerCase().includes(search.toLowerCase())
+            result =
+                result.filter(
+                    (a) =>
+                        a.title.toLowerCase().includes(search.toLowerCase()) ||
+                        a.user.nickname
+                            .toLowerCase()
+                            .includes(search.toLowerCase())
+                ) || a.user.name.toLowerCase().includes(search.toLowerCase());
         }
 
         setFilteredCampaigns(result);
@@ -70,9 +93,8 @@ export default function Campaign_Verification() {
     };
 
     const handleView = (id) => {
-        router.get(`/admin/campaigns/view/${id}`)
-    }
-
+        router.get(`/admin/campaigns/view/${id}?from=verification`);
+    };
 
     const handleChangeStatus = (id, status) => {
         router.post(`/admin/campaigns/changeStatus/${id}`, { status });
@@ -88,7 +110,7 @@ export default function Campaign_Verification() {
                         <div className="flex items-center gap-2">
                             <Input
                                 type="text"
-                                placeholder="Search by title/creator"
+                                placeholder="Search by Title/Creator"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="w-[300px] h-10 border-[0.5px] focus-visible:ring-purple-700 dark:text-white dark:focus-visible:ring-purple-400 dark:placeholder:text-white"
@@ -215,7 +237,9 @@ export default function Campaign_Verification() {
                                             {a.category}
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
-                                            {new Date(a.created_at).toLocaleString()}
+                                            {new Date(
+                                                a.created_at
+                                            ).toLocaleString()}
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {a.user?.nickname || a.user?.name}
@@ -258,7 +282,10 @@ export default function Campaign_Verification() {
                                                     confirmColor="bg-green-600 hover:bg-green-700 text-white"
                                                     triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                                                     onConfirm={() =>
-                                                        handleChangeStatus(a.id, "active")
+                                                        handleChangeStatus(
+                                                            a.id,
+                                                            "active"
+                                                        )
                                                     }
                                                 />
                                                 <Popup
@@ -271,7 +298,10 @@ export default function Campaign_Verification() {
                                                     confirmColor="bg-red-600 hover:bg-red-700 text-white"
                                                     triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                                                     onConfirm={() =>
-                                                        handleChangeStatus(a.id, "rejected")
+                                                        handleChangeStatus(
+                                                            a.id,
+                                                            "rejected"
+                                                        )
                                                     }
                                                 />
                                             </div>
@@ -290,7 +320,7 @@ export default function Campaign_Verification() {
                             )}
                         </tbody>
                     </table>
-                     <div className="flex items-center justify-between mt-4">
+                    <div className="flex items-center justify-between mt-4">
                         <div className="text-sm text-gray-500">
                             Page {currentPage} of {totalPages || 1}
                         </div>

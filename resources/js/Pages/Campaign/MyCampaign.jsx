@@ -19,8 +19,12 @@ import {
 import Popup from "@/Components/Popup";
 import { toast } from "sonner";
 
-export default function MyCampaign({campaigns = [], categories = [], sortOrder: initialSortOrder}) {
-    const [visibleCampaigns, setVisibleCampaigns] = useState(8)
+export default function MyCampaign({
+    campaigns = [],
+    categories = [],
+    sortOrder: initialSortOrder,
+}) {
+    const [visibleCampaigns, setVisibleCampaigns] = useState(8);
     const [campaignList, setCampaignList] = useState(() => {
         if (!campaigns) return [];
         // Urutkan agar active & pending muncul di depan
@@ -34,23 +38,22 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
             };
             return (order[a.status] || 99) - (order[b.status] || 99);
         });
-        return sorted
-    })
-    const [chosenCategory, setChosenCategory] = useState("All")
-    const [searchTerm, setSearchTerm] = useState("")
-    const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc")
-    const [images, setImages] = useState({thumbnail: null})
-    const [openPop, setOpenPop] = useState(-1)
+        return sorted;
+    });
+    const [chosenCategory, setChosenCategory] = useState("All");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
+    const [images, setImages] = useState({ thumbnail: null });
+    const [openPop, setOpenPop] = useState(-1);
 
     useEffect(() => {
-        if (campaigns.images && (images.thumbnail === null)) {
+        if (campaigns.images && images.thumbnail === null) {
             campaigns.images.map((dat) => {
                 dat.url.toLowerCase().includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
                     : setImages((prev) => ({ ...prev, logo: dat.url }));
             });
         }
-
     }, [campaigns]);
 
     useEffect(() => {
@@ -96,30 +99,30 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
     };
 
     const colorCoder = (data) => {
-        if(data === 'Foods & Beverage'){
-            return "bg-[#B8DF5D]"
-        }else if(data === 'Beauty & Cosmetic'){
-            return "bg-[#FB84B2]"
-        }else if(data === 'Clothes & Fashion'){
-            return "bg-[#CDADF1]"
-        }else if(data === 'Services'){
-            return "bg-[#EDAC6B]"
-        }else if(data === 'Lifestyle'){
-            return "bg-[#D3DE5D]"
-        }else if(data === 'Logistics'){
-            return "bg-[#80BDF6]"
+        if (data === "Foods & Beverage") {
+            return "bg-[#B8DF5D]";
+        } else if (data === "Beauty & Cosmetic") {
+            return "bg-[#FB84B2]";
+        } else if (data === "Clothes & Fashion") {
+            return "bg-[#CDADF1]";
+        } else if (data === "Services") {
+            return "bg-[#EDAC6B]";
+        } else if (data === "Lifestyle") {
+            return "bg-[#D3DE5D]";
+        } else if (data === "Logistics") {
+            return "bg-[#80BDF6]";
         }
-    }
+    };
 
     const handleMoveToEdit = (id) => {
-        router.get(`/campaigns/create/detailsPreview/${id}`)
-    }
+        router.get(`/campaigns/create/detailsPreview/${id}?from=myCampaigns`);
+    };
 
     const handleDeleteCampaign = (id) => {
-        setCampaignList(campaignList.filter(dat => dat.id != id))
+        setCampaignList(campaignList.filter((dat) => dat.id != id));
         router.post(`/campaigns/deleteCampaign/${id}`);
-        setOpenPop(-1)
-    }
+        setOpenPop(-1);
+    };
 
     const cardRepeater = (data) => {
         if (!data || data.length === 0) {
@@ -128,7 +131,12 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
             return data.slice(0, visibleCampaigns).map((campaign, idx) => {
                 const progress =
                     campaign.goal_amount > 0
-                        ? Math.round((campaign.collected_amount /campaign.goal_amount) * 100) : 0;
+                        ? Math.round(
+                              (campaign.collected_amount /
+                                  campaign.goal_amount) *
+                                  100
+                          )
+                        : 0;
 
                 return (
                     <div
@@ -155,9 +163,7 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
 
                         <div className="flex justify-center gap-2 mb-4">
                             <span
-                                className={`text-sm font-semibold text-gray-100 rounded-sm text-center px-4 py-1 mb-2 ${colorCoder(
-                                    campaign.category
-                                )}`}
+                                className={`text-sm font-semibold rounded-sm text-center px-4 py-1 mb-2 bg-purple-200 text-purple-700 dark:bg-purple-800 dark:text-white`}
                             >
                                 {campaign.category ?? "Uncategorized"}
                             </span>
@@ -173,15 +179,34 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                         <div className="w-full bg-gray-200 dark:bg-gray-400 rounded-full h-3 mb-3">
                             <div
                                 className="bg-purple-700 h-3 rounded-full"
-                                style={{ width: `${Math.min(progress, 100).toFixed(1)}%` }}
+                                style={{
+                                    width: `${Math.min(progress, 100).toFixed(
+                                        1
+                                    )}%`,
+                                }}
                             ></div>
                         </div>
                         <div className="flex flex-row gap-2 justify-center">
-
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 text-center">
-                            Raised{" "}
-                            {parseInt(campaign.collected_amount)?.toLocaleString("id-ID", {style:"currency" ,currency:'IDR', minimumFractionDigits:2})} / {parseInt(campaign.goal_amount)?.toLocaleString("id-ID", {style:"currency" ,currency:"IDR",minimumFractionDigits: 2})}{" "}({progress}%)
-                        </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 text-center">
+                                Raised{" "}
+                                {parseInt(
+                                    campaign.collected_amount
+                                )?.toLocaleString("id-ID", {
+                                    style: "currency",
+                                    currency: "IDR",
+                                    minimumFractionDigits: 2,
+                                })}{" "}
+                                /{" "}
+                                {parseInt(campaign.goal_amount)?.toLocaleString(
+                                    "id-ID",
+                                    {
+                                        style: "currency",
+                                        currency: "IDR",
+                                        minimumFractionDigits: 2,
+                                    }
+                                )}{" "}
+                                ({progress}%)
+                            </p>
                             {/* <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">
                                 ({progress}%)
                                 </p> */}
@@ -192,14 +217,14 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                                 className={`inline-block text-xs font-semibold px-2 py-1 rounded-full
                             ${
                                 campaign.status === "active"
-                                    ? "bg-green-200 dark:bg-green-300 text-green-700 dark:text-green-900"
+                                    ? "bg-green-200 dark:bg-green-700 text-green-700 dark:text-white"
                                     : campaign.status === "pending"
-                                    ? "bg-yellow-200 text-yellow-700"
+                                    ? "bg-yellow-200 text-yellow-700 dark:bg-yellow-500 dark:text-white"
                                     : campaign.status === "rejected"
-                                    ? "bg-red-200 dark:bg-red-300 text-red-700"
+                                    ? "bg-red-200 dark:bg-red-700 text-red-700 dark:text-white"
                                     : campaign.status === "banned"
-                                    ? "bg-red-200 text-red-700"
-                                    : "bg-purple-200 text-purple-700"
+                                    ? "bg-red-200 dark:bg-red-700 text-red-700 dark:text-white"
+                                    : "bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-white"
                             }`}
                             >
                                 {campaign.status.toUpperCase()}
@@ -208,26 +233,38 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                         <div className="flex justify-center mt-auto">
                             {campaign.status != "completed" ? (
                                 <div className="flex gap-4 flex justify-center items-center">
-                                    {campaign.status === "draft" &&
-                                    <Button
-                                        className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg"
-                                        onClick={() => setOpenPop(campaign.id)}>
-                                        ✖ Cancel
-                                    </Button >
-                                    }
-                                    {campaign.status != "rejected" &&
-                                    <>
-                                    {campaign.status === "active" && <Link
-                                        href={`/campaigns/details/${campaign.id}`}
-                                        className="text-purple-700 dark:text-purple-500 hover:underline text-lg font-medium"
-                                    >
-                                    View Details →
-                                    </Link>}
-                                    <Button onClick={() => handleMoveToEdit(campaign.id)} className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg">
-                                         Edit →
-                                    </Button>
-                                    </>
-                                    }
+                                    {campaign.status === "draft" && (
+                                        <Button
+                                            className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg"
+                                            onClick={() =>
+                                                setOpenPop(campaign.id)
+                                            }
+                                        >
+                                            ✖ Cancel
+                                        </Button>
+                                    )}
+                                    {campaign.status != "rejected" && (
+                                        <>
+                                            {campaign.status === "active" && (
+                                                <Link
+                                                    href={`/campaigns/details/${campaign.id}?from=myCampaigns`}
+                                                    className="text-purple-700 dark:text-purple-500 hover:underline text-lg font-medium"
+                                                >
+                                                    View Details →
+                                                </Link>
+                                            )}
+                                            <Button
+                                                onClick={() =>
+                                                    handleMoveToEdit(
+                                                        campaign.id
+                                                    )
+                                                }
+                                                className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg"
+                                            >
+                                                Edit →
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             ) : (
                                 <Link
@@ -465,7 +502,9 @@ export default function MyCampaign({campaigns = [], categories = [], sortOrder: 
                 onClose={() => setOpenPop(-1)}
                 triggerText={null}
                 title={"you are about to delete a campaign!"}
-                description={"This will remove all instances of data associated to this campaign. Are you sure to continue?"}
+                description={
+                    "This will remove all instances of data associated to this campaign. Are you sure to continue?"
+                }
                 confirmText={"Confirm"}
                 cancelText="Cancel"
                 showCancel={true}

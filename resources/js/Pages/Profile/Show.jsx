@@ -199,7 +199,7 @@ export default function Show({
                                     <Button
                                         size="sm"
                                         onClick={() => setIsEditOpen(true)}
-                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white"
                                     >
                                         <Edit className="h-4 w-4 mr-2" />
                                         Edit Profile
@@ -244,14 +244,14 @@ export default function Show({
                         )}
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 ">
                         <Card
-                            className="cursor-pointer hover:shadow-lg transition-shadow"
+                            className="cursor-pointer hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-black/70"
                             onClick={() => fetchDetails("campaigns")}
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    Campaigns Created
+                                    Campaigns Createds
                                 </CardTitle>
                                 <Target className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
@@ -267,7 +267,7 @@ export default function Show({
                         </Card>
 
                         <Card
-                            className="cursor-pointer hover:shadow-lg transition-shadow"
+                            className="cursor-pointer hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-black/70"
                             onClick={() => fetchDetails("articles")}
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -288,7 +288,7 @@ export default function Show({
                         </Card>
 
                         <Card
-                            className="cursor-pointer hover:shadow-lg transition-shadow"
+                            className="cursor-pointer hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-black/70"
                             onClick={() => fetchDetails("donations")}
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -309,7 +309,7 @@ export default function Show({
                         </Card>
 
                         <Card
-                            className="cursor-pointer hover:shadow-lg transition-shadow"
+                            className="cursor-pointer hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-black/70"
                             onClick={() => fetchDetails("raised")}
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -372,7 +372,7 @@ export default function Show({
                                                     "accepted" && (
                                                     <Badge
                                                         variant="default"
-                                                        className="bg-green-100 text-green-800 px-3 py-1 text-sm font-medium"
+                                                        className="bg-green-100 text-green-800 px-3 py-1 text-sm font-medium dark:bg-green-700 dark:text-green-200"
                                                     >
                                                         Verified
                                                     </Badge>
@@ -438,7 +438,7 @@ export default function Show({
                             <div className="flex justify-end gap-3">
                                 <Button
                                     onClick={handleLogout}
-                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                    className="bg-red-200 hover:bg-red-300 text-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
                                 >
                                     <LogOut className="h-4 w-4 mr-2" />
                                     Logout
@@ -761,24 +761,24 @@ export default function Show({
                                                     {item.title}
                                                 </h4>
                                                 <Badge
-                                                    className={`capitalize px-3 py-1 rounded-md text-white font-medium
+                                                    className={`capitalize px-3 py-1 rounded-md font-medium
                                                         ${
                                                             item.status ===
                                                             "active"
-                                                                ? "bg-green-600"
+                                                                ? "dark:bg-green-600 dark:text-white bg-green-200 text-green-700"
                                                                 : item.status ===
                                                                   "rejected"
-                                                                ? "bg-red-600"
+                                                                ? "dark:bg-red-600 dark:text-white bg-red-200 text-red-700"
                                                                 : item.status ===
                                                                   "banned"
-                                                                ? "bg-red-600"
+                                                                ? "dark:bg-red-600 dark:text-white bg-red-200 text-red-700"
                                                                 : item.status ===
                                                                   "completed"
-                                                                ? "bg-purple-600"
+                                                                ? "dark:bg-purple-600 dark:text-white bg-purple-200 text-purple-700"
                                                                 : item.status ===
                                                                   "pending"
-                                                                ? "bg-yellow-400 text-black"
-                                                                : "bg-gray-400"
+                                                                ? "bg-yellow-200 text-yellow-800 dark:bg-yellow-500 dark:text-white"
+                                                                : "bg-gray-200 text-gray-800 dark:bg-gray-500 dark:text-white"
                                                         }`}
                                                 >
                                                     {item.status
@@ -848,14 +848,17 @@ export default function Show({
                                                         ${
                                                             item.status ===
                                                             "approved"
-                                                                ? "bg-green-600"
+                                                                ? "dark:bg-green-600 dark:text-white bg-green-200 text-green-700"
                                                                 : item.status ===
                                                                   "rejected"
-                                                                ? "bg-red-600"
+                                                                ? "dark:bg-red-600 dark:text-white bg-red-200 text-red-700"
+                                                                : item.status ===
+                                                                  "disabled"
+                                                                ? "bg-yellow-200 text-yellow-800 dark:bg-yellow-500 dark:text-white"
                                                                 : item.status ===
                                                                   "pending"
-                                                                ? "bg-yellow-400 text-black"
-                                                                : "bg-gray-400"
+                                                                ? "bg-yellow-200 text-yellow-800 dark:bg-yellow-500 dark:text-white"
+                                                                : "bg-gray-200 text-gray-800 dark:bg-gray-500 dark:text-white"
                                                         }`}
                                                 >
                                                     {item.status

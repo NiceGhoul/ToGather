@@ -4,7 +4,15 @@ import { Button } from "@/Components/ui/button";
 import { useState, useEffect } from "react";
 import Layout_Admin from "@/Layouts/Layout_Admin";
 import Popup from "@/Components/Popup";
-import { Eye, EyeOff, Search, Trash, RotateCcw, File } from "lucide-react";
+import {
+    Eye,
+    EyeOff,
+    Search,
+    Trash,
+    RotateCcw,
+    File,
+    EyeClosed,
+} from "lucide-react";
 
 export default function Article_List() {
     const { articles, categories } = usePage().props;
@@ -28,7 +36,10 @@ export default function Article_List() {
         // 🔹 Filter awal (hanya approved + disabled)
         if (status === "") {
             result = result.filter(
-                (a) => a.status === "approved" || a.status === "disabled"
+                (a) =>
+                    a.status === "approved" ||
+                    a.status === "disabled" ||
+                    a.status === "rejected"
             );
         }
         // 🔹 Kalau klik tombol "Rejected"
@@ -414,6 +425,11 @@ export default function Article_List() {
                                                         }
                                                     >
                                                         <Eye className="text-green-700" />
+                                                    </Button>
+                                                )}
+                                                {a.status === "rejected" && (
+                                                    <Button className="bg-gray-300/60 cursor-not-allowed text-gray-700 hover:bg-gray-300/60">
+                                                        <EyeClosed />
                                                     </Button>
                                                 )}
                                                 <Popup
