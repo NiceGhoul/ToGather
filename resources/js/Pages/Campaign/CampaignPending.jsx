@@ -35,7 +35,7 @@ export default function CampaignPending() {
                         </p>
                         <Button
                             asChild
-                            className="w-full bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                            className="w-full bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                         >
                             <Link href="/">Back to Home</Link>
                         </Button>

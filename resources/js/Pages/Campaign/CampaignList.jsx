@@ -20,8 +20,12 @@ const CampaignList = () => {
 
     console.log(campaigns);
     const handleShowMore = () => {
-        setVisibleCampaign((prev) => prev + 8);
-        setIsShowMoreloading(false);
+        // show spinner, then load more (small delay so spinner is visible)
+        setIsShowMoreloading(true);
+        setTimeout(() => {
+            setVisibleCampaign((prev) => prev + 8);
+            setIsShowMoreloading(false);
+        }, 400);
     };
 
     useEffect(() => {
@@ -115,7 +119,7 @@ const CampaignList = () => {
                             />
                         )}
 
-                        <h2 className="h-[48px] flex justify-center items-center text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden leading-snug dark:text-white">
+                        <h2 className="h-12 flex justify-center items-center text-lg font-semibold mb-2 text-center min-h-8 max-h-12 overflow-hidden leading-snug dark:text-white">
                             {campaign.title.length > 50
                                 ? campaign.title.substring(0, 50) + "..."
                                 : campaign.title}
@@ -138,7 +142,7 @@ const CampaignList = () => {
                             </span>
                         </div>
 
-                        <p className="h-[80px] text-sm text-gray-700 mb-3 text-justify dark:text-gray-300">
+                        <p className="h-20 text-sm text-gray-700 mb-3 text-justify dark:text-gray-300">
                             {campaign.description
                                 ?.replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 150) || "No description available."}
@@ -307,7 +311,10 @@ const CampaignList = () => {
                 <CardContent>
                     {campaigns?.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {cardRepeater(campaignList, images)}
+                            {cardRepeater(
+                                campaignList.slice(0, visibleCampaign),
+                                images
+                            )}
                         </div>
                     ) : (
                         <p className="flex flex-col justify-center items-center w-full mx-auto text-center text-gray-500 mt-20 dark:text-gray-400">
@@ -316,17 +323,17 @@ const CampaignList = () => {
                     )}
                     {visibleCampaign < campaigns?.length ? (
                         <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
-                            <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                            <Separator className="flex-1 bg-gray-400 h-px" />
                             <p
                                 onClick={handleShowMore}
-                                className="text-sm text-gray-400 font-thin"
+                                className=" text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
                             >
                                 {isShowMoreLoading && (
                                     <Spinner className="w-4 h-4" />
                                 )}
-                                show more
+                                Show More
                             </p>
-                            <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                            <Separator className="flex-1 bg-gray-400 h-px" />
                         </div>
                     ) : (
                         <></>

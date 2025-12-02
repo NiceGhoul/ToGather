@@ -134,7 +134,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                         {!like ? "Like This Campaign" : "Campaign Liked"}
                     </Toggle>
 
-                    <Button className="min-h-10 min-w-48 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white">
+                    <Button className="min-h-10 min-w-48 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
                         Donate
                     </Button>
                 </div>

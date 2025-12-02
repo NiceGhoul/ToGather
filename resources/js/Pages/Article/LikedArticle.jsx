@@ -16,6 +16,7 @@ import {
     EmptyTitle,
 } from "@/Components/ui/empty";
 import { useMemo, useState } from "react";
+import { Spinner } from "@/Components/ui/spinner";
 
 export default function LikedArticlesPage() {
     const { likedArticles } = usePage().props;
@@ -28,6 +29,7 @@ export default function LikedArticlesPage() {
     const [chosenCategory, setChosenCategory] = useState("All");
     const [sortOrder, setSortOrder] = useState("desc");
     const [visibleArticles, setVisibleArticles] = useState(8);
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
 
     // =========================
     // CATEGORY LIST
@@ -53,6 +55,15 @@ export default function LikedArticlesPage() {
         setChosenCategory("All");
         setSortOrder("desc");
         setVisibleArticles(8);
+    };
+
+    const handleShowMore = () => {
+        // show spinner, then load more (small delay so spinner is visible)
+        setIsShowMoreloading(true);
+        setTimeout(() => {
+            setVisibleArticles((prev) => prev + 8);
+            setIsShowMoreloading(false);
+        }, 400);
     };
 
     // =========================
@@ -109,7 +120,7 @@ export default function LikedArticlesPage() {
                         />
                     )}
 
-                    <h2 className="text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden dark:text-white">
+                    <h2 className="text-lg font-semibold mb-2 text-center min-h-8 max-h-12 overflow-hidden dark:text-white">
                         {article.title.length > 50
                             ? article.title.slice(0, 50) + "..."
                             : article.title}
@@ -124,7 +135,7 @@ export default function LikedArticlesPage() {
                         {article.category}
                     </p>
 
-                    <p className="h-[80px] text-sm text-gray-700 mb-4 text-justify dark:text-gray-300">
+                    <p className="h-40 text-sm text-gray-700 mb-4 text-justify dark:text-gray-300">
                         {previewText.replace(/(<([^>]+)>)/gi, "").slice(0, 180)}
                         ...
                     </p>
@@ -158,9 +169,7 @@ export default function LikedArticlesPage() {
             );
         });
 
-    // =========================
-    // EMPTY VIEW
-    // =========================
+    //Empty View
     const emptyView = (
         <Empty className="mt-20">
             <EmptyHeader>
@@ -290,18 +299,17 @@ export default function LikedArticlesPage() {
 
                             {visibleArticles < filteredList.length && (
                                 <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
-                                    <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                                    <Separator className="flex-1 bg-gray-400 h-px" />
                                     <p
-                                        onClick={() =>
-                                            setVisibleArticles(
-                                                (prev) => prev + 8
-                                            )
-                                        }
+                                        onClick={() => handleShowMore()}
                                         className="text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
                                     >
+                                        {isShowMoreLoading && (
+                                            <Spinner className="w-4 h-4" />
+                                        )}
                                         Show More
                                     </p>
-                                    <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                                    <Separator className="flex-1 bg-gray-400 h-px" />
                                 </div>
                             )}
                         </>
