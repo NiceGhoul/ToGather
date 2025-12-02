@@ -1,8 +1,21 @@
 import Popup from "@/Components/Popup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
-import {Card,CardContent,CardDescription,CardHeader,CardTitle} from "@/Components/ui/card";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/Components/ui/empty";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
+import {
+    Empty,
+    EmptyContent,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyMedia,
+    EmptyTitle,
+} from "@/Components/ui/empty";
 import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
@@ -16,9 +29,8 @@ import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
 
-export const UpperPreview = ({campaign, user, images}) => {
-    console.log(campaign)
-    const [like, setLike] = useState(false)
+export const UpperPreview = ({ campaign, user, images }) => {
+    const [like, setLike] = useState(false);
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
             <div className="flex flex-col min-w-[50%] max-h-full">
@@ -113,37 +125,41 @@ export const UpperPreview = ({campaign, user, images}) => {
                         data-[state=on]:*:[svg]:stroke-red-500"
                     >
                         <Heart />
-                        {!like ? "like this campaign" : "campaign liked"}
+                        {!like ? "Like This Campaign" : "Campaign Liked"}
                     </Toggle>
 
-                    <Button className="min-h-10 min-w-48 font-semibold text-lg">
+                    <Button className="min-h-10 min-w-48 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white">
                         Donate
                     </Button>
                 </div>
             </div>
         </div>
     );
-}
+};
 
 const CreateDetailsPreview = () => {
-
     const data = ["About", "FAQ", "Updates", "Donations"];
-    const { campaign, user, contents, flash } = usePage().props
-    const [images, setImages] = useState({thumbnail: null, logo: null})
-    const [openPopUp, setOpenPopUp] = useState(false)
-    const [popUpData, setPopupData] = useState({ title: "", description: "", confText: "", confColor: ""})
+    const { campaign, user, contents, flash } = usePage().props;
+    const [images, setImages] = useState({ thumbnail: null, logo: null });
+    const [openPopUp, setOpenPopUp] = useState(false);
+    const [popUpData, setPopupData] = useState({
+        title: "",
+        description: "",
+        confText: "",
+        confColor: "",
+    });
 
     const handleBack = () => {
-        router.get(`/campaigns/create/createPreview/${campaign.id}`)
+        router.get(`/campaigns/create/createPreview/${campaign.id}`);
     };
 
     const handleFinalize = () => {
-        router.post(`/campaigns/finalize/${campaign.id}`)
-    }
+        router.post(`/campaigns/finalize/${campaign.id}`);
+    };
 
     const handleInsertUpdates = (campaignContent) => {
-        router.post(`/campaigns/insertUpdates`, campaignContent)
-    }
+        router.post(`/campaigns/insertUpdates`, campaignContent);
+    };
 
     const contentDivider = (data) => {
         if (data === "About") {
@@ -165,15 +181,23 @@ const CreateDetailsPreview = () => {
             return (
                 // has a dropdown box
                 <div className="flex flex-col gap-8 px-8 py-4 text-center min-h-[500px]">
-                    <FaqBuilder campaign={campaign} contents={contents.filter((dat) => dat.type === 'faqs')}/>
-
+                    <FaqBuilder
+                        campaign={campaign}
+                        contents={contents.filter((dat) => dat.type === "faqs")}
+                    />
                 </div>
             );
         } else if (data === "Updates") {
             return (
                 // navigation bar on the side, with the updates on the inside  (make new table in xampp)
                 <div className="flex flex-col gap-8 px-8 py-4 text-center min-h-[500px]">
-                    <UpdateBuilder campaign={campaign} contents={contents.filter((dat) => dat.type === 'updates')} insertHandler={handleInsertUpdates} />
+                    <UpdateBuilder
+                        campaign={campaign}
+                        contents={contents.filter(
+                            (dat) => dat.type === "updates"
+                        )}
+                        insertHandler={handleInsertUpdates}
+                    />
                 </div>
             );
         } else if (data === "Donations") {
@@ -183,10 +207,14 @@ const CreateDetailsPreview = () => {
                     <Empty>
                         <EmptyHeader>
                             <EmptyMedia variant="icon">
-                                <IconFolderCode  />
+                                <IconFolderCode />
                             </EmptyMedia>
                             <EmptyTitle>This is the donation page</EmptyTitle>
-                            <EmptyDescription>Every donation this campaign obtained will be displayed here. You can see the total donation as well as the message left by donators!</EmptyDescription>
+                            <EmptyDescription>
+                                Every donation this campaign obtained will be
+                                displayed here. You can see the total donation
+                                as well as the message left by donators!
+                            </EmptyDescription>
                         </EmptyHeader>
                         <EmptyContent>
                             {/* <Button>Add data</Button> */}
@@ -214,14 +242,18 @@ const CreateDetailsPreview = () => {
             <TabsContent
                 key={index}
                 value={index + 1}
-                className="w-[90%] text-lg text-center py-4">
+                className="w-[90%] text-lg text-center py-4"
+            >
                 {contentDivider(data, campaign)}
             </TabsContent>
         );
     };
 
     useEffect(() => {
-        if (campaign.images && (images.thumbnail === null || images.logo === null)) {
+        if (
+            campaign.images &&
+            (images.thumbnail === null || images.logo === null)
+        ) {
             campaign.images.map((dat) => {
                 dat.url.toLowerCase().includes("thumbnail")
                     ? setImages((prev) => ({ ...prev, thumbnail: dat.url }))
@@ -248,7 +280,7 @@ const CreateDetailsPreview = () => {
                         <CardDescription className="w-full text-center text-md justify-center flex items-center">
                             {campaign.status === "draft"
                                 ? "Edit everything about your campaign here! preview what your campaign details would looked like prior to publishing!"
-                                : " Edit everything about your campaign here! Add ne campaign updates on the Updates Tab!"}
+                                : " Edit everything about your campaign here! Add new campaign updates on the Updates Tab!"}
                         </CardDescription>
                     </div>
                     <div className="justify-center items-center">

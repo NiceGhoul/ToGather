@@ -1,4 +1,11 @@
-import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card";
+import {
+    Card,
+    CardAction,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
@@ -74,7 +81,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                 i === index ? { ...block, content: value } : block
             )
         );
-        setIsChanged(true)
+        setIsChanged(true);
     };
 
     const toggleBlockEdit = (index) => {
@@ -85,27 +92,37 @@ export const AboutBuilder = ({campaign, contents}) => {
         );
     };
 
-     const handleRemove = (id, index) => {
-         if (id != undefined) {
-             setDescription((prev) => prev.filter((_, i) => i !== index));
-             router.post(`/campaigns/deleteContent/${id}`);
-         } else {
-             setDescription((prev) => prev.filter((_, i) => i !== index));
-         }
-     };
+    const handleRemove = (id, index) => {
+        if (id != undefined) {
+            setDescription((prev) => prev.filter((_, i) => i !== index));
+            router.post(`/campaigns/deleteContent/${id}`);
+        } else {
+            setDescription((prev) => prev.filter((_, i) => i !== index));
+        }
+    };
 
-     const handleSave = () => {
-         if (description.some((dat) => dat.content === "")) {
-             toast.error("there are empty descriptions!", {description:"please double check your description before submitting."});
-         } else {
+    const handleSave = () => {
+        if (description.some((dat) => dat.content === "")) {
+            toast.error("there are empty descriptions!", {
+                description:
+                    "please double check your description before submitting.",
+            });
+        } else {
             const prepared = description.map((block, index) => {
                 return {
                     id: block.id ?? null,
                     campaign_id: block.campaign_id,
                     type: block.type,
-                    content: block.type === "paragraph" ? block.content : block.content?.file,
+                    content:
+                        block.type === "paragraph"
+                            ? block.content
+                            : block.content?.file,
                     // file: block.type === "media" ? block.content?.file ?? null : null,
-                    existing:  block.type === "media" && typeof block.content === "string" ? block.content : null,
+                    existing:
+                        block.type === "media" &&
+                        typeof block.content === "string"
+                            ? block.content
+                            : null,
                     order_y: block.order_y,
                 };
             })
@@ -123,10 +140,20 @@ export const AboutBuilder = ({campaign, contents}) => {
                     </CardTitle>
                 </div>
                 <div className="sticky flex justify-center gap-4 mt-2 top-[80px] z-35">
-                    <Button onClick={addParagraphBlock}>
-                        {" "} + Add Paragraph {" "}
+                    <Button
+                        onClick={addParagraphBlock}
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    >
+                        {" "}
+                        + Add Paragraph{" "}
                     </Button>
-                    <Button onClick={addMediaBlock}> + Add Media </Button>
+                    <Button
+                        onClick={addMediaBlock}
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    >
+                        {" "}
+                        + Add Media{" "}
+                    </Button>
                 </div>
             </CardHeader>
             {description && description.length > 0 ? (
@@ -173,7 +200,10 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                             "~;"
                                                         );
                                                     parts[1] = e.target.value;
-                                                    handleChange(index, parts.join("~;"));
+                                                    handleChange(
+                                                        index,
+                                                        parts.join("~;")
+                                                    );
                                                 }}
                                                 className="resize-none min-h-[120px] dark:text-gray-100"
                                             />
@@ -182,14 +212,15 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                     onClick={() => {
                                                         toggleBlockEdit(index);
                                                     }}
+                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                                                 >
                                                     Save
                                                 </Button>
                                                 <Button
-                                                    variant="secondary"
                                                     onClick={() =>
                                                         toggleBlockEdit(index)
                                                     }
+                                                    className="bg-red-600 hover:bg-red-500 text-white"
                                                 >
                                                     Cancel
                                                 </Button>
@@ -205,7 +236,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                             </p>
                                             <div className="w-full flex justify-end">
                                                 <Button
-                                                    className="w-[10%]"
+                                                    className="w-[10%] bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                                                     size="sm"
                                                     onClick={() =>
                                                         toggleBlockEdit(index)
@@ -248,26 +279,32 @@ export const AboutBuilder = ({campaign, contents}) => {
                                         />
                                     </div>
                                 )}
-                                    <Popup
-                                        triggerText={
-                                            <Button
-                                                variant="destructive"
-                                                size="icon"
-                                                // className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
-                                            >
-                                                <Trash2
-                                                    className="w-30 h-30 text-white p-0"
-                                                    strokeWidth={2.5}
-                                                />
-                                            </Button>
-                                        }
-                                        title={"Delete " + block.type + " ?"}
-                                        description={"This " + block.type + " will be removed permanently, are you sure?"}
-                                        confirmText="Yes, Confirm"
-                                        confirmColor="bg-red-600 hover:bg-red-700 text-white"
-                                        triggerClass="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
-                                        onConfirm={() => handleRemove(block.id, index)}
-                                    />
+                                <Popup
+                                    triggerText={
+                                        <Button
+                                            size="icon"
+                                            className="bg-red-600 hover:bg-red-500 text-white"
+                                            // className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
+                                        >
+                                            <Trash2
+                                                className="w-30 h-30 text-white p-0"
+                                                strokeWidth={2.5}
+                                            />
+                                        </Button>
+                                    }
+                                    title={"Delete " + block.type + " ?"}
+                                    description={
+                                        "This " +
+                                        block.type +
+                                        " will be removed permanently, are you sure?"
+                                    }
+                                    confirmText="Yes, Confirm"
+                                    confirmColor="bg-red-600 hover:bg-red-700 text-white"
+                                    triggerClass="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
+                                    onConfirm={() =>
+                                        handleRemove(block.id, index)
+                                    }
+                                />
                             </div>
                         ))}
                     </div>
@@ -279,9 +316,16 @@ export const AboutBuilder = ({campaign, contents}) => {
                     </h3>
                 </CardContent>
             )}
-            {description.length != oldDescription.length || description.some((dat) => oldDescription.map((a) => a === dat)) ? (
+            {description.length != oldDescription.length ||
+            description.some((dat) => oldDescription.map((a) => a === dat)) ? (
                 <CardFooter className="bottom-0 mt-10 justify-end flex items-end w-full">
-                    <Button onClick={handleSave}> Save Changes </Button>
+                    <Button
+                        onClick={handleSave}
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    >
+                        {" "}
+                        Save Changes{" "}
+                    </Button>
                 </CardFooter>
             ) : (
                 <></>

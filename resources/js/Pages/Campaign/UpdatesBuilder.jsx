@@ -1,7 +1,13 @@
 import Popup from "@/Components/Popup";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent } from "@/Components/ui/card";
-import { Carousel,CarouselNext, CarouselItem, CarouselPrevious, CarouselContent } from "@/Components/ui/carousel";
+import {
+    Carousel,
+    CarouselNext,
+    CarouselItem,
+    CarouselPrevious,
+    CarouselContent,
+} from "@/Components/ui/carousel";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
@@ -10,13 +16,15 @@ import { Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
+export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
     const [editMode, setEditMode] = useState(false);
-    const [openPopUp, setOpenPopUp] = useState(-1)
+    const [openPopUp, setOpenPopUp] = useState(-1);
     // useState that saves what will be shown on the right side
-    const [updates, setUpdates] = useState(contents)
-    const [oldUpdates, setOldUpdates] = useState(contents)
-    const [selectedUpdate, setSelectedUpdate] = useState(updates[updates.length - 1]);
+    const [updates, setUpdates] = useState(contents);
+    const [oldUpdates, setOldUpdates] = useState(contents);
+    const [selectedUpdate, setSelectedUpdate] = useState(
+        updates[updates.length - 1]
+    );
 
     const handleAddUpdate = () => {
         const date = new Date();
@@ -55,23 +63,41 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
             return;
         }
 
-        const cleanedMedia = (formData.media || []).filter((dat) => dat && (dat.file || dat.url));
+        const cleanedMedia = (formData.media || []).filter(
+            (dat) => dat && (dat.file || dat.url)
+        );
 
         // console.log(cleanedMedia)
 
-        const updatedList = updates.map((upd) => upd.id === selectedUpdate.id ? {...upd, content: `${formData.title}~;${formData.content ?? ""}`,media: cleanedMedia} : upd );
+        const updatedList = updates.map((upd) =>
+            upd.id === selectedUpdate.id
+                ? {
+                      ...upd,
+                      content: `${formData.title}~;${formData.content ?? ""}`,
+                      media: cleanedMedia,
+                  }
+                : upd
+        );
 
-        const updatedUpdate = { ...selectedUpdate, content: `${formData.title}~;${formData.content ?? ""}`, media: cleanedMedia.map((dat) => dat.file), };
+        const updatedUpdate = {
+            ...selectedUpdate,
+            content: `${formData.title}~;${formData.content ?? ""}`,
+            media: cleanedMedia.map((dat) => dat.file),
+        };
 
-        const updatesPreview = { ...selectedUpdate, content: `${formData.title}~;${formData.content ?? ""}`, media: formData.media, };
+        const updatesPreview = {
+            ...selectedUpdate,
+            content: `${formData.title}~;${formData.content ?? ""}`,
+            media: formData.media,
+        };
 
-        setUpdates(updatedList)
-        setSelectedUpdate(updatesPreview)
-        setEditMode(false)
+        setUpdates(updatedList);
+        setSelectedUpdate(updatesPreview);
+        setEditMode(false);
 
         if (insertHandler) {
             // console.log(updatedUpdate)
-             insertHandler(updatedUpdate)
+            insertHandler(updatedUpdate);
         }
     };
 
@@ -88,29 +114,28 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
     const handleUpdatesDelete = async (openPopUp) => {
         if (contents.some((dat) => dat.id === openPopUp)) {
             await router.post(`/campaigns/deleteContent/${openPopUp}`);
-            setUpdates(contents)
+            setUpdates(contents);
             console.log(openPopUp);
             setOpenPopUp(-1);
-            return
+            return;
         }
-            setUpdates((prev) => {
-                const index = prev.findIndex((u) => u.id === selectedUpdate.id);
-                const filtered = prev.filter((u) => u.id !== selectedUpdate.id);
+        setUpdates((prev) => {
+            const index = prev.findIndex((u) => u.id === selectedUpdate.id);
+            const filtered = prev.filter((u) => u.id !== selectedUpdate.id);
 
-                let nextSelected = null;
+            let nextSelected = null;
 
-                if (filtered.length > 0) {
-                    if (index - 1 >= 0) {
-                        nextSelected = filtered[index - 1];
-                    } else {
-                        nextSelected = filtered[0];
-                    }
+            if (filtered.length > 0) {
+                if (index - 1 >= 0) {
+                    nextSelected = filtered[index - 1];
+                } else {
+                    nextSelected = filtered[0];
                 }
+            }
 
-                setSelectedUpdate(nextSelected);
-                return filtered;
-            });
-
+            setSelectedUpdate(nextSelected);
+            return filtered;
+        });
     };
     // console.log(selectedUpdate.id)
     return (
@@ -128,14 +153,14 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                 {editMode ? (
                                     <Input
                                         value={formData.title}
-                                        placeholder="Input update title here"
+                                        placeholder="Input Update Title Here"
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
                                                 title: e.target.value,
                                             })
                                         }
-                                        className="text-sm h-[50px]"
+                                        className="text-sm h-[50px] dark:placeholder-gray-300 dark:text-white"
                                     />
                                 ) : (
                                     <Label className="text-2xl font-bold text-[#7C4789] dark:text-purple-400">
@@ -232,7 +257,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                             )}
                                         </div>
                                         <Label className="text-sm text-gray-500">
-                                            Upload images/videos
+                                            Upload Images/Videos
                                         </Label>
                                         <div className="flex flex-row gap-5">
                                             <Input
@@ -242,7 +267,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                 onChange={handleMediaChange}
                                             />
                                             <Button
-                                                className=""
+                                                className="bg-red-300 hover:bg-red-400 text-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white"
                                                 onClick={() =>
                                                     setFormData((dat) => ({
                                                         ...dat,
@@ -250,7 +275,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                     }))
                                                 }
                                             >
-                                                clear media
+                                                Clear Media
                                             </Button>
                                         </div>
                                     </div>
@@ -260,8 +285,8 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                 {editMode ? (
                                     <Textarea
                                         rows={8}
-                                        placeholder="Input update description here"
-                                        className="text-md text-gray-700"
+                                        placeholder="Input Update Description Here"
+                                        className="text-md text-gray-700 dark:placeholder-gray-300 dark:text-white"
                                         value={formData.content}
                                         onChange={(e) =>
                                             setFormData({
@@ -271,7 +296,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                         }
                                     />
                                 ) : (
-                                    <p className="text-left text-md text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                                    <p className="text-left text-md text-gray-700 dark:text-gray-300 whitespace-pre-line ">
                                         {selectedUpdate.content.split("~;")[1]}
                                     </p>
                                 )}
@@ -281,8 +306,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                     {editMode ? (
                                         <>
                                             <Button
-                                                variant="outline"
-                                                className="border-[#7C4789] text-[#7C4789]"
+                                                className="bg-red-300 hover:bg-red-400 text-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white"
                                                 onClick={() =>
                                                     setEditMode(false)
                                                 }
@@ -290,7 +314,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                                 Cancel
                                             </Button>
                                             <Button
-                                                className="bg-[#7C4789] hover:bg-[#7C4789]/90 text-white"
+                                                className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                                                 onClick={handleSaveUpdate}
                                             >
                                                 Save
@@ -298,19 +322,20 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                                         </>
                                     ) : (
                                         <div className="flex flex-row justify-between w-full">
-                                            <Trash
-                                                size={30}
+                                            <Button
+                                                className="bg-red-300 hover:bg-red-400 text-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white p-0 w-12 h-12 rounded-md"
                                                 onClick={() =>
                                                     setOpenPopUp(
                                                         selectedUpdate.id
                                                     )
                                                 }
-                                                className="cursor-pointer rounded-md p-1 hover:bg-red-100 hover:text-red-600 text-gray-600 transition-colors"
-                                            />
+                                            >
+                                                <Trash />
+                                            </Button>
 
                                             <Button
                                                 variant="outline"
-                                                className="w-30 text-base border-[#7C4789] text-[#7C4789] hover:bg-[#7C4789] hover:text-[#ffffff]"
+                                                className="w-30 p-0 h-12 text-base bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                                                 onClick={() => {
                                                     setFormData({
                                                         title: selectedUpdate.content.split(
@@ -389,8 +414,7 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                             </Card>
                         ))}
                         <Button
-                            variant={"outline"}
-                            className="text-light border-dotted"
+                            className=" border-dotted bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
                             onClick={handleAddUpdate}
                         >
                             + Add Project Update
@@ -401,11 +425,9 @@ export const UpdateBuilder = ({ campaign , contents , insertHandler }) => {
                     open={openPopUp === -1 ? false : true}
                     onClose={() => setOpenPopUp(-1)}
                     triggerText={null}
-                    title={"you are about to delete a campaign updates!"}
-                    description={
-                        "This will remove the chosen updates. Are you sure to continue?"
-                    }
-                    confirmText={"Confirm"}
+                    title="You are about to Delete a Campaign Updates!"
+                    description={"This will remove the chosen updates."}
+                    confirmText="Delete"
                     cancelText="Cancel"
                     showCancel={true}
                     confirmColor={"bg-red-600 hover:bg-red-700 text-white"}
