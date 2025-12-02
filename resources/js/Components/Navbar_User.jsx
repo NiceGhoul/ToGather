@@ -71,11 +71,8 @@ export default function Navbar_User() {
     const isActive = (path) => url.startsWith(path);
 
     const handleStart = () => {
-        if (draft) {
-            router.get(`/campaigns/create/detailsPreview/${draft.id}`);
-        } else {
             router.get("/campaigns/create");
-        }
+
     };
 
     return (

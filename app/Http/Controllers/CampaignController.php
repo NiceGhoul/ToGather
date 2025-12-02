@@ -79,6 +79,7 @@ class CampaignController extends Controller
         );
 
         return redirect()->route('admin.campaign.adminIndex')->with('success', 'Campaign deleted!');
+
     }
 
 
@@ -116,7 +117,6 @@ class CampaignController extends Controller
     public function create($id = null)
     {
         $user = auth()->user();
-
         // Check if user is banned first
         if ($user->status->value === 'banned' || $user->status === 'banned') {
             return inertia('Verification/Banned');
@@ -154,25 +154,25 @@ class CampaignController extends Controller
 
         if ($verificationRequest->status->value === 'accepted') {
             // Accepted verification - show campaign create form
-            if ($usersCampaign) {
-                if ($usersCampaign->status->value === 'pending') {
-                    return inertia('Campaign/CampaignPending');
-                    // If user already has a campaign with the status draft
-                } else if ($usersCampaign->status->value === 'draft' || $usersCampaign->status->value === 'active') {
-                    $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())->latest()->first();
-                    $location = Location::where('campaign_id', $id)->latest()->first();
-                    // dd($location);
-                    return Inertia::render('Campaign/Create', [
-                        'user_Id' => Auth::id(),
-                        'campaign' => $draft,
-                        'location' => $location,
-                    ]);
-                }
-            } else {
+            // if ($usersCampaign) {
+            //     if ($usersCampaign->status->value === 'pending') {
+            //         return inertia('Campaign/CampaignPending');
+            //         // If user already has a campaign with the status draft
+            //     } else if ($usersCampaign->status->value === 'draft' || $usersCampaign->status->value === 'active') {
+            //         $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())->latest()->first();
+            //         $location = Location::where('campaign_id', $id)->latest()->first();
+            //         // dd($location);
+            //         return Inertia::render('Campaign/Create', [
+            //             'user_Id' => Auth::id(),
+            //             'campaign' => $draft,
+            //             'location' => $location,
+            //         ]);
+            //     }
+            // } else {
                 return inertia::render('Campaign/Create', [
                     'user_Id' => Auth::user()->id,
                 ]);
-            }
+            // }
         }
 
         // return inertia('Verification/Create');
@@ -184,7 +184,7 @@ class CampaignController extends Controller
         $campaigns = Campaign::with('images')->whereIn('status', ['completed', 'active'])->get();
         $lookups = Lookup::all();
 
-        return inertia('Campaign/CampaignList', [
+        return inertia::render('Campaign/CampaignList', [
             'campaigns' => $campaigns,
             'lookups' => $lookups,
         ]);

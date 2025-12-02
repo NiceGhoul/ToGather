@@ -464,106 +464,124 @@ class CampaignSeeder extends Seeder
             [
                 'path' => 'updateMedia1.avif',
                 'imageable_id' => 1,
+                'campaign_id' => 1,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign 2
             [
                 'path' => 'updateMedia1.avif',
                 'imageable_id' => 2,
+                'campaign_id' => 2,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign 4
             [
                 'path' => 'updatesMedia1.avif',
                 'imageable_id' => 3,
+                'campaign_id' => 4,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updatesMedia2.avif',
                 'imageable_id' => 3,
+                'campaign_id' => 4,
                 'imageable_type' => CampaignContent::class
             ],
             // campaign 4_update2
             [
                 'path' => 'updatesMedia3.avif',
                 'imageable_id' => 4,
+                'campaign_id' => 4,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign 9_update2
             [
                 'path' => 'updateMedia1.jpg',
                 'imageable_id' => 7,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updateMedia2.jpg',
                 'imageable_id' => 7,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updateMedia3.jpg',
                 'imageable_id' => 7,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign 9_update3
             [
                 'path' => 'updateMedia4.jpg',
                 'imageable_id' => 8,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updateMedia5.jpg',
                 'imageable_id' => 8,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updateMedia6.jpg',
                 'imageable_id' => 8,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign 9_update4
             [
                 'path' => 'updateMedia7.jpg',
                 'imageable_id' => 9,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updateMedia8.jpg',
                 'imageable_id' => 9,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updateMedia9.jpg',
                 'imageable_id' => 9,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign 9_update5
             [
                 'path' => 'updateMedia10.jpg',
                 'imageable_id' => 10,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             [
                 'path' => 'updateMedia11.jpg',
                 'imageable_id' => 10,
+                'campaign_id' => 9,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign_11_update2
             [
                 'path' => 'updatesMedia1.jpg',
                 'imageable_id' => 11,
+                'campaign_id' => 11,
                 'imageable_type' => CampaignContent::class
             ],
             //campaign 11_update3
             [
                 'path' => 'updatesMedia2.jpg',
                 'imageable_id' => 12,
+                'campaign_id' => 11,
                 'imageable_type' => CampaignContent::class
             ],
         ];
 
         foreach($updateImages as $update){
-            $localImg = public_path("images/onlineCampaignMedia/updates/{$update['imageable_id']}/{$update['path']}");
+            $localImg = public_path("images/onlineCampaignMedia/updates/{$update['campaign_id']}/{$update['path']}");
             if (file_exists($localImg)) {
                 $imgName = basename($update['path']);
                 $imgPath = Storage::disk('minio')->putFileAs(
@@ -652,9 +670,9 @@ class CampaignSeeder extends Seeder
             [
                 'campaign_id' => 1,
                 'type' => 'paragraph',
-                'content' => 'Our Second Year~;n our second year of business we have only grown... exponentially! We quickly outgrew our small roasting space and moved into a bigger warehouse location with a MUCH bigger coffee roaster and more space for order fulfillment to  help with our growing needs.
+                'content' => 'Our Second Year~;In our second year of business we have only grown... exponentially! We quickly outgrew our small roasting space and moved into a bigger warehouse location with a MUCH bigger coffee roaster and more space for order fulfillment to  help with our growing needs.
 
-                We have also more than doubled our amount of events we have been going to, with over 24 events we will have done by the end of the year. We are not slowing down any time soon and are on a quest to bring better coffee to gamers everywhere! Our goals are to continue to grow and this will only be our  first of hopefully MANY more Kickstarter campaigns to come!',
+                We have also more than doubled our amount of events we have been going to, with over 24 events we will have done by the end of the year. We are not slowing down any time soon and are on a quest to bring better coffee to gamers everywhere! Our goals are to continue to grow and this will only be our  first of hopefully MANY more campaigns to come!',
                 'order_y' => 9,
             ],
             [
@@ -700,7 +718,7 @@ class CampaignSeeder extends Seeder
             [
                 'campaign_id' => 2,
                 'type' => 'paragraph',
-                'content' => "Why is your support so important?~;This cookbook is my way of preserving family culture. Living far from home, you understand how fragile the connection to your roots can be. In the conditions of immigration and constant changes, I want my children and grandchildren to know who they are, through taste, smell, traditions, and culture.?",
+                'content' => "Why is your support so important?~;This cookbook is my way of preserving family culture. Living far from home, you understand how fragile the connection to your roots can be. In the conditions of immigration and constant changes, I want my children and grandchildren to know who they are, through taste, smell, traditions, and culture.",
                 'order_y' => 5,
             ],
             [
@@ -760,7 +778,6 @@ class CampaignSeeder extends Seeder
                 Ascorbic Acid, Garlic Powder, Ground Black Pepper, Onion Powder.
 
                 Chilli & Garlic
-
                 INGREDIENTS: Venison (88%), Water, Salt, Smoked Paprika, Hot Chilli
                 Powder (chilli (60%), Paprika), Natural Flavor, Salt, Antioxidant Ascorbic
                 Acid, Garlic Powder, Onion Granules, Cayenne Pepper, Oregano, Ground

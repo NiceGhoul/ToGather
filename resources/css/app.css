@@ -234,3 +234,21 @@
     @apply bg-background text-foreground;
   }
 }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+
+@keyframes autoScrollHorizontal {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.auto-scroll-horizontal {
+  animation: autoScrollHorizontal 30s linear infinite;
+  display: flex;
+  gap: 0.75rem; /* same as gap-3 */
+}
