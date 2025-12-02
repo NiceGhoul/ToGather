@@ -221,7 +221,10 @@ export default function Home() {
                         <div className="lg:w-1/3 w-full flex flex-col">
                             <div className="rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 flex flex-col h-full">
                                 <img
-                                    src={featuredCampaign?.images[0].url}
+                                    src={
+                                        featuredCampaign?.images?.[0]?.url ??
+                                        "/images/placeholder.jpg"
+                                    }
                                     alt={featuredCampaign.title}
                                     className="w-full h-64 object-cover"
                                 />
@@ -346,7 +349,10 @@ export default function Home() {
                                 >
                                     <Card className="overflow-hidden shadow-sm bg-white dark:bg-gray-800 transition-transform duration-200 hover:scale-[1.02] hover:shadow-md rounded-xl pt-0 cursor-pointer">
                                         <img
-                                            src={c?.images[0].url}
+                                            src={
+                                                c?.images?.[0]?.url ??
+                                                "/images/placeholder.jpg"
+                                            }
                                             alt={c.title}
                                             className="w-full h-30 object-cover"
                                         />
@@ -395,7 +401,7 @@ export default function Home() {
 
                         {/* 🟤 Pagination */}
                         <div className="flex justify-center mt-8 gap-2">
-                            {[1,2].map((p) => (
+                            {[1, 2].map((p) => (
                                 <button
                                     key={p}
                                     onClick={() => setPage(p)}
@@ -446,7 +452,11 @@ export default function Home() {
                                             >
                                                 <div className="w-[250px] bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-pointer">
                                                     <img
-                                                        src={c?.images[0].url}
+                                                        src={
+                                                            c?.images?.[0]
+                                                                ?.url ??
+                                                            "/images/placeholder.jpg"
+                                                        }
                                                         alt={c.title}
                                                         className="w-full h-32 object-cover"
                                                     />

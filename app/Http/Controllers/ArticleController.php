@@ -120,8 +120,12 @@ class ArticleController extends Controller
 
     public function toggleLike($id)
     {
-        $article = Article::findOrFail($id);
         $user = auth()->user();
+        dd($user);
+        if (!$user) {
+            return inertia('Login/Login');
+        }
+        $article = Article::findOrFail($id);
 
         // check if user already liked
         $existingLike = $article->likes()->where('user_id', $user->id)->first();

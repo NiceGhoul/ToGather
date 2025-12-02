@@ -24,6 +24,10 @@ Route::get('/', function () {
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/check-email', [UserController::class, 'checkEmail']);
 Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
+Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
+Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
+
 
 
 
@@ -49,10 +53,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/campaigns/create/createPreview/{id}', [CampaignController::class, 'getCreateSupportingMediaData'])->name('campaigns.createPreview');
     Route::get('/campaigns/create/detailsPreview/{id}', [CampaignController::class, 'getDetailsPreview'])->name('campaigns.detailsPreview');
     Route::get('/campaigns/likedCampaign', [CampaignController::class, 'showLiked'])->name('campaigns.liked');
-    Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
+
     Route::get('/campaigns/getList', [CampaignController::class, 'getCampaignListData'])->name('campaigns.getAllList');
     Route::get('/campaigns/myCampaigns', [CampaignController::class, 'showMyCampaigns'])->name('campaigns.showMyCampaigns');
-    Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
+
     Route::post('/campaigns/upload-image', [CampaignController::class, 'uploadSupportingMedia'])->name('campaigns.uploadImages');
     Route::post('/campaigns/newCampaign', [CampaignController::class, 'createNewCampaign'])->name('campaigns.createNewCampaign');
     Route::post('/campaigns/deleteContent/{id}', [CampaignController::class, 'deleteCampaignInfo'])->name('campaigns.delete');
@@ -68,7 +72,7 @@ Route::middleware('auth')->group(function () {
     //articles routing
     Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
     Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
-    Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
+
     Route::get('/articles/likedArticles', [ArticleController::class, 'showLiked'])->name('articles.liked');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
     Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
@@ -122,7 +126,7 @@ Route::get('/api/get-video', [FileController::class, 'getVideo'])->name('api.get
 // Midtrans webhook
 Route::post('/midtrans/callback', [DonationController::class, 'midtransCallback'])->name('midtrans.callback');
 
-Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
+
 
 // --- Admin Routes ---
 // Must be logged in AND have the 'admin' role.

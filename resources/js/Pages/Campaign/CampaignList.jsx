@@ -1,5 +1,6 @@
 import { Button } from "@/Components/ui/button";
 import Layout_User from "@/Layouts/Layout_User";
+import Layout_Guest from "@/Layouts/Layout_Guest";
 import { CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@/Components/ui/separator";
@@ -10,13 +11,19 @@ import { SearchIcon } from "lucide-react";
 import { Spinner } from "@/Components/ui/spinner";
 
 const CampaignList = () => {
-    const { campaigns, lookups } = usePage().props;
+    const { campaigns, lookups, auth } = usePage().props;
     const [visibleCampaign, setVisibleCampaign] = useState(8);
     const [campaignList, setCampaignList] = useState(campaigns || []);
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
     const [images, setImages] = useState({ thumbnail: null, logo: null });
+    const [isLogin, setIsLogin] = useState(false);
+
+    // 🟣 Check authentication status
+    useEffect(() => {
+        setIsLogin(!!auth?.user);
+    }, [auth]);
 
     console.log(campaigns);
     const handleShowMore = () => {
@@ -215,9 +222,10 @@ const CampaignList = () => {
             });
         }
     };
+    const Layout = isLogin ? Layout_User : Layout_Guest;
 
     return (
-        <Layout_User>
+        <Layout>
             {/* upper part (banner and category picker) */}
             <div className="w-full flex flex-col">
                 <div
@@ -340,7 +348,7 @@ const CampaignList = () => {
                     )}
                 </CardContent>
             </div>
-        </Layout_User>
+        </Layout>
     );
 };
 

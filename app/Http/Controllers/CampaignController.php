@@ -211,7 +211,12 @@ class CampaignController extends Controller
     {
         $user = auth()->user();
         $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
-        $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
+        if (!$user) {
+            $likes = false;
+        } else {
+            $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
+        }
+
         $campaignData = Campaign::where('id', $id)->with('images', 'locations')->with('user')->latest()->first();
         $content = CampaignContent::with('images', 'videos')->where('campaign_id', $campaignData->id)->get()->map(function ($data) {
             $imageMedia = $data->images->map(function ($img) {

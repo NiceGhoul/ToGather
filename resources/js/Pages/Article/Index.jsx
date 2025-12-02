@@ -113,6 +113,11 @@ const ArticleList = () => {
                     Accept: "application/json",
                 },
             });
+            if (response.status === 401) {
+                router.visit("/login");
+                return;
+            }
+
             const data = await response.json();
 
             setLikesState((prev) => ({
