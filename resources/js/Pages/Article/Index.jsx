@@ -113,6 +113,11 @@ const ArticleList = () => {
                     Accept: "application/json",
                 },
             });
+            if (response.status === 401) {
+                router.visit("/login");
+                return;
+            }
+
             const data = await response.json();
 
             setLikesState((prev) => ({
@@ -127,9 +132,12 @@ const ArticleList = () => {
     };
 
     const handleShowMore = () => {
+        // show spinner, then load more (small delay so spinner is visible)
         setIsShowMoreloading(true);
-        setVisibleArticles((prev) => prev + 8);
-        setIsShowMoreloading(false);
+        setTimeout(() => {
+            setVisibleArticles((prev) => prev + 8);
+            setIsShowMoreloading(false);
+        }, 400);
     };
 
     // Skeleton card component
@@ -178,7 +186,7 @@ const ArticleList = () => {
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 min-h-[2rem] max-h-[3rem] overflow-hidden text-center leading-snug dark:text-white">
+                        <h2 className="text-lg font-semibold mb-2 min-h-8 max-h-12 overflow-hidden text-center leading-snug dark:text-white">
                             {article.title.length > 50
                                 ? article.title.substring(0, 50) + "..."
                                 : article.title}
@@ -193,7 +201,7 @@ const ArticleList = () => {
                             {article.category ?? "Uncategorized"}
                         </p>
 
-                        <p className="h-[80px]text-sm text-gray-700 mb-6 text-justify dark:text-gray-300">
+                        <p className="text-sm text-gray-700 mb-6 text-justify dark:text-gray-300 h-40 overflow-hidden">
                             {previewText
                                 .replace(/(<([^>]+)>)/gi, "")
                                 .slice(0, 180) || "No preview text."}
@@ -406,7 +414,7 @@ const ArticleList = () => {
 
                     {!isLoading && visibleArticles < articleList?.length && (
                         <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
-                            <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                            <Separator className="flex-1 bg-gray-400 h-px" />
                             <p
                                 onClick={handleShowMore}
                                 className=" text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
@@ -416,7 +424,7 @@ const ArticleList = () => {
                                 )}
                                 Show More
                             </p>
-                            <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                            <Separator className="flex-1 bg-gray-400 h-px" />
                         </div>
                     )}
                 </CardContent>

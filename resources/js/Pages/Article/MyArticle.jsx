@@ -8,6 +8,7 @@ import { Skeleton } from "@/Components/ui/skeleton";
 import { ButtonGroup } from "@/Components/ui/button-group";
 import { Input } from "@/Components/ui/input";
 import { SearchIcon, Heart } from "lucide-react";
+import { Spinner } from "@/Components/ui/spinner";
 import { useEffect, useState } from "react";
 import { IconFolderCode } from "@tabler/icons-react";
 import { ArrowUpRightIcon, RotateCcw } from "lucide-react";
@@ -31,12 +32,21 @@ export default function MyArticle({
     const [chosenCategory, setChosenCategory] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
 
     const [likesState, setLikesState] = useState(
         Object.fromEntries(
             (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false])
         )
     );
+    const handleShowMore = () => {
+        // show spinner, then load more (small delay so spinner is visible)
+        setIsShowMoreloading(true);
+        setTimeout(() => {
+            setVisibleArticles((prev) => prev + 8);
+            setIsShowMoreloading(false);
+        }, 400);
+    };
 
     useEffect(() => {
         if (articles?.length) {
@@ -69,6 +79,7 @@ export default function MyArticle({
                     setArticleList(page.props.articles);
                     setChosenCategory(activeCategory);
                     setVisibleArticles(8);
+
                     setIsLoading(false);
                 },
                 onError: () => setIsLoading(false),
@@ -458,6 +469,23 @@ export default function MyArticle({
                                 </a>
                             </Button>
                         </Empty>
+                    )}
+                    {!isLoading && visibleArticles < articleList?.length && (
+                        <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
+                            <Separator className="flex-1 bg-gray-400 h-px" />
+                            <p
+                                onClick={() => {
+                                    handleShowMore();
+                                }}
+                                className=" text-xl text-black dark:text-white font-medium cursor-pointer inline-flex items-center gap-2"
+                            >
+                                Show More
+                                {isShowMoreLoading && (
+                                    <Spinner className="w-4 h-4" />
+                                )}
+                            </p>
+                            <Separator className="flex-1 bg-gray-400 h-px" />
+                        </div>
                     )}
                 </CardContent>
             </div>

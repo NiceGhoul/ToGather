@@ -257,12 +257,7 @@ const CreatePreview = () => {
     const handleBack = () => {
         const params = new URLSearchParams(window.location.search);
         const from = params.get("from");
-
-        if (from === "myCampaigns") {
-            router.get("/campaigns/myCampaigns");
-        } else {
-            router.get(`/campaigns/create/${campaign.id}`);
-        }
+        router.get(`/campaigns/create/${campaign.id}?from=${from}`);
     };
 
     const handleToPreview = () => {
@@ -317,7 +312,7 @@ const CreatePreview = () => {
                         </div>
                         <div className="items-center text-center justify-center flex gap-5">
                             <Button
-                                className="mt-5 w-20 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                className="mt-5 w-20 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                 onClick={handleNext}
                             >
                                 Next

@@ -19,22 +19,21 @@ import Popup from "@/Components/Popup";
 import { Description } from "@radix-ui/react-dialog";
 
 
-export const AboutBuilder = ({campaign, contents}) => {
+export const AboutBuilder = ({campaign, contents, errorHandler}) => {
     const [description, setDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
     const [oldDescription, setOldDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
     const [isChanged, setIsChanged] = useState(false)
 
     useEffect(() => {
-        if(contents.length > 0){
-            setDescription(contents)
+        if (contents.length > 0) {
+            setDescription(contents);
         }
-    },[contents])
-
+    }, [contents]);
 
     const addParagraphBlock = () => {
         window.scrollTo({
             top: document.body.scrollHeight,
-            behavior: "instant",
+            behavior: "auto",
         });
         setDescription((prev) => {
             const lastOrder =
@@ -81,7 +80,6 @@ export const AboutBuilder = ({campaign, contents}) => {
                 i === index ? { ...block, content: value } : block
             )
         );
-        setIsChanged(true);
     };
 
     const toggleBlockEdit = (index) => {
@@ -126,7 +124,9 @@ export const AboutBuilder = ({campaign, contents}) => {
                     order_y: block.order_y,
                 };
             })
-             router.post("/campaigns/insertAbout", prepared)
+             router.post("/campaigns/insertAbout", prepared,{
+                onError: (errors) => errorHandler(errors),
+             })
              setDescription(contents)
          }
      };
@@ -142,14 +142,14 @@ export const AboutBuilder = ({campaign, contents}) => {
                 <div className="sticky flex justify-center gap-4 mt-2 top-[80px] z-35">
                     <Button
                         onClick={addParagraphBlock}
-                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                     >
                         {" "}
                         + Add Paragraph{" "}
                     </Button>
                     <Button
                         onClick={addMediaBlock}
-                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                     >
                         {" "}
                         + Add Media{" "}
@@ -212,7 +212,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                     onClick={() => {
                                                         toggleBlockEdit(index);
                                                     }}
-                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                                 >
                                                     Save
                                                 </Button>
@@ -220,7 +220,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                                     onClick={() =>
                                                         toggleBlockEdit(index)
                                                     }
-                                                    className="bg-red-600 hover:bg-red-500 text-white"
+                                                    className="dark:bg-red-600 dark:hover:bg-red-500 dark:text-white bg-red-200 hover:bg-red-300 text-red-700"
                                                 >
                                                     Cancel
                                                 </Button>
@@ -236,7 +236,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                                             </p>
                                             <div className="w-full flex justify-end">
                                                 <Button
-                                                    className="w-[10%] bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                                    className="w-[10%] bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                                     size="sm"
                                                     onClick={() =>
                                                         toggleBlockEdit(index)
@@ -283,11 +283,11 @@ export const AboutBuilder = ({campaign, contents}) => {
                                     triggerText={
                                         <Button
                                             size="icon"
-                                            className="bg-red-600 hover:bg-red-500 text-white"
+                                            className="dark:bg-red-600 dark:hover:bg-red-500 dark:text-white bg-red-200 hover:bg-red-300 text-red-700"
                                             // className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
                                         >
                                             <Trash2
-                                                className="w-30 h-30 text-white p-0"
+                                                className="w-30 h-3 p-0"
                                                 strokeWidth={2.5}
                                             />
                                         </Button>
@@ -321,7 +321,7 @@ export const AboutBuilder = ({campaign, contents}) => {
                 <CardFooter className="bottom-0 mt-10 justify-end flex items-end w-full">
                     <Button
                         onClick={handleSave}
-                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                     >
                         {" "}
                         Save Changes{" "}

@@ -5,6 +5,7 @@ import { Button } from "@/Components/ui/button";
 import { Toggle } from "@/Components/ui/toggle";
 import { Heart, ArrowLeft } from "lucide-react";
 import Layout_Guest from "@/Layouts/Layout_Guest";
+import { router } from "@inertiajs/react";
 
 export default function Details() {
     const { article, auth } = usePage().props;
@@ -31,6 +32,10 @@ export default function Details() {
                     Accept: "application/json",
                 },
             });
+            if (res.status === 401) {
+                router.visit("/login");
+                return;
+            }
             const data = await res.json();
             setLiked(data.isLiked);
             setLikeCount(data.likeCount);
@@ -144,7 +149,7 @@ export default function Details() {
                                     {cells.map(({ x, y, block }, index) => (
                                         <div
                                             key={`${y}-${x}`}
-                                            className="w-full rounded-md p-2 overflow-hidden break-words"
+                                            className="w-full rounded-md p-2 overflow-hidden wrap-break-words"
                                             style={{
                                                 gridColumnStart: x,
                                                 gridRowStart: y,
@@ -154,7 +159,7 @@ export default function Details() {
                                                 block.type === "paragraph" ||
                                                 block.type === "text" ? (
                                                     <div
-                                                        className="max-w-none text-justify leading-relaxed tracking-normal"
+                                                        className="max-w-none text-justify leading-normal tracking-normal"
                                                         style={{
                                                             textJustify:
                                                                 "inter-word",

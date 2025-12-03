@@ -255,7 +255,7 @@ export default function Create() {
                                             <Button
                                                 type="button"
                                                 size="sm"
-                                                className="absolute top-2 right-2 bg-red-600 text-white hover:bg-red-500"
+                                                className="absolute top-2 right-2 dark:bg-red-600 dark:hover:bg-red-500 dark:text-white bg-red-200 hover:bg-red-300 text-red-700"
                                                 onClick={() => removeBlock(idx)}
                                             >
                                                 ✕
@@ -272,7 +272,7 @@ export default function Create() {
                                         onClick={() =>
                                             addBlockAt(1, 999, "text")
                                         }
-                                        className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                                        className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                     >
                                         <CaseSensitive className="mr-1" />
                                         Add Text Block
@@ -284,7 +284,7 @@ export default function Create() {
                                         onClick={() =>
                                             addBlockAt(1, 999, "image")
                                         }
-                                        className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                                        className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                     >
                                         <Image className="mr-1" />
                                         Add Image Block
@@ -296,7 +296,7 @@ export default function Create() {
                                 <Button
                                     type="submit"
                                     disabled={processing}
-                                    className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                                    className="bg-purple-200 text-purple-800 hover:bg-purple-300 hover:text-purple-900 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                 >
                                     {processing
                                         ? "Saving..."

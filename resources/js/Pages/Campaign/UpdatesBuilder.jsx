@@ -314,7 +314,7 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                                                 Cancel
                                             </Button>
                                             <Button
-                                                className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                                className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                                 onClick={handleSaveUpdate}
                                             >
                                                 Save
@@ -335,7 +335,7 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
 
                                             <Button
                                                 variant="outline"
-                                                className="w-30 p-0 h-12 text-base bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                                className="w-30 p-0 h-12 text-base bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                                 onClick={() => {
                                                     setFormData({
                                                         title: selectedUpdate.content.split(
@@ -414,7 +414,7 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                             </Card>
                         ))}
                         <Button
-                            className=" border-dotted bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                            className=" border-dotted bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                             onClick={handleAddUpdate}
                         >
                             + Add Project Update

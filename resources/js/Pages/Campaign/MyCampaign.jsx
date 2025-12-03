@@ -8,6 +8,7 @@ import { Input } from "@/Components/ui/input";
 import { SearchIcon, RotateCcw, Currency } from "lucide-react";
 import { useEffect, useState } from "react";
 import { IconFolderCode } from "@tabler/icons-react";
+import { Spinner } from "@/Components/ui/spinner";
 import {
     Empty,
     EmptyContent,
@@ -45,6 +46,7 @@ export default function MyCampaign({
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
     const [images, setImages] = useState({ thumbnail: null });
     const [openPop, setOpenPop] = useState(-1);
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
 
     useEffect(() => {
         if (campaigns.images && images.thumbnail === null) {
@@ -98,20 +100,13 @@ export default function MyCampaign({
         );
     };
 
-    const colorCoder = (data) => {
-        if (data === "Foods & Beverage") {
-            return "bg-[#B8DF5D]";
-        } else if (data === "Beauty & Cosmetic") {
-            return "bg-[#FB84B2]";
-        } else if (data === "Clothes & Fashion") {
-            return "bg-[#CDADF1]";
-        } else if (data === "Services") {
-            return "bg-[#EDAC6B]";
-        } else if (data === "Lifestyle") {
-            return "bg-[#D3DE5D]";
-        } else if (data === "Logistics") {
-            return "bg-[#80BDF6]";
-        }
+    const handleShowMore = () => {
+        // show spinner, then load more (small delay so spinner is visible)
+        setIsShowMoreloading(true);
+        setTimeout(() => {
+            setVisibleCampaigns((prev) => prev + 8);
+            setIsShowMoreloading(false);
+        }, 400);
     };
 
     const handleMoveToEdit = (id) => {
@@ -151,7 +146,7 @@ export default function MyCampaign({
                             />
                         )}
 
-                        <h2 className="text-lg font-semibold mb-2 items-center justify-center flex text-center min-h-[3rem] max-h-[3rem] overflow-hidden leading-snug dark:text-white">
+                        <h2 className="text-lg font-semibold mb-2 items-center justify-center flex text-center min-h-12 max-h-12 overflow-hidden leading-snug dark:text-white">
                             {campaign.title.length > 50
                                 ? campaign.title.substring(0, 50) + "..."
                                 : campaign.title}
@@ -232,7 +227,7 @@ export default function MyCampaign({
                         </div>
                         <div className="flex justify-center mt-auto">
                             {campaign.status != "completed" ? (
-                                <div className="flex gap-4 flex justify-center items-center">
+                                <div className="gap-4 flex justify-center items-center">
                                     {campaign.status === "draft" && (
                                         <Button
                                             className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg"
@@ -445,21 +440,19 @@ export default function MyCampaign({
                                 {cardRepeater(campaignList)}
                             </div>
 
-                            {/* === Show More (gaya seperti di ArticleList) === */}
                             {visibleCampaigns < campaignList?.length && (
                                 <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
-                                    <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                                    <Separator className="flex-1 bg-gray-400 h-px" />
                                     <p
-                                        onClick={() =>
-                                            setVisibleCampaigns(
-                                                (prev) => prev + 8
-                                            )
-                                        }
-                                        className="text-sm text-gray-400 font-thin cursor-pointer hover:text-gray-600 transition-colors"
+                                        onClick={() => handleShowMore()}
+                                        className=" text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
                                     >
-                                        show more
+                                        {isShowMoreLoading && (
+                                            <Spinner className="w-4 h-4" />
+                                        )}
+                                        Show More
                                     </p>
-                                    <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                                    <Separator className="flex-1 bg-gray-400 h-px" />
                                 </div>
                             )}
                         </>
