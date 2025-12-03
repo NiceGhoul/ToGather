@@ -73,9 +73,9 @@ class DonationController extends Controller
                 'name' => 'Donation for '.$campaign->title,
             ]],
             'callbacks' => [
-                'finish' => url('/donate?success=1'),
-                'unfinish' => url('/donate?cancelled=1'),
-                'error' => url('/donate?error=1'),
+                'finish' => url('/campaigns/details/'.$campaign->id),
+                'unfinish' => url('/campaigns/details/'.$campaign->id),
+                'error' => url('/campaigns/details/'.$campaign->id),
             ],
         ];
 
