@@ -79,7 +79,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                 </div>
                 <div className="flex flex-row justify-between">
                     <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
-                        0 Donator
+                        {/* 0 Donator */}
                     </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
@@ -174,7 +174,35 @@ const CreateDetailsPreview = () => {
     };
 
     const handleInsertUpdates = (campaignContent) => {
-        router.post(`/campaigns/insertUpdates`, campaignContent);
+        router.post(`/campaigns/insertUpdates`, campaignContent,{
+            onError: (errors) => uploadErrorHandler(errors),
+        });
+    };
+
+    const uploadErrorHandler = (errors) => {
+        let fieldName = "";
+        let errorMessage = "";
+
+        if (errors.thumbnail) {
+            fieldName = "thumbnail";
+            errorMessage = errors.thumbnail;
+        } else if (errors.logo) {
+            fieldName = "logo";
+            errorMessage = errors.logo;
+        } else {
+            errorMessage = "Unknown error occurred during upload.";
+        }
+
+        setPopupData({
+            title: "Upload Error",
+            description: `Error found when uploading ${
+                fieldName ? fieldName : "file"
+            }: ${errorMessage}`,
+            confText: "Okay",
+            confColor: "bg-red-600 hover:bg-red-700 text-white",
+        });
+
+        setOpenPopUp(true);
     };
 
     const contentDivider = (data) => {
@@ -189,6 +217,7 @@ const CreateDetailsPreview = () => {
                                     dat.type === "paragraph" ||
                                     dat.type === "media"
                             )}
+                            errorHandler={uploadErrorHandler}
                         />
                     </div>
                 </div>
@@ -241,19 +270,6 @@ const CreateDetailsPreview = () => {
         }
     };
 
-    const tabsRepeater = (data, index) => {
-        // console.log(data, index)
-        return (
-            <TabsTrigger
-                key={index}
-                value={index + 1}
-                className="flex min-w-64 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200"
-            >
-                {data}
-            </TabsTrigger>
-        );
-    };
-
     const tabsContentRepeater = (data, campaign, index) => {
         return (
             <TabsContent
@@ -278,15 +294,15 @@ const CreateDetailsPreview = () => {
             });
         }
     }, [campaign]);
+
     return (
         <Layout_User>
-            <Card className="rounded-none border-0 border-b-1 border-gray-700">
+            <Card className="rounded-none border-0 border-gray-700">
                 <CardHeader className="flex flex-row">
                     <div className="justify-center items-center">
                         <Button
-                            className="bg-transparent text-purple-700 dark:text-purple-400 hover:bg-purple-100 text-xl "
-                            onClick={() => handleBack()}
-                        >
+                            className="bg-transparent text-purple-700 dark:text-purple-400 hover:bg-purple-100 text-xl"
+                            onClick={() => handleBack()}>
                             ← Back
                         </Button>
                     </div>
@@ -321,16 +337,22 @@ const CreateDetailsPreview = () => {
                 </CardContent>
             </Card>
 
-            <div>
+            <div className="flex justify-center items-center">
                 <Tabs defaultValue={flash?.activeTab ?? 1} className="w-full">
-                    <div className="sticky top-[72px] z-40 bg-white rounded dark:bg-[#171717]">
-                        <TabsList className="flex gap-40 bg-transparent border-b-1 border-gray-700 w-full mx-auto rounded-none">
+                    <div className="dark:border-t-1 sticky top-[72px] z-40 bg-none pt-3 dark:pt-2 h-auto">
+                        <TabsList className="text-gray-500 flex gap-30 bg-[#fcfcfc] dark:bg-gray-800 shadow-md mx-auto rounded-md dark:text-white h-[50px] max-w-7xl">
                             {data.map((dat, idx) => {
-                                return tabsRepeater(dat, idx);
+                                return (
+                                    <TabsTrigger
+                                        value={idx + 1}
+                                        className="w-[10rem] flex px-8 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm h-[40px]">
+                                        {dat}
+                                    </TabsTrigger>
+                                );
                             })}
                         </TabsList>
                     </div>
-                    <div className="flex justify-center items-center gap-2 bg-transparent border-b border-gray-300 rounded-none mb-0">
+                    <div className="mt-10 flex justify-center items-center gap-2 bg-transparent">
                         {data.map((dat, idx) => {
                             return tabsContentRepeater(dat, campaign, idx);
                         })}

@@ -257,12 +257,7 @@ const CreatePreview = () => {
     const handleBack = () => {
         const params = new URLSearchParams(window.location.search);
         const from = params.get("from");
-
-        if (from === "myCampaigns") {
-            router.get("/campaigns/myCampaigns");
-        } else {
-            router.get(`/campaigns/create/${campaign.id}`);
-        }
+        router.get(`/campaigns/create/${campaign.id}?from=${from}`);
     };
 
     const handleToPreview = () => {

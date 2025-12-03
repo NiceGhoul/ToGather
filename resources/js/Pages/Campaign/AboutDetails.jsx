@@ -8,13 +8,13 @@ export const AboutDetails = ({contents}) => {
     return (
         <div className="w-full p-6 justify-center flex flex-col items-center">
             {description.length > 0 ? (
-                <div className="flex flex-col gap-10 w-[80%]">
+                <div className="flex flex-col gap-10 w-[100%]">
                     <div className="flex flex-col gap-4">
                         {description.map((block, index) => (
                             <div key={index}className="rounded-lg p-3 flex flex-col gap-2 relative">
                                 {block.type === "paragraph" ? (
                                         <div className="flex flex-col gap-4 flex">
-                                            <Label className="text-3xl font-bold text-[#7C4789]">
+                                            <Label className="text-3xl font-bold text-[#7C4789] dark:text-[#966CA1]">
                                                 {block.content.split("~;")[0]}
                                             </Label>
                                             <p className="break-words font-normal text-lg mt-4 text-justify">

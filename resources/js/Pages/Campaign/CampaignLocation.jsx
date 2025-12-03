@@ -120,9 +120,9 @@ function SearchBar() {
         return null;
     };
 
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
-
             <DialogContent className="min-w-4xl">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-bold text-purple-700">
@@ -152,83 +152,108 @@ function SearchBar() {
                                 <SearchBar />
                             </MapContainer>
                         </div>
-
-                        <Input
-                            placeholder="Street Name & Address"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                        />
+                        <div className="flex text-center  p-2 border-1 rounded">
+                            <p>{address.split(",").slice(0, 6).join(",").trim() }</p>
+                        </div>
                     </div>
 
                     <div className="flex flex-col w-1/2 justify-between">
                         <div className="flex flex-col gap-3">
                             <div className="flex flex-row gap-4">
                                 <div className="grid w-full max-w-sm items-center gap-2">
-                                    <Label htmlFor="cb">City Block</Label>
+                                    <Label className="dark:text-gray-100" htmlFor="cb">City Block</Label>
                                     <Input
                                         type="cb"
                                         placeholder={"enter city block"}
                                         value={location.city_block ?? ""}
-                                        onChange={(prev) => setLocation({...prev, city_block:e.target.value})}
-                                        // on change set objects.keys = e.target.value
+                                        onChange={(e) =>
+                                            setLocation(prev => ({
+                                                ...prev,
+                                                city_block: e.target.value,
+                                            }))}
                                     />
                                 </div>
                                 <div className="grid w-full max-w-sm items-center gap-2">
-                                    <Label htmlFor="vl">Village</Label>
+                                    <Label className="dark:text-gray-100" htmlFor="vl">Village</Label>
                                     <Input
                                         type="vl"
                                         placeholder={"enter city block"}
                                         value={location.village ?? ""}
-                                        onChange={(prev) => setLocation({...prev, village:e.target.value})}
+                                        onChange={(e) =>
+                                            setLocation(prev => ({
+                                                ...prev,
+                                                village: e.target.value,
+                                            }))}
                                     />
                                 </div>
                             </div>
                             <div className="grid w-full max-w-sm items-center gap-2">
-                                <Label htmlFor="sb">Suburb</Label>
+                                <Label className="dark:text-gray-100" htmlFor="sb">Suburb</Label>
                                 <Input
+                                className={"w-full"}
                                     type="sb"
                                     placeholder={"enter suburb"}
                                     value={location.suburb ?? ""}
-                                    onChange={(prev) => setLocation({...prev, suburb:e.target.value})}
+                                    onChange={(e) =>
+                                            setLocation(prev => ({
+                                                ...prev,
+                                                suburb: e.target.value,
+                                            }))}
                                 />
                             </div>
                             <div className="grid w-full max-w-sm items-center gap-2">
-                                <Label htmlFor="ct">City</Label>
+                                <Label className="dark:text-gray-100" htmlFor="ct">City</Label>
                                 <Input
                                     type="ct"
                                     placeholder={"enter city"}
                                     value={location.city ?? ""}
-                                    onChange={(prev) => setLocation({...prev, city:e.target.value})}
+                                    onChange={(e) =>
+                                            setLocation(prev => ({
+                                                ...prev,
+                                                city: e.target.value,
+                                            }))}
                                 />
                             </div>
 
                             <div className="flex flex-row gap-4">
                                 <div className="grid w-full max-w-sm items-center gap-3">
-                                    <Label htmlFor="rg">Region</Label>
+                                    <Label className="dark:text-gray-100" htmlFor="rg">Region</Label>
                                     <Input
                                         type="rg"
                                         placeholder={"enter region"}
                                         value={location.region ?? ""}
-                                        onChange={(prev) => setLocation({...prev, region:e.target.value})}
+                                        onChange={(e) =>
+                                            setLocation(prev => ({
+                                                ...prev,
+                                                region: e.target.value,
+                                            }))}
                                     />
                                 </div>
                                 <div className="grid w-full max-w-sm items-center gap-3">
-                                    <Label htmlFor="pc">Postal Code</Label>
+                                    <Label className="dark:text-gray-100" htmlFor="pc">Postal Code</Label>
                                     <Input
                                         type="pc"
                                         placeholder={"enter region"}
                                         value={location.postcode ?? ""}
-                                        onChange={(prev) => setLocation({...prev, postcode:e.target.value})}
+                                        onChange={(e) =>
+                                            setLocation(prev => ({
+                                                ...prev,
+                                                postcode: e.target.value,
+                                            }))}
                                     />
                                 </div>
                             </div>
                             <div className="grid w-full max-w-sm items-center gap-3">
-                                <Label htmlFor="rg">Country</Label>
+                                <Label className="dark:text-gray-100" htmlFor="rg">Country</Label>
                                 <Input
                                     type="rg"
                                     placeholder={"enter region"}
                                     value={location.country}
-                                    onChange={(prev) => setLocation({...prev, country:e.target.value})}
+                                    onChange={(e) =>
+                                            setLocation(prev => ({
+                                                ...prev,
+                                                country: e.target.value,
+                                            }))}
                                 />
                             </div>
                         </div>
@@ -236,7 +261,18 @@ function SearchBar() {
                 </div>
 
                 <DialogFooter>
-                    <Button onClick={()=>setCampaignLocation( {...location, lat:coords.lat, lon:coords.lng}, address)}>
+                    <Button
+                        onClick={() =>
+                            setCampaignLocation(
+                                {
+                                    ...location,
+                                    lat: coords.lat,
+                                    lon: coords.lng,
+                                },
+                                address
+                            )
+                        }
+                    >
                         Confirm
                     </Button>
                 </DialogFooter>
