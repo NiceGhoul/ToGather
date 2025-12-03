@@ -89,8 +89,9 @@ class CampaignController extends Controller
 
         // dd($request->all());
         $campaign = Campaign::findOrFail($id);
+        dd($campaign);
+        dd(now()->addDays((int) $campaign->duration));
         $campaign->update(['status' => $request->status]);
-
         if ($request->status === "active") {
             if (empty($campaign->start_date) && empty($campaign->end_date)) {
                 $start = now();
@@ -171,6 +172,14 @@ class CampaignController extends Controller
             //         ]);
             //     }
             // } else {
+            if ($usersCampaign) {
+                $location = Location::where('campaign_id', $id)->latest()->first();
+                return Inertia::render('Campaign/Create', [
+                    'user_Id' => Auth::id(),
+                    'campaign' => $usersCampaign,
+                    'location' => $location,
+                ]);
+            }
             return inertia::render('Campaign/Create', [
                 'user_Id' => Auth::user()->id,
             ]);

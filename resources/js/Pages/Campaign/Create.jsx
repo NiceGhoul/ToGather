@@ -100,7 +100,6 @@ function create() {
     };
 
     useEffect(() => {
-        console.log(campaign, location);
         if (campaign) {
             setCampaignData(campaign);
         }
@@ -121,8 +120,8 @@ function create() {
             errors.push("Address cannot be empty.");
         if (!campaignData.goal_amount || campaignData.goal_amount <= 0)
             errors.push("Goal amount must be greater than 0.");
-        // if (campaignData.goal_amount && campaignData.goal_amount > 50000000)
-        //     errors.push("Goal amount must be less than Rp. 50.000.000,00.");
+        if (campaignData.goal_amount && campaignData.goal_amount > 5000000000)
+            errors.push("Goal amount must be less than Rp. 5.000.000.000,00.");
         if (!campaignData.duration) errors.push("Duration cannot be empty");
         if (campaignData.duration && campaignData.duration < 0)
             errors.push("Duration must be greater than or equals to 1 day");
@@ -131,22 +130,21 @@ function create() {
         return errors;
     };
 
-    // useEffect(() => {
-    //   const handleBeforeUnload = (event) => {
-    //     setOpenUnsaved(true)
-    //     event.preventDefault()
-    //     event.returnValue = ""
-    //   };
+    useEffect(() => {
+      const handleBeforeUnload = (event) => {
+        setOpenUnsaved(true)
+        event.preventDefault()
+        event.returnValue = ""
+      };
 
-    //   window.addEventListener("beforeunload", handleBeforeUnload);
+      window.addEventListener("beforeunload", handleBeforeUnload);
 
-    //   return () => {
-    //     window.removeEventListener("beforeunload", handleBeforeUnload);
-    //   };
-    // }, []);
+      return () => {
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+      };
+    }, []);
 
     const handleCloseLocation = (locationData, addressData) => {
-        console.log(locationData);
         setOpenLocation(false);
         setCampaignData((prev) => ({ ...prev, location: locationData }));
         setCampaignData((prev) => ({ ...prev, address: addressData }));

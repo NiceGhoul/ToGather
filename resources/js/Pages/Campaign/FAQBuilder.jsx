@@ -229,7 +229,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
                                 <div className="flex gap-2">
                                     {dat.isEditing ? (
                                         <Button
-                                            className="p-0 w-12 h-12 cursor-pointer rounded-md bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white transition-colors"
+                                            className="p-0 w-12 h-12 cursor-pointer rounded-md bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white transition-colors"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleEdit(idx);
@@ -239,7 +239,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
                                         </Button>
                                     ) : (
                                         <Button
-                                            className="p-0 w-12 h-12 cursor-pointer rounded-md bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white transition-colors"
+                                            className="p-0 w-12 h-12 cursor-pointer rounded-md bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white transition-colors"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleEdit(idx);
@@ -271,14 +271,14 @@ export const FaqBuilder = ({ campaign, contents }) => {
                 <Button
                     variant={"outline"}
                     onClick={handleAddQuestions}
-                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                    className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                 >
                     + Add Questions and answers
                 </Button>
                 {userQuestions.length > 0 && (
                     <Button
                         onClick={handleSave}
-                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                        className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                     >
                         Save Changes
                     </Button>

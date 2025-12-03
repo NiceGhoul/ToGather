@@ -95,7 +95,7 @@ const tabsContentRepeater = (data, campaign, index, contents, donations) => {
     return (
         <TabsContent
             value={index + 1}
-            className="w-[90%] h-full text-lg text-center py-4"
+            className="w-full h-full text-lg text-center py-4"
         >
             {contentDivider(data, campaign, contents, donations)}
         </TabsContent>
@@ -136,27 +136,6 @@ export default function Create() {
         }
     }, [campaign]);
 
-    // scrolling donation effect
-    // useEffect(() => {
-    //     const container = scrollRef.current;
-
-    //     let timer = setInterval(() => {
-    //         container.scrollBy({
-    //             left: 1,
-    //             behavior: "smooth",
-    //         });
-
-    //         if (
-    //             container.scrollLeft + container.clientWidth >=
-    //             container.scrollWidth - 1
-    //         ) {
-    //             container.scrollTo({ left: 0, behavior: "auto" });
-    //         }
-    //     }, 30);
-
-    //     return () => clearInterval(timer);
-    // }, []);
-
     const handleLikes = async (id) => {
         const prev = like;
         setLike(!prev);
@@ -171,7 +150,7 @@ export default function Create() {
 
     const mainData = () => {
         return (
-            <div className="max-w-6xl mx-auto px-4">
+            <div className="max-w-7xl mx-auto px-4">
                 <Button
                     className="mt-8 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white cursor-pointer"
                     onClick={() => router.get(backUrl)}
@@ -184,12 +163,12 @@ export default function Create() {
                 <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
                 <div className="flex flex-col gap-2 my-4">
                     <div className="w-full overflow-hidden p-2">
-                        <div className="auto-scroll-horizontal">
+                        <div className={donations.length > 4 ? "auto-scroll-horizontal" : "flex flex-row gap-4"}>
                             {donations.length > 0 ? (
                                 donations
                                     .slice(0, 10)
-                                    .map((donation) =>
-                                        scrollDonations(donation)
+                                    .map((donation, idx) =>
+                                        scrollDonations(donation, idx)
                                     )
                             ) : (
                                 <p key={0} className="text-lg text-center">
@@ -200,6 +179,7 @@ export default function Create() {
                     </div>
                 </div>
                 <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
+
                 {/* pictures and titles */}
                 <div className="flex flex-col lg:flex-row px-4 py-8 gap-8 items-start w-full">
                     <div className="flex flex-col lg:w-1/2 w-full max-h-full">
@@ -258,14 +238,15 @@ export default function Create() {
                                         ? " Donators"
                                         : " Donator")}
                             </h1>
-
-                            <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
+                            {campaign.status != "completed" &&
+                                <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
                                 {Math.ceil(
                                     (new Date(campaign.end_campaign) -
-                                        new Date()) /
-                                        (1000 * 60 * 60 * 24)
+                                    new Date()) /
+                                    (1000 * 60 * 60 * 24)
                                 ) + " Days left"}
                             </h1>
+                            }
                         </div>
                         <div className="relative flex flex-col justify-end gap-4 mt-2">
                             <Progress
@@ -328,15 +309,14 @@ export default function Create() {
                 <div>
                     <Tabs
                         defaultValue={flash?.activeTab ?? 1}
-                        className="w-full"
-                    >
+                        className="w-full">
                         <div className="dark:border-t-1 sticky top-[72px] z-40 bg-none pt-3 dark:pt-2 h-auto">
-                            <TabsList className="text-gray-500 flex gap-6 bg-[#fcfcfc] dark:bg-gray-800 p-2 shadow-md w-full max-w-3xl mx-auto rounded-md dark:text-white h-[48px] ">
+                            <TabsList className="text-gray-500 flex gap-30 bg-[#fcfcfc] dark:bg-gray-800 shadow-md w-full mx-auto rounded-md dark:text-white h-[48px] ">
                                 {data.map((dat, idx) => {
                                     return (
                                         <TabsTrigger
                                             value={idx + 1}
-                                            className="flex px-4 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm"
+                                            className="w-[10rem] flex px-8 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm"
                                         >
                                             {dat}
                                         </TabsTrigger>
@@ -344,18 +324,7 @@ export default function Create() {
                                 })}
                             </TabsList>
                         </div>
-                        <div className="mt-10 flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.90]">
-                            {data.map((dat, idx) => {
-                                return tabsContentRepeater(
-                                    dat,
-                                    campaign,
-                                    idx,
-                                    contents,
-                                    donations
-                                );
-                            })}
-                        </div>
-                        <div className="mt-8 w-full">
+                        <div className="mt-10 flex justify-center items-center gap-2 bg-transparent origin-top scale-[0.95]">
                             {data.map((dat, idx) => {
                                 return tabsContentRepeater(
                                     dat,

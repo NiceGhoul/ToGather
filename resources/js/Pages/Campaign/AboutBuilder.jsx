@@ -19,7 +19,7 @@ import Popup from "@/Components/Popup";
 import { Description } from "@radix-ui/react-dialog";
 
 
-export const AboutBuilder = ({campaign, contents}) => {
+export const AboutBuilder = ({campaign, contents, errorHandler}) => {
     const [description, setDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
     const [oldDescription, setOldDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
     const [isChanged, setIsChanged] = useState(false)
@@ -34,7 +34,7 @@ export const AboutBuilder = ({campaign, contents}) => {
     const addParagraphBlock = () => {
         window.scrollTo({
             top: document.body.scrollHeight,
-            behavior: "instant",
+            behavior: "auto",
         });
         setDescription((prev) => {
             const lastOrder =
@@ -81,7 +81,6 @@ export const AboutBuilder = ({campaign, contents}) => {
                 i === index ? { ...block, content: value } : block
             )
         );
-        setIsChanged(true);
     };
 
     const toggleBlockEdit = (index) => {
@@ -126,7 +125,9 @@ export const AboutBuilder = ({campaign, contents}) => {
                     order_y: block.order_y,
                 };
             })
-             router.post("/campaigns/insertAbout", prepared)
+             router.post("/campaigns/insertAbout", prepared,{
+                onError: (errors) => errorHandler(errors),
+             })
              setDescription(contents)
          }
      };
