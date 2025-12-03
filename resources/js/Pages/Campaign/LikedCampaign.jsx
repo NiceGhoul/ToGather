@@ -28,6 +28,7 @@ export default function LikedCampaign() {
     const [sortOrder, setSortOrder] = useState("desc");
     const [visibleItems, setVisibleItems] = useState(8);
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     // CATEGORIES
     const categories = useMemo(() => {
