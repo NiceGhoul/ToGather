@@ -69,16 +69,19 @@ export default function Create({ campaign, campaigns }) {
                 window.snap.pay(data.snap_token, {
                     onSuccess: function (result) {
                         alert("Payment successful!");
-                        window.location.href = "/donate?success=1";
+                        // Redirect back to the campaign detail page
+                        window.location.href = `/campaigns/details/${formData.campaign_id}`;
                     },
                     onPending: function (result) {
                         alert("Payment pending. Please complete your payment.");
+                        // Also redirect to campaign page on pending
+                        window.location.href = `/campaigns/details/${formData.campaign_id}`;
                     },
                     onError: function (result) {
                         alert("Payment failed. Please try again.");
                     },
                     onClose: function () {
-                        alert("Payment popup closed.");
+                        console.log("Payment popup closed.");
                     },
                 });
             }
