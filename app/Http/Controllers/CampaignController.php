@@ -172,17 +172,19 @@ class CampaignController extends Controller
             //         ]);
             //     }
             // } else {
-            if ($usersCampaign) {
+            if ($id != null) {
                 $location = Location::where('campaign_id', $id)->latest()->first();
                 return Inertia::render('Campaign/Create', [
                     'user_Id' => Auth::id(),
                     'campaign' => $usersCampaign,
                     'location' => $location,
                 ]);
+            } else {
+
+                return inertia::render('Campaign/Create', [
+                    'user_Id' => Auth::user()->id,
+                ]);
             }
-            return inertia::render('Campaign/Create', [
-                'user_Id' => Auth::user()->id,
-            ]);
             // }
         }
 
@@ -397,6 +399,7 @@ class CampaignController extends Controller
     public function getDetailsPreview($id)
     {
         $user = auth()->user();
+        $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
 
         if ($id != null) {
             $usersCampaign = $user->campaigns()->with('images', 'locations')
@@ -452,6 +455,7 @@ class CampaignController extends Controller
         return inertia::render('Campaign/CreateDetailsPreview', [
             'campaign' => $usersCampaign,
             'contents' => $content,
+            'donations' => $donations,
             'user' => $user,
         ]);
     }
@@ -600,17 +604,19 @@ class CampaignController extends Controller
             'content' => $request->input('content'),
         ]);
 
-        $oldMedia = $content->images;
 
-        if ($oldMedia->isNotEmpty()) {
-            foreach ($oldMedia as $media) {
-                Storage::disk('minio')->delete($media->path);
-            }
-
-            $content->images()->delete();
-        }
 
         if ($request->hasFile('media')) {
+
+            $oldMedia = $content->images;
+
+            if ($oldMedia->isNotEmpty()) {
+                foreach ($oldMedia as $media) {
+                    Storage::disk('minio')->delete($media->path);
+                }
+
+                $content->images()->delete();
+            }
             foreach ($request->file('media') as $file) {
                 // bikin minio dlu
                 $path = $file->store('campaigns/updates/' . $content['campaign_id'], 'minio');

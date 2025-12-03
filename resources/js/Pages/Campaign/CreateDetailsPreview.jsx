@@ -29,7 +29,7 @@ import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
 
-export const UpperPreview = ({ campaign, user, images }) => {
+export const UpperPreview = ({ campaign, user, images, donations }) => {
     const [like, setLike] = useState(false);
 
     return (
@@ -77,10 +77,14 @@ export const UpperPreview = ({ campaign, user, images }) => {
                         </Label>
                     </div>
                 </div>
-                <div className="flex flex-row justify-between">
-                    <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
-                        {/* 0 Donator */}
-                    </h1>
+                {<div className="flex flex-row justify-between">
+                    <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-gray-300">
+                                {donations.length.toString() +
+                                    " " +
+                                    (donations.length > 1
+                                        ? " Donators"
+                                        : " Donator")}
+                            </h1>
 
                     <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
                         {campaign.end_campaign
@@ -91,7 +95,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                               ) + " Days left"
                             : "- Days left"}
                     </h1>
-                </div>
+                </div>}
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
                     <Progress
                         className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789] dark:[&>div]: bg-[#aaaaaa]"
@@ -117,7 +121,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                             minimumFractionDigits: 2,
                         })}
                 </p>
-                <div className="flex flex-row items-center justify-between mt-5">
+                {/* <div className="flex flex-row items-center justify-between mt-5">
                     <Toggle
                         pressed={like}
                         onPressedChange={() => setLike(!like)}
@@ -137,7 +141,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                     <Button className="min-h-10 min-w-48 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
                         Donate
                     </Button>
-                </div>
+                </div> */}
             </div>
         </div>
     );
@@ -145,7 +149,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
 
 const CreateDetailsPreview = () => {
     const data = ["About", "FAQ", "Updates", "Donations"];
-    const { campaign, user, contents, flash } = usePage().props;
+    const { campaign, user, contents, flash, donations } = usePage().props;
     const [images, setImages] = useState({ thumbnail: null, logo: null });
     const [openPopUp, setOpenPopUp] = useState(false);
     const [popUpData, setPopupData] = useState({
@@ -333,6 +337,7 @@ const CreateDetailsPreview = () => {
                         campaign={campaign}
                         user={user}
                         images={images}
+                        donations={donations}
                     />
                 </CardContent>
             </Card>
