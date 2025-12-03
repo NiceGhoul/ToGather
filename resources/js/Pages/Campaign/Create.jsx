@@ -362,7 +362,7 @@ function create() {
                     <CardFooter className="flex flex-row gap-5 justify-end">
                         <div className="w-full justify-center flex">
                             <Button
-                                className="w-28 h-8 text-sm ml-36 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                className="w-28 h-8 text-sm ml-36 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                 onClick={handleClick}
                             >
                                 {campaign != undefined ? "Update" : "Next"}
@@ -372,7 +372,7 @@ function create() {
                         <div className="w-1/6 justify-end flex">
                             {campaign != undefined ? (
                                 <Button
-                                    className="bg-transparent text-purple-700  hover:bg-purple-100 dark:hover:bg-blue-600 dark:text-white text-lg"
+                                    className="bg-transparent text-purple-700  hover:bg-purple-100 dark:hover:bg-purple-700 dark:text-white text-lg"
                                     onClick={handleEditCancel}
                                 >
                                     Go to Media →
@@ -407,7 +407,7 @@ function create() {
                             ? description
                             : "Your campaign will be saved as a draft."
                     }
-                    confirmText={description.length > 0 ? "okay" : "Confirm"}
+                    confirmText={description.length > 0 ? "Okay" : "Confirm"}
                     cancelText="Cancel"
                     showCancel={description.length > 0 ? false : true}
                     confirmColor={

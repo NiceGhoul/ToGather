@@ -312,7 +312,7 @@ const CreatePreview = () => {
                         </div>
                         <div className="items-center text-center justify-center flex gap-5">
                             <Button
-                                className="mt-5 w-20 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-white"
+                                className="mt-5 w-20 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                 onClick={handleNext}
                             >
                                 Next

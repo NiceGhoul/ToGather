@@ -15,7 +15,9 @@ import {
     EmptyMedia,
     EmptyTitle,
 } from "@/Components/ui/empty";
+import { Skeleton } from "@/Components/ui/skeleton";
 import { useMemo, useState } from "react";
+import { Spinner } from "@/Components/ui/spinner";
 
 export default function LikedArticlesPage() {
     const { likedArticles } = usePage().props;
@@ -28,6 +30,7 @@ export default function LikedArticlesPage() {
     const [chosenCategory, setChosenCategory] = useState("All");
     const [sortOrder, setSortOrder] = useState("desc");
     const [visibleArticles, setVisibleArticles] = useState(8);
+    const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
 
     // =========================
     // CATEGORY LIST
@@ -39,20 +42,55 @@ export default function LikedArticlesPage() {
         return ["All", ...unique];
     }, [likedArticles]);
 
+    // Skeleton component
+    const ArticleSkeleton = () => (
+        <div className="border dark:border-gray-700 rounded-lg p-4 shadow-md flex flex-col justify-between bg-white dark:bg-gray-800">
+            <Skeleton className="w-full h-64 mb-4 rounded" />
+            <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/2 mx-auto mb-2" />
+            <Skeleton className="h-4 w-1/3 mx-auto mb-2" />
+            <Skeleton className="h-16 w-full mb-4" />
+            <div className="flex justify-between items-center mt-auto">
+                <Skeleton className="h-4 w-24" />
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 rounded" />
+                    <Skeleton className="h-4 w-8" />
+                </div>
+            </div>
+        </div>
+    );
+
     // =========================
     // HANDLE SEARCH
     // =========================
     const handleSearch = () => {
-        setSearchQuery(searchTerm);
-        setVisibleArticles(8);
+        setIsLoading(true);
+        setTimeout(() => {
+            setSearchQuery(searchTerm);
+            setVisibleArticles(8);
+            setIsLoading(false);
+        }, 500);
     };
 
     const handleReset = () => {
-        setSearchTerm("");
-        setSearchQuery("");
-        setChosenCategory("All");
-        setSortOrder("desc");
-        setVisibleArticles(8);
+        setIsLoading(true);
+        setTimeout(() => {
+            setSearchTerm("");
+            setSearchQuery("");
+            setChosenCategory("All");
+            setSortOrder("desc");
+            setVisibleArticles(8);
+            setIsLoading(false);
+        }, 500);
+    };
+
+    const handleShowMore = () => {
+        // show spinner, then load more (small delay so spinner is visible)
+        setIsShowMoreloading(true);
+        setTimeout(() => {
+            setVisibleArticles((prev) => prev + 8);
+            setIsShowMoreloading(false);
+        }, 400);
     };
 
     // =========================
@@ -109,7 +147,7 @@ export default function LikedArticlesPage() {
                         />
                     )}
 
-                    <h2 className="text-lg font-semibold mb-2 text-center min-h-[2rem] max-h-[3rem] overflow-hidden dark:text-white">
+                    <h2 className="text-lg font-semibold mb-2 text-center min-h-8 max-h-12 overflow-hidden dark:text-white">
                         {article.title.length > 50
                             ? article.title.slice(0, 50) + "..."
                             : article.title}
@@ -124,7 +162,7 @@ export default function LikedArticlesPage() {
                         {article.category}
                     </p>
 
-                    <p className="h-[80px] text-sm text-gray-700 mb-4 text-justify dark:text-gray-300">
+                    <p className="h-40 text-sm text-gray-700 mb-4 text-justify dark:text-gray-300">
                         {previewText.replace(/(<([^>]+)>)/gi, "").slice(0, 180)}
                         ...
                     </p>
@@ -158,9 +196,7 @@ export default function LikedArticlesPage() {
             );
         });
 
-    // =========================
-    // EMPTY VIEW
-    // =========================
+    //Empty View
     const emptyView = (
         <Empty className="mt-20">
             <EmptyHeader>
@@ -210,8 +246,12 @@ export default function LikedArticlesPage() {
                         <Button
                             key={idx}
                             onClick={() => {
-                                setChosenCategory(item);
-                                setVisibleArticles(8);
+                                setIsLoading(true);
+                                setTimeout(() => {
+                                    setChosenCategory(item);
+                                    setVisibleArticles(8);
+                                    setIsLoading(false);
+                                }, 500);
                             }}
                             className={`${
                                 chosenCategory === item
@@ -231,8 +271,12 @@ export default function LikedArticlesPage() {
                 <select
                     value={sortOrder}
                     onChange={(e) => {
-                        setSortOrder(e.target.value);
-                        setVisibleArticles(8);
+                        setIsLoading(true);
+                        setTimeout(() => {
+                            setSortOrder(e.target.value);
+                            setVisibleArticles(8);
+                            setIsLoading(false);
+                        }, 500);
                     }}
                     className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                 >
@@ -280,7 +324,13 @@ export default function LikedArticlesPage() {
                 </CardHeader>
 
                 <CardContent>
-                    {filteredList.length === 0 ? (
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {[...Array(8)].map((_, idx) => (
+                                <ArticleSkeleton key={idx} />
+                            ))}
+                        </div>
+                    ) : filteredList.length === 0 ? (
                         emptyView
                     ) : (
                         <>
@@ -290,18 +340,17 @@ export default function LikedArticlesPage() {
 
                             {visibleArticles < filteredList.length && (
                                 <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full gap-4 mt-10">
-                                    <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                                    <Separator className="flex-1 bg-gray-400 h-px" />
                                     <p
-                                        onClick={() =>
-                                            setVisibleArticles(
-                                                (prev) => prev + 8
-                                            )
-                                        }
+                                        onClick={() => handleShowMore()}
                                         className="text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
                                     >
+                                        {isShowMoreLoading && (
+                                            <Spinner className="w-4 h-4" />
+                                        )}
                                         Show More
                                     </p>
-                                    <Separator className="flex-1 bg-gray-400 h-[1px]" />
+                                    <Separator className="flex-1 bg-gray-400 h-px" />
                                 </div>
                             )}
                         </>

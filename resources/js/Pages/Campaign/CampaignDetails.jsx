@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Toggle } from "@/Components/ui/toggle";
 import Layout_User from "@/Layouts/Layout_User";
 import Layout_Admin from "@/Layouts/Layout_Admin";
+import Layout_Guest from "@/Layouts/Layout_Guest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Link, router, usePage } from "@inertiajs/react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
@@ -144,6 +145,7 @@ export default function Create() {
                 campaign_id: id,
             });
         } catch (err) {
+            router.visit("/login");
             setLike(prev);
         }
     };
@@ -342,9 +344,17 @@ export default function Create() {
     };
 
     {
-        return user.role === "user" ? (
-            <Layout_User>{mainData()}</Layout_User>
-        ) : (
+        if (!user || !user.role) {
+            // Guest (not logged in)
+            return <Layout_Guest>{mainData()}</Layout_Guest>;
+        }
+
+        if (user.role === "user") {
+            return <Layout_User>{mainData()}</Layout_User>;
+        }
+
+        // ELSE: admin
+        return (
             <Layout_Admin
                 title={
                     campaign
