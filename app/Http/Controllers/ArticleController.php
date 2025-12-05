@@ -121,7 +121,6 @@ class ArticleController extends Controller
     public function toggleLike($id)
     {
         $user = auth()->user();
-        dd($user);
         if (!$user) {
             return inertia('Login/Login');
         }
