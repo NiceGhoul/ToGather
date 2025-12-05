@@ -492,26 +492,31 @@ class CampaignController extends Controller
         // validate gambar
         $request->validate([
             'thumbnail' => ['required', 'mimetypes:image/*', 'max:4096'],
-            'logo' => ['sometimes', 'nullable', 'mimetypes:image/*', 'max:4096'],
+            'logo' => ['nullable', 'exclude_if:logo,null','mimetypes:image/*', 'max:4096'],
             'campaign_id' => 'required|integer|exists:campaigns,id',
+        ], [
+            'logo.mimetypes' => 'The logo must be a valid image (jpg, png, webp, avif).',
+            'thumbnail.mimetypes' => 'The thumbnail must be a valid image (jpg, png, webp, avif).',
         ]);
 
-        $urls = Image::where('imageable_id', $request->campaign_id)->get();
-
-        if ($urls->isNotEmpty()) {
-            foreach ($urls as $path) {
-                Storage::disk('minio')->delete($path->path);
-                $path->delete();
-            }
-            ;
-        }
-        ;
 
         foreach (['thumbnail', 'logo'] as $data) {
             if ($request->hasFile($data)) {
+
+                $urls = Image::where('imageable_id', $request->campaign_id)
+                    ->where('path', 'like', "%_$data.%")
+                    ->get();
+
+                foreach ($urls as $path) {
+                    Storage::disk('minio')->delete($path->path);
+                    $path->delete();
+                }
+
                 $ext = $request->file($data)->getClientOriginalExtension();
                 $filename = "campaign_{$request->campaign_id}_{$data}." . $ext;
+
                 $path = $request->file($data)->storeAs('campaigns/image', $filename, 'minio');
+
                 Image::create([
                     'path' => $path,
                     'imageable_id' => $request->campaign_id,
@@ -520,7 +525,7 @@ class CampaignController extends Controller
             }
         }
 
-        $content = CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
+        CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
             $media = $data->images->map(function ($image) {
                 return [
                     'path' => $image->path,
@@ -617,6 +622,7 @@ class CampaignController extends Controller
 
                 $content->images()->delete();
             }
+
             foreach ($request->file('media') as $file) {
                 // bikin minio dlu
                 $path = $file->store('campaigns/updates/' . $content['campaign_id'], 'minio');

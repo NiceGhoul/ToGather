@@ -36,6 +36,7 @@ import {
     InputGroupInput,
 } from "@/Components/ui/input-group";
 import { router, usePage } from "@inertiajs/react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
 
 const emptyCampaign = {
     title: "",
@@ -142,6 +143,7 @@ function create() {
       return () => {
         window.removeEventListener("beforeunload", handleBeforeUnload);
       };
+
     }, []);
 
     const handleCloseLocation = (locationData, addressData) => {
@@ -168,6 +170,21 @@ function create() {
         router.get(`/campaigns/create/createPreview/${campaignData.id}`);
     };
 
+    const backToPreview = () => {
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+
+        if (from === "myCampaigns") {
+            router.get(`/campaigns/create/createPreview/${campaign.id}?from=${from}`);
+        } else {
+            router.get(`/campaigns/create/createPreview/${campaign.id}`);
+        }
+    };
+
+    const backToDetails = ()=> {
+
+    }
+
     const handleSave = () => {
         const formattedData = {
             ...campaignData,
@@ -190,24 +207,55 @@ function create() {
 
     return (
         <Layout_User>
-            <div className="container mx-auto px-4 py-8">
+            <Card className="rounded-none border-0">
+                <CardHeader>
+                    <CardTitle className="text-center text-2xl">
+                        {campaign === undefined
+                            ? " Create New Campaign"
+                            : "Update Campaign Data"}
+                    </CardTitle>
+                    <CardDescription className="text-center text-sm">
+                        {campaign != undefined ? "Edit your campaign data using the form below!" : "Fill in the form below to create your campaign!"}
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent className="border-none">
+                    <Breadcrumb className="flex w-full items-start justify-start mb-5 ml-4 p-0">
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink
+                                    aria-current="page"
+                                    className="font-medium text-primary"
+                                >
+                                    Campaign Data
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbLink
+                                    className="text-muted-foreground"
+                                    onClick={backToPreview}
+                                >
+                                    Campaign Media
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbLink
+                                    onClick={backToDetails}
+                                    className="text-muted-foreground"
+                                >
+                                    Campaign Preview
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </CardContent>
                 <Card className="max-w-4xl mx-auto">
-                    <CardHeader>
-                        <CardTitle className="text-center text-xl">
-                            {campaign === undefined
-                                ? " Create New Campaign"
-                                : "Update Campaign Data"}
-                        </CardTitle>
-                        <CardDescription className="text-center text-sm">
-                            {"Please fill out the form below to " +
-                                (campaign != undefined ? "update" : "create") +
-                                " a new campaign."}
-                        </CardDescription>
-                    </CardHeader>
                     <CardContent className="flex flex-col gap-4">
                         <div>
                             <Label className="mb-1 dark:text-white">
-                                Campaign Title
+                                Campaign Title*
                             </Label>
                             <Input
                                 placeholder="Enter your title"
@@ -226,8 +274,7 @@ function create() {
                                 Description
                             </Label>
                             <Textarea
-                                placeholder={`Give your campaign a brief description:
-(What your product is, what your plan is for this campaign, or you can describe what your campaign is about)`}
+                                placeholder={`Give your campaign a brief description, describe what your campaign is about)`}
                                 value={campaignData.description}
                                 onChange={(e) =>
                                     setCampaignData({
@@ -241,7 +288,7 @@ function create() {
 
                         <div>
                             <Label className="mb-1 dark:text-white">
-                                Category
+                                Category*
                             </Label>
                             <Select
                                 value={campaignData.category}
@@ -267,7 +314,7 @@ function create() {
 
                         <div>
                             <Label className="mb-1 dark:text-white">
-                                Location
+                                Location*
                             </Label>
                             <Button
                                 className="w-full gap-4"
@@ -288,7 +335,7 @@ function create() {
                             <div className="w-3/6">
                                 <div className="flex flex-row items-center justify-between">
                                     <Label className="mb-1 dark:text-white">
-                                        Goal Amount
+                                        Goal Amount*
                                     </Label>
                                 </div>
                                 <div className="w-full">
@@ -334,7 +381,7 @@ function create() {
 
                             <div className="w-3/6 flex flex-col items-start justify-center ">
                                 <Label className="mb-1 dark:text-white">
-                                    Campaign Duration
+                                    Campaign Duration*
                                 </Label>
                                 <InputGroup className="h-[40px] w-full">
                                     <InputGroupInput
@@ -370,20 +417,20 @@ function create() {
                         </div>
 
                         <div className="w-1/6 justify-end flex">
-                            {campaign != undefined ? (
+                            {/* {campaign != undefined ? (
                                 <Button
                                     className="bg-transparent text-purple-700  hover:bg-purple-100 dark:hover:bg-purple-700 dark:text-white text-lg"
-                                    onClick={handleEditCancel}
+                                    onClick={backToPreview}
                                 >
                                     Go to Media →
                                 </Button>
                             ) : (
                                 <></>
-                            )}
+                            )} */}
                         </div>
                     </CardFooter>
                 </Card>
-            </div>
+            </Card>
             <CampaignLocation
                 open={openLocation}
                 setCampaignLocation={handleCloseLocation}

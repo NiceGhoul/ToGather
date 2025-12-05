@@ -1,5 +1,6 @@
 import Popup from "@/Components/Popup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
 import { Button } from "@/Components/ui/button";
 import {
     Card,
@@ -18,10 +19,11 @@ import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const PreviewLayout = ({ user, campaign, images }) => {
+    console.log(campaign)
     return (
         <div className="flex container px-4 py-4 flex-row gap-16 justify-center items-center mx-auto scale-90 border-2 rounded-xl border-gray-300">
-            <div className="flex flex-col min-w-[45%] max-h-[600px]  object-fit">
-                <div className="flex flex-row w-full min-h-[400px] overflow-hidden border border-gray-800 dark:border-gray-100 rounded items-center">
+            <div className="flex flex-col min-w-[45%] max-h-full">
+                <div className="flex flex-row max-w-[800px] max-h-[400px] overflow-hidden border border-gray-800 dark:border-gray-100 rounded items-center object-fit">
                     {images.thumbnailPreview != null ? (
                         <img
                             src={images.thumbnailPreview}
@@ -29,7 +31,7 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                             className="w-full h-full"
                         />
                     ) : (
-                        <span className="text-gray-500 text-md w-full text-center italic">
+                        <span className="flex items-center justify-center text-gray-500 text-md w-full h-[400px] text-center italic">
                             No image available
                         </span>
                     )}
@@ -115,9 +117,10 @@ export const UploadSupportingMedia = ({ handler }) => {
             <div className="flex container h-24 px-8 py-8 flex-row gap-4 justify-center items-center mx-auto border-2 rounded-xl border-gray-300">
                 <div>
                     <Label htmlFor="picture" className="mb-1 dark:text-white">
-                        Thumbnail
+                        Thumbnail*
                     </Label>
                     <Input
+                    required
                         id="picture"
                         type="file"
                         accept="image/*"
@@ -165,12 +168,11 @@ const CreatePreview = () => {
     useEffect(() => {
         if (campaign?.images && campaign.images.length > 0) {
             const thumb = campaign.images.find((img) =>
-                img.path.includes("thumbnail")
+                img.path.toLowerCase().includes("thumbnail")
             );
             const logo = campaign.images.find((img) =>
-                img.path.includes("logo")
+                img.path.toLowerCase().includes("logo")
             );
-            console.log("im running here");
             setImages((prev) => ({
                 ...prev,
                 thumbnailPreview: thumb ? thumb.url : null,
@@ -219,10 +221,14 @@ const CreatePreview = () => {
 
         if (errors.thumbnail) {
             fieldName = "thumbnail";
-            errorMessage = errors.thumbnail;
+            errorMessage = Array.isArray(errors.thumbnail)
+                ? errors.thumbnail[0]
+                : errors.thumbnail;
         } else if (errors.logo) {
             fieldName = "logo";
-            errorMessage = errors.logo;
+            errorMessage = Array.isArray(errors.logo)
+                ? errors.logo[0]
+                : errors.logo;
         } else {
             errorMessage = "Unknown error occurred during upload.";
         }
@@ -230,7 +236,7 @@ const CreatePreview = () => {
         setPopupData({
             title: "Upload Error",
             description: `Error found when uploading ${
-                fieldName ? fieldName : "file"
+                fieldName || "file"
             }: ${errorMessage}`,
             confText: "Okay",
             confColor: "bg-red-600 hover:bg-red-700 text-white",
@@ -254,52 +260,92 @@ const CreatePreview = () => {
         }
     };
 
-    const handleBack = () => {
+    // const handleBack = () => {
+    //     const params = new URLSearchParams(window.location.search);
+    //     const from = params.get("from");
+    //     router.get(`/campaigns/create/${campaign.id}?from=${from}`);
+    // };
+
+    const backToPreview = () => {
         const params = new URLSearchParams(window.location.search);
         const from = params.get("from");
-        router.get(`/campaigns/create/${campaign.id}?from=${from}`);
+        if (from === "myCampaigns") {
+            router.get(`/campaigns/create/detailsPreview/${campaign.id}?from=${from}`);
+        } else {
+            router.get(`/campaigns/create/detailsPreview/${campaign.id}`);
+        }
     };
 
-    const handleToPreview = () => {
-        router.get(
-            `/campaigns/create/detailsPreview/${campaign.id}?from=createPreview`
-        );
+     const backToForm = () => {
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+
+        if (from === "myCampaigns") {
+            router.get(`/campaigns/create/${campaign.id}?from=${from}`);
+        } else {
+            router.get(`/campaigns/create/${campaign.id}`);
+        }
     };
 
-    console.log(campaign);
     return (
         <Layout_User>
             <div>
                 <Card>
                     <CardHeader className="flex flex-row">
-                        <div className="justify-center items-center">
+                        {/* <div className="justify-center items-center">
                             <Button
                                 className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
-                                onClick={() => handleBack()}
+                                onClick={() => backToForm()}
                             >
                                 ← Back
                             </Button>
-                        </div>
+                        </div> */}
                         <div className="w-full justify-center items-center">
                             <CardTitle className="text-center text-3xl">
                                 Media Preview
                             </CardTitle>
                             <CardDescription className="text-center text-sm">
-                                Upload your thumbnail and logo, the preview will
-                                show what your campaign details would looked
-                                like.
+                                Upload your campaign thumbnail and logo here!
                             </CardDescription>
                         </div>
-                        <div className="justify-center items-center">
+                        {/* <div className="justify-center items-center">
                             <Button
                                 className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
-                                onClick={() => handleToPreview()}
+                                onClick={() => backToPreview()}
                             >
                                 Go to Preview →
                             </Button>
-                        </div>
+                        </div> */}
                     </CardHeader>
                     <CardContent>
+                        <Breadcrumb className="flex w-full items-start justify-start mb-5 ml-4 p-0">
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink
+                                        onClick={backToForm}
+                                        className="text-muted-foreground"
+                                    >
+                                        Campaign Data
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem aria-current="page">
+                                    <BreadcrumbLink className="font-medium text-primary">
+                                        Campaign Media
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink
+                                        onClick={backToPreview}
+                                        className="text-muted-foreground"
+                                    >
+                                        Campaign Preview
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+
                         <div>
                             <PreviewLayout
                                 user={user}
