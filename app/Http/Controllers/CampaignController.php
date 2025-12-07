@@ -86,19 +86,15 @@ class CampaignController extends Controller
 
     public function AdminChangeStatus(Request $request, $id)
     {
-
-        // dd($request->all());
         $campaign = Campaign::findOrFail($id);
-        dd($campaign);
-        dd(now()->addDays((int) $campaign->duration));
         $campaign->update(['status' => $request->status]);
-        if ($request->status === "active") {
-            if (empty($campaign->start_date) && empty($campaign->end_date)) {
+        if ($campaign->status === "pending" && $request->status === "active") {
+            if (empty($campaign->start_campaign) && empty($campaign->end_campaign)) {
                 $start = now();
                 $end = now()->addDays((int) $campaign->duration);
                 $campaign->update([
                     'start_campaign' => $start,
-                    'end_campaign`' => $end,
+                    'end_campaign' => $end,
                 ]);
             }
         }
@@ -172,17 +168,19 @@ class CampaignController extends Controller
             //         ]);
             //     }
             // } else {
-            if ($usersCampaign) {
+            if ($id != null) {
                 $location = Location::where('campaign_id', $id)->latest()->first();
                 return Inertia::render('Campaign/Create', [
                     'user_Id' => Auth::id(),
                     'campaign' => $usersCampaign,
                     'location' => $location,
                 ]);
+            } else {
+
+                return inertia::render('Campaign/Create', [
+                    'user_Id' => Auth::user()->id,
+                ]);
             }
-            return inertia::render('Campaign/Create', [
-                'user_Id' => Auth::user()->id,
-            ]);
             // }
         }
 
@@ -397,6 +395,7 @@ class CampaignController extends Controller
     public function getDetailsPreview($id)
     {
         $user = auth()->user();
+        $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
 
         if ($id != null) {
             $usersCampaign = $user->campaigns()->with('images', 'locations')
@@ -452,6 +451,7 @@ class CampaignController extends Controller
         return inertia::render('Campaign/CreateDetailsPreview', [
             'campaign' => $usersCampaign,
             'contents' => $content,
+            'donations' => $donations,
             'user' => $user,
         ]);
     }
@@ -488,26 +488,31 @@ class CampaignController extends Controller
         // validate gambar
         $request->validate([
             'thumbnail' => ['required', 'mimetypes:image/*', 'max:4096'],
-            'logo' => ['sometimes', 'nullable', 'mimetypes:image/*', 'max:4096'],
+            'logo' => ['nullable', 'exclude_if:logo,null','mimetypes:image/*', 'max:4096'],
             'campaign_id' => 'required|integer|exists:campaigns,id',
+        ], [
+            'logo.mimetypes' => 'The logo must be a valid image (jpg, png, webp, avif).',
+            'thumbnail.mimetypes' => 'The thumbnail must be a valid image (jpg, png, webp, avif).',
         ]);
 
-        $urls = Image::where('imageable_id', $request->campaign_id)->get();
-
-        if ($urls->isNotEmpty()) {
-            foreach ($urls as $path) {
-                Storage::disk('minio')->delete($path->path);
-                $path->delete();
-            }
-            ;
-        }
-        ;
 
         foreach (['thumbnail', 'logo'] as $data) {
             if ($request->hasFile($data)) {
+
+                $urls = Image::where('imageable_id', $request->campaign_id)
+                    ->where('path', 'like', "%_$data.%")
+                    ->get();
+
+                foreach ($urls as $path) {
+                    Storage::disk('minio')->delete($path->path);
+                    $path->delete();
+                }
+
                 $ext = $request->file($data)->getClientOriginalExtension();
                 $filename = "campaign_{$request->campaign_id}_{$data}." . $ext;
+
                 $path = $request->file($data)->storeAs('campaigns/image', $filename, 'minio');
+
                 Image::create([
                     'path' => $path,
                     'imageable_id' => $request->campaign_id,
@@ -516,7 +521,7 @@ class CampaignController extends Controller
             }
         }
 
-        $content = CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
+        CampaignContent::with('images')->where('campaign_id', $request->campaign_id)->get()->map(function ($data) {
             $media = $data->images->map(function ($image) {
                 return [
                     'path' => $image->path,
@@ -648,17 +653,17 @@ class CampaignController extends Controller
             ]
         );
 
-        // Ambil media lama
-        $oldMedia = $content->images;
 
-        // CASE 1 — Kalau user upload file baru
+
         if ($request->hasFile('media')) {
 
-            // HAPUS media lama hanya jika ada file baru
+            $oldMedia = $content->images;
+
             if ($oldMedia->isNotEmpty()) {
                 foreach ($oldMedia as $media) {
                     Storage::disk('minio')->delete($media->path);
                 }
+
                 $content->images()->delete();
             }
 
