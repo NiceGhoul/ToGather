@@ -151,17 +151,22 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                             <>
                                 {/* Title */}
                                 {editMode ? (
-                                    <Input
-                                        value={formData.title}
-                                        placeholder="Input Update Title Here"
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                title: e.target.value,
-                                            })
-                                        }
-                                        className="text-sm h-[50px] dark:placeholder-gray-300 dark:text-white"
-                                    />
+                                    <div>
+                                        <Label className="text-base text-gray-500">
+                                            Updates Title
+                                        </Label>
+                                        <Input
+                                            value={formData.title}
+                                            placeholder="Input Update Title Here"
+                                            onChange={(e) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    title: e.target.value,
+                                                })
+                                            }
+                                            className="text-sm h-[50px] dark:placeholder-gray-300 dark:text-white"
+                                        />
+                                    </div>
                                 ) : (
                                     <Label className="text-2xl font-bold text-[#7C4789] dark:text-purple-400">
                                         {selectedUpdate.content
@@ -186,78 +191,54 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                                     </p>
                                 )}
                                 {/* media carousel */}
-                                {selectedUpdate.media?.length > 0 &&
-                                    !editMode && (
+                                {
+                                    <div className="flex flex-col gap-2 my-10">
+                                        <Label className="text-base text-gray-500">
+                                            Media Preview
+                                        </Label>
                                         <Carousel className="w-full max-w-[80%] mx-auto">
                                             <CarouselContent>
-                                                {selectedUpdate.media.map(
-                                                    (m, idx) => (
-                                                        <CarouselItem
-                                                            key={idx}
-                                                            className="flex justify-center"
-                                                        >
-                                                            {m.filetype ===
-                                                            "image" ? (
-                                                                <img
-                                                                    src={m.url}
-                                                                    alt={`Media ${
-                                                                        idx + 1
-                                                                    }`}
-                                                                    className="rounded-lg min-w-[100%] max-h-[450px] object-contain"
-                                                                />
-                                                            ) : (
-                                                                <video
-                                                                    controls
-                                                                    className="rounded-lg w-full min-h-[400px] object-content"
-                                                                >
-                                                                    <source
-                                                                        src={
-                                                                            m.url
-                                                                        }
-                                                                        type="video/mp4"
-                                                                    />
-                                                                </video>
-                                                            )}
-                                                        </CarouselItem>
-                                                    )
-                                                )}
-                                            </CarouselContent>
-                                            <CarouselPrevious className="text-[#7C4789]" />
-                                            <CarouselNext className="text-[#7C4789]" />
-                                        </Carousel>
-                                    )}
-
-                                {editMode && (
-                                    <div className="flex flex-col gap-2">
-                                        <div className="grid grid-cols-3 gap-2 mt-2">
-                                            {formData.media ? (
-                                                formData.media.map((m, idx) => (
-                                                    <div
+                                                {(editMode
+                                                    ? formData
+                                                    : selectedUpdate
+                                                ).media.map((m, idx) => (
+                                                    <CarouselItem
                                                         key={idx}
-                                                        className="relative"
+                                                        className="flex justify-center"
                                                     >
                                                         {m.filetype ===
                                                         "image" ? (
                                                             <img
                                                                 src={m.url}
-                                                                alt=""
-                                                                className="rounded-lg object-cover h-36 w-full"
+                                                                alt={`Media ${
+                                                                    idx + 1
+                                                                }`}
+                                                                className="rounded-lg min-w-[100%] max-h-[400px] object-contain"
                                                             />
                                                         ) : (
                                                             <video
-                                                                src={m.url}
-                                                                className="rounded-lg h-36 w-full object-cover"
-                                                                muted
-                                                            />
+                                                                controls
+                                                                className="rounded-lg w-full min-h-[400px] object-content"
+                                                            >
+                                                                <source
+                                                                    src={m.url}
+                                                                    type="video/mp4"
+                                                                />
+                                                            </video>
                                                         )}
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <></>
-                                            )}
-                                        </div>
-                                        <Label className="text-sm text-gray-500">
-                                            Upload Images/Videos
+                                                    </CarouselItem>
+                                                ))}
+                                            </CarouselContent>
+                                            <CarouselPrevious className="text-[#7C4789]" />
+                                            <CarouselNext className="text-[#7C4789]" />
+                                        </Carousel>
+                                    </div>
+                                }
+
+                                {editMode && (
+                                    <div className="flex flex-col gap-2 mb-5">
+                                        <Label className="text-base text-gray-500">
+                                            Upload Media
                                         </Label>
                                         <div className="flex flex-row gap-5">
                                             <Input
@@ -278,24 +259,28 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                                                 Clear Media
                                             </Button>
                                         </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Label className="text-base text-gray-500 dark:text-gray-200">
+                                                Updates Description
+                                            </Label>
+                                            <Textarea
+                                                rows={12}
+                                                placeholder="Input Update Description Here"
+                                                className="text-md text-gray-700 dark:placeholder-gray-300 dark:text-white h-24"
+                                                value={formData.content}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        content: e.target.value,
+                                                    })
+                                                }
+                                            />
+                                        </div>
                                     </div>
                                 )}
 
                                 {/* Content */}
-                                {editMode ? (
-                                    <Textarea
-                                        rows={8}
-                                        placeholder="Input Update Description Here"
-                                        className="text-md text-gray-700 dark:placeholder-gray-300 dark:text-white"
-                                        value={formData.content}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                content: e.target.value,
-                                            })
-                                        }
-                                    />
-                                ) : (
+                                {!editMode && (
                                     <p className="text-left text-md text-gray-700 dark:text-gray-300 whitespace-pre-line ">
                                         {selectedUpdate.content.split("~;")[1]}
                                     </p>

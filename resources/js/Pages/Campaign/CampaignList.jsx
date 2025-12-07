@@ -25,7 +25,6 @@ const CampaignList = () => {
         setIsLogin(!!auth?.user);
     }, [auth]);
 
-    console.log(campaigns);
     const handleShowMore = () => {
         // show spinner, then load more (small delay so spinner is visible)
         setIsShowMoreloading(true);

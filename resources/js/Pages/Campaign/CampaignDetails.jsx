@@ -240,13 +240,16 @@ export default function Create() {
                                         ? " Donators"
                                         : " Donator")}
                             </h1>
-                            {campaign.status != "completed" &&
+                            {campaign.status != "completed" ?
                                 <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
                                 {Math.ceil(
                                     (new Date(campaign.end_campaign) -
                                     new Date()) /
                                     (1000 * 60 * 60 * 24)
                                 ) + " Days left"}
+                            </h1> :
+                            <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
+                                {"Campaign " + campaign.status}
                             </h1>
                             }
                         </div>

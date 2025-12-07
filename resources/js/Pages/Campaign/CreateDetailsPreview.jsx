@@ -28,14 +28,22 @@ import { useEffect, useRef, useState } from "react";
 import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
 
-export const UpperPreview = ({ campaign, user, images }) => {
-    const [like, setLike] = useState(false);
+export const UpperPreview = ({ campaign, user, images, donations }) => {
+
+     const percentage = Math.round(
+         (campaign.collected_amount / campaign.goal_amount) * 100
+     );
+
+     const handleFinalize = () => {
+         router.post(`/campaigns/finalize/${campaign.id}`);
+     };
 
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
             <div className="flex flex-col min-w-[50%] max-h-full">
-                <div className="flex flex-row min-w-full min-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
+                <div className="flex flex-row min-w-full max-h-[400px] overflow-hidden border-1 rounded-md border-gray-800 dark:border-gray-400 shrink-0 items-center">
                     {images.thumbnail ? (
                         <img
                             src={images.thumbnail}
@@ -43,7 +51,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                             className="w-full h-full object-contain"
                         />
                     ) : (
-                        <span className="text-gray-500 text-md w-full text-center italic">
+                        <span className="flex items-center justify-center text-gray-500 text-md w-full h-[400px] text-center italic">
                             No image available
                         </span>
                     )}
@@ -69,7 +77,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col gap-1 justify-center">
-                        <Label className="text-3xl text-start font-semibold dark:text-white">
+                        <Label className="text-2xl text-start font-semibold dark:text-white">
                             {campaign.title}
                         </Label>
                         <Label className="text-md text-start font-medium dark:text-white">
@@ -77,28 +85,37 @@ export const UpperPreview = ({ campaign, user, images }) => {
                         </Label>
                     </div>
                 </div>
-                <div className="flex flex-row justify-between">
-                    <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
-                        {/* 0 Donator */}
-                    </h1>
+                {
+                    <div className="flex flex-row justify-between">
+                        <h1 className="text-2xl text-start font-semibold my-4 text-[#7C4789] dark:text-gray-300">
+                            {donations.length.toString() +
+                                " " +
+                                (donations.length > 1
+                                    ? " Donators"
+                                    : " Donator")}
+                        </h1>
 
-                    <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-[#9A5CAA]">
-                        {campaign.end_campaign
-                            ? Math.ceil(
-                                  (new Date(campaign.end_campaign) -
-                                      new Date()) /
-                                      (1000 * 60 * 60 * 24)
-                              ) + " Days left"
-                            : "- Days left"}
-                    </h1>
-                </div>
+                        <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-purple-700">
+                            {campaign.end_campaign
+                                ? Math.ceil(
+                                      (new Date(campaign.end_campaign) -
+                                          new Date()) /
+                                          (1000 * 60 * 60 * 24)
+                                  ) + " Days left"
+                                : "- Days left"}
+                        </h1>
+                    </div>
+                }
                 <div className="relative flex flex-col justify-end gap-4 mt-2">
                     <Progress
-                        className="h-6 rounded-sm bg-[#d3bfe0] [&>div]:bg-[#7C4789] dark:[&>div]: bg-[#aaaaaa]"
-                        value={0}
+                        className="h-6 rounded-sm [&>div]:bg-purple-800 dark:[&>div]:bg-purple-800"
+                        value={
+                            (campaign.collected_amount / campaign.goal_amount) *
+                            100
+                        }
                     />
                     <span className="absolute inset-0 flex items-start justify-center text-md font-medium text-gray-200 dark:text-white">
-                        0%
+                       {percentage}%
                     </span>
                 </div>
                 <p className="text-lg font-normal flex justify-end mt-2">
@@ -117,7 +134,26 @@ export const UpperPreview = ({ campaign, user, images }) => {
                             minimumFractionDigits: 2,
                         })}
                 </p>
-                <div className="flex flex-row items-center justify-between mt-5">
+
+                    {campaign.status === "draft" && (
+                        <div className="flex justify-end items-end my-5">
+                            <Popup
+                                triggerText={
+                                    <Button className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl">
+                                        Finalize →
+                                    </Button>
+                                }
+                                title="Finalize Campaign?"
+                                description="This campaign status will be set to 'pending' and will be reviewed by the admin. Are you sure you want to proceed?"
+                                confirmText="Yes, Approve"
+                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                triggerClass="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl"
+                                onConfirm={() => handleFinalize()}
+                            />
+                        </div>
+                    )}
+
+                {/* <div className="flex flex-row items-center justify-between mt-5">
                     <Toggle
                         pressed={like}
                         onPressedChange={() => setLike(!like)}
@@ -137,7 +173,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
                     <Button className="min-h-10 min-w-48 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
                         Donate
                     </Button>
-                </div>
+                </div> */}
             </div>
         </div>
     );
@@ -145,7 +181,7 @@ export const UpperPreview = ({ campaign, user, images }) => {
 
 const CreateDetailsPreview = () => {
     const data = ["About", "FAQ", "Updates", "Donations"];
-    const { campaign, user, contents, flash } = usePage().props;
+    const { campaign, user, contents, flash, donations } = usePage().props;
     const [images, setImages] = useState({ thumbnail: null, logo: null });
     const [openPopUp, setOpenPopUp] = useState(false);
     const [popUpData, setPopupData] = useState({
@@ -155,22 +191,29 @@ const CreateDetailsPreview = () => {
         confColor: "",
     });
 
-    const handleBack = () => {
+    const backToPreview = () => {
         const params = new URLSearchParams(window.location.search);
         const from = params.get("from");
 
         if (from === "myCampaigns") {
-            router.get(
-                `/campaigns/create/createPreview/${campaign.id}` +
-                    "?from=myCampaigns"
-            );
+            router.get(`/campaigns/create/createPreview/${campaign.id}?from=${from}`);
         } else {
             router.get(`/campaigns/create/createPreview/${campaign.id}`);
         }
     };
 
-    const handleFinalize = () => {
-        router.post(`/campaigns/finalize/${campaign.id}`);
+    const backToForm = () => {
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+
+        if (from === "myCampaigns") {
+            router.get(
+                `/campaigns/create/${campaign.id}` +
+                    "?from=myCampaigns"
+            );
+        } else {
+            router.get(`/campaigns/create/${campaign.id}`);
+        }
     };
 
     const handleInsertUpdates = (campaignContent) => {
@@ -282,6 +325,7 @@ const CreateDetailsPreview = () => {
         );
     };
 
+    // thumbnail and logo handler
     useEffect(() => {
         if (
             campaign.images &&
@@ -298,41 +342,68 @@ const CreateDetailsPreview = () => {
     return (
         <Layout_User>
             <Card className="rounded-none border-0 border-gray-700">
+                {/* <Button
+                    className="bg-transparent text-purple-700 dark:text-purple-400 hover:bg-purple-100 text-xl"
+                    onClick={() => handleBack()}
+                >
+                    ← Back
+                </Button> */}
+
                 <CardHeader className="flex flex-row">
-                    <div className="justify-center items-center">
-                        <Button
-                            className="bg-transparent text-purple-700 dark:text-purple-400 hover:bg-purple-100 text-xl"
-                            onClick={() => handleBack()}>
-                            ← Back
-                        </Button>
-                    </div>
                     <div className="w-full justify-center items-center">
                         <CardTitle className="text-center text-3xl">
                             Edit Campaign Details
                         </CardTitle>
-                        <CardDescription className="w-full text-center text-md justify-center flex items-center">
+                        <CardDescription className="text-center text-sm justify-center flex items-center">
                             {campaign.status === "draft"
                                 ? "Edit everything about your campaign here! preview what your campaign details would looked like prior to publishing!"
-                                : " Edit everything about your campaign here! Add new campaign updates on the Updates Tab!"}
+                                : " Edit everything about your campaign here! Customize and personalize your campaign according to your preferences!"}
                         </CardDescription>
                     </div>
-                    {campaign.status === "draft" && (
-                        <div className="justify-center items-center">
-                            <Button
-                                className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl "
-                                onClick={() => handleFinalize()}
-                            >
+
+                    {/* <Popup
+                        triggerText={
+                            <Button className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl">
                                 Finalize →
                             </Button>
-                        </div>
-                    )}
+                        }
+                        title="Finalize Campaign?"
+                        description="This campaign status will be set to 'pending' and will be reviewed by the admin. Are you sure you want to proceed?"
+                        confirmText="Yes, Approve"
+                        confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                        triggerClass="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl"
+                        onConfirm={() => handleFinalize()}
+                    /> */}
                 </CardHeader>
 
                 <CardContent className="border-none">
+                    <Breadcrumb className="flex w-full items-start justify-start m-0 ml-4 p-0">
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink onClick={backToForm} className="text-muted-foreground">
+                                    Campaign Data
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbLink onClick={backToPreview} className="text-muted-foreground">
+                                    Campaign Media
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem aria-current="page">
+                                <BreadcrumbLink className="font-medium text-primary"  >
+                                    Campaign Preview
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+
                     <UpperPreview
                         campaign={campaign}
                         user={user}
                         images={images}
+                        donations={donations}
                     />
                 </CardContent>
             </Card>
@@ -345,7 +416,8 @@ const CreateDetailsPreview = () => {
                                 return (
                                     <TabsTrigger
                                         value={idx + 1}
-                                        className="w-[10rem] flex px-8 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm h-[40px]">
+                                        className="w-[10rem] flex px-8 uppercase text-md font-bold rounded-none tracking-wide border-2 border-transparent data-[state=active]:text-white data-[state=active]:bg-[#7C4789] transition-colors duration-200 rounded-sm h-[40px]"
+                                    >
                                         {dat}
                                     </TabsTrigger>
                                 );
