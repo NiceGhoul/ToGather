@@ -301,7 +301,7 @@ export default function Register() {
                             ? "OTP Authentication"
                             : "Finish Your Account"}
                     </CardTitle>
-                    <CardDescription className="mt-2 dark:text-gray-300">
+                    <CardDescription className="mt-2 text-gray-600 dark:text-gray-300">
                         {step === 1 &&
                             "Kindly fill in this form to set up your ToGather account"}
                         {step === 2 && (

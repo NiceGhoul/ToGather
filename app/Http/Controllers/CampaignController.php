@@ -86,19 +86,15 @@ class CampaignController extends Controller
 
     public function AdminChangeStatus(Request $request, $id)
     {
-
-        // dd($request->all());
         $campaign = Campaign::findOrFail($id);
-        dd($campaign);
-        dd(now()->addDays((int) $campaign->duration));
         $campaign->update(['status' => $request->status]);
-        if ($request->status === "active") {
-            if (empty($campaign->start_date) && empty($campaign->end_date)) {
+        if ($campaign->status === "pending" && $request->status === "active") {
+            if (empty($campaign->start_campaign) && empty($campaign->end_campaign)) {
                 $start = now();
                 $end = now()->addDays((int) $campaign->duration);
                 $campaign->update([
                     'start_campaign' => $start,
-                    'end_campaign`' => $end,
+                    'end_campaign' => $end,
                 ]);
             }
         }
