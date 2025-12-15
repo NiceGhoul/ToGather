@@ -240,7 +240,7 @@ export default function Create() {
                                         ? " Donators"
                                         : " Donator")}
                             </h1>
-                            {campaign.status != "completed" ?
+                            {campaign.status != "completed" || campaign.end_campaign < Date.now() ?
                                 <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
                                 {Math.ceil(
                                     (new Date(campaign.end_campaign) -
@@ -302,11 +302,11 @@ export default function Create() {
                                     : "Campaign Liked"}
                             </Toggle>
 
-                            <Link href={`/donate?campaign_id=${campaign.id}`}>
+                           {campaign.status != 'completed' && <Link href={`/donate?campaign_id=${campaign.id}`}>
                                 <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
                                     Donate
                                 </Button>
-                            </Link>
+                            </Link>}
                         </div>
                     </div>
                 </div>
