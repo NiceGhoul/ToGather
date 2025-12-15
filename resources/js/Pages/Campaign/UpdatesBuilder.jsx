@@ -15,6 +15,7 @@ import { router } from "@inertiajs/react";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Toaster } from "@/Components/ui/sonner";
 
 export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
     const [editMode, setEditMode] = useState(false);
@@ -53,13 +54,21 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
     });
 
     const handleSaveUpdate = () => {
-        if (!formData.title || formData.title.trim() === "") {
-            () => toast("Title cannot be empty!");
-            return;
-        }
-
-        if (!formData.content || formData.content.trim() === "") {
-            toast("description cannot be empty!");
+        if (!formData.content || formData.content.trim() === "" || !formData.title || formData.title.trim() === "") {
+             toast.error("Unable to save changes", {
+                duration: 2500,
+                style: {
+            '--normal-bg':
+              'light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))',
+            '--normal-text': 'var(--color-white)',
+            '--normal-border': 'transparent'
+          },
+                description: (
+                    <div className="text-white text-md">
+                       Input cannot be empty! please check your input before saving.
+                    </div>
+                ),
+            });
             return;
         }
 
@@ -191,12 +200,12 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                                     </p>
                                 )}
                                 {/* media carousel */}
-                                {
+                                {selectedUpdate.media.length > 0 &&
                                     <div className="flex flex-col gap-2 my-10">
-                                        <Label className="text-base text-gray-500">
+                                        {editMode && <Label className="text-base text-gray-500 ">
                                             Media Preview
-                                        </Label>
-                                        <Carousel className="w-full max-w-[80%] mx-auto">
+                                        </Label>}
+                                        <Carousel className="w-full max-w-[80%] mx-auto my-20">
                                             <CarouselContent>
                                                 {(editMode
                                                     ? formData
@@ -418,6 +427,11 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                     confirmColor={"bg-red-600 hover:bg-red-700 text-white"}
                     onConfirm={() => handleUpdatesDelete(openPopUp)}
                 />
+                <Toaster
+                className="text-xl"
+                toastOptions={{ duration: 2500 }}
+                position="top-center"
+            />
             </div>
         </>
     );
