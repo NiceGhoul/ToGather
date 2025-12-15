@@ -11,7 +11,6 @@ import { Edit, Save, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/Components/ui/button";
 import { router } from "@inertiajs/react";
-import { Alert, AlertTitle } from "@mui/material";
 import { toast } from "sonner";
 import { Toaster } from "@/Components/ui/sonner";
 import Popup from "@/Components/Popup";
@@ -29,6 +28,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
         })
     );
     const [openItem, setOpenItem] = useState(null);
+    const [prevUserQuestions, setPrevUserQuestions]= useState(contents)
 
     useEffect(() => {
         const editingIndex = userQuestions.findIndex((q) => q.isEditing);
@@ -75,10 +75,21 @@ export const FaqBuilder = ({ campaign, contents }) => {
     };
 
     const handleSave = () => {
-        if (userQuestions.length === 0) {
-            toast.error("there are empty descriptions!", {
-                description:
-                    "please double check your description before submitting.",
+        if (userQuestions.map((item) => item.question.trim() === "").includes(true)) {
+            toast.error("Unable to save changes", {
+                duration: 2500,
+                style: {
+                    "--normal-bg":
+                        "light-dark(var(--color-amber-600), var(--color-amber-600))",
+                    "--normal-text": "var(--color-white)",
+                    "--normal-border":
+                        "light-dark(var(--color-amber-600), var(--color-amber-600))",
+                },
+                description: (
+                    <div className="text-white text-md">
+                        empty Questions is not allowed! please check your Questions before saving.
+                    </div>
+                ),
             });
             return;
         }
@@ -98,6 +109,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
             content: normalized[idx].question + "~;" + normalized[idx].answer,
             order_y: idx + 1,
         }));
+
         router.post("/campaigns/insertFAQ", data);
     };
 
@@ -275,7 +287,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
                 >
                     + Add Questions and answers
                 </Button>
-                {userQuestions.length > 0 && (
+                {contents.length != userQuestions.length && (
                     <Button
                         onClick={handleSave}
                         className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"

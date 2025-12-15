@@ -271,10 +271,9 @@ class CampaignController extends Controller
     public function createNewCampaign(Request $request)
     {
         // Check if user is banned
-        if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
-            return back()->with('error', 'Your account has been banned. You cannot create campaigns.');
-        }
-        $data = $request->all();
+        // if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
+        //     return back()->with('error', 'Your account has been banned. You cannot create campaigns.');
+        // }
 
         // $draft = Campaign::where('id', $request->id)->where('user_id', Auth::id())->first();
         // dd($draft);
@@ -282,12 +281,13 @@ class CampaignController extends Controller
         //     $draft->update($data);
         //     $campaign = $draft;
         // } else {
-        //     $data['user_id'] = Auth::id();
-        //     $data['status'] = 'draft';
-        //     $campaign = Campaign::create($data);
+            //     $data['user_id'] = Auth::id();
+            //     $data['status'] = 'draft';
+            //     $campaign = Campaign::create($data);
 
-        // }
+            // }
 
+        $data = $request->all();
         $campaign = Campaign::updateOrCreate(
             [
                 'id' => $request->id,

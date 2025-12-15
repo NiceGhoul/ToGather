@@ -251,7 +251,7 @@ function create() {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </CardContent>
-                <Card className="max-w-4xl mx-auto">
+                <Card className="w-4xl mx-auto">
                     <CardContent className="flex flex-col gap-4">
                         <div>
                             <Label className="mb-1 dark:text-white">
