@@ -597,13 +597,61 @@ class CampaignController extends Controller
         return redirect()->route('campaigns.detailsPreview', $content->campaign_id)->with('activeTab', $tab);
     }
 
+    // public function insertCampaignUpdate(Request $request)
+    // {
+    //     $content = CampaignContent::updateOrCreate(['id' => $request->id], [
+    //         'campaign_id' => $request->campaign_id,
+    //         'type' => "updates",
+    //         'content' => $request->input('content'),
+    //     ]);
+
+    //     $oldMedia = $content->images;
+
+    //     if ($oldMedia->isNotEmpty()) {
+    //         foreach ($oldMedia as $media) {
+    //             Storage::disk('minio')->delete($media->path);
+    //         }
+
+    //         $content->images()->delete();
+    //     }
+
+    //     if ($request->hasFile('media')) {
+    //         foreach ($request->file('media') as $file) {
+    //             // bikin minio dlu
+    //             $path = $file->store('campaigns/updates/' . $content['campaign_id'], 'minio');
+    //             $mime = $file->getMimeType();
+
+    //             if (str_starts_with($mime, 'image/')) {
+    //                 Image::create([
+    //                     'path' => $path,
+    //                     'imageable_id' => $content->id,
+    //                     'imageable_type' => CampaignContent::class,
+    //                 ]);
+    //             }
+
+    //             if (str_starts_with($mime, 'video/')) {
+    //                 Video::create([
+    //                     'path' => $path,
+    //                     'videoable_id' => $content->id,
+    //                     'videoable_type' => CampaignContent::class,
+    //                 ]);
+    //             }
+    //         }
+    //     }
+
+    //     return redirect()->route('campaigns.detailsPreview', ['id' => $content->campaign_id])->with('activeTab', 2);
+    // }
+
     public function insertCampaignUpdate(Request $request)
     {
-        $content = CampaignContent::updateOrCreate(['id' => $request->id], [
-            'campaign_id' => $request->campaign_id,
-            'type' => "updates",
-            'content' => $request->input('content'),
-        ]);
+        $content = CampaignContent::updateOrCreate(
+            ['id' => $request->id],
+            [
+                'campaign_id' => $request->campaign_id,
+                'type' => "updates",
+                'content' => $request->input('content'),
+            ]
+        );
 
 
 
@@ -620,7 +668,6 @@ class CampaignController extends Controller
             }
 
             foreach ($request->file('media') as $file) {
-                // bikin minio dlu
                 $path = $file->store('campaigns/updates/' . $content['campaign_id'], 'minio');
                 $mime = $file->getMimeType();
 
@@ -642,8 +689,15 @@ class CampaignController extends Controller
             }
         }
 
+        // CASE 2 — Tidak ada file baru
+        else {
+            // Jangan hapus apa-apa
+            // Media lama tetap aman
+        }
+
         return redirect()->route('campaigns.detailsPreview', ['id' => $content->campaign_id])->with('activeTab', 2);
     }
+
 
     public function insertFAQContent(Request $request)
     {
