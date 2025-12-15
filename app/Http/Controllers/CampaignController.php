@@ -202,7 +202,7 @@ class CampaignController extends Controller
     public function showLiked()
     {
         $liked = Likes::where('likes_type', 'App\Models\Campaign')->where('user_id', Auth::id())->pluck('likes_id');
-        $campaigns = Campaign::whereIn('id', $liked)->with('images')->get()->map(function ($campaign) {
+        $campaigns = Campaign::whereIn('id', $liked)->with('images')->withCount('likes')->get()->map(function ($campaign) {
             // Extract thumbnail_url dari images relation
             $thumbnail = $campaign->images->first();
             $campaign->thumbnail_url = $thumbnail ? Storage::disk('minio')->url($thumbnail->path) : null;
@@ -488,7 +488,7 @@ class CampaignController extends Controller
         // validate gambar
         $request->validate([
             'thumbnail' => ['required', 'mimetypes:image/*', 'max:4096'],
-            'logo' => ['nullable', 'exclude_if:logo,null','mimetypes:image/*', 'max:4096'],
+            'logo' => ['nullable', 'exclude_if:logo,null', 'mimetypes:image/*', 'max:4096'],
             'campaign_id' => 'required|integer|exists:campaigns,id',
         ], [
             'logo.mimetypes' => 'The logo must be a valid image (jpg, png, webp, avif).',
