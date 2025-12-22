@@ -217,12 +217,15 @@ class CampaignController extends Controller
     public function getCampaignDetails($id)
     {
         $user = auth()->user();
-        $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
+
         if (!$user) {
             $likes = false;
         } else {
             $likes = $user->likedItems()->where('likes_id', $id)->where('likes_type', Campaign::class)->exists();
         }
+
+        $donations = Donation::with(['user.images'])->where('campaign_id', $id)->where('status', 'successful')->get();
+
 
         $campaignData = Campaign::where('id', $id)->with('images', 'locations')->with('user')->latest()->first();
         $content = CampaignContent::with('images', 'videos')->where('campaign_id', $campaignData->id)->get()->map(function ($data) {
@@ -270,46 +273,34 @@ class CampaignController extends Controller
 
     public function createNewCampaign(Request $request)
     {
-        // Check if user is banned
-        // if (auth()->user()->status->value === 'banned' || auth()->user()->status === 'banned') {
-        //     return back()->with('error', 'Your account has been banned. You cannot create campaigns.');
-        // }
-
-        // $draft = Campaign::where('id', $request->id)->where('user_id', Auth::id())->first();
-        // dd($draft);
-        // if ($draft) {
-        //     $draft->update($data);
-        //     $campaign = $draft;
-        // } else {
-            //     $data['user_id'] = Auth::id();
-            //     $data['status'] = 'draft';
-            //     $campaign = Campaign::create($data);
-
-            // }
 
         $data = $request->all();
-        $campaign = Campaign::updateOrCreate(
-            [
-                'id' => $request->id,
-                'user_id' => Auth::id(),
-            ],
-            array_merge($data, [
+
+        $isUpdate = !empty($request->id);
+        unset($data['status']);
+
+
+        if ($isUpdate) {
+            $campaign = Campaign::where('id', $request->id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+
+            $campaign->update($data);
+
+        } else {
+
+            $campaign = Campaign::create(array_merge($data, [
                 'user_id' => Auth::id(),
                 'status' => 'draft',
-            ])
-        );
-        // if ($campaign && $request->has('location')) {
-        //     $location = $request->input('location');
-        //     $location['campaign_id'] = $campaign->id;
-
-        //     $existingLocation = Location::where('campaign_id', $campaign->id)->first();
-
-        //     if ($existingLocation) {
-        //         $existingLocation->update($location);
-        //     } else {
-        //         Location::create($location);
-        //     }
-        // }
+            ]));
+            // Notify admins about new campaign
+            NotificationController::notifyAdmins(
+                'campaign_created',
+                'New Campaign Submitted',
+                "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",
+                ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
+            );
+        }
 
         if ($request->has('location')) {
             $locationData = $request->input('location');
@@ -324,14 +315,6 @@ class CampaignController extends Controller
             );
         }
 
-        // Notify admins about new campaign
-        NotificationController::notifyAdmins(
-            'campaign_created',
-            'New Campaign Submitted',
-            "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",
-            ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
-        );
-        // dd($campaign);
         return redirect()->route('campaigns.createPreview', $campaign->id);
     }
 
@@ -538,7 +521,7 @@ class CampaignController extends Controller
         return redirect()->route('campaigns.detailsPreview', $request->campaign_id);
         // return Inertia::render('Campaign/CreateDetailsPreview', [
         //     'campaign' => Campaign::with('images')->findOrFail($request->campaign_id),
-        //     'co  ntents' => $content,
+        //     'contents' => $content,
         //     'user' => $user,
         // ]);
     }

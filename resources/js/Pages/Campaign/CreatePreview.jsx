@@ -361,7 +361,7 @@ const CreatePreview = () => {
                                 className="mt-5 w-20 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                                 onClick={handleNext}
                             >
-                                Next
+                                Save
                             </Button>
                         </div>
                     </CardContent>

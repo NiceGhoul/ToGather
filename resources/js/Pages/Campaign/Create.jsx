@@ -182,7 +182,13 @@ function create() {
     };
 
     const backToDetails = ()=> {
-
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+        if (from === "myCampaigns") {
+            router.get(`/campaigns/create/detailsPreview/${campaign.id}?from=${from}`);
+        } else {
+            router.get(`/campaigns/create/detailsPreview/${campaign.id}`);
+        }
     }
 
     const handleSave = () => {
