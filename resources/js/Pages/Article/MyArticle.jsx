@@ -235,7 +235,7 @@ export default function MyArticle({
 
                         <div className="flex justify-between items-center mt-auto">
                             <Link
-                                href={`/articles/${article.id}/details`}
+                                href={`/articles/view/${article.id}/details`}
                                 className="text-purple-700 hover:underline font-medium"
                             >
                                 Read more →

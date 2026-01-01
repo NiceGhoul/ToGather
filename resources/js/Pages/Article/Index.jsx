@@ -210,7 +210,7 @@ const ArticleList = () => {
 
                         <div className="flex justify-between items-center mt-auto">
                             <Link
-                                href={`/articles/${article.id}?from=articles_list`}
+                                href={`/articles/view/${article.id}?from=articles_list`}
                                 className="text-purple-700 hover:underline font-medium"
                             >
                                 Read more →

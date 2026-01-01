@@ -169,7 +169,7 @@ export default function LikedArticlesPage() {
 
                     <div className="flex justify-between items-center mt-auto">
                         <Link
-                            href={`/articles/${article.id}?from=liked_articles`}
+                            href={`/articles/view/${article.id}?from=liked_articles`}
                             className="text-purple-700 hover:underline"
                         >
                             Read more →
@@ -324,7 +324,7 @@ export default function LikedArticlesPage() {
                 </CardHeader>
 
                 <CardContent>
-                    {isLoading ? (
+                    {isShowMoreLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {[...Array(8)].map((_, idx) => (
                                 <ArticleSkeleton key={idx} />
