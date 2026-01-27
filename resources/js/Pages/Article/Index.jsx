@@ -13,7 +13,6 @@ import { Toggle } from "@/Components/ui/toggle";
 import { Spinner } from "@/Components/ui/spinner";
 
 const ArticleList = () => {
-    // 🟣 Ambil props dari backend
     const {
         articles,
         categories,
@@ -22,7 +21,7 @@ const ArticleList = () => {
     } = usePage().props;
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    // 🟣 Inisialisasi state lokal
+    // States
     const [visibleArticles, setVisibleArticles] = useState(8);
     const [articleList, setArticleList] = useState(articles || []);
     const [chosenCategory, setChosenCategory] = useState("All");
@@ -30,16 +29,16 @@ const ArticleList = () => {
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
     const [isLogin, setIsLogin] = useState(false);
 
-    // 🟣 Check authentication status
+    // Check auth
     useEffect(() => {
         setIsLogin(!!auth?.user);
     }, [auth]);
 
-    // 🟣 State untuk Like
+    // Like State
     const [likesState, setLikesState] = useState(
         Object.fromEntries(
-            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false])
-        )
+            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false]),
+        ),
     );
 
     useEffect(() => {
@@ -47,7 +46,7 @@ const ArticleList = () => {
             setArticleList(articles);
             setIsLoading(false);
         } else {
-            // Simulate loading for initial page load
+            // loading
             const timer = setTimeout(() => setIsLoading(false), 500);
             return () => clearTimeout(timer);
         }
@@ -63,7 +62,7 @@ const ArticleList = () => {
             "/articles/list",
             {
                 category: activeCategory,
-                search: searchTerm, // ⬅️ ikutkan search
+                search: searchTerm,
                 sort: sortOrder,
             },
             {
@@ -76,7 +75,7 @@ const ArticleList = () => {
                     setIsLoading(false);
                 },
                 onError: () => setIsLoading(false),
-            }
+            },
         );
     };
 
@@ -87,7 +86,7 @@ const ArticleList = () => {
             {
                 category: chosenCategory === "" ? "All" : chosenCategory,
                 sort: sortOrder,
-                search: searchTerm, // ⬅️ kirim ke backend
+                search: searchTerm,
             },
             {
                 preserveScroll: true,
@@ -97,7 +96,7 @@ const ArticleList = () => {
                     setIsLoading(false);
                 },
                 onError: () => setIsLoading(false),
-            }
+            },
         );
     };
 
@@ -132,7 +131,7 @@ const ArticleList = () => {
     };
 
     const handleShowMore = () => {
-        // show spinner, then load more (small delay so spinner is visible)
+        // handle show more button
         setIsShowMoreloading(true);
         setTimeout(() => {
             setVisibleArticles((prev) => prev + 8);
@@ -168,7 +167,7 @@ const ArticleList = () => {
                         (c) =>
                             (c.type === "text" || c.type === "paragraph") &&
                             c.order_x === 1 &&
-                            c.order_y === 1
+                            c.order_y === 1,
                     )?.content || "";
 
                 const liked = likesState[article.id] || false;
@@ -239,12 +238,11 @@ const ArticleList = () => {
         }
     };
 
-    // 🟣 Dynamic Layout based on authentication
     const Layout = isLogin ? Layout_User : Layout_Guest;
 
     return (
         <Layout>
-            {/* === Banner Section === */}
+            {/* Banner */}
             <div className="w-full flex flex-col">
                 <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
                     <img
@@ -263,7 +261,7 @@ const ArticleList = () => {
                     </div>
                 </div>
 
-                {/* === Category Bar === */}
+                {/* Category Bar*/}
                 <div
                     className="flex flex-row space-x-4 h-[75px] bg-gray-300 bg-cover bg-center w-full items-center justify-center"
                     style={{ background: "#7A338C" }}
@@ -298,9 +296,9 @@ const ArticleList = () => {
                 </div>
             </div>
 
-            {/* === Search Bar + Sort === */}
+            {/* Search Parameter*/}
             <div className="w-11/12 flex m-10 items-end justify-end gap-3">
-                {/* Dropdown Sort */}
+                {/* Sort Dropdown */}
                 <select
                     value={sortOrder}
                     onChange={(e) => {
@@ -313,7 +311,7 @@ const ArticleList = () => {
                                 category:
                                     chosenCategory === ""
                                         ? "All"
-                                        : chosenCategory, // ⬅️ pastikan tetap kirim kategori
+                                        : chosenCategory,
                                 sort: newSort,
                                 search: searchTerm,
                             },
@@ -325,7 +323,7 @@ const ArticleList = () => {
                                     setIsLoading(false);
                                 },
                                 onError: () => setIsLoading(false),
-                            }
+                            },
                         );
                     }}
                     className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none  bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
@@ -370,7 +368,7 @@ const ArticleList = () => {
                                         setIsLoading(false);
                                     },
                                     onError: () => setIsLoading(false),
-                                }
+                                },
                             );
                         }}
                         className="hover:ring-1 ml-0.5 hover:ring-red-500 text-red-600 hover:bg-red-100 hover:text-red-800"
@@ -380,7 +378,7 @@ const ArticleList = () => {
                 </ButtonGroup>
             </div>
 
-            {/* === Article Section === */}
+            {/* Article List */}
             <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4">
