@@ -98,7 +98,6 @@ class ImageController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Image upload error: ' . $e->getMessage());
             return response()->json(['error' => 'Upload failed'], 500);
         }
     }
