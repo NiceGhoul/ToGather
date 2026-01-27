@@ -41,7 +41,6 @@ class DonationController extends Controller
         Config::$isSanitized = env('MIDTRANS_IS_SANITIZED', true);
         Config::$is3ds = env('MIDTRANS_IS_3DS', true);
 
-        // Create donation record
         $donation = Donation::create([
             'user_id' => auth()->id(),
             'campaign_id' => $request->campaign_id,
@@ -80,8 +79,6 @@ class DonationController extends Controller
 
         try {
             $snapToken = Snap::getSnapToken($params);
-
-            // Notify user about donation initiation
             NotificationController::notifyUser(
                 $user->id,
                 'donation_initiated',
@@ -101,7 +98,6 @@ class DonationController extends Controller
                 'user_id' => auth()->id() ?? 'guest', // Optional: add context
             ]);
 
-            // Return a generic, safe error message to the user
             return response()->json([
                 'error' => 'Payment initialization failed',
                 'message' => 'Please check the server logs for details.',
