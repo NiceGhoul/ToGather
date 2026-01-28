@@ -398,7 +398,7 @@ export default function Edit() {
                                         setIsDirty(true);
                                         addRow();
                                     }}
-                                    className="bg-purple-800 hover:bg-purple-700 text-whtie"
+                                    className="bg-purple-800 hover:bg-purple-700 text-white"
                                 >
                                     Add Row
                                 </Button>
@@ -411,7 +411,7 @@ export default function Edit() {
                             onClick={() =>
                                 requestExit(() => {
                                     router.get(
-                                        `/articles/${article.id}/details`
+                                        `/articles/view/${article.id}/details`
                                     );
                                     router.reload();
                                 })

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/Components/ui/card";
+import { Card, CardContent } from "@/Components/ui/card";
 import {
     Carousel,
     CarouselNext,
@@ -7,13 +7,12 @@ import {
     CarouselContent,
 } from "@/Components/ui/carousel";
 import { Label } from "@/Components/ui/label";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useState } from "react";
 
 export const UpdatesDetails = ({ contents }) => {
 
     const [selectedUpdate, setSelectedUpdate] = useState(contents[contents.length - 1]);
-    const [oldUpdates, setOldUpdates] = useState(contents)
+    // const [oldUpdates, setOldUpdates] = useState(contents)
 
     return (
         <>

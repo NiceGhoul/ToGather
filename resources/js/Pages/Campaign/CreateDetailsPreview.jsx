@@ -19,16 +19,15 @@ import {
 import { Label } from "@/Components/ui/label";
 import { Progress } from "@/Components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
-import { Toggle } from "@/Components/ui/toggle";
 import Layout_User from "@/Layouts/Layout_User";
 import { router, usePage } from "@inertiajs/react";
 import { IconFolderCode } from "@tabler/icons-react";
-import { Heart, Map } from "lucide-react";
+import { Map } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
 
 export const UpperPreview = ({ campaign, user, images, donations }) => {
 
@@ -152,28 +151,6 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                             />
                         </div>
                     )}
-
-                {/* <div className="flex flex-row items-center justify-between mt-5">
-                    <Toggle
-                        pressed={like}
-                        onPressedChange={() => setLike(!like)}
-                        size="lg"
-                        variant={"outline"}
-                        className="
-                        data-[state=on]:bg-transparent
-                        data-[state=on]:text-red-400 dark:data-[state=on]:text-red-300
-                        data-[state=on]:stroke-red-400 dark:data-[state=on]:stroke-red-300
-                        data-[state=on]:*:[svg]:fill-red-500
-                        data-[state=on]:*:[svg]:stroke-red-500"
-                    >
-                        <Heart />
-                        {!like ? "Like This Campaign" : "Campaign Liked"}
-                    </Toggle>
-
-                    <Button className="min-h-10 min-w-48 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
-                        Donate
-                    </Button>
-                </div> */}
             </div>
         </div>
     );
@@ -207,10 +184,7 @@ const CreateDetailsPreview = () => {
         const from = params.get("from");
 
         if (from === "myCampaigns") {
-            router.get(
-                `/campaigns/create/${campaign.id}` +
-                    "?from=myCampaigns"
-            );
+            router.get(`/campaigns/create/${campaign.id}` + "?from=myCampaigns");
         } else {
             router.get(`/campaigns/create/${campaign.id}`);
         }
@@ -305,7 +279,6 @@ const CreateDetailsPreview = () => {
                             </EmptyDescription>
                         </EmptyHeader>
                         <EmptyContent>
-                            {/* <Button>Add data</Button> */}
                         </EmptyContent>
                     </Empty>
                 </div>

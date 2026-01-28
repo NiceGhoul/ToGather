@@ -28,7 +28,6 @@ export const FaqBuilder = ({ campaign, contents }) => {
         })
     );
     const [openItem, setOpenItem] = useState(null);
-    const [prevUserQuestions, setPrevUserQuestions]= useState(contents)
 
     useEffect(() => {
         const editingIndex = userQuestions.findIndex((q) => q.isEditing);
@@ -36,14 +35,6 @@ export const FaqBuilder = ({ campaign, contents }) => {
             setOpenItem(`item-${editingIndex}`);
         }
     }, [userQuestions]);
-
-    const handleDelete = (itemToDelete, idx) => {
-        setUserQuestions((prev) => prev.filter((_, i) => i !== idx));
-
-        if (contents?.some((c) => c.id === itemToDelete.id)) {
-            router.post(`/campaigns/deleteContent/${id}`);
-        }
-    };
 
     const handleChange = (index, field, value) => {
         setUserQuestions((prev) =>
@@ -54,8 +45,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
     };
 
     const handleAddQuestions = () => {
-        setUserQuestions((prev) => [
-            ...prev,
+        setUserQuestions((prev) => [...prev,
             {
                 id: null,
                 campaign_id: campaign.id,
@@ -68,9 +58,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
 
     const toggleEdit = (index) => {
         setUserQuestions((prev) =>
-            prev.map((block, i) =>
-                i === index ? { ...block, isEditing: !block.isEditing } : block
-            )
+            prev.map((block, i) => i === index ? { ...block, isEditing: !block.isEditing } : block)
         );
     };
 
@@ -79,15 +67,13 @@ export const FaqBuilder = ({ campaign, contents }) => {
             toast.error("Unable to save changes", {
                 duration: 2500,
                 style: {
-                    "--normal-bg":
-                        "light-dark(var(--color-amber-600), var(--color-amber-600))",
+                    "--normal-bg": "light-dark(var(--color-amber-600), var(--color-amber-600))",
                     "--normal-text": "var(--color-white)",
-                    "--normal-border":
-                        "light-dark(var(--color-amber-600), var(--color-amber-600))",
+                    "--normal-border":"light-dark(var(--color-amber-600), var(--color-amber-600))",
                 },
                 description: (
                     <div className="text-white text-md">
-                        empty Questions is not allowed! please check your Questions before saving.
+                        {"empty Questions is not allowed! please check your Questions before saving."}
                     </div>
                 ),
             });
@@ -114,9 +100,8 @@ export const FaqBuilder = ({ campaign, contents }) => {
     };
 
     const handleRemove = (id, index) => {
-        // remove dari state langsung
+        // remove from local state, as well as database
         setUserQuestions((prev) => prev.filter((_, i) => i !== index));
-
         if (id != undefined) {
             router.post(`/campaigns/deleteContent/${id}`);
         }
@@ -148,9 +133,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
                                     onValueChange={(val) => {
                                         const currentIndex =
                                             userQuestions.findIndex(
-                                                (q) =>
-                                                    `item-${q.id - 1}` ===
-                                                    openItem
+                                                (q) => `item-${q.id - 1}` ===  openItem
                                             );
                                         const isEditing =
                                             userQuestions[currentIndex]
@@ -164,7 +147,7 @@ export const FaqBuilder = ({ campaign, contents }) => {
                                         value={`item-${idx}`}
                                     >
                                         <AccordionTrigger className="flex justify-between items-center">
-                                            {/* if is editing */}
+                                            {/* if is editing, opened accordion can't be closed */}
                                             {dat.isEditing ? (
                                                 <Input
                                                     onKeyDownCapture={(e) =>
@@ -206,26 +189,12 @@ export const FaqBuilder = ({ campaign, contents }) => {
                                             {dat.isEditing ? (
                                                 <Textarea
                                                     value={dat.answer}
-                                                    onKeyDown={(e) =>
-                                                        e.stopPropagation()
-                                                    }
-                                                    onKeyDownCapture={(e) =>
-                                                        e.stopPropagation()
-                                                    }
-                                                    onKeyUpCapture={(e) =>
-                                                        e.stopPropagation()
-                                                    }
-                                                    onChange={(e) =>
-                                                        handleChange(
-                                                            idx,
-                                                            "answer",
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                    onKeyDownCapture={(e) => e.stopPropagation()}
+                                                    onKeyUpCapture={(e) => e.stopPropagation()}
+                                                    onChange={(e) =>handleChange(idx,"answer", e.target.value)}
                                                     className="w-full mt-2 dark:text-gray-200"
-                                                    placeholder={
-                                                        "Write your answer here"
-                                                    }
+                                                    placeholder={"Write your answer here"}
                                                     rows={3}
                                                 />
                                             ) : (

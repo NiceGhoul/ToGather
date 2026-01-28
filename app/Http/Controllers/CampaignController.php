@@ -96,20 +96,30 @@ class CampaignController extends Controller
                     'start_campaign' => $start,
                     'end_campaign' => $end,
                 ]);
+                // Notify user about article approval
+                NotificationController::notifyUser(
+                    $campaign->user_id,
+                    "campaign_{$request->status}",
+                    'campaign Approved',
+                    "Your Campaign '{$campaign->title}' status is now: {$request->status}!",
+                    ['campaign_id' => $campaign->id]
+                );
+
+                return redirect()->route('admin.campaign.verification')->with('success', `Campaign status changed to '{$request->status}' !`);
             }
+        } else {
+            NotificationController::notifyUser(
+                $campaign->user_id,
+                "campaign_{$request->status}",
+                'campaign Status Updated',
+                "Your Campaign '{$campaign->title}' status is now: {$request->status}!",
+                ['campaign_id' => $campaign->id]
+            );
+
+            return redirect()->route('admin.campaign.adminIndex')->with('success', `Campaign status changed to '{$request->status}' !`);
         }
-
-        // Notify user about article approval
-        NotificationController::notifyUser(
-            $campaign->user_id,
-            "campaign_{$request->status}",
-            'campaign Approved',
-            "Your Campaign '{$campaign->title}' status is now: {$request->status}!",
-            ['campaign_id' => $campaign->id]
-        );
-
-        return redirect()->route('admin.campaign.verification')->with('success', `Campaign status changed to '{$request->status}' !`);
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -152,22 +162,6 @@ class CampaignController extends Controller
         }
 
         if ($verificationRequest->status->value === 'accepted') {
-            // Accepted verification - show campaign create form
-            // if ($usersCampaign) {
-            //     if ($usersCampaign->status->value === 'pending') {
-            //         return inertia('Campaign/CampaignPending');
-            //         // If user already has a campaign with the status draft
-            //     } else if ($usersCampaign->status->value === 'draft' || $usersCampaign->status->value === 'active') {
-            //         $draft =  Campaign::where('id', $id)->where('user_id', Auth::id())->latest()->first();
-            //         $location = Location::where('campaign_id', $id)->latest()->first();
-            //         // dd($location);
-            //         return Inertia::render('Campaign/Create', [
-            //             'user_Id' => Auth::id(),
-            //             'campaign' => $draft,
-            //             'location' => $location,
-            //         ]);
-            //     }
-            // } else {
             if ($id != null) {
                 $location = Location::where('campaign_id', $id)->latest()->first();
                 return Inertia::render('Campaign/Create', [
@@ -181,10 +175,7 @@ class CampaignController extends Controller
                     'user_Id' => Auth::user()->id,
                 ]);
             }
-            // }
         }
-
-        // return inertia('Verification/Create');
     }
 
 
@@ -216,6 +207,7 @@ class CampaignController extends Controller
 
     public function getCampaignDetails($id)
     {
+        
         $user = auth()->user();
 
         if (!$user) {
@@ -250,7 +242,7 @@ class CampaignController extends Controller
             if ($data->type === 'media' && $media->isEmpty()) {
                 $media->push([
                     'path' => $data->content,
-                    'filetype' => 'image', // You can detect extension too
+                    'filetype' => 'image',
                     'url' => Storage::disk('minio')->url($data->content),
                 ]);
             }
@@ -293,6 +285,7 @@ class CampaignController extends Controller
                 'user_id' => Auth::id(),
                 'status' => 'draft',
             ]));
+
             // Notify admins about new campaign
             NotificationController::notifyAdmins(
                 'campaign_created',
@@ -474,8 +467,8 @@ class CampaignController extends Controller
             'logo' => ['nullable', 'exclude_if:logo,null', 'mimetypes:image/*', 'max:4096'],
             'campaign_id' => 'required|integer|exists:campaigns,id',
         ], [
-            'logo.mimetypes' => 'The logo must be a valid image (jpg, png, webp, avif).',
-            'thumbnail.mimetypes' => 'The thumbnail must be a valid image (jpg, png, webp, avif).',
+            'logo.mimetypes' => 'The logo must be a valid image (jpg, jpeg, png, webp, avif).',
+            'thumbnail.mimetypes' => 'The thumbnail must be a valid image (jpg, jpeg, png, webp, avif).',
         ]);
 
 
@@ -579,51 +572,6 @@ class CampaignController extends Controller
 
         return redirect()->route('campaigns.detailsPreview', $content->campaign_id)->with('activeTab', $tab);
     }
-
-    // public function insertCampaignUpdate(Request $request)
-    // {
-    //     $content = CampaignContent::updateOrCreate(['id' => $request->id], [
-    //         'campaign_id' => $request->campaign_id,
-    //         'type' => "updates",
-    //         'content' => $request->input('content'),
-    //     ]);
-
-    //     $oldMedia = $content->images;
-
-    //     if ($oldMedia->isNotEmpty()) {
-    //         foreach ($oldMedia as $media) {
-    //             Storage::disk('minio')->delete($media->path);
-    //         }
-
-    //         $content->images()->delete();
-    //     }
-
-    //     if ($request->hasFile('media')) {
-    //         foreach ($request->file('media') as $file) {
-    //             // bikin minio dlu
-    //             $path = $file->store('campaigns/updates/' . $content['campaign_id'], 'minio');
-    //             $mime = $file->getMimeType();
-
-    //             if (str_starts_with($mime, 'image/')) {
-    //                 Image::create([
-    //                     'path' => $path,
-    //                     'imageable_id' => $content->id,
-    //                     'imageable_type' => CampaignContent::class,
-    //                 ]);
-    //             }
-
-    //             if (str_starts_with($mime, 'video/')) {
-    //                 Video::create([
-    //                     'path' => $path,
-    //                     'videoable_id' => $content->id,
-    //                     'videoable_type' => CampaignContent::class,
-    //                 ]);
-    //             }
-    //         }
-    //     }
-
-    //     return redirect()->route('campaigns.detailsPreview', ['id' => $content->campaign_id])->with('activeTab', 2);
-    // }
 
     public function insertCampaignUpdate(Request $request)
     {
@@ -772,4 +720,36 @@ class CampaignController extends Controller
         ]);
     }
 
+
+    public function AdminBulkEnable(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        Campaign::whereIn('id', $ids)->update(['status' => 'active']);
+
+        return redirect()->route('admin.campaign.adminIndex')->with('success', 'Selected campaigns have been enabled!');
+    }
+
+    public function AdminBulkDisable(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        Campaign::whereIn('id', $ids)->update(['status' => 'inactive']);
+
+        return redirect()->route('admin.campaign.adminIndex')->with('success', 'Selected campaigns have been disabled!');
+    }
+
+    public function AdminBulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        Campaign::whereIn('id', $ids)->delete();
+
+        return redirect()->route('admin.campaign.adminIndex')->with('success', 'Selected campaigns have been deleted!');
+    }
+
+    public function AdminBulkUnban(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        Campaign::whereIn('id', $ids)->update(['status' => 'inactive']);
+
+        return redirect()->route('admin.campaign.adminIndex')->with('success', 'Selected campaigns have been unbaned!');
+    }
 }

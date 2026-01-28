@@ -63,11 +63,10 @@ const categories = [
 ];
 
 function create() {
-    const { campaign, user_Id, location } = usePage().props;
+    const { campaign, location } = usePage().props;
     const [campaignData, setCampaignData] = useState(emptyCampaign);
     const [openLocation, setOpenLocation] = useState(false);
     const [description, setDescription] = useState([]);
-    // const [openUnsaved, setOpenUnsaved] = useState(false)
     const [openPop, setOpenPop] = useState(false);
 
     const DatePicker = ({ open, date, setOpen, setDate }) => {
@@ -126,8 +125,6 @@ function create() {
         if (!campaignData.duration) errors.push("Duration cannot be empty");
         if (campaignData.duration && campaignData.duration < 0)
             errors.push("Duration must be greater than or equals to 1 day");
-        // if (campaignData.duration && campaignData.duration > 90) errors.push("Duration must be less than or equals to 90 days");
-
         return errors;
     };
 
@@ -137,7 +134,6 @@ function create() {
         event.preventDefault()
         event.returnValue = ""
       };
-
       window.addEventListener("beforeunload", handleBeforeUnload);
 
       return () => {
@@ -166,10 +162,6 @@ function create() {
         }
     };
 
-    const handleEditCancel = () => {
-        router.get(`/campaigns/create/createPreview/${campaignData.id}`);
-    };
-
     const backToPreview = () => {
         const params = new URLSearchParams(window.location.search);
         const from = params.get("from");
@@ -192,8 +184,7 @@ function create() {
     }
 
     const handleSave = () => {
-        const formattedData = {
-            ...campaignData,
+        const formattedData = {...campaignData,
             start_campaign: campaignData.start_campaign
                 ? new Date(campaignData.start_campaign)
                       .toISOString()
@@ -207,13 +198,13 @@ function create() {
                       .replace("T", " ")
                 : null,
         };
-        // console.log(formattedData)
         router.post("/campaigns/newCampaign", formattedData);
     };
 
     return (
         <Layout_User>
-            <Card className="rounded-none border-0">
+            <Card className="rounded-none border-0 ">
+
                 <CardHeader>
                     <CardTitle className="text-center text-2xl">
                         {campaign === undefined
@@ -225,6 +216,7 @@ function create() {
                     </CardDescription>
                 </CardHeader>
 
+                {/* breadcrumbs */}
                 <CardContent className="border-none">
                     <Breadcrumb className="flex w-full items-start justify-start mb-5 ml-4 p-0">
                         <BreadcrumbList>
@@ -257,6 +249,7 @@ function create() {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </CardContent>
+
                 <Card className="w-4xl mx-auto">
                     <CardContent className="flex flex-col gap-4">
                         <div>
@@ -280,7 +273,7 @@ function create() {
                                 Description
                             </Label>
                             <Textarea
-                                placeholder={`Give your campaign a brief description, describe what your campaign is about)`}
+                                placeholder={`Give your campaign a brief description, tell people what your campaign is about!`}
                                 value={campaignData.description}
                                 onChange={(e) =>
                                     setCampaignData({
@@ -329,11 +322,10 @@ function create() {
                                     setOpenLocation(true);
                                 }}
                             >
-                                {" "}
                                 {campaignData.location === null
                                     ? "Input Your Location"
-                                    : "Edit Your Location"}{" "}
-                                <Map />{" "}
+                                    : "Edit Your Location"}
+                                <Map />
                             </Button>
                         </div>
 
@@ -361,21 +353,18 @@ function create() {
                                             }
                                         />
                                         <InputGroupAddon align="inline-end">
-                                            <Label>,00</Label>
+                                            <Label className="dark:text-gray-100">,00</Label>
                                         </InputGroupAddon>
                                         <InputGroupAddon>
                                             <Label className="dark:text-white">
-                                                Rp.{" "}
+                                                {" Rp."}
                                             </Label>
                                         </InputGroupAddon>
                                     </InputGroup>
                                 </div>
                                 <div className="flex items-center justify-center">
                                     <Label className="mt-2 text-gray-400 font-light">
-                                        {campaignData.goal_amount
-                                            ? parseInt(
-                                                  campaignData.goal_amount
-                                              ).toLocaleString("id-ID", {
+                                        {campaignData.goal_amount ? parseInt(campaignData.goal_amount).toLocaleString("id-ID", {
                                                   style: "currency",
                                                   currency: "IDR",
                                                   minimumFractionDigits: 2,
@@ -387,7 +376,7 @@ function create() {
 
                             <div className="w-3/6 flex flex-col items-start justify-center ">
                                 <Label className="mb-1 dark:text-white">
-                                    Campaign Duration*
+                                    {"Campaign Duration*"}
                                 </Label>
                                 <InputGroup className="h-[40px] w-full">
                                     <InputGroupInput
@@ -402,7 +391,7 @@ function create() {
                                     />
                                     <InputGroupAddon align="inline-end">
                                         <Label className="dark:text-white">
-                                            Days
+                                            {"Days"}
                                         </Label>
                                     </InputGroupAddon>
                                     <InputGroupAddon>
@@ -421,19 +410,6 @@ function create() {
                                 {campaign != undefined ? "Update" : "Next"}
                             </Button>
                         </div>
-
-                        <div className="w-1/6 justify-end flex">
-                            {/* {campaign != undefined ? (
-                                <Button
-                                    className="bg-transparent text-purple-700  hover:bg-purple-100 dark:hover:bg-purple-700 dark:text-white text-lg"
-                                    onClick={backToPreview}
-                                >
-                                    Go to Media →
-                                </Button>
-                            ) : (
-                                <></>
-                            )} */}
-                        </div>
                     </CardFooter>
                 </Card>
             </Card>
@@ -443,6 +419,7 @@ function create() {
                 onClose={() => setOpenLocation(false)}
                 locationData={campaignData.location}
             />
+            {/* popup handler */}
             {openPop && (
                 <Popup
                     open={openPop}

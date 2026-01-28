@@ -101,7 +101,6 @@ export default function MyCampaign({
     };
 
     const handleShowMore = () => {
-        // show spinner, then load more (small delay so spinner is visible)
         setIsShowMoreloading(true);
         setTimeout(() => {
             setVisibleCampaigns((prev) => prev + 8);
@@ -175,9 +174,7 @@ export default function MyCampaign({
                             <div
                                 className="bg-purple-700 h-3 rounded-full"
                                 style={{
-                                    width: `${Math.min(progress, 100).toFixed(
-                                        1
-                                    )}%`,
+                                    width: `${Math.min(progress, 100).toFixed(1)}%`,
                                 }}
                             ></div>
                         </div>
@@ -185,26 +182,23 @@ export default function MyCampaign({
                             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 text-center">
                                 Raised{" "}
                                 {parseInt(
-                                    campaign.collected_amount
+                                    campaign.collected_amount,
                                 )?.toLocaleString("id-ID", {
                                     style: "currency",
                                     currency: "IDR",
                                     minimumFractionDigits: 2,
-                                })}{" "}
-                                /{" "}
+                                })}
+                                {"/"}
                                 {parseInt(campaign.goal_amount)?.toLocaleString(
                                     "id-ID",
                                     {
                                         style: "currency",
                                         currency: "IDR",
                                         minimumFractionDigits: 2,
-                                    }
+                                    },
                                 )}{" "}
                                 ({progress}%)
                             </p>
-                            {/* <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">
-                                ({progress}%)
-                                </p> */}
                         </div>
 
                         <div className="flex justify-center gap-2 mb-4">
@@ -214,12 +208,12 @@ export default function MyCampaign({
                                 campaign.status === "active"
                                     ? "bg-green-200 dark:bg-green-700 text-green-700 dark:text-white"
                                     : campaign.status === "pending"
-                                    ? "bg-yellow-200 text-yellow-700 dark:bg-yellow-500 dark:text-white"
-                                    : campaign.status === "rejected"
-                                    ? "bg-red-200 dark:bg-red-700 text-red-700 dark:text-white"
-                                    : campaign.status === "banned"
-                                    ? "bg-red-200 dark:bg-red-700 text-red-700 dark:text-white"
-                                    : "bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-white"
+                                      ? "bg-yellow-200 text-yellow-700 dark:bg-yellow-500 dark:text-white"
+                                      : campaign.status === "rejected"
+                                        ? "bg-red-200 dark:bg-red-700 text-red-700 dark:text-white"
+                                        : campaign.status === "banned"
+                                          ? "bg-red-200 dark:bg-red-700 text-red-700 dark:text-white"
+                                          : "bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-white"
                             }`}
                             >
                                 {campaign.status.toUpperCase()}
@@ -235,7 +229,7 @@ export default function MyCampaign({
                                                 setOpenPop(campaign.id)
                                             }
                                         >
-                                            ✖ Cancel
+                                            {"✖ Cancel"}
                                         </Button>
                                     )}
                                     {campaign.status != "rejected" && (
@@ -251,7 +245,7 @@ export default function MyCampaign({
                                             <Button
                                                 onClick={() =>
                                                     handleMoveToEdit(
-                                                        campaign.id
+                                                        campaign.id,
                                                     )
                                                 }
                                                 className="bg-transparent text-purple-700 dark:text-purple-500 hover:bg-purple-100 text-lg"

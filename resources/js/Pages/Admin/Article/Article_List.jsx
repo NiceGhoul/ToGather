@@ -29,6 +29,17 @@ export default function Article_List() {
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
 
+    // ===== Pagination =====
+    // const [currentPage, setCurrentPage] = useState(1);
+    // const itemsPerPage = 10;
+
+    // const [totalPages, setTotalPages] = useState(Math.ceil(articles.length / itemsPerPage));
+    // const startIndex = (currentPage - 1) * itemsPerPage;
+    // const currentArticles = articles.slice(
+    //     startIndex,
+    //     startIndex + itemsPerPage
+    // );
+
     // 🧠 Filter frontend — otomatis jalan tiap kali search/category/status berubah
     useEffect(() => {
         let result = allArticles;

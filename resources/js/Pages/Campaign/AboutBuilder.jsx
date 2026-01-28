@@ -16,13 +16,12 @@ import { toast } from "sonner";
 import { Toaster } from "@/Components/ui/sonner";
 import { router } from "@inertiajs/react";
 import Popup from "@/Components/Popup";
-import { Description } from "@radix-ui/react-dialog";
-
 
 export const AboutBuilder = ({campaign, contents, errorHandler}) => {
+    // responsible in saving blocks for about page
     const [description, setDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
-    const [oldDescription, setOldDescription] = useState(contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}])
-    const [isChanged, setIsChanged] = useState(false)
+    // old Description is used to make sure does changes happens or not
+    const oldDescription = contents.length > 0 ? contents : [{id: null, campaign_id: campaign.id, type: "paragraph", content: "Our Story~;" + campaign.description ,order_y: 1, isEditing:false}]
 
     useEffect(() => {
         if (contents.length > 0) {
@@ -36,11 +35,8 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
             behavior: "auto",
         });
         setDescription((prev) => {
-            const lastOrder =
-                prev.length > 0 ? prev[prev.length - 1].order_y : 0;
-
-            return [
-                ...prev,
+            const lastOrder = prev.length > 0 ? prev[prev.length - 1].order_y : 0;
+            return [...prev,
                 {
                     campaign_id: campaign.id,
                     type: "paragraph",
@@ -53,24 +49,14 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
     };
 
     const addMediaBlock = () => {
+        // on add, scroll to bottom of page
         window.scrollTo({
             top: document.body.scrollHeight,
             behavior: "instant",
         });
         setDescription((prev) => {
-            const lastOrder =
-                prev.length > 0 ? prev[prev.length - 1].order_y : 0;
-
-            return [
-                ...prev,
-                {
-                    campaign_id: campaign.id,
-                    type: "media",
-                    content: "",
-                    order_y: lastOrder + 1,
-                    isEditing: true,
-                },
-            ];
+            const lastOrder = prev.length > 0 ? prev[prev.length - 1].order_y : 0;
+            return [...prev,{ campaign_id: campaign.id, type: "media", content: "", order_y: lastOrder + 1, isEditing: true }];
         });
     };
 
@@ -102,11 +88,10 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
     const handleSave = () => {
         if (description.some((dat) => dat.content === "")) {
             toast.error("there are empty descriptions!", {
-                description:
-                    "please double check your description before submitting.",
+                description: "please double check your description before submitting.",
             });
         } else {
-            const prepared = description.map((block, index) => {
+            const prepared = description.map((block) => {
                 return {
                     id: block.id ?? null,
                     campaign_id: block.campaign_id,
@@ -115,7 +100,6 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                         block.type === "paragraph"
                             ? block.content
                             : block.content?.file,
-                    // file: block.type === "media" ? block.content?.file ?? null : null,
                     existing:
                         block.type === "media" &&
                         typeof block.content === "string"
@@ -144,18 +128,17 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                         onClick={addParagraphBlock}
                         className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                     >
-                        {" "}
-                        + Add Paragraph{" "}
+                        {"+ Add Paragraph"}
                     </Button>
                     <Button
                         onClick={addMediaBlock}
                         className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                     >
-                        {" "}
-                        + Add Media{" "}
+                        {"+ Add Media"}
                     </Button>
                 </div>
             </CardHeader>
+            {/*  */}
             {description && description.length > 0 ? (
                 <CardContent className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4 justify-center">
@@ -170,20 +153,15 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                                             <Input
                                                 className="w-[85%]"
                                                 defaultValue={
-                                                    block.content.split(
-                                                        "~;"
-                                                    )[0] ?? ""
+                                                    block.content.split("~;")[0] ?? ""
                                                 }
                                                 placeholder="Write your section title"
                                                 onChange={(e) => {
-                                                    const parts =
-                                                        block.content.split(
-                                                            "~;"
-                                                        );
+                                                    const parts =  block.content.split("~;");
                                                     parts[0] = e.target.value;
                                                     handleChange(
                                                         index,
-                                                        parts.join("~;")
+                                                        parts.join("~;"),
                                                     );
                                                 }}
                                             ></Input>
@@ -191,18 +169,18 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                                                 placeholder="Write a paragraph..."
                                                 defaultValue={
                                                     block.content.split(
-                                                        "~;"
+                                                        "~;",
                                                     )[1] ?? ""
                                                 }
                                                 onChange={(e) => {
                                                     const parts =
                                                         block.content.split(
-                                                            "~;"
+                                                            "~;",
                                                         );
                                                     parts[1] = e.target.value;
                                                     handleChange(
                                                         index,
-                                                        parts.join("~;")
+                                                        parts.join("~;"),
                                                     );
                                                 }}
                                                 className="resize-none min-h-[120px] dark:text-gray-100"
@@ -271,7 +249,7 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                                                         file: file,
                                                         preview:
                                                             URL.createObjectURL(
-                                                                file
+                                                                file,
                                                             ),
                                                     });
                                                 }
@@ -284,7 +262,6 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                                         <Button
                                             size="icon"
                                             className="dark:bg-red-600 dark:hover:bg-red-500 dark:text-white bg-red-200 hover:bg-red-300 text-red-700"
-                                            // className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 p-0"
                                         >
                                             <Trash2
                                                 className="w-30 h-3 p-0"
@@ -312,7 +289,7 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
             ) : (
                 <CardContent className="flex h-[100px] w-full justify-center items-center text-gray-300 dark:text-gray-500 italic">
                     <h3>
-                        Add explanation for your business before continuing!
+                        {"Add explanation for your business before continuing!"}
                     </h3>
                 </CardContent>
             )}
@@ -323,8 +300,7 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                         onClick={handleSave}
                         className="bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                     >
-                        {" "}
-                        Save Changes{" "}
+                        {"Save Changes"}
                     </Button>
                 </CardFooter>
             ) : (
