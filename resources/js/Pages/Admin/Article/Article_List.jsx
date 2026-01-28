@@ -17,14 +17,12 @@ import {
 export default function Article_List() {
     const { articles, categories } = usePage().props;
 
-    // 🔹 State untuk data dan filter
+    // States
     const [allArticles, setAllArticles] = useState(articles || []);
     const [filteredArticles, setFilteredArticles] = useState(articles || []);
     const [category, setCategory] = useState("");
     const [status, setStatus] = useState("");
     const [search, setSearch] = useState("");
-
-    // 🔹 State lain tetap sama
     const [selectedIds, setSelectedIds] = useState([]);
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
@@ -40,51 +38,43 @@ export default function Article_List() {
     //     startIndex + itemsPerPage
     // );
 
-    // 🧠 Filter frontend — otomatis jalan tiap kali search/category/status berubah
+    // Filtering logic
     useEffect(() => {
         let result = allArticles;
-
-        // 🔹 Filter awal (hanya approved + disabled)
         if (status === "") {
             result = result.filter(
                 (a) =>
                     a.status === "approved" ||
                     a.status === "disabled" ||
-                    a.status === "rejected"
+                    a.status === "rejected",
             );
-        }
-        // 🔹 Kalau klik tombol "Rejected"
-        else if (status === "rejected") {
+        } else if (status === "rejected") {
             result = result.filter((a) => a.status === "rejected");
-        }
-        // 🔹 Kalau filter lain (misalnya khusus "approved" aja)
-        else {
+        } else {
             result = result.filter((a) => a.status === status);
         }
 
-        // 🔹 Filter category
         if (category !== "") {
             result = result.filter((a) => a.category === category);
         }
 
-        // 🔹 Filter search
         if (search.trim() !== "") {
             result = result.filter((a) =>
-                a.title.toLowerCase().includes(search.toLowerCase())
+                a.title.toLowerCase().includes(search.toLowerCase()),
             );
         }
 
         setFilteredArticles(result);
     }, [allArticles, search, category, status]);
 
-    // 🔁 Reset filter
+    // Reset Handler
     const handleResetFilter = () => {
         setCategory("");
         setStatus("");
         setSearch("");
     };
 
-    // 🔧 Aksi server (bulk & toggle)
+    // Action Handlers
     const handleDisable = (id) =>
         router.post(
             `/admin/articles/${id}/disable`,
@@ -93,11 +83,11 @@ export default function Article_List() {
                 onSuccess: () => {
                     setAllArticles((prev) =>
                         prev.map((a) =>
-                            a.id === id ? { ...a, status: "disabled" } : a
-                        )
+                            a.id === id ? { ...a, status: "disabled" } : a,
+                        ),
                     );
                 },
-            }
+            },
         );
 
     const handleEnable = (id) =>
@@ -108,11 +98,11 @@ export default function Article_List() {
                 onSuccess: () => {
                     setAllArticles((prev) =>
                         prev.map((a) =>
-                            a.id === id ? { ...a, status: "approved" } : a
-                        )
+                            a.id === id ? { ...a, status: "approved" } : a,
+                        ),
                     );
                 },
-            }
+            },
         );
 
     const handleDelete = (id) =>
@@ -126,15 +116,15 @@ export default function Article_List() {
                     setSuccessPopupMessage("Article deleted");
                     setSuccessPopupOpen(true);
                 },
-            }
+            },
         );
     const handleView = (id) =>
         router.get(`/admin/articles/${id}/view?from=list`);
 
-    // 🧩 Bulk logic
+    // Bulk Action Handlers
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
         );
     };
     const handleSelectAll = (checked) => {
@@ -150,14 +140,14 @@ export default function Article_List() {
         router.post(
             "/admin/articles/bulk-approve",
             { ids: selectedIds },
-            { preserveState: true, onSuccess: () => setSelectedIds([]) }
+            { preserveState: true, onSuccess: () => setSelectedIds([]) },
         );
     const handleBulkDisable = () =>
         selectedIds.length &&
         router.post(
             "/admin/articles/bulk-disable",
             { ids: selectedIds },
-            { preserveState: true, onSuccess: () => setSelectedIds([]) }
+            { preserveState: true, onSuccess: () => setSelectedIds([]) },
         );
     const handleBulkDelete = () =>
         selectedIds.length &&
@@ -172,10 +162,9 @@ export default function Article_List() {
                     setSuccessPopupOpen(true);
                     router.reload();
                 },
-            }
+            },
         );
 
-    // Auto close popup
     useEffect(() => {
         if (!successPopupOpen) return;
         const t = setTimeout(() => setSuccessPopupOpen(false), 3500);
@@ -196,9 +185,9 @@ export default function Article_List() {
             />
 
             <div className="p-6 space-y-6">
-                {/* 🔎 Filter & Bulk Section */}
+                {/* Filters  */}
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
-                    {/* Row 1: Search & Filter */}
+                    {/* Search and Category Paramater */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                             <Input
@@ -228,7 +217,7 @@ export default function Article_List() {
                             </Button>
                         </div>
 
-                        {/* Status filter buttons */}
+                        {/* Status Parameter */}
                         <div className="flex items-center gap-2">
                             <Button
                                 className={`${
@@ -273,13 +262,12 @@ export default function Article_List() {
                         </div>
                     </div>
 
-                    {/* Row 2: Bulk actions */}
+                    {/* Bulk Actions */}
                     <div className="flex flex-wrap justify-end items-center gap-2 border-t dark:border-gray-700 pt-3">
                         <div className="text-sm mr-auto dark:text-gray-200">
                             {selectedIds.length} selected
                         </div>
 
-                        {/* 🔹 Tampilkan tombol Enable/Disable hanya kalau bukan status rejected */}
                         {status !== "rejected" && (
                             <>
                                 <Popup
@@ -316,7 +304,6 @@ export default function Article_List() {
                             </>
                         )}
 
-                        {/* 🔸 Tombol Delete selalu muncul */}
                         <Popup
                             triggerText={
                                 <div className="flex items-center gap-2 cursor-pointer">
@@ -335,7 +322,7 @@ export default function Article_List() {
                     </div>
                 </div>
 
-                {/* 🗂️ Articles Table */}
+                {/* Article List Table */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
                     <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
                         <thead className="bg-gray-100 dark:bg-gray-700">
@@ -384,7 +371,7 @@ export default function Article_List() {
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
-                                                    a.id
+                                                    a.id,
                                                 )}
                                                 onChange={() =>
                                                     handleToggle(a.id)

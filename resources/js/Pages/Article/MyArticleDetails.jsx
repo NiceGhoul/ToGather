@@ -7,17 +7,16 @@ import { Heart, ArrowLeft } from "lucide-react";
 export default function MyArticleDetails() {
     const { article } = usePage().props;
 
-    // ---------- MODAL ----------
+    // Modal State
     const [showModal, setShowModal] = useState(false);
     const [modalImage, setModalImage] = useState(null);
 
-    // ---------- SORTED CONTENT ----------
+    // Sort Contents
     const sortedContents = [...(article.contents || [])].sort((a, b) => {
         if (a.order_y === b.order_y) return a.order_x - b.order_x;
         return a.order_y - b.order_y;
     });
 
-    // ---------- STATUS COLOR ----------
     const statusColor =
         {
             approved:
@@ -34,7 +33,7 @@ export default function MyArticleDetails() {
     return (
         <Layout_User>
             <div className="w-full flex flex-col items-center py-10">
-                {/* HEADER */}
+                {/* Header */}
                 <div className="w-full max-w-4xl flex items-center justify-between mb-6">
                     <Button
                         variant="secondary"
@@ -55,7 +54,7 @@ export default function MyArticleDetails() {
                     </Button>
                 </div>
 
-                {/* STATUS BADGE */}
+                {/* Status */}
                 <div className="w-full max-w-4xl mb-4">
                     <div
                         className={`inline-block px-4 py-2 rounded-md border font-medium capitalize ${statusColor}`}
@@ -64,7 +63,7 @@ export default function MyArticleDetails() {
                     </div>
                 </div>
 
-                {/* REJECTION MESSAGE */}
+                {/* Rejected Message */}
                 {article.status === "rejected" && article.rejected_reason && (
                     <div className="w-full max-w-4xl mb-6">
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md">
@@ -76,7 +75,7 @@ export default function MyArticleDetails() {
                     </div>
                 )}
 
-                {/* THUMBNAIL */}
+                {/* Thumbnail */}
                 {article.thumbnail_url && (
                     <div className="flex justify-center mb-8 w-full">
                         <div className="w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-sm">
@@ -89,7 +88,7 @@ export default function MyArticleDetails() {
                     </div>
                 )}
 
-                {/* TITLE & AUTHOR */}
+                {/* Title & Author */}
                 <div className="w-full max-w-4xl text-left mb-4">
                     <h1 className="text-3xl font-bold dark:text-white">
                         {article.title}
@@ -103,15 +102,15 @@ export default function MyArticleDetails() {
                     </p>
                 </div>
 
-                {/* CONTENT */}
+                {/* Content */}
                 <div className="w-full max-w-4xl">
                     {sortedContents.length > 0 ? (
                         (() => {
                             const maxX = Math.max(
-                                ...sortedContents.map((b) => b.order_x)
+                                ...sortedContents.map((b) => b.order_x),
                             );
                             const maxY = Math.max(
-                                ...sortedContents.map((b) => b.order_y)
+                                ...sortedContents.map((b) => b.order_y),
                             );
                             const cells = [];
 
@@ -119,7 +118,7 @@ export default function MyArticleDetails() {
                                 for (let x = 1; x <= maxX; x++) {
                                     const block = sortedContents.find(
                                         (b) =>
-                                            b.order_x === x && b.order_y === y
+                                            b.order_x === x && b.order_y === y,
                                     );
                                     cells.push({ x, y, block });
                                 }
@@ -171,10 +170,10 @@ export default function MyArticleDetails() {
                                                                 className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform duration-200 cursor-pointer"
                                                                 onClick={() => {
                                                                     setModalImage(
-                                                                        block.image_url
+                                                                        block.image_url,
                                                                     );
                                                                     setShowModal(
-                                                                        true
+                                                                        true,
                                                                     );
                                                                 }}
                                                             />
@@ -197,7 +196,7 @@ export default function MyArticleDetails() {
                 </div>
             </div>
 
-            {/* IMAGE MODAL VIEWER */}
+            {/* Image Modal Viewer */}
             {showModal && modalImage && (
                 <div
                     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
