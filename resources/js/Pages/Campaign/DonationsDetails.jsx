@@ -36,7 +36,6 @@ export const DonationsDetails = ({ donations }) => {
     };
 
     return donations.length > 0 ? (
-        // <div className="flex flex-wrap items-center justify-center gap-4 overflow-hidden my-10 h-[530px] min-w-[100%]">
         <div className="grid grid-cols-3 gap-4 my-10 min-w-full">
             {paginatedDonations.map((d) => (
                 <div
@@ -56,7 +55,10 @@ export const DonationsDetails = ({ donations }) => {
                         </Avatar>
                         <div className="flex flex-col">
                             <span className="text-md">
-                                {d.anonymous === 0 ? d.user.nickname : "anonymous"} Donated
+                                {d.anonymous === 0
+                                    ? d.user.nickname
+                                    : "anonymous"}{" "}
+                                Donated
                             </span>
                             <span className="font-bold text-lg">
                                 {parseInt(d.amount).toLocaleString("id-ID", {
@@ -68,7 +70,7 @@ export const DonationsDetails = ({ donations }) => {
                         </div>
                     </div>
 
-                    {/* Expandable Content */}
+                    {/* show message */}
                     {openId === d.id && (
                         <div className="mt-3 bg-[#723f89] rounded-xl p-3">
                             {d.message || "no message"}
@@ -106,12 +108,11 @@ export const DonationsDetails = ({ donations }) => {
                     </EmptyMedia>
                     <EmptyTitle>This is the donation page</EmptyTitle>
                     <EmptyDescription>
-                        Every donation this campaign obtained will be displayed
+                        Every donation this campaign has obtained will be displayed
                         here! You can see the donations amount, as well as the
-                        message left by donators!
+                        messages left by donators!
                     </EmptyDescription>
                 </EmptyHeader>
-                <EmptyContent>{/* <Button>Add data</Button> */}</EmptyContent>
             </Empty>
         </div>
     );

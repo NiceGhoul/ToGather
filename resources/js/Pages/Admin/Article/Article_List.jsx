@@ -12,6 +12,8 @@ import {
     RotateCcw,
     File,
     EyeClosed,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 
 export default function Article_List() {
@@ -26,6 +28,19 @@ export default function Article_List() {
     const [selectedIds, setSelectedIds] = useState([]);
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
+
+    // ===== Pagination =====
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const [totalPages, setTotalPages] = useState(Math.ceil(allArticles.length / itemsPerPage));
+    const startIndex = (currentPage - 1) * itemsPerPage;
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            setSelectedIds([]);
+        }
+    };
 
     // Filtering logic
     useEffect(() => {
@@ -53,8 +68,10 @@ export default function Article_List() {
             );
         }
 
-        setFilteredArticles(result);
-    }, [allArticles, search, category, status]);
+        setTotalPages(Math.ceil(result.length / itemsPerPage) || 1);
+        setFilteredArticles(result.slice(startIndex, startIndex + itemsPerPage));
+
+    }, [allArticles, search, category, status, currentPage]);
 
     // Reset Handler
     const handleResetFilter = () => {
@@ -75,6 +92,8 @@ export default function Article_List() {
                             a.id === id ? { ...a, status: "disabled" } : a,
                         ),
                     );
+                    setSuccessPopupMessage("Article Disabled!");
+                    setSuccessPopupOpen(true);
                 },
             },
         );
@@ -85,11 +104,9 @@ export default function Article_List() {
             {},
             {
                 onSuccess: () => {
-                    setAllArticles((prev) =>
-                        prev.map((a) =>
-                            a.id === id ? { ...a, status: "approved" } : a,
-                        ),
-                    );
+                    setAllArticles((prev) => prev.map((a) => a.id === id ? { ...a, status: "approved" } : a));
+                    setSuccessPopupMessage("Article Enabled!");
+                    setSuccessPopupOpen(true);
                 },
             },
         );
@@ -129,14 +146,28 @@ export default function Article_List() {
         router.post(
             "/admin/articles/bulk-approve",
             { ids: selectedIds },
-            { preserveState: true, onSuccess: () => setSelectedIds([]) },
+            {
+                preserveState: true,
+                onSuccess: () => {
+                    setSelectedIds([]);
+                    setSuccessPopupMessage("Selected Articles Approved");
+                    setSuccessPopupOpen(true);
+                },
+            },
         );
     const handleBulkDisable = () =>
         selectedIds.length &&
         router.post(
             "/admin/articles/bulk-disable",
             { ids: selectedIds },
-            { preserveState: true, onSuccess: () => setSelectedIds([]) },
+            {
+                preserveState: true,
+                onSuccess: () => {
+                    setSelectedIds([]);
+                    setSuccessPopupMessage("Selected Articles Disabled");
+                    setSuccessPopupOpen(true);
+                },
+            },
         );
     const handleBulkDelete = () =>
         selectedIds.length &&
@@ -147,12 +178,17 @@ export default function Article_List() {
                 preserveState: true,
                 onSuccess: () => {
                     setSelectedIds([]);
-                    setSuccessPopupMessage("Selected articles deleted");
+                    setSuccessPopupMessage("Selected Articles deleted");
                     setSuccessPopupOpen(true);
                     router.reload();
                 },
             },
         );
+    
+    const handleSuccessClose = () => {
+        setSuccessPopupOpen(false);
+        router.reload();
+    };
 
     useEffect(() => {
         if (!successPopupOpen) return;
@@ -448,6 +484,47 @@ export default function Article_List() {
                             )}
                         </tbody>
                     </table>
+                    <div className="flex items-center justify-between mt-4">
+                        <div className="text-sm text-gray-500">
+                            Page {currentPage} of {totalPages || 1}
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === 1}
+                                onClick={() =>
+                                    handlePageChange(currentPage - 1)
+                                }
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+                            </Button>
+                            {[...Array(totalPages)].map((_, i) => (
+                                <Button
+                                    key={i}
+                                    onClick={() => handlePageChange(i + 1)}
+                                    className={`
+                                        ${
+                                            currentPage === i + 1
+                                                ? "bg-purple-800 text-white hover:bg-purple-800"
+                                                : "bg-purple-300 text-purple-900 hover:bg-purple-800 hover:text-white"
+                                        }
+                                        font-medium transition-colors duration-200
+                                    `}
+                                >
+                                    {i + 1}
+                                </Button>
+                            ))}
+                            <Button
+                                variant="outline"
+                                disabled={currentPage === totalPages}
+                                onClick={() =>
+                                    handlePageChange(currentPage + 1)
+                                }
+                            >
+                                Next <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </Layout_Admin>

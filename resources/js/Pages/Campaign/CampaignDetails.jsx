@@ -23,8 +23,7 @@ const scrollDonations = (data, idx) => {
     return (
         <Card
             key={idx}
-            className="w-[300px] h-[100px] flex flex-row items-center justify-betweendark:bg-gray-800 dark:border-gray-800"
-        >
+            className="w-[300px] h-[100px] flex flex-row items-center justify-between dark:bg-gray-800 dark:border-gray-800">
             <div className="overflow-hidden flex items-center justify-center shrink-0 ml-4">
                 <Avatar className="w-14 h-14 border-2 dark:bg-white">
                     <AvatarImage src={data.user ?? data?.user?.images[0].url} />
@@ -164,14 +163,10 @@ export default function Create() {
                 </h1>
                 <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
                 <div className="flex flex-col gap-2 my-4">
-                    <div className="w-full overflow-hidden p-2">
+                    <div className="w-full auto-scroll-wrapper p-2">
                         <div className={donations.length > 4 ? "auto-scroll-horizontal" : "flex flex-row gap-4 justify-center items-center"}>
                             {donations.length > 0 ? (
-                                donations
-                                    .slice(0, 10)
-                                    .map((donation, idx) =>
-                                        scrollDonations(donation, idx)
-                                    )
+                                [...donations.slice(0, 10), ...donations.slice(0, 10)].map((donation, idx) => (scrollDonations(donation, idx)))
                             ) : (
                                 <p key={0} className="text-lg text-center">
                                     No Donations, yet...

@@ -52,16 +52,12 @@ export const FaqDetails = ({ contents }) => {
                                     collapsible
                                     className="w-full "
                                     onValueChange={() => {
-                                        userQuestions.findIndex(
-                                            (q) =>
-                                                `item-${q.id - 1}` === openItem
-                                        );
+                                        userQuestions.findIndex((q) => `item-${q.id - 1}` === openItem);
                                     }}
                                 >
                                     <AccordionItem
                                         key={dat.id}
-                                        value={`item-${idx}`}
-                                    >
+                                        value={`item-${idx}`}>
                                         <AccordionTrigger className="flex justify-between items-center">
                                             <span className="text-xl font-semibold">
                                                 {dat.question}
@@ -82,10 +78,7 @@ export const FaqDetails = ({ contents }) => {
             </div>
             <div className="flex flex-col">
                 <p>
-                    Have any questions? Send them{" "}
-                    <a href="/profile" className="text-purple-500 underline">
-                        Here!
-                    </a>
+                    {"Have any questions? Send them"} <a href="/profile" className="text-purple-500 underline"> Here! </a>
                 </p>
             </div>
         </div>

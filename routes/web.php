@@ -77,7 +77,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/articles/likedArticles', [ArticleController::class, 'showLiked'])->name('articles.liked');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
-    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
+    Route::get('/articles/view/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
     Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
@@ -147,6 +147,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/campaigns/view/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaign.adminView');
     Route::post('/campaigns/delete/{id}', [CampaignController::class, 'AdminDelete'])->name('campaign.adminDelete');
     Route::post('/campaigns/changeStatus/{id}', [CampaignController::class, 'AdminChangeStatus'])->name('campaign.adminChangeStatus');
+    Route::post('/campaigns/bulkEnable', [CampaignController::class, 'AdminBulkEnable'])->name('campaign.bulkEnable');
+    Route::post('/campaigns/bulkDisable', [CampaignController::class, 'AdminBulkDisable'])->name('campaign.bulkDisable');
+    Route::post('/campaigns/bulkDelete', [CampaignController::class, 'AdminBulkDelete'])->name('campaign.bulkDelete');
+    Route::post('/campaigns/bulkUnban', [CampaignController::class, 'AdminBulkUnban'])->name('campaign.bulkUnban');
 
     Route::get('/articles/list', [ArticleController::class, 'adminIndex'])->name('articles.index');
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');
