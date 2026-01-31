@@ -151,6 +151,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/campaigns/bulkDisable', [CampaignController::class, 'AdminBulkDisable'])->name('campaign.bulkDisable');
     Route::post('/campaigns/bulkDelete', [CampaignController::class, 'AdminBulkDelete'])->name('campaign.bulkDelete');
     Route::post('/campaigns/bulkUnban', [CampaignController::class, 'AdminBulkUnban'])->name('campaign.bulkUnban');
+    Route::post('campaigns/bulkAccept', [CampaignController::class, 'AdminBulkAcceptVerification'])->name('campaign.bulkAcceptVerification');
+    Route::post('campaigns/bulkReject', [CampaignController::class, 'AdminBulkRejectVerification'])->name('campaign.bulkRejectVerification');
 
     Route::get('/articles/list', [ArticleController::class, 'adminIndex'])->name('articles.index');
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');

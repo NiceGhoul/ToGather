@@ -21,6 +21,7 @@ use App\Http\Controllers\NotificationController;
 use App\Models\CampaignContent;
 use App\Models\Image;
 use App\Models\video;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 use function PHPUnit\Framework\isEmpty;
@@ -80,7 +81,6 @@ class CampaignController extends Controller
         );
 
         return redirect()->route('admin.campaign.adminIndex')->with('success', 'Campaign deleted!');
-
     }
 
 
@@ -89,14 +89,12 @@ class CampaignController extends Controller
         $campaign = Campaign::findOrFail($id);
         $campaign->update(['status' => $request->status]);
         if ($campaign->status === "pending" && $request->status === "active") {
-            if (empty($campaign->start_campaign) && empty($campaign->end_campaign)) {
-                $start = now();
-                $end = now()->addDays((int) $campaign->duration);
+             if (empty($campaign->end_campaign)) {
+                $end = $campaign->start_campaign->addDays((int) $campaign->duration);
                 $campaign->update([
-                    'start_campaign' => $start,
                     'end_campaign' => $end,
                 ]);
-                // Notify user about article approval
+                // Notify user about campaign approval
                 NotificationController::notifyUser(
                     $campaign->user_id,
                     "campaign_{$request->status}",
@@ -108,6 +106,7 @@ class CampaignController extends Controller
                 return redirect()->route('admin.campaign.verification')->with('success', `Campaign status changed to '{$request->status}' !`);
             }
         } else {
+            // Notify user about campaign status update
             NotificationController::notifyUser(
                 $campaign->user_id,
                 "campaign_{$request->status}",
@@ -206,7 +205,7 @@ class CampaignController extends Controller
 
     public function getCampaignDetails($id)
     {
-        
+
         $user = auth()->user();
 
         if (!$user) {
@@ -276,7 +275,6 @@ class CampaignController extends Controller
                 ->firstOrFail();
 
             $campaign->update($data);
-
         } else {
 
             $campaign = Campaign::create(array_merge($data, [
@@ -284,6 +282,13 @@ class CampaignController extends Controller
                 'status' => 'draft',
             ]));
 
+            NotificationController::notifyUser(
+                auth()->id(),
+                'campaign_created',
+                'New Campaign Submitted',
+                "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",
+                ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
+            );
         }
 
         if ($request->has('location')) {
@@ -298,13 +303,7 @@ class CampaignController extends Controller
                 ])
             );
         }
-        NotificationController::notifyUser(
-            auth()->id(),
-            'campaign_created',
-            'New Campaign Submitted',
-            "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",
-            ['campaign_id' => $campaign->id, 'user_id' => $campaign->user_id]
-        );
+
 
         return redirect()->route('campaigns.createPreview', $campaign->id);
     }
@@ -435,10 +434,8 @@ class CampaignController extends Controller
             $campaigns = Campaign::with('images')->where('status', ['completed'])->get();
         } else if ($category === 'All') {
             $campaigns = Campaign::with('images')->whereIn('status', ['active', 'completed'])->get();
-
         } else {
             $campaigns = Campaign::with('images')->where('category', $category)->whereIn('status', ['active', 'completed'])->get();
-
         }
 
         return inertia::render('Campaign/CampaignList', [
@@ -519,7 +516,6 @@ class CampaignController extends Controller
         );
 
         return inertia::render('Campaign/CampaignPending');
-
     }
 
     public function deleteCampaignData($id)
@@ -726,5 +722,43 @@ class CampaignController extends Controller
         Campaign::whereIn('id', $ids)->update(['status' => 'inactive']);
 
         return redirect()->route('admin.campaign.adminIndex')->with('success', 'Selected campaigns have been unbaned!');
+    }
+
+
+    public function AdminBulkAcceptVerification(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        Campaign::whereIn('id', $ids)->update(['status' => 'active']);
+
+        foreach ($ids as $id) {
+            $campaign = Campaign::findOrFail($id);
+            $campaign->status = 'active';
+            if (empty($campaign->end_campaign)) {
+                // $end = $campaign->start_campaign->copy()->addDays((int) $campaign->duration);
+                // $campaign->update([
+                //     'end_campaign' => $end,
+                // ]);
+                $campaign->end_campaign = Carbon::parse($campaign->start_campaign)->copy()->addDays((int) $campaign->duration);
+                $campaign->save();
+
+                // Notify user about campaign approval
+                NotificationController::notifyUser(
+                    $campaign->user_id,
+                    "campaign_Active",
+                    'campaign Approved',
+                    "Your Campaign '{$campaign->title}' status is now: Active!",
+                    ['campaign_id' => $campaign->id]
+                );
+            }
+        }
+        return redirect()->route('admin.campaign.verification')->with('success', 'Selected campaigns have been accepted!');
+    }
+
+    public function AdminBulkRejectVerification(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        Campaign::whereIn('id', $ids)->update(['status' => 'rejected']);
+
+        return redirect()->route('admin.campaign.verification')->with('success', 'Selected campaigns have been rejected!');
     }
 }
