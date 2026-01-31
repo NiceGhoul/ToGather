@@ -33,10 +33,10 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
     }, [contents]);
 
     const addParagraphBlock = () => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "auto",
-        });
+        // window.scrollTo({
+        //     top: document.body.scrollHeight,
+        //     behavior: "auto",
+        // });
         setDescription((prev) => {
             const lastOrder = prev.length > 0 ? prev[prev.length - 1].order_y : 0;
             return [...prev,
@@ -53,10 +53,10 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
 
     const addMediaBlock = () => {
         // on add, scroll to bottom of page
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "instant",
-        });
+        // window.scrollTo({
+        //     top: document.body.scrollHeight,
+        //     behavior: "instant",
+        // });
         setDescription((prev) => {
             const lastOrder = prev.length > 0 ? prev[prev.length - 1].order_y : 0;
             return [...prev,{ campaign_id: campaign.id, type: "media", content: "", order_y: lastOrder + 1, isEditing: true }];
@@ -146,7 +146,7 @@ export const AboutBuilder = ({campaign, contents, errorHandler}) => {
                 triggerClass=""
             />
 
-            <div className="relative grid grid-cols-[1fr_auto] gap-6">
+            <div className="relative grid grid-cols-[180px_1fr] gap-6">
                 <div className="sticky top-1/8 translate-y-1/2 h-fit self-start
              rounded-xl border border-purple-200 dark:border-purple-700
              bg-white/90 dark:bg-gray-900/90

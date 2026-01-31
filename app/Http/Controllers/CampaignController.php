@@ -170,7 +170,6 @@ class CampaignController extends Controller
                     'location' => $location,
                 ]);
             } else {
-
                 return inertia::render('Campaign/Create', [
                     'user_Id' => Auth::user()->id,
                 ]);
@@ -285,8 +284,6 @@ class CampaignController extends Controller
                 'status' => 'draft',
             ]));
 
-            // Notify admins about new campaign
-           
         }
 
         if ($request->has('location')) {
@@ -302,6 +299,7 @@ class CampaignController extends Controller
             );
         }
         NotificationController::notifyUser(
+            $campaign->user_id,
             'campaign_created',
             'New Campaign Submitted',
             "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",

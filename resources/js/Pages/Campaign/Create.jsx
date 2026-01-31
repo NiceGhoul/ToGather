@@ -63,41 +63,41 @@ const categories = [
 ];
 
 function create() {
-    const { campaign, location } = usePage().props;
+    const { user_Id, campaign, location } = usePage().props;
     const [campaignData, setCampaignData] = useState(emptyCampaign);
     const [openLocation, setOpenLocation] = useState(false);
     const [description, setDescription] = useState([]);
     const [openPop, setOpenPop] = useState(false);
 
-    const DatePicker = ({ open, date, setOpen, setDate }) => {
-        return (
-            <div className="flex flex-col w-full">
-                <Popover open={open} onOpenChange={setOpen} className="w-auto">
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant="outline"
-                            id={date}
-                            className="w-full justify-between font-normal"
-                        >
-                            {date ? date.toLocaleDateString() : "Select date"}
-                            <CalendarIcon className="h-3 w-3 opacity-50" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                        className="w-auto overflow-hidden p-0"
-                        align="bottom"
-                    >
-                        <Calendar
-                            mode="single"
-                            selected={date}
-                            captionLayout="dropdown"
-                            onSelect={setDate}
-                        />
-                    </PopoverContent>
-                </Popover>
-            </div>
-        );
-    };
+    // const DatePicker = ({ open, date, setOpen, setDate }) => {
+    //     return (
+    //         <div className="flex flex-col w-full">
+    //             <Popover open={open} onOpenChange={setOpen} className="w-auto">
+    //                 <PopoverTrigger asChild>
+    //                     <Button
+    //                         variant="outline"
+    //                         id={date}
+    //                         className="w-full justify-between font-normal"
+    //                     >
+    //                         {date ? date.toLocaleDateString() : "Select date"}
+    //                         <CalendarIcon className="h-3 w-3 opacity-50" />
+    //                     </Button>
+    //                 </PopoverTrigger>
+    //                 <PopoverContent
+    //                     className="w-auto overflow-hidden p-0"
+    //                     align="bottom"
+    //                 >
+    //                     <Calendar
+    //                         mode="single"
+    //                         selected={date}
+    //                         captionLayout="dropdown"
+    //                         onSelect={setDate}
+    //                     />
+    //                 </PopoverContent>
+    //             </Popover>
+    //         </div>
+    //     );
+    // };
 
     useEffect(() => {
         if (campaign) {
@@ -185,19 +185,22 @@ function create() {
 
     const handleSave = () => {
         const formattedData = {...campaignData,
-            start_campaign: campaignData.start_campaign
-                ? new Date(campaignData.start_campaign)
+            user_id: user_Id,
+            start_campaign: campaignData.start_campaign ? new Date(campaignData.start_campaign)
                       .toISOString()
                       .slice(0, 19)
                       .replace("T", " ")
-                : null,
-            end_campaign: campaignData.end_campaign
-                ? new Date(campaignData.end_campaign)
+                : new Date(Date.now())
+                      .toISOString()
+                      .slice(0, 19)
+                      .replace("T", " "),
+            end_campaign: campaignData.end_campaign ? new Date(campaignData.end_campaign)
                       .toISOString()
                       .slice(0, 19)
                       .replace("T", " ")
                 : null,
         };
+        // console.log(formattedData)
         router.post("/campaigns/newCampaign", formattedData);
     };
 
