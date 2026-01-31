@@ -12,15 +12,6 @@ import {
     ChevronRight,
     ChevronLeft,
 } from "lucide-react";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
-import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
-import { Tooltip } from "@/Components/ui/tooltip";
 
 export default function Campaign_Verification() {
     const { campaigns, filters, categories } = usePage().props;
@@ -35,7 +26,6 @@ export default function Campaign_Verification() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const [totalPages, setTotalPages] = useState(Math.ceil(campaigns.length / itemsPerPage));
-    let startIndex = (currentPage - 1) * itemsPerPage;
     const [filteredCampaign, setFilteredCampaigns] = useState(campaigns || []);
 
     const handlePageChange = (page) => {
@@ -48,6 +38,11 @@ export default function Campaign_Verification() {
     const handleResetFilter = () => {
         setCategory("");
         setSearch("");
+    };
+
+    const handleSuccessClose = () => {
+        setSuccessPopupOpen(false);
+        router.reload();
     };
 
     useEffect(() => {
@@ -66,7 +61,7 @@ export default function Campaign_Verification() {
                             .includes(search.toLowerCase())
                 ) || a.user.name.toLowerCase().includes(search.toLowerCase());
         }
-
+        setTotalPages(Math.ceil(result.length / itemsPerPage) || 1);
         setFilteredCampaigns(result);
     }, [campaigns, search, category]);
 
@@ -91,13 +86,48 @@ export default function Campaign_Verification() {
     const handleChangeStatus = (id, status) => {
         router.post(`/admin/campaigns/changeStatus/${id}`, { status });
     };
-
+    
     const handleBulkAccept = () => {
+        router.post(
+            `/admin/campaigns/bulkAccept`,
+            { ids: selectedIds },
+            {
+                onSuccess: () => {
+                    setSuccessPopupMessage("Selected Campaigns Accepted");
+                    setSuccessPopupOpen(true);
+                },
+            },
+        );
+        setSelectedIds([]);
+    };
 
-    }
+    const handleBulkReject = () => {
+            router.post(
+                `/admin/campaigns/bulkReject`,
+                { ids: selectedIds },
+                {
+                    onSuccess: () => {
+                        setSuccessPopupMessage("Selected Campaigns Rejected");
+                        setSuccessPopupOpen(true);
+                    },
+                },
+            );
+            setSelectedIds([]);
+        };
 
     return (
         <Layout_Admin title="Verify Campaigns">
+            <Popup
+                triggerText=""
+                title={successPopupMessage}
+                description=""
+                confirmText="OK"
+                confirmColor={"bg-purple-800 hover:bg-purple-700 text-white"}
+                open={successPopupOpen}
+                onConfirm={handleSuccessClose}
+                onClose={handleSuccessClose}
+                triggerClass=""
+            />
             <div className="p-6 space-y-6">
                 <div className="dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Search bar & filter by category */}
@@ -155,7 +185,7 @@ export default function Campaign_Verification() {
                             confirmColor="bg-green-600 hover:bg-green-700 text-white"
                             triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
                             disabledValue={selectedIds.length === 0}
-                            // onConfirm={handleBulkAccept}
+                            onConfirm={handleBulkAccept}
                         />
 
                         <Popup
@@ -171,7 +201,7 @@ export default function Campaign_Verification() {
                             confirmColor="bg-red-600 hover:bg-red-700 text-white"
                             triggerClass="bg-red-200 hover:bg-red-300 text-red-700"
                             disabledValue={selectedIds.length === 0}
-                            // onConfirm={handleBulkReject}
+                            onConfirm={handleBulkReject}
                         />
                     </div>
                 </div>
@@ -215,7 +245,7 @@ export default function Campaign_Verification() {
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
-                                                    a.id
+                                                    a.id,
                                                 )}
                                                 onChange={() =>
                                                     handleToggle(a.id)
@@ -233,7 +263,7 @@ export default function Campaign_Verification() {
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {new Date(
-                                                a.created_at
+                                                a.created_at,
                                             ).toLocaleString()}
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
@@ -241,7 +271,7 @@ export default function Campaign_Verification() {
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">
                                             {parseInt(
-                                                a.goal_amount
+                                                a.goal_amount,
                                             ).toLocaleString("id-ID", {
                                                 style: "currency",
                                                 currency: "IDR",
@@ -279,7 +309,7 @@ export default function Campaign_Verification() {
                                                     onConfirm={() =>
                                                         handleChangeStatus(
                                                             a.id,
-                                                            "active"
+                                                            "active",
                                                         )
                                                     }
                                                 />
@@ -295,7 +325,7 @@ export default function Campaign_Verification() {
                                                     onConfirm={() =>
                                                         handleChangeStatus(
                                                             a.id,
-                                                            "rejected"
+                                                            "rejected",
                                                         )
                                                     }
                                                 />

@@ -13,19 +13,27 @@ import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
 import { router } from "@inertiajs/react";
 import { Trash } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/Components/ui/sonner";
 
-export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
+export const UpdateBuilder = ({ campaign, contents }) => {
     const [editMode, setEditMode] = useState(false);
     const [openPopUp, setOpenPopUp] = useState(-1);
 
     // useState that saves what will be shown on the right side
     const [updates, setUpdates] = useState(contents);
-    // const [oldUpdates, setOldUpdates] = useState(contents);
-    const [selectedUpdate, setSelectedUpdate] = useState(updates[updates.length - 1]);
+    const [selectedUpdate, setSelectedUpdate] = useState(
+        updates[updates.length - 1],
+    );
     const fileInputRef = useRef(null);
+    const [successPopupOpen, setSuccessPopupOpen] = useState(false);
+    const [successPopupMessage, setSuccessPopupMessage] = useState("");
+
+    useEffect(() => {;
+        setUpdates(contents);
+        setSelectedUpdate(contents[contents.length - 1]);
+    }, [contents]);
 
     const handleAddUpdate = () => {
         const date = new Date();
@@ -100,13 +108,17 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
         setSelectedUpdate(updatesPreview);
         setEditMode(false);
 
-        if (insertHandler) {
-            insertHandler(updatedUpdate);
-        }
+            router.post(`/campaigns/insertUpdates`, updatedUpdate, {
+                onError: (errors) => uploadErrorHandler(errors),
+                onSuccess: () => {
+                    setSuccessPopupMessage("Update Saved!");
+                    setSuccessPopupOpen(true);
+                }
+            });
     };
 
+
     const handleMediaChange = (e) => {
-        console.log(e.target.files);
         const files = Array.from(e.target.files);
         const previews = files.map((file) => ({
             filetype: file.type.startsWith("image/") ? "image" : "video",
@@ -116,9 +128,18 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
         setFormData({ ...formData, media: previews });
     };
 
-    const handleUpdatesDelete = async (openPopUp) => {
-        if (contents.some((dat) => dat.id === openPopUp)) {
-            await router.post(`/campaigns/deleteContent/${openPopUp}`);
+    const handleUpdatesDelete = async (id) => {
+        if (contents.some((dat) => dat.id === id)) {
+            await router.post(
+                `/campaigns/deleteContent/${id}`,
+                { id },
+                {
+                    onSuccess: () => {
+                        setSuccessPopupMessage("Update Deleted!");
+                        setSuccessPopupOpen(true);
+                    },
+                },
+            );
             setUpdates(contents);
             setOpenPopUp(-1);
             return;
@@ -141,8 +162,25 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
             return filtered;
         });
     };
+
+    const handleSuccessClose = () => {
+        setSuccessPopupOpen(false);
+        router.reload();
+    };
+
     return (
         <>
+            <Popup
+                triggerText=""
+                title={successPopupMessage}
+                description=""
+                confirmText="OK"
+                confirmColor={"bg-purple-800 hover:bg-purple-700 text-white"}
+                open={successPopupOpen}
+                onConfirm={handleSuccessClose}
+                onClose={handleSuccessClose}
+                triggerClass=""
+            />
             <Label className="text-3xl justify-center items-center font-bold text-[#7C4789] dark:text-purple-400">
                 Project Updates
             </Label>
@@ -260,9 +298,13 @@ export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
                                             <Button
                                                 className="bg-red-300 hover:bg-red-400 text-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white"
                                                 onClick={() => {
-                                                    setFormData((dat) => ({...dat, media: []}));
+                                                    setFormData((dat) => ({
+                                                        ...dat,
+                                                        media: [],
+                                                    }));
                                                     if (fileInputRef.current) {
-                                                        fileInputRef.current.value = "";
+                                                        fileInputRef.current.value =
+                                                            "";
                                                     }
                                                 }}
                                             >

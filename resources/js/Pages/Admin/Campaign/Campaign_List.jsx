@@ -30,11 +30,13 @@ export default function Campaign_List() {
     const [status, setStatus] = useState("All");
     const [search, setSearch] = useState("");
     const [selectedIds, setSelectedIds] = useState([]);
-   
+
     // ===== Pagination =====
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-    const [totalPages, setTotalPages] = useState(Math.ceil(campaigns.length / itemsPerPage));
+    const [totalPages, setTotalPages] = useState(
+        Math.ceil(campaigns.length / itemsPerPage),
+    );
     let startIndex = (currentPage - 1) * itemsPerPage;
     const [filteredCampaign, setFilteredCampaigns] = useState(campaigns || []);
 
@@ -61,7 +63,7 @@ export default function Campaign_List() {
 
     useEffect(() => {
         let result = campaigns;
-        
+
         if (status != "All") {
             result = campaigns.filter((a) => a.status === status);
         }
@@ -71,19 +73,21 @@ export default function Campaign_List() {
         }
 
         if (search.trim() != "") {
-            result = campaigns.filter(
+            result =
+                campaigns.filter(
                     (a) =>
                         a.title.toLowerCase().includes(search.toLowerCase()) ||
-                        a.user.nickname.toLowerCase().includes(search.toLowerCase()),
+                        a.user.nickname
+                            .toLowerCase()
+                            .includes(search.toLowerCase()),
                 ) || a.user.name.toLowerCase().includes(search.toLowerCase());
         }
 
         setTotalPages(Math.ceil(result.length / itemsPerPage) || 1);
-        setFilteredCampaigns(result.slice(startIndex, startIndex + itemsPerPage));
-
+        setFilteredCampaigns(
+            result.slice(startIndex, startIndex + itemsPerPage),
+        );
     }, [campaigns, search, category, status, handleDelete]);
-
-   
 
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
@@ -93,7 +97,7 @@ export default function Campaign_List() {
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(campaigns.map((a) => a.id));
+            setSelectedIds(filteredCampaign.map((a) => a.id));
         } else {
             setSelectedIds([]);
         }
@@ -114,24 +118,66 @@ export default function Campaign_List() {
         }
     };
 
+    const handleSuccessClose = () => {
+        setSuccessPopupOpen(false);
+        router.reload();
+    };
+
     const handleBulkEnable = () => {
-        // console.log(selectedIds)
-        router.post(`/admin/campaigns/bulkEnable`, { ids: selectedIds });
+        router.post(
+            `/admin/campaigns/bulkEnable`,
+            { ids: selectedIds },
+            {
+                onSuccess: () => {
+                    setSuccessPopupMessage("Selected Campaigns Enabled");
+                    setSuccessPopupOpen(true);
+                },
+            },
+        );
         setSelectedIds([]);
     };
 
     const handleBulkDisable = () => {
-        router.post(`/admin/campaigns/bulkDisable`, { ids: selectedIds });
+        router.post(
+            `/admin/campaigns/bulkDisable`,
+            { ids: selectedIds },
+            {
+                onSuccess: () => {
+                    setSuccessPopupMessage("Selected Campaigns Disabled");
+                    setSuccessPopupOpen(true);
+                },
+            },
+        );
         setSelectedIds([]);
     };
 
     const handleBulkDelete = () => {
-        router.post(`/admin/campaigns/bulkDelete`, { ids: selectedIds });
+        router.post(
+            `/admin/campaigns/bulkDelete`,
+            { ids: selectedIds },
+            {
+                onSuccess: () => {
+                    setSuccessPopupMessage("Selected Campaigns Enabled");
+                    setSuccessPopupOpen(true);
+                },
+            },
+        );
         setSelectedIds([]);
     };
 
     return (
         <Layout_Admin title="Manage Campaigns">
+            <Popup
+                triggerText=""
+                title={successPopupMessage}
+                description=""
+                confirmText="OK"
+                confirmColor={"bg-purple-800 hover:bg-purple-700 text-white"}
+                open={successPopupOpen}
+                onConfirm={handleSuccessClose}
+                onClose={handleSuccessClose}
+                triggerClass=""
+            />
             <div className="p-6 space-y-6">
                 <div className="dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
                     {/* Search bar & filter by category */}
@@ -201,41 +247,40 @@ export default function Campaign_List() {
                         <div className="text-sm mr-auto">
                             {selectedIds.length} selected
                         </div>
-                        {(status === "active" || status === "inactive") && (
-                            <>
-                                <Popup
-                                    triggerText={
-                                        <div className="flex items-center gap-2 cursor-pointer">
-                                            <Eye className="w-4 h-4" />
-                                            <span>Enable Selected</span>
-                                        </div>
-                                    }
-                                    title="Enable Selected Campaigns?"
-                                    description="All selected campaigns will be enabled and shown publicly."
-                                    confirmText="Yes, Enable Selected"
-                                    confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                    triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
-                                    disabledValue={selectedIds.length === 0}
-                                    onConfirm={handleBulkEnable}
-                                />
-
-                                <Popup
-                                    triggerText={
-                                        <div className="flex items-center gap-2 cursor-pointer">
-                                            <EyeOff className="w-4 h-4" />
-                                            <span>Disable Selected</span>
-                                        </div>
-                                    }
-                                    title="Disable Selected Campaigns?"
-                                    description="All selected articles will be disabled and hidden from public."
-                                    confirmText="Yes, Disable Selected"
-                                    confirmColor="bg-yellow-600 hover:bg-yellow-700 text-white"
-                                    triggerClass="bg-yellow-200 hover:bg-yellow-300 text-yellow-700"
-                                    disabledValue={selectedIds.length === 0}
-                                    onConfirm={handleBulkDisable}
-                                />
-                            </>
-                        )}
+                        { (status === "inactive") && 
+                            <Popup
+                                triggerText={
+                                    <div className="flex items-center gap-2 cursor-pointer">
+                                        <Eye className="w-4 h-4" />
+                                        <span>Enable Selected</span>
+                                    </div>
+                                }
+                                title="Enable Selected Campaigns?"
+                                description="All selected campaigns will be enabled and shown publicly."
+                                confirmText="Yes, Enable Selected"
+                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                                triggerClass="bg-green-200 hover:bg-green-300 text-green-700"
+                                disabledValue={selectedIds.length === 0}
+                                onConfirm={handleBulkEnable}
+                            />
+                        }
+                        {(status === "active") && 
+                            <Popup
+                                triggerText={
+                                    <div className="flex items-center gap-2 cursor-pointer">
+                                        <EyeOff className="w-4 h-4" />
+                                        <span>Disable Selected</span>
+                                    </div>
+                                }
+                                title="Disable Selected Campaigns?"
+                                description="All selected articles will be disabled and hidden from public."
+                                confirmText="Yes, Disable Selected"
+                                confirmColor="bg-yellow-600 hover:bg-yellow-700 text-white"
+                                triggerClass="bg-yellow-200 hover:bg-yellow-300 text-yellow-700"
+                                disabledValue={selectedIds.length === 0}
+                                onConfirm={handleBulkDisable}
+                            />
+                        }
 
                         <Popup
                             triggerText={
@@ -295,7 +340,9 @@ export default function Campaign_List() {
                                                 checked={selectedIds.includes(
                                                     a.id,
                                                 )}
-                                                onChange={() => handleToggle(a.id) }
+                                                onChange={() =>
+                                                    handleToggle(a.id)
+                                                }
                                             />
                                         </td>
                                         <td className="border dark:border-gray-700 dark:text-gray-200 px-4 py-2">

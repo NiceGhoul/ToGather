@@ -23,7 +23,7 @@ import Layout_User from "@/Layouts/Layout_User";
 import { router, usePage } from "@inertiajs/react";
 import { IconFolderCode } from "@tabler/icons-react";
 import { Map } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
@@ -190,12 +190,6 @@ const CreateDetailsPreview = () => {
         }
     };
 
-    const handleInsertUpdates = (campaignContent) => {
-        router.post(`/campaigns/insertUpdates`, campaignContent,{
-            onError: (errors) => uploadErrorHandler(errors),
-        });
-    };
-
     const uploadErrorHandler = (errors) => {
         let fieldName = "";
         let errorMessage = "";
@@ -258,7 +252,6 @@ const CreateDetailsPreview = () => {
                         contents={contents.filter(
                             (dat) => dat.type === "updates"
                         )}
-                        insertHandler={handleInsertUpdates}
                     />
                 </div>
             );
@@ -315,13 +308,6 @@ const CreateDetailsPreview = () => {
     return (
         <Layout_User>
             <Card className="rounded-none border-0 border-gray-700">
-                {/* <Button
-                    className="bg-transparent text-purple-700 dark:text-purple-400 hover:bg-purple-100 text-xl"
-                    onClick={() => handleBack()}
-                >
-                    ← Back
-                </Button> */}
-
                 <CardHeader className="flex flex-row">
                     <div className="w-full justify-center items-center">
                         <CardTitle className="text-center text-3xl">

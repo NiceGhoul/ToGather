@@ -348,7 +348,7 @@ export default function MyCampaign({
                                 onSuccess: (page) => {
                                     setCampaignList(page.props.campaigns);
                                 },
-                            }
+                            },
                         );
                     }}
                     className="border rounded-md px-3 text-sm h-[38px] focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none dark:bg-black hover:ring-1 hover:ring-purple-700"
@@ -404,7 +404,7 @@ export default function MyCampaign({
                                         });
                                         setCampaignList(sorted);
                                     },
-                                }
+                                },
                             );
                         }}
                         className="hover:ring-1 ml-0.5 hover:ring-red-500 text-red-600 hover:bg-red-100 hover:text-red-800"
@@ -481,6 +481,7 @@ export default function MyCampaign({
                     )}
                 </CardContent>
             </div>
+
             <Popup
                 open={openPop === -1 ? false : true}
                 onClose={() => setOpenPop(-1)}
