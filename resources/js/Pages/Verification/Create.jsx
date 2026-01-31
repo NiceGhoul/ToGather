@@ -24,21 +24,18 @@ export default function Create() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setIsSubmitLoading(true)
-        console.log("Form data:", data);
 
         if (!data.id_photo || !data.selfie_with_id) {
-            console.log("Missing files");
+            setIsSubmitLoading(false);
             return;
         }
 
         post("/verification", {
             forceFormData: true,
             onSuccess: () => {
-                console.log("Form submitted successfully");
                 setIsSubmitLoading(false)
             },
-            onError: (errors) => {
-                console.log("Form errors:", errors);
+            onError: () => {
                 setIsSubmitLoading(false)
             },
         });
