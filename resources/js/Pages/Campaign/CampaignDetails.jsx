@@ -198,8 +198,8 @@ export default function Create() {
                             <p className="text-center">
                                 {campaign.locations
                                     ? campaign.locations.region +
-                                      ", " +
-                                      campaign.locations.country
+                                    ", " +
+                                    campaign.locations.country
                                     : campaign.address}
                             </p>
                         </div>
@@ -237,15 +237,15 @@ export default function Create() {
                             </h1>
                             {campaign.status != "completed" || campaign.end_campaign < Date.now() ?
                                 <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {Math.ceil(
-                                    (new Date(campaign.end_campaign) -
-                                    new Date()) /
-                                    (1000 * 60 * 60 * 24)
-                                ) + " Days left"}
-                            </h1> :
-                            <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {"Campaign " + campaign.status}
-                            </h1>
+                                    {Math.ceil(
+                                        (new Date(campaign.end_campaign) -
+                                            new Date()) /
+                                        (1000 * 60 * 60 * 24)
+                                    ) + " Days left"}
+                                </h1> :
+                                <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
+                                    {"Campaign " + campaign.status}
+                                </h1>
                             }
                         </div>
                         <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -284,7 +284,7 @@ export default function Create() {
                                 )}
                         </p>
                         <div className="flex flex-row items-center justify-between mt-5">
-                            <Toggle
+                            {user && user.role !== 'admin' &&(<Toggle
                                 pressed={like}
                                 onPressedChange={() => handleLikes(campaign.id)}
                                 size="lg"
@@ -296,12 +296,15 @@ export default function Create() {
                                     ? "Like This Campaign"
                                     : "Campaign Liked"}
                             </Toggle>
+                            )}
 
-                           {campaign.status != 'completed' && <Link href={`/donate?campaign_id=${campaign.id}`}>
-                                <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
-                                    Donate
-                                </Button>
-                            </Link>}
+                            {user && user.role !== 'admin' && campaign.status != 'completed' && (
+                                <Link href={`/donate?campaign_id=${campaign.id}`}>
+                                    <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
+                                        Donate
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>

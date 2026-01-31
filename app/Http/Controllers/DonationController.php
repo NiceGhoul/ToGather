@@ -52,6 +52,8 @@ class DonationController extends Controller
         ]);
         $campaign = Campaign::find($request->campaign_id);
         $user = auth()->user();
+        $campaign->collected_amount += $request->amount;
+        $campaign->save();
 
         // Midtrans transaction parameters
         $params = [
@@ -161,6 +163,7 @@ class DonationController extends Controller
             // Update campaign collected amount
             $campaign = $donation->campaign;
             $campaign->increment('collected_amount', $donation->amount);
+            
         } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'expire' || $transactionStatus == 'failure') {
             $donation->update(['status' => 'failed']);
         }

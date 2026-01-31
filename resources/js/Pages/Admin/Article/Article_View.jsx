@@ -168,7 +168,7 @@ export default function ArticleView() {
         const baseMaxX = Math.max(1, ...(xs.length ? xs : [1]));
         const baseMaxY = Math.max(1, ...(ys.length ? ys : [1]));
 
-        const computedMaxX = Math.min(2, baseMaxX + extraCols);
+        const computedMaxX = Math.min(2, baseMaxX);
         const computedMaxY = baseMaxY + extraRows;
 
         const cells = [];
@@ -182,7 +182,7 @@ export default function ArticleView() {
             }
         }
         return { maxX: computedMaxX, maxY: computedMaxY, gridCells: cells };
-    }, [blocks, extraCols, extraRows]);
+    }, [blocks, extraRows]);
 
     const addBlockAt = (order_x, order_y, type) => {
         if (order_x > 2) return;

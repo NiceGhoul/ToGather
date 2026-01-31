@@ -137,16 +137,12 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                     {campaign.status === "draft" && (
                         <div className="flex justify-end items-end my-5">
                             <Popup
-                                triggerText={
-                                    <Button className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl">
-                                        Finalize →
-                                    </Button>
-                                }
+                                triggerText="Finalize →"
                                 title="Finalize Campaign?"
                                 description="This campaign status will be set to 'pending' and will be reviewed by the admin. Are you sure you want to proceed?"
                                 confirmText="Yes, Approve"
                                 confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                triggerClass="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl"
+                                triggerClass="bg-green-400 text-black dark:text-white hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-600 text-xl"
                                 onConfirm={() => handleFinalize()}
                             />
                         </div>

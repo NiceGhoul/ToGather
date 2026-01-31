@@ -299,7 +299,7 @@ class CampaignController extends Controller
             );
         }
         NotificationController::notifyUser(
-            $campaign->user_id,
+            auth()->id(),
             'campaign_created',
             'New Campaign Submitted',
             "New campaign '{$campaign->title}' has been submitted by {$campaign->user->nickname} and a draft has been made.",
