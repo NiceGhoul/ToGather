@@ -232,8 +232,8 @@ export default function Create() {
                                 {donations.length.toString() +
                                     " " +
                                     (donations.length > 1
-                                        ? " Donators"
-                                        : " Donator")}
+                                        ? " Donations"
+                                        : " Donation")}
                             </h1>
                             {campaign.status != "completed" || campaign.end_campaign < Date.now() ?
                                 <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">

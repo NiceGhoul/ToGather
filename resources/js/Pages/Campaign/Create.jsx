@@ -200,7 +200,6 @@ function create() {
                       .replace("T", " ")
                 : null,
         };
-        // console.log(formattedData)
         router.post("/campaigns/newCampaign", formattedData);
     };
 

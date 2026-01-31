@@ -30,7 +30,7 @@ import { UpdateBuilder } from "./UpdatesBuilder";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
 
 export const UpperPreview = ({ campaign, user, images, donations }) => {
-
+    console.log(donations)
      const percentage = Math.round(
          (campaign.collected_amount / campaign.goal_amount) * 100
      );
@@ -90,8 +90,8 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                             {donations.length.toString() +
                                 " " +
                                 (donations.length > 1
-                                    ? " Donators"
-                                    : " Donator")}
+                                    ? " Donations"
+                                    : " Donation")}
                         </h1>
 
                         <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-purple-700">
@@ -99,7 +99,7 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                                 ? Math.ceil(
                                       (new Date(campaign.end_campaign) -
                                           new Date()) /
-                                          (1000 * 60 * 60 * 24)
+                                          (1000 * 60 * 60 * 24),
                                   ) + " Days left"
                                 : "- Days left"}
                         </h1>
@@ -114,7 +114,7 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                         }
                     />
                     <span className="absolute inset-0 flex items-start justify-center text-md font-medium text-gray-200 dark:text-white">
-                       {percentage}%
+                        {percentage}%
                     </span>
                 </div>
                 <p className="text-lg font-normal flex justify-end mt-2">
@@ -124,7 +124,7 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                             style: "currency",
                             currency: "IDR",
                             minimumFractionDigits: 2,
-                        }
+                        },
                     ) +
                         " / " +
                         parseInt(campaign.goal_amount).toLocaleString("id-ID", {
@@ -134,19 +134,19 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                         })}
                 </p>
 
-                    {campaign.status === "draft" && (
-                        <div className="flex justify-end items-end my-5">
-                            <Popup
-                                triggerText="Finalize →"
-                                title="Finalize Campaign?"
-                                description="This campaign status will be set to 'pending' and will be reviewed by the admin. Are you sure you want to proceed?"
-                                confirmText="Yes, Approve"
-                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                triggerClass="bg-green-400 text-black dark:text-white hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-600 text-xl"
-                                onConfirm={() => handleFinalize()}
-                            />
-                        </div>
-                    )}
+                {campaign.status === "draft" && (
+                    <div className="flex justify-end items-end my-5">
+                        <Popup
+                            triggerText="Finalize →"
+                            title="Finalize Campaign?"
+                            description="This campaign status will be set to 'pending' and will be reviewed by the admin. Are you sure you want to proceed?"
+                            confirmText="Yes, Approve"
+                            confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                            triggerClass="bg-green-400 text-black dark:text-white hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-600 text-xl"
+                            onConfirm={() => handleFinalize()}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

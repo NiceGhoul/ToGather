@@ -26,10 +26,6 @@ use Illuminate\Support\Facades\Storage;
 
 use function PHPUnit\Framework\isEmpty;
 
-/*Bakal tambah 1 table untuk yg campaign sma verification request yaitu rejection reason
- tapi harus buat create untuk campaign dlu bru lanjut buat yang it */
-
-
 class CampaignController extends Controller
 {
     /**
@@ -87,11 +83,12 @@ class CampaignController extends Controller
     public function AdminChangeStatus(Request $request, $id)
     {
         $campaign = Campaign::findOrFail($id);
-        $campaign->update(['status' => $request->status]);
-        if ($campaign->status === "pending" && $request->status === "active") {
-             if (empty($campaign->end_campaign)) {
-                $end = $campaign->start_campaign->addDays((int) $campaign->duration);
+        if ($campaign->status->value == "pending" && $request->status == "active") {
+             if (is_null($campaign->end_campaign)) {
+
+                $end = Carbon::parse($campaign->start_campaign)->copy()->addDays((int) $campaign->duration);
                 $campaign->update([
+                    'status' => $request->status,
                     'end_campaign' => $end,
                 ]);
                 // Notify user about campaign approval
@@ -103,9 +100,10 @@ class CampaignController extends Controller
                     ['campaign_id' => $campaign->id]
                 );
 
-                return redirect()->route('admin.campaign.verification')->with('success', `Campaign status changed to '{$request->status}' !`);
+                return redirect()->route('admin.campaign.verification')->with('success', "Campaign status changed to '{$request->status}' !");
             }
         } else {
+            $campaign->update(['status' => $request->status]);
             // Notify user about campaign status update
             NotificationController::notifyUser(
                 $campaign->user_id,
