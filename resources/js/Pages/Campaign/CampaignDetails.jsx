@@ -62,7 +62,7 @@ const contentDivider = (data, campaign, contents, donation) => {
                     campaign={campaign}
                     contents={contents.filter(
                         (dat) =>
-                            dat.type === "paragraph" || dat.type === "media"
+                            dat.type === "paragraph" || dat.type === "media",
                     )}
                 />
             </div>
@@ -110,9 +110,8 @@ export default function Create() {
     const [images, setImages] = useState({ thumbnail: null, logo: null });
     const [like, setLike] = useState(liked);
     const scrollRef = useRef(null);
-
     const percentage = Math.round(
-        (campaign.collected_amount / campaign.goal_amount) * 100
+        (campaign.collected_amount / campaign.goal_amount) * 100,
     );
     const from = new URL(window.location.href).searchParams.get("from");
 
@@ -165,12 +164,18 @@ export default function Create() {
                 <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
                 <div className="flex flex-col gap-2 my-4">
                     <div className="w-full overflow-hidden p-2">
-                        <div className={donations.length > 4 ? "auto-scroll-horizontal" : "flex flex-row gap-4"}>
+                        <div
+                            className={
+                                donations.length > 4
+                                    ? "auto-scroll-horizontal"
+                                    : "flex flex-row gap-4"
+                            }
+                        >
                             {donations.length > 0 ? (
                                 donations
                                     .slice(0, 10)
                                     .map((donation, idx) =>
-                                        scrollDonations(donation, idx)
+                                        scrollDonations(donation, idx),
                                     )
                             ) : (
                                 <p key={0} className="text-lg text-center">
@@ -240,18 +245,19 @@ export default function Create() {
                                         ? " Donators"
                                         : " Donator")}
                             </h1>
-                            {campaign.status != "completed" ?
+                            {campaign.status != "completed" ? (
                                 <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {Math.ceil(
-                                    (new Date(campaign.end_campaign) -
-                                    new Date()) /
-                                    (1000 * 60 * 60 * 24)
-                                ) + " Days left"}
-                            </h1> :
-                            <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {"Campaign " + campaign.status}
-                            </h1>
-                            }
+                                    {Math.ceil(
+                                        (new Date(campaign.end_campaign) -
+                                            new Date()) /
+                                            (1000 * 60 * 60 * 24),
+                                    ) + " Days left"}
+                                </h1>
+                            ) : (
+                                <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
+                                    {"Campaign " + campaign.status}
+                                </h1>
+                            )}
                         </div>
                         <div className="relative flex flex-col justify-end gap-4 mt-2">
                             <Progress
@@ -276,7 +282,7 @@ export default function Create() {
                                     style: "currency",
                                     currency: "IDR",
                                     minimumFractionDigits: 2,
-                                }
+                                },
                             ) +
                                 " / " +
                                 parseInt(campaign.goal_amount).toLocaleString(
@@ -285,28 +291,38 @@ export default function Create() {
                                         style: "currency",
                                         currency: "IDR",
                                         minimumFractionDigits: 2,
-                                    }
+                                    },
                                 )}
                         </p>
                         <div className="flex flex-row items-center justify-between mt-5">
-                            <Toggle
-                                pressed={like}
-                                onPressedChange={() => handleLikes(campaign.id)}
-                                size="lg"
-                                variant="outline"
-                                className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500 hover:bg-red-100 dark:hover:bg-red-600"
-                            >
-                                <Heart />
-                                {!like
-                                    ? "Like This Campaign"
-                                    : "Campaign Liked"}
-                            </Toggle>
+                            {user && user.role !== "admin" && (
+                                <Toggle
+                                    pressed={like}
+                                    onPressedChange={() =>
+                                        handleLikes(campaign.id)
+                                    }
+                                    size="lg"
+                                    variant="outline"
+                                    className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-red-500 data-[state=on]:*:[svg]:stroke-red-500 hover:bg-red-100 dark:hover:bg-red-600"
+                                >
+                                    <Heart />
+                                    {!like
+                                        ? "Like This Campaign"
+                                        : "Campaign Liked"}
+                                </Toggle>
+                            )}
 
-                            <Link href={`/donate?campaign_id=${campaign.id}`}>
-                                <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
-                                    Donate
-                                </Button>
-                            </Link>
+                            {user &&
+                                user.role !== "admin" &&
+                                campaign.status != "completed" && (
+                                    <Link
+                                        href={`/donate?campaign_id=${campaign.id}`}
+                                    >
+                                        <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
+                                            Donate
+                                        </Button>
+                                    </Link>
+                                )}
                         </div>
                     </div>
                 </div>
@@ -314,7 +330,8 @@ export default function Create() {
                 <div>
                     <Tabs
                         defaultValue={flash?.activeTab ?? 1}
-                        className="w-full">
+                        className="w-full"
+                    >
                         <div className="dark:border-t-1 sticky top-[72px] z-40 bg-none pt-3 dark:pt-2 h-auto">
                             <TabsList className="text-gray-500 flex gap-30 bg-[#fcfcfc] dark:bg-gray-800 shadow-md w-full mx-auto rounded-md dark:text-white h-[48px] ">
                                 {data.map((dat, idx) => {
@@ -336,7 +353,7 @@ export default function Create() {
                                     campaign,
                                     idx,
                                     contents,
-                                    donations
+                                    donations,
                                 );
                             })}
                         </div>

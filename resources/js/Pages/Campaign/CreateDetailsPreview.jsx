@@ -28,17 +28,23 @@ import { useEffect, useRef, useState } from "react";
 import { FaqBuilder } from "./FAQBuilder";
 import { AboutBuilder } from "./AboutBuilder";
 import { UpdateBuilder } from "./UpdatesBuilder";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/Components/ui/breadcrumb";
 
 export const UpperPreview = ({ campaign, user, images, donations }) => {
+    const percentage = Math.round(
+        (campaign.collected_amount / campaign.goal_amount) * 100,
+    );
 
-     const percentage = Math.round(
-         (campaign.collected_amount / campaign.goal_amount) * 100
-     );
-
-     const handleFinalize = () => {
-         router.post(`/campaigns/finalize/${campaign.id}`);
-     };
+    const handleFinalize = () => {
+        router.post(`/campaigns/finalize/${campaign.id}`);
+    };
 
     return (
         <div className="flex container px-4 py-8 flex-row gap-16 justify-center items-center mx-auto mb-20">
@@ -100,7 +106,7 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                                 ? Math.ceil(
                                       (new Date(campaign.end_campaign) -
                                           new Date()) /
-                                          (1000 * 60 * 60 * 24)
+                                          (1000 * 60 * 60 * 24),
                                   ) + " Days left"
                                 : "- Days left"}
                         </h1>
@@ -115,7 +121,7 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                         }
                     />
                     <span className="absolute inset-0 flex items-start justify-center text-md font-medium text-gray-200 dark:text-white">
-                       {percentage}%
+                        {percentage}%
                     </span>
                 </div>
                 <p className="text-lg font-normal flex justify-end mt-2">
@@ -125,7 +131,7 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                             style: "currency",
                             currency: "IDR",
                             minimumFractionDigits: 2,
-                        }
+                        },
                     ) +
                         " / " +
                         parseInt(campaign.goal_amount).toLocaleString("id-ID", {
@@ -135,23 +141,19 @@ export const UpperPreview = ({ campaign, user, images, donations }) => {
                         })}
                 </p>
 
-                    {campaign.status === "draft" && (
-                        <div className="flex justify-end items-end my-5">
-                            <Popup
-                                triggerText={
-                                    <Button className="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl">
-                                        Finalize →
-                                    </Button>
-                                }
-                                title="Finalize Campaign?"
-                                description="This campaign status will be set to 'pending' and will be reviewed by the admin. Are you sure you want to proceed?"
-                                confirmText="Yes, Approve"
-                                confirmColor="bg-green-600 hover:bg-green-700 text-white"
-                                triggerClass="bg-transparent text-green-700 dark:text-green-400 hover:bg-green-100 text-xl"
-                                onConfirm={() => handleFinalize()}
-                            />
-                        </div>
-                    )}
+                {campaign.status === "draft" && (
+                    <div className="flex justify-end items-end my-5">
+                        <Popup
+                            triggerText="Finalize →"
+                            title="Finalize Campaign?"
+                            description="This campaign status will be set to 'pending' and will be reviewed by the admin. Are you sure you want to proceed?"
+                            confirmText="Yes, Approve"
+                            confirmColor="bg-green-600 hover:bg-green-700 text-white"
+                            triggerClass="bg-green-400 text-black dark:text-white hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-600 text-xl"
+                            onConfirm={() => handleFinalize()}
+                        />
+                    </div>
+                )}
 
                 {/* <div className="flex flex-row items-center justify-between mt-5">
                     <Toggle
@@ -196,7 +198,9 @@ const CreateDetailsPreview = () => {
         const from = params.get("from");
 
         if (from === "myCampaigns") {
-            router.get(`/campaigns/create/createPreview/${campaign.id}?from=${from}`);
+            router.get(
+                `/campaigns/create/createPreview/${campaign.id}?from=${from}`,
+            );
         } else {
             router.get(`/campaigns/create/createPreview/${campaign.id}`);
         }
@@ -208,8 +212,7 @@ const CreateDetailsPreview = () => {
 
         if (from === "myCampaigns") {
             router.get(
-                `/campaigns/create/${campaign.id}` +
-                    "?from=myCampaigns"
+                `/campaigns/create/${campaign.id}` + "?from=myCampaigns",
             );
         } else {
             router.get(`/campaigns/create/${campaign.id}`);
@@ -217,7 +220,7 @@ const CreateDetailsPreview = () => {
     };
 
     const handleInsertUpdates = (campaignContent) => {
-        router.post(`/campaigns/insertUpdates`, campaignContent,{
+        router.post(`/campaigns/insertUpdates`, campaignContent, {
             onError: (errors) => uploadErrorHandler(errors),
         });
     };
@@ -258,7 +261,7 @@ const CreateDetailsPreview = () => {
                             contents={contents.filter(
                                 (dat) =>
                                     dat.type === "paragraph" ||
-                                    dat.type === "media"
+                                    dat.type === "media",
                             )}
                             errorHandler={uploadErrorHandler}
                         />
@@ -282,7 +285,7 @@ const CreateDetailsPreview = () => {
                     <UpdateBuilder
                         campaign={campaign}
                         contents={contents.filter(
-                            (dat) => dat.type === "updates"
+                            (dat) => dat.type === "updates",
                         )}
                         insertHandler={handleInsertUpdates}
                     />
@@ -380,19 +383,25 @@ const CreateDetailsPreview = () => {
                     <Breadcrumb className="flex w-full items-start justify-start m-0 ml-4 p-0">
                         <BreadcrumbList>
                             <BreadcrumbItem>
-                                <BreadcrumbLink onClick={backToForm} className="text-muted-foreground">
+                                <BreadcrumbLink
+                                    onClick={backToForm}
+                                    className="text-muted-foreground"
+                                >
                                     Campaign Data
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem>
-                                <BreadcrumbLink onClick={backToPreview} className="text-muted-foreground">
+                                <BreadcrumbLink
+                                    onClick={backToPreview}
+                                    className="text-muted-foreground"
+                                >
                                     Campaign Media
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem aria-current="page">
-                                <BreadcrumbLink className="font-medium text-primary"  >
+                                <BreadcrumbLink className="font-medium text-primary">
                                     Campaign Preview
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
