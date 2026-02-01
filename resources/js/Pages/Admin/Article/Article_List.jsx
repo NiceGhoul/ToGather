@@ -12,75 +12,68 @@ import {
     RotateCcw,
     File,
     EyeClosed,
-    ChevronLeft,
-    ChevronRight,
 } from "lucide-react";
 
 export default function Article_List() {
     const { articles, categories } = usePage().props;
 
-    // States
+    // 🔹 State untuk data dan filter
     const [allArticles, setAllArticles] = useState(articles || []);
     const [filteredArticles, setFilteredArticles] = useState(articles || []);
     const [category, setCategory] = useState("");
     const [status, setStatus] = useState("");
     const [search, setSearch] = useState("");
+
+    // 🔹 State lain tetap sama
     const [selectedIds, setSelectedIds] = useState([]);
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
 
-    // ===== Pagination =====
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
-    const [totalPages, setTotalPages] = useState(Math.ceil(allArticles.length / itemsPerPage));
-    const startIndex = (currentPage - 1) * itemsPerPage;
-
-    const handlePageChange = (page) => {
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-            setSelectedIds([]);
-        }
-    };
-
-    // Filtering logic
+    // 🧠 Filter frontend — otomatis jalan tiap kali search/category/status berubah
     useEffect(() => {
         let result = allArticles;
+
+        // 🔹 Filter awal (hanya approved + disabled)
         if (status === "") {
             result = result.filter(
                 (a) =>
                     a.status === "approved" ||
                     a.status === "disabled" ||
-                    a.status === "rejected",
+                    a.status === "rejected"
             );
-        } else if (status === "rejected") {
+        }
+        // 🔹 Kalau klik tombol "Rejected"
+        else if (status === "rejected") {
             result = result.filter((a) => a.status === "rejected");
-        } else {
+        }
+        // 🔹 Kalau filter lain (misalnya khusus "approved" aja)
+        else {
             result = result.filter((a) => a.status === status);
         }
 
+        // 🔹 Filter category
         if (category !== "") {
             result = result.filter((a) => a.category === category);
         }
 
+        // 🔹 Filter search
         if (search.trim() !== "") {
             result = result.filter((a) =>
-                a.title.toLowerCase().includes(search.toLowerCase()),
+                a.title.toLowerCase().includes(search.toLowerCase())
             );
         }
 
-        setTotalPages(Math.ceil(result.length / itemsPerPage) || 1);
-        setFilteredArticles(result.slice(startIndex, startIndex + itemsPerPage));
+        setFilteredArticles(result);
+    }, [allArticles, search, category, status]);
 
-    }, [allArticles, search, category, status, currentPage]);
-
-    // Reset Handler
+    // 🔁 Reset filter
     const handleResetFilter = () => {
         setCategory("");
         setStatus("");
         setSearch("");
     };
 
-    // Action Handlers
+    // 🔧 Aksi server (bulk & toggle)
     const handleDisable = (id) =>
         router.post(
             `/admin/articles/${id}/disable`,
@@ -89,13 +82,11 @@ export default function Article_List() {
                 onSuccess: () => {
                     setAllArticles((prev) =>
                         prev.map((a) =>
-                            a.id === id ? { ...a, status: "disabled" } : a,
-                        ),
+                            a.id === id ? { ...a, status: "disabled" } : a
+                        )
                     );
-                    setSuccessPopupMessage("Article Disabled!");
-                    setSuccessPopupOpen(true);
                 },
-            },
+            }
         );
 
     const handleEnable = (id) =>
@@ -104,11 +95,13 @@ export default function Article_List() {
             {},
             {
                 onSuccess: () => {
-                    setAllArticles((prev) => prev.map((a) => a.id === id ? { ...a, status: "approved" } : a));
-                    setSuccessPopupMessage("Article Enabled!");
-                    setSuccessPopupOpen(true);
+                    setAllArticles((prev) =>
+                        prev.map((a) =>
+                            a.id === id ? { ...a, status: "approved" } : a
+                        )
+                    );
                 },
-            },
+            }
         );
 
     const handleDelete = (id) =>
@@ -122,15 +115,15 @@ export default function Article_List() {
                     setSuccessPopupMessage("Article deleted");
                     setSuccessPopupOpen(true);
                 },
-            },
+            }
         );
     const handleView = (id) =>
         router.get(`/admin/articles/${id}/view?from=list`);
 
-    // Bulk Action Handlers
+    // 🧩 Bulk logic
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
     };
     const handleSelectAll = (checked) => {
@@ -146,28 +139,14 @@ export default function Article_List() {
         router.post(
             "/admin/articles/bulk-approve",
             { ids: selectedIds },
-            {
-                preserveState: true,
-                onSuccess: () => {
-                    setSelectedIds([]);
-                    setSuccessPopupMessage("Selected Articles Approved");
-                    setSuccessPopupOpen(true);
-                },
-            },
+            { preserveState: true, onSuccess: () => setSelectedIds([]) }
         );
     const handleBulkDisable = () =>
         selectedIds.length &&
         router.post(
             "/admin/articles/bulk-disable",
             { ids: selectedIds },
-            {
-                preserveState: true,
-                onSuccess: () => {
-                    setSelectedIds([]);
-                    setSuccessPopupMessage("Selected Articles Disabled");
-                    setSuccessPopupOpen(true);
-                },
-            },
+            { preserveState: true, onSuccess: () => setSelectedIds([]) }
         );
     const handleBulkDelete = () =>
         selectedIds.length &&
@@ -178,18 +157,14 @@ export default function Article_List() {
                 preserveState: true,
                 onSuccess: () => {
                     setSelectedIds([]);
-                    setSuccessPopupMessage("Selected Articles deleted");
+                    setSuccessPopupMessage("Selected articles deleted");
                     setSuccessPopupOpen(true);
                     router.reload();
                 },
-            },
+            }
         );
-    
-    const handleSuccessClose = () => {
-        setSuccessPopupOpen(false);
-        router.reload();
-    };
 
+    // Auto close popup
     useEffect(() => {
         if (!successPopupOpen) return;
         const t = setTimeout(() => setSuccessPopupOpen(false), 3500);
@@ -210,9 +185,9 @@ export default function Article_List() {
             />
 
             <div className="p-6 space-y-6">
-                {/* Filters  */}
+                {/* 🔎 Filter & Bulk Section */}
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md space-y-4">
-                    {/* Search and Category Paramater */}
+                    {/* Row 1: Search & Filter */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                             <Input
@@ -242,7 +217,7 @@ export default function Article_List() {
                             </Button>
                         </div>
 
-                        {/* Status Parameter */}
+                        {/* Status filter buttons */}
                         <div className="flex items-center gap-2">
                             <Button
                                 className={`${
@@ -287,12 +262,13 @@ export default function Article_List() {
                         </div>
                     </div>
 
-                    {/* Bulk Actions */}
+                    {/* Row 2: Bulk actions */}
                     <div className="flex flex-wrap justify-end items-center gap-2 border-t dark:border-gray-700 pt-3">
                         <div className="text-sm mr-auto dark:text-gray-200">
                             {selectedIds.length} selected
                         </div>
 
+                        {/* 🔹 Tampilkan tombol Enable/Disable hanya kalau bukan status rejected */}
                         {status !== "rejected" && (
                             <>
                                 <Popup
@@ -329,6 +305,7 @@ export default function Article_List() {
                             </>
                         )}
 
+                        {/* 🔸 Tombol Delete selalu muncul */}
                         <Popup
                             triggerText={
                                 <div className="flex items-center gap-2 cursor-pointer">
@@ -347,7 +324,7 @@ export default function Article_List() {
                     </div>
                 </div>
 
-                {/* Article List Table */}
+                {/* 🗂️ Articles Table */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
                     <table className="min-w-full border dark:border-gray-700 dark:bg-gray-800">
                         <thead className="bg-gray-100 dark:bg-gray-700">
@@ -396,7 +373,7 @@ export default function Article_List() {
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
-                                                    a.id,
+                                                    a.id
                                                 )}
                                                 onChange={() =>
                                                     handleToggle(a.id)
@@ -484,47 +461,6 @@ export default function Article_List() {
                             )}
                         </tbody>
                     </table>
-                    <div className="flex items-center justify-between mt-4">
-                        <div className="text-sm text-gray-500">
-                            Page {currentPage} of {totalPages || 1}
-                        </div>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                disabled={currentPage === 1}
-                                onClick={() =>
-                                    handlePageChange(currentPage - 1)
-                                }
-                            >
-                                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
-                            </Button>
-                            {[...Array(totalPages)].map((_, i) => (
-                                <Button
-                                    key={i}
-                                    onClick={() => handlePageChange(i + 1)}
-                                    className={`
-                                        ${
-                                            currentPage === i + 1
-                                                ? "bg-purple-800 text-white hover:bg-purple-800"
-                                                : "bg-purple-300 text-purple-900 hover:bg-purple-800 hover:text-white"
-                                        }
-                                        font-medium transition-colors duration-200
-                                    `}
-                                >
-                                    {i + 1}
-                                </Button>
-                            ))}
-                            <Button
-                                variant="outline"
-                                disabled={currentPage === totalPages}
-                                onClick={() =>
-                                    handlePageChange(currentPage + 1)
-                                }
-                            >
-                                Next <ChevronRight className="w-4 h-4 ml-1" />
-                            </Button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </Layout_Admin>

@@ -88,6 +88,8 @@ class ArticleController extends Controller
     public function showLiked()
     {
         $user = auth()->user();
+        // $articles = Article::All();
+        // $likes = $articles->likes()->where('user_id', $user->id())->where('likes_id', $articles->id())->get();
 
         $liked = Likes::with(['user', 'contents.image', 'thumbnailImage', 'likes'])->where('likes_type', 'App\Models\Article')->where('user_id', $user->id)->pluck('likes_id');
         $articles = Article::whereIn('id', $liked)->withCount('likes')->with('user')->get()->map(function ($articles) {
@@ -124,20 +126,20 @@ class ArticleController extends Controller
         }
         $article = Article::findOrFail($id);
 
-        // Check if user already liked
+        // check if user already liked
         $existingLike = $article->likes()->where('user_id', $user->id)->first();
 
         if ($existingLike) {
-            // If already like
+            // if already like
             $existingLike->delete();
             $isLiked = false;
         } else {
-            // If haven't like
+            // if havent like
             $article->likes()->create(['user_id' => $user->id]);
             $isLiked = true;
         }
 
-        // Count all like
+        // count all like
         $likeCount = $article->likes()->count();
 
         return response()->json([
@@ -207,7 +209,7 @@ class ArticleController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $validated) {
-            // Save thumbnail (if exists)
+            // 🟣 1. Save thumbnail (optional)
             $thumbnailImageId = null;
             if ($request->hasFile('thumbnail')) {
                 $thumbnailPath = $request->file('thumbnail')->store('article/thumbnails', 'minio');
@@ -215,7 +217,7 @@ class ArticleController extends Controller
                 $thumbnailImageId = $thumbnailImage->id;
             }
 
-            // Create Article
+            // 🟣 2. Create article
             $article = Article::create([
                 'user_id' => auth()->id(),
                 'title' => $validated['title'],
@@ -224,7 +226,7 @@ class ArticleController extends Controller
                 'status' => 'pending',
             ]);
 
-            // Save ArticleContents
+            // 🟣 3. Save contents
             foreach ($request->input('contents') as $i => $block) {
                 $type = $block['type'];
                 $content = ArticleContent::create([
@@ -241,7 +243,7 @@ class ArticleController extends Controller
                 }
             }
 
-            // Notify admins
+            // 🟣 4. Notify admins
             NotificationController::notifyAdmins(
                 'article_created',
                 'New Article Submitted',
@@ -249,7 +251,7 @@ class ArticleController extends Controller
                 ['article_id' => $article->id, 'user_id' => $article->user_id]
             );
 
-            // Notify user (article creator)
+            // 🟣 5. Notify user (article creator)
             NotificationController::notifyUser(
                 $article->user_id,
                 'article_submitted',
@@ -284,7 +286,7 @@ class ArticleController extends Controller
         // Create image record
         $image = Image::create([
             'path' => $path,
-            'imageable_id' => null,
+            'imageable_id' => null, // Will be set when article is created
             'imageable_type' => Article::class,
         ]);
 
@@ -339,10 +341,10 @@ class ArticleController extends Controller
     {
         $user = auth()->user();
 
-        // Get all categories (from Lookup)
+        // --- ambil semua kategori (biar bisa muncul di dropdown MyArticle.jsx)
         $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
 
-        // Get query parameters
+        // --- ambil query params
         $filterCategory = $request->query('category');
         $sortOrder = $request->query('sort', 'desc');
         $searchQuery = $request->query('search');
@@ -351,7 +353,7 @@ class ArticleController extends Controller
             $filterCategory = null;
         }
 
-        // Get articles
+        // --- query utama untuk artikel milik user
         $articles = Article::with(['user', 'contents.image', 'thumbnailImage'])
             ->where('user_id', $user->id)
             ->when($filterCategory, function ($q) use ($filterCategory) {
@@ -379,7 +381,7 @@ class ArticleController extends Controller
                     $article->thumbnail_url = $article->thumbnailImage->url;
                 }
 
-                // Transform content image URL
+                // transform content image URL
                 $article->contents->transform(function ($content) {
                     if ($content->type === 'image' && $content->image) {
                         $content->image_url = $content->image->url;
@@ -387,7 +389,7 @@ class ArticleController extends Controller
                     return $content;
                 });
 
-                // Check if liked by user
+                // status like per user
                 $article->is_liked_by_user = $article->likes()
                     ->where('user_id', $user->id)
                     ->exists();
@@ -406,7 +408,6 @@ class ArticleController extends Controller
     }
     public function showMyArticleDetails($id)
     {
-        // Get Article
         $article = Article::with(['user', 'contents.image', 'thumbnailImage', 'likes'])
             ->withCount('likes')
             ->findOrFail($id);
@@ -423,7 +424,7 @@ class ArticleController extends Controller
             return [
                 'id' => $content->id,
                 'type' => $content->type,
-                'content' => $content->content,
+                'content' => $content->content,  // WAJIB!
                 'order_x' => (int) $content->order_x,
                 'order_y' => (int) $content->order_y,
                 'image_url' => $content->type === 'image' && $content->image
@@ -432,7 +433,7 @@ class ArticleController extends Controller
             ];
         });
 
-        // Check if liked by user
+        // Add like status
         $article->is_liked_by_user = auth()->check()
             ? $article->likes()->where('user_id', auth()->id())->exists()
             : false;
@@ -449,7 +450,7 @@ class ArticleController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        // Get URL for thumbnail
+        // tambahkan URL gambar
         if ($article->thumbnailImage) {
             $article->thumbnail_url = $article->thumbnailImage->url;
         }
@@ -475,13 +476,13 @@ class ArticleController extends Controller
         $wasRejected = $article->status === 'rejected';
         $updateData = [];
 
-        // $validated = $request->validate([
-        //     'contents' => 'required|array|min:1',
-        //     'contents.*.type' => 'required|in:text,image,paragraph',
-        //     'contents.*.content' => 'nullable',
-        //     'contents.*.order_x' => 'required|integer',
-        //     'contents.*.order_y' => 'required|integer',
-        // ]);
+        $validated = $request->validate([
+            'contents' => 'required|array|min:1',
+            'contents.*.type' => 'required|in:text,image,paragraph',
+            'contents.*.content' => 'nullable',
+            'contents.*.order_x' => 'required|integer',
+            'contents.*.order_y' => 'required|integer',
+        ]);
 
         DB::transaction(function () use ($request, $article, $wasRejected, $updateData) {
             $article->update(['status' => 'pending']);
@@ -512,7 +513,7 @@ class ArticleController extends Controller
 
                 if ($type === 'image') {
 
-                    // Upload New Image
+                    // CASE 1 — Upload New Image
                     if ($request->hasFile("contents.$i.content")) {
 
                         $path = $request->file("contents.$i.content")
@@ -523,7 +524,7 @@ class ArticleController extends Controller
                         ]);
                     }
 
-                    // Existing Image
+                    // CASE 2 — Existing Image
                     else if (!empty($block['content'])) {
 
                         $url = $block['content'];
@@ -552,21 +553,31 @@ class ArticleController extends Controller
         return back()->with('success', 'Your article has been updated and sent for review again!');
     }
 
+
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Article $article)
+    {
+        //
+    }
+
     /**
      * Upload files and return the file URLs.
      */
-    // public function upload(Request $request)
-    // {
-    //     if ($request->hasFile('files')) {
-    //         $file = $request->file('files')[0];
-    //         $path = $file->store('public/images');
-    //         $url = asset(str_replace('public/', 'storage/', $path));
-    //         return response()->json([
-    //             'files' => [$url]
-    //         ]);
-    //     }
-    //     return response()->json(['error' => 'No file uploaded'], 400);
-    // }
+    public function upload(Request $request)
+    {
+        if ($request->hasFile('files')) {
+            $file = $request->file('files')[0];
+            $path = $file->store('public/images');
+            $url = asset(str_replace('public/', 'storage/', $path));
+            return response()->json([
+                'files' => [$url]
+            ]);
+        }
+        return response()->json(['error' => 'No file uploaded'], 400);
+    }
 
     public function serveImage($path)
     {
@@ -587,7 +598,6 @@ class ArticleController extends Controller
         $status = $request->query('status');
         $search = $request->query('search');
 
-        // Get Articles
         $articles = Article::with(['user', 'thumbnailImage'])
             ->whereIn('status', ['approved', 'disabled', 'rejected'])
             ->when($category, fn($q) => $q->where('category', $category))
@@ -600,7 +610,9 @@ class ArticleController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        // Get all categories (from Lookup)
+
+
+
         $categories = Lookup::where('lookup_type', 'ArticleCategory')->pluck('lookup_value');
 
         return inertia('Admin/Article/Article_List', [
@@ -616,7 +628,6 @@ class ArticleController extends Controller
 
     public function adminRequestIndex()
     {
-        // Get all Articles with pending status
         $articles = Article::with('user')
             ->where('status', 'pending')
             ->orderByDesc('created_at')
@@ -630,6 +641,8 @@ class ArticleController extends Controller
 
     public function adminViewArticle($id)
     {
+        // Eager-load contents so the view can build the full grid.
+        // Also order contents by row (order_y) then column (order_x) for predictable layout.
         $article = Article::with([
             'user',
             'contents.image',
@@ -652,8 +665,9 @@ class ArticleController extends Controller
                 $content->image_url = $content->image->url;
             }
 
+            // Tambahkan ini supaya TEXT dikirim
             if ($content->type === 'text' || $content->type === 'paragraph') {
-                $content->content = $content->content;
+                $content->content = $content->content;  // pastikan tetap dikirim
             }
 
             return $content;
@@ -669,7 +683,7 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $article->update(['status' => 'approved']);
 
-        // Notify user
+        // Notify user about article approval
         NotificationController::notifyUser(
             $article->user_id,
             'article_approved',
@@ -686,7 +700,7 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $article->update(['status' => 'approved']);
 
-        // Notify user
+        // Notify user about article approval
         NotificationController::notifyUser(
             $article->user_id,
             'article_approved',
@@ -703,7 +717,7 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $article->update(['status' => 'disabled']);
 
-        // Notify user
+        // Notify user about article being disabled
         NotificationController::notifyUser(
             $article->user_id,
             'article_disabled',
@@ -727,7 +741,7 @@ class ArticleController extends Controller
             'rejected_at' => now(),
         ]);
 
-        // Notify user
+        // Notify user about article rejection
         NotificationController::notifyUser(
             $article->user_id,
             'article_rejected',
@@ -744,7 +758,7 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $article->delete();
 
-        // Notify user
+        // Notify user about article deletetion
         NotificationController::notifyUser(
             $article->user_id,
             'article_deleted',
@@ -758,7 +772,7 @@ class ArticleController extends Controller
             ->with('success', 'Article deleted!');
     }
 
-
+    // Bulk actions: expect request with { ids: [1,2,3] }
     public function adminBulkApprove(Request $request)
     {
         $validated = $request->validate([
@@ -768,7 +782,7 @@ class ArticleController extends Controller
 
         $articles = Article::whereIn('id', $validated['ids'])->get();
 
-        // Notify each user
+        // Notify each user about their article approval
         foreach ($articles as $article) {
             NotificationController::notifyUser(
                 $article->user_id,
@@ -793,7 +807,7 @@ class ArticleController extends Controller
 
         $articles = Article::whereIn('id', $validated['ids'])->get();
 
-        // Notify each user
+        // Notify each user about their article being disabled
         foreach ($articles as $article) {
             NotificationController::notifyUser(
                 $article->user_id,
@@ -816,17 +830,18 @@ class ArticleController extends Controller
             'ids.*' => 'integer|distinct|exists:articles,id',
             'reason' => 'nullable|string|max:500',
         ]);
-
+        // dd($validated);
         $articles = Article::whereIn('id', $validated['ids'])->get();
+        // dd($articles);
 
         foreach ($articles as $article) {
-            // Update article status and reason
+            // update status + simpan alasan
             $article->update([
                 'status' => 'rejected',
                 'rejected_reason' => $validated['reason'] ?? null,
             ]);
 
-            // Notify each user
+            // kirim notifikasi ke user
             NotificationController::notifyUser(
                 $article->user_id,
                 'article_rejected',
@@ -849,23 +864,10 @@ class ArticleController extends Controller
             'ids' => 'required|array|min:1',
             'ids.*' => 'integer|distinct|exists:articles,id',
         ]);
-        //Get Articles for deletion
-        $articlesToDelete = Article::whereIn('id', $validated['ids'])->get();
 
         DB::transaction(function () use ($validated) {
             Article::whereIn('id', $validated['ids'])->delete();
         });
-
-        // Notify each user
-        foreach ($articlesToDelete as $article) {
-            NotificationController::notifyUser(
-                $article->user_id,
-                'article_deleted',
-                'Article Deleted',
-                "Your article '{$article->title}' has been deleted and is no longer visible to the public.",
-                ['article_id' => $article->id]
-            );
-        }
 
         return redirect()->route('admin.articles.index')->with('success', 'Selected articles deleted!');
     }
@@ -931,7 +933,7 @@ class ArticleController extends Controller
 
                 if ($type === 'image') {
 
-                    // Upload New Image
+                    // CASE 1 — Upload New Image
                     if ($request->hasFile("contents.$i.content")) {
 
                         $path = $request->file("contents.$i.content")
@@ -942,7 +944,7 @@ class ArticleController extends Controller
                         ]);
                     }
 
-                    // Existing Image
+                    // CASE 2 — Existing Image
                     else if (!empty($block['content'])) {
 
                         $url = $block['content'];

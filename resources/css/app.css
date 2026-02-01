@@ -242,24 +242,13 @@
   scrollbar-width: none;
 }
 
-.auto-scroll-wrapper {
-  overflow: hidden;
-  width: 100%;
+@keyframes autoScrollHorizontal {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .auto-scroll-horizontal {
+  animation: autoScrollHorizontal 30s linear infinite;
   display: flex;
-  width: max-content;
-  gap: 0.75rem;
-  animation: autoScrollHorizontal 120s linear infinite;
-  will-change: transform;
-}
-
-@keyframes autoScrollHorizontal {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+  gap: 0.75rem; /* same as gap-3 */
 }

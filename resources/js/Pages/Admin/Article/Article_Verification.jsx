@@ -14,18 +14,20 @@ import {
 export default function ArticleRequestList() {
     const { articles } = usePage().props;
 
-    // States
     const [selectedIds, setSelectedIds] = useState([]);
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
 
+    // ===== Reject (per item) =====
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
     const [targetRejectId, setTargetRejectId] = useState(null);
 
+    // ===== Bulk Reject =====
     const [bulkRejectModalOpen, setBulkRejectModalOpen] = useState(false);
     const [bulkRejectReason, setBulkRejectReason] = useState("");
 
+    // ===== Pagination =====
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -33,10 +35,9 @@ export default function ArticleRequestList() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentArticles = articles.slice(
         startIndex,
-        startIndex + itemsPerPage,
+        startIndex + itemsPerPage
     );
 
-    // Pagination handler
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
@@ -46,11 +47,18 @@ export default function ArticleRequestList() {
 
     const handleToggle = (id) => {
         setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
     };
 
-    // Action Handler
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(currentArticles.map((a) => a.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
     const handleApprove = (id) => {
         router.post(
             `/admin/articles/${id}/approve`,
@@ -65,7 +73,7 @@ export default function ArticleRequestList() {
                     setSuccessPopupMessage("Approve failed");
                     setSuccessPopupOpen(true);
                 },
-            },
+            }
         );
     };
 
@@ -86,17 +94,8 @@ export default function ArticleRequestList() {
                     setSuccessPopupMessage("Failed to reject article");
                     setSuccessPopupOpen(true);
                 },
-            },
+            }
         );
-    };
-
-    // Bulk Action Handler
-    const handleSelectAll = (checked) => {
-        if (checked) {
-            setSelectedIds(currentArticles.map((a) => a.id));
-        } else {
-            setSelectedIds([]);
-        }
     };
 
     const handleBulkApprove = () => {
@@ -116,7 +115,7 @@ export default function ArticleRequestList() {
                     setSuccessPopupMessage("Bulk approve failed");
                     setSuccessPopupOpen(true);
                 },
-            },
+            }
         );
     };
 
@@ -139,7 +138,7 @@ export default function ArticleRequestList() {
                     setSuccessPopupMessage("Bulk reject failed");
                     setSuccessPopupOpen(true);
                 },
-            },
+            }
         );
     };
 
@@ -173,7 +172,7 @@ export default function ArticleRequestList() {
                     Pending Article Requests
                 </h1>
 
-                {/* Bulk Actions */}
+                {/* 🔹 Bulk Actions */}
                 <div className="mb-4 flex items-center gap-3 flex-row justify-end border-b dark:border-gray-700 pb-3">
                     <div className="text-sm mr-auto dark:text-gray-200">
                         {selectedIds.length} selected
@@ -207,7 +206,7 @@ export default function ArticleRequestList() {
                     </Button>
                 </div>
 
-                {/* Article List Table */}
+                {/* 🧾 Table + Pagination wrapper */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col justify-between min-h-[45rem]">
                     <table className="min-w-full border dark:border-gray-700 text-sm dark:bg-gray-800">
                         <thead>
@@ -225,21 +224,11 @@ export default function ArticleRequestList() {
                                         }
                                     />
                                 </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Id
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Title
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Author
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Category
-                                </th>
-                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
-                                    Created At
-                                </th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Id</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Title</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Author</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Category</th>
+                                <th className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">Created At</th>
                                 <th className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                     Action
                                 </th>
@@ -248,15 +237,12 @@ export default function ArticleRequestList() {
                         <tbody>
                             {currentArticles.length > 0 ? (
                                 currentArticles.map((a) => (
-                                    <tr
-                                        key={a.id}
-                                        className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                                    >
+                                    <tr key={a.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedIds.includes(
-                                                    a.id,
+                                                    a.id
                                                 )}
                                                 onChange={() =>
                                                     handleToggle(a.id)
@@ -277,7 +263,7 @@ export default function ArticleRequestList() {
                                         </td>
                                         <td className="border dark:border-gray-700 px-4 py-2 dark:text-gray-200">
                                             {new Date(
-                                                a.created_at,
+                                                a.created_at
                                             ).toLocaleString()}
                                         </td>
                                         <td className="border dark:border-gray-700 px-4 py-2 text-center dark:text-gray-200">
@@ -285,7 +271,7 @@ export default function ArticleRequestList() {
                                                 <Button
                                                     onClick={() =>
                                                         router.get(
-                                                            `/admin/articles/${a.id}/view?from=verification`,
+                                                            `/admin/articles/${a.id}/view?from=verification`
                                                         )
                                                     }
                                                     className="bg-purple-200 hover:bg-purple-300 text-purple-700"
@@ -312,7 +298,7 @@ export default function ArticleRequestList() {
                                                     onClick={() => {
                                                         setTargetRejectId(a.id);
                                                         setRejectModalOpen(
-                                                            true,
+                                                            true
                                                         );
                                                     }}
                                                 >
@@ -335,7 +321,7 @@ export default function ArticleRequestList() {
                         </tbody>
                     </table>
 
-                    {/* Pagination */}
+                    {/* 🔸 Pagination Section */}
                     <div className="flex items-center justify-between mt-4">
                         <div className="text-sm text-gray-500 dark:text-gray-400">
                             Page {currentPage} of {totalPages || 1}
@@ -380,7 +366,7 @@ export default function ArticleRequestList() {
                 </div>
             </div>
 
-            {/* Modals */}
+            {/* ==== MODAL: Per-item Reject reason ==== */}
             {rejectModalOpen && (
                 <Popup
                     triggerText=""
@@ -418,6 +404,7 @@ export default function ArticleRequestList() {
                 </Popup>
             )}
 
+            {/* ==== MODAL: Bulk Reject reason ==== */}
             {bulkRejectModalOpen && (
                 <Popup
                     triggerText=""

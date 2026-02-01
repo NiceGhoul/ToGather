@@ -282,7 +282,7 @@ class CampaignSeeder extends Seeder
             // build local paths
             $localThumb = public_path("images/onlineCampaignMedia/Thumbnail_Logo/{$campImage['thumbnail']}");
             $localLogo  = public_path("images/onlineCampaignMedia/Thumbnail_Logo/{$campImage['logo']}");
-
+            // dd($localThumb);
             if (file_exists($localThumb)) {
                 $thumbName = basename($campImage['thumbnail']);
                 $thumbPath = Storage::disk('minio')->putFileAs(
@@ -316,9 +316,9 @@ class CampaignSeeder extends Seeder
 
 
         //create content AFTER campaign is made, and thumbnail is inserted
-        // kalo updates, create dlu, baru abis tu buat ada medianya
-        // kalo faq karena gaada images or video, cuma question-;answer
-        // kalo about dibagi jadi 2 antara media yang simpen link contentnya, or paragraph yang simpen title-;description
+        // kalo updates, create dlu, baru abis tu buat ada medianya susah bezir
+        // kalo faq karena gaada images or video, cuma question-;answer so ez
+        // kalo about dibagi jadi 2 antara media yang simpen link contentnya, or paragraph yang simpen title-;description ez lah kalo ini, manual sabi
         $campaignUpdates = [
             [
                 'campaign_id' => 1,
@@ -487,7 +487,7 @@ class CampaignSeeder extends Seeder
                 'campaign_id' => 4,
                 'imageable_type' => CampaignContent::class
             ],
-            //campaign 4_update2
+            // campaign 4_update2
             [
                 'path' => 'updatesMedia3.avif',
                 'imageable_id' => 4,
