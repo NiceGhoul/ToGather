@@ -88,32 +88,42 @@ class CampaignController extends Controller
     {
         $fromVerification = false;
         $campaign = Campaign::findOrFail($id);
-        $campaign->update(['status' => $request->status]);
-        if ($campaign->status === "pending" && $request->status === "active") {
-            if (empty($campaign->start_campaign) && empty($campaign->end_campaign)) {
+
+        $currentStatus = is_object($campaign->status) ? $campaign->status->value : $campaign->status;
+
+        if ($currentStatus === 'pending' && ($request->status === 'active' || $request->status === 'rejected')) {
+
+            $fromVerification = true;
+            if ($request->status === 'active' && empty($campaign->start_campaign)) {
                 $start = now();
                 $end = now()->addDays((int) $campaign->duration);
+
                 $campaign->update([
                     'start_campaign' => $start,
                     'end_campaign' => $end,
                 ]);
             }
-            $fromVerification = true;
         }
-        // Notify user about article approval
+
+        $campaign->update(['status' => $request->status]);
+
         NotificationController::notifyUser(
             $campaign->user_id,
             "campaign_{$request->status}",
-            'campaign Approved',
+            'Campaign Status Updated',
             "Your Campaign '{$campaign->title}' status is now: {$request->status}!",
             ['campaign_id' => $campaign->id]
         );
+
         if ($fromVerification) {
-            return redirect()->route('admin.campaign.verification')->with('success', "Campaign status changed to '{$request->status}' !");
+            return redirect()->route('admin.campaign.verification')
+                ->with('success', "Campaign verified and status changed to '{$request->status}'!");
         } else {
-            return redirect()->route('admin.campaign.adminIndex')->with('success', "Campaign status changed to '{$request->status}' !");
+            return redirect()->route('admin.campaign.adminIndex')
+                ->with('success', "Campaign status changed to '{$request->status}'!");
         }
     }
+
     /**
      * Show the form for creating a new resource.
      */
