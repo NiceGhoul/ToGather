@@ -553,6 +553,14 @@
       ),
     ),
   ),
+  'midtrans' => 
+  array (
+    'server_key' => 'Mid-server-XtU8fGacrpQeiKjIemN3Qy_i',
+    'client_key' => 'Mid-client-9wj2SwWUKL2EuJze',
+    'is_production' => false,
+    'is_sanitized' => true,
+    'is_3ds' => true,
+  ),
   'queue' => 
   array (
     'default' => 'database',
