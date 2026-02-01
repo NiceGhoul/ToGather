@@ -21,7 +21,7 @@ export default function Create() {
     const thumbInputRef = useRef(null);
     const { categories } = usePage().props;
 
-    const { data, setData, processing } = useForm({
+    const { data, setData, post, processing } = useForm({
         title: "",
         category: "",
         thumbnail: null,
@@ -102,9 +102,10 @@ export default function Create() {
 
         setShowConfirm(false);
 
-        const payload = { ...data, contents: blocks };
+        // Put the dynamic blocks onto the Inertia form, then post.
+        setData("contents", blocks);
 
-        router.post("/articles", payload, {
+        post("/articles", {
             forceFormData: true,
             onSuccess: () => {
                 setShowSuccess(true);
@@ -222,7 +223,7 @@ export default function Create() {
                                                 onChange={(html) =>
                                                     updateBlockContent(
                                                         idx,
-                                                        html
+                                                        html,
                                                     )
                                                 }
                                             />
@@ -234,7 +235,7 @@ export default function Create() {
                                                     onChange={(e) =>
                                                         handleImageChange(
                                                             idx,
-                                                            e
+                                                            e,
                                                         )
                                                     }
                                                 />
@@ -242,7 +243,7 @@ export default function Create() {
                                                     <div className="mt-3 bg-white border rounded-md p-2 flex justify-center">
                                                         <img
                                                             src={URL.createObjectURL(
-                                                                block.content
+                                                                block.content,
                                                             )}
                                                             className="max-h-[250px] object-contain rounded-md"
                                                         />
@@ -352,7 +353,7 @@ export default function Create() {
                                         block.content && (
                                             <img
                                                 src={URL.createObjectURL(
-                                                    block.content
+                                                    block.content,
                                                 )}
                                                 className="max-h-[300px] object-contain rounded"
                                             />
