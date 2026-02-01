@@ -30,7 +30,6 @@ Route::get('/check-email', [UserController::class, 'checkEmail']);
 // --- Public Routes ---
 // Accessible by everyone (guest + logged in)
 Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
-Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
 Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
 
@@ -88,9 +87,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles/{id}/like', [ArticleController::class, 'toggleLike'])->name('articles.toggleLike');
 
 
-
-
-
     // User Verification
     Route::get('/verification/create', [VerificationRequestController::class, 'create'])->name('verification.create');
     Route::post('/verification', [VerificationRequestController::class, 'store'])->name('verification.store');
@@ -124,6 +120,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 });
+
+// Public article show route - must be after specific /articles/* routes to avoid catching them
+Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
 
 // Video upload and retrieval
 Route::post('/api/upload-video', [FileController::class, 'uploadVideo'])->name('api.upload.video');
