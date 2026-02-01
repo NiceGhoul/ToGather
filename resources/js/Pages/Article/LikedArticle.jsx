@@ -37,7 +37,7 @@ export default function LikedArticlesPage() {
     // =========================
     const categories = useMemo(() => {
         const unique = Array.from(
-            new Set(likedArticles.map((a) => a.category))
+            new Set(likedArticles.map((a) => a.category)),
         );
         return ["All", ...unique];
     }, [likedArticles]);
@@ -64,23 +64,23 @@ export default function LikedArticlesPage() {
     // HANDLE SEARCH
     // =========================
     const handleSearch = () => {
-        setIsLoading(true);
+        setIsShowMoreloading(true);
         setTimeout(() => {
             setSearchQuery(searchTerm);
             setVisibleArticles(8);
-            setIsLoading(false);
+            setIsShowMoreloading(false);
         }, 500);
     };
 
     const handleReset = () => {
-        setIsLoading(true);
+        setIsShowMoreloading(true);
         setTimeout(() => {
             setSearchTerm("");
             setSearchQuery("");
             setChosenCategory("All");
             setSortOrder("desc");
             setVisibleArticles(8);
-            setIsLoading(false);
+            setIsShowMoreloading(false);
         }, 500);
     };
 
@@ -108,14 +108,14 @@ export default function LikedArticlesPage() {
             data = data.filter(
                 (a) =>
                     a.title.toLowerCase().includes(t) ||
-                    a.user?.nickname?.toLowerCase().includes(t)
+                    a.user?.nickname?.toLowerCase().includes(t),
             );
         }
 
         data.sort((a, b) =>
             sortOrder === "asc"
                 ? new Date(a.created_at) - new Date(b.created_at)
-                : new Date(b.created_at) - new Date(a.created_at)
+                : new Date(b.created_at) - new Date(a.created_at),
         );
 
         return data;
@@ -131,7 +131,7 @@ export default function LikedArticlesPage() {
                     (c) =>
                         (c.type === "text" || c.type === "paragraph") &&
                         c.order_x === 1 &&
-                        c.order_y === 1
+                        c.order_y === 1,
                 )?.content ?? "";
 
             return (
@@ -225,8 +225,8 @@ export default function LikedArticlesPage() {
                     className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden"
                     style={{
                         backgroundImage: "url('/images/articleBook.jpg')",
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
                     }}
                 >
                     <div className="absolute inset-0 bg-black opacity-30"></div>
@@ -249,11 +249,11 @@ export default function LikedArticlesPage() {
                         <Button
                             key={idx}
                             onClick={() => {
-                                setIsLoading(true);
+                                setIsShowMoreloading(true);
                                 setTimeout(() => {
                                     setChosenCategory(item);
                                     setVisibleArticles(8);
-                                    setIsLoading(false);
+                                    setIsShowMoreloading(false);
                                 }, 500);
                             }}
                             className={`${
@@ -274,11 +274,11 @@ export default function LikedArticlesPage() {
                 <select
                     value={sortOrder}
                     onChange={(e) => {
-                        setIsLoading(true);
+                        setIsShowMoreloading(true);
                         setTimeout(() => {
                             setSortOrder(e.target.value);
                             setVisibleArticles(8);
-                            setIsLoading(false);
+                            setIsShowMoreloading(false);
                         }, 500);
                     }}
                     className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
@@ -327,7 +327,7 @@ export default function LikedArticlesPage() {
                 </CardHeader>
 
                 <CardContent>
-                    {isLoading ? (
+                    {isShowMoreLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {[...Array(8)].map((_, idx) => (
                                 <ArticleSkeleton key={idx} />
