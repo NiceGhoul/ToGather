@@ -200,7 +200,7 @@ class ArticleController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
+            // 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
             'contents' => 'required|array|min:1',
             'contents.*.type' => 'required|in:text,image',
             'contents.*.content' => 'nullable',
@@ -896,7 +896,7 @@ class ArticleController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
+            // 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
             'contents' => 'required|array|min:1',
             'contents.*.type' => 'required|in:text,image,paragraph',
             'contents.*.content' => 'nullable',
