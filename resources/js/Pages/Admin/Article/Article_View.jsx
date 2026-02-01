@@ -41,10 +41,9 @@ export default function ArticleView() {
             order_y: Number(c.order_y),
             newFile: null,
             preview: c.image_url || null,
-        }))
+        })),
     );
-
-    const [extraCols, setExtraCols] = useState(0);
+    //States
     const [extraRows, setExtraRows] = useState(0);
 
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
@@ -72,11 +71,9 @@ export default function ArticleView() {
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
-        // Deteksi dark mode dari body element
         const isDark = document.documentElement.classList.contains("dark");
         setIsDarkMode(isDark);
 
-        // Observer untuk perubahan class
         const observer = new MutationObserver(() => {
             const isDark = document.documentElement.classList.contains("dark");
             setIsDarkMode(isDark);
@@ -93,11 +90,13 @@ export default function ArticleView() {
     const handleImageClick = (url) => setSelectedImage(url);
     const handleCloseModal = () => setSelectedImage(null);
 
+    // Back Handler
     const handleBack = () => {
         if (from === "verification") router.get("/admin/articles/requests");
         else router.get("/admin/articles/list");
     };
 
+    //Actions Handler
     const handleEnable = (id) => router.post(`/admin/articles/${id}/approve`);
     const handleDisable = (id) => router.post(`/admin/articles/${id}/disable`);
 
@@ -111,7 +110,7 @@ export default function ArticleView() {
                     setPopupType("delete");
                     setSuccessPopupOpen(true);
                 },
-            }
+            },
         );
     };
 
@@ -129,11 +128,10 @@ export default function ArticleView() {
                     setPopupType("reject");
                     setSuccessPopupOpen(true);
                 },
-            }
+            },
         );
     };
 
-    // ---------------- TEXT EDITOR (QUILL) --------------------
     const startEdit = (idx) => {
         const block = blocks[idx];
         if (!block || (block.type !== "text" && block.type !== "paragraph"))
@@ -162,7 +160,7 @@ export default function ArticleView() {
         setQuillValue("");
     };
 
-    // ---------------- GRID HELPERS --------------------
+    // Blocks Actions
     const { maxX, maxY, gridCells } = useMemo(() => {
         const xs = blocks.map((b) => b.order_x || 1);
         const ys = blocks.map((b) => b.order_y || 1);
@@ -170,21 +168,21 @@ export default function ArticleView() {
         const baseMaxX = Math.max(1, ...(xs.length ? xs : [1]));
         const baseMaxY = Math.max(1, ...(ys.length ? ys : [1]));
 
-        const computedMaxX = Math.min(2, baseMaxX + extraCols);
+        const computedMaxX = Math.min(2, baseMaxX);
         const computedMaxY = baseMaxY + extraRows;
 
         const cells = [];
         for (let y = 1; y <= computedMaxY; y++) {
             for (let x = 1; x <= computedMaxX; x++) {
                 let idx = blocks.findIndex(
-                    (b) => b.order_x === x && b.order_y === y
+                    (b) => b.order_x === x && b.order_y === y,
                 );
                 if (idx === -1) idx = null;
                 cells.push({ x, y, idx });
             }
         }
         return { maxX: computedMaxX, maxY: computedMaxY, gridCells: cells };
-    }, [blocks, extraCols, extraRows]);
+    }, [blocks, extraRows]);
 
     const addBlockAt = (order_x, order_y, type) => {
         if (order_x > 2) return;
@@ -218,11 +216,11 @@ export default function ArticleView() {
                     !(
                         b.order_x === target.order_x &&
                         b.order_y === target.order_y
-                    )
+                    ),
             );
 
             const rowStillExists = remaining.some(
-                (b) => b.order_y === target.order_y
+                (b) => b.order_y === target.order_y,
             );
 
             if (!rowStillExists) {
@@ -241,7 +239,6 @@ export default function ArticleView() {
         setExtraRows((r) => r + 1);
     };
 
-    // ---------------- IMAGE CROP --------------------
     const onSelectImageForBlock = (file, idx) => {
         setCropFile(file);
         setCropTargetIdx(idx);
@@ -271,7 +268,7 @@ export default function ArticleView() {
                     0,
                     0,
                     cropPixels.width,
-                    cropPixels.height
+                    cropPixels.height,
                 );
 
                 canvas.toBlob((blob) => {
@@ -308,7 +305,6 @@ export default function ArticleView() {
         setCropTargetIdx(null);
     };
 
-    // ---------------- SAVE CHANGES --------------------
     const saveAllChanges = () => {
         const fd = new FormData();
 
@@ -351,14 +347,13 @@ export default function ArticleView() {
                 order_y: Number(c.order_y),
                 newFile: null,
                 preview: c.image_url || null,
-            }))
+            })),
         );
         setEditingId(null);
         setEditingMode(false);
         setQuillValue("");
     };
 
-    // ---------------- RENDER CELL CONTROLS --------------------
     const renderCellControls = (cell, idxInBlocks) => {
         if (!editingMode) return null;
 
@@ -461,7 +456,7 @@ export default function ArticleView() {
     return (
         <Layout_Admin title={`View Article: ${article.title}`}>
             <div className="p-6 space-y-6">
-                {/* POPUPS */}
+                {/* Popups */}
                 <Popup
                     triggerText=""
                     title={successPopupMessage}
@@ -478,10 +473,8 @@ export default function ArticleView() {
                     onClose={() => setSuccessPopupOpen(false)}
                 />
 
-                {/* HEADER */}
+                {/* Header */}
                 <div className="relative">
-                    {/* status badge di pojok kiri atas */}
-
                     <div className="flex flex-col gap-3 pt-8">
                         <h1 className="text-2xl font-bold">{article.title}</h1>
 
@@ -491,10 +484,10 @@ export default function ArticleView() {
                                     .charAt(0)
                                     .toUpperCase() +
                                     String(article.status || "unknown").slice(
-                                        1
+                                        1,
                                     )}
                             </span>
-                            {/* conditional action buttons based on status (hidden in edit mode) */}
+                            {/* Buttons */}
                             {!editingMode && (
                                 <>
                                     {article.status === "pending" ? (
@@ -529,7 +522,7 @@ export default function ArticleView() {
                                                         className="bg-yellow-200 hover:bg-yellow-300 text-yellow-700 dark:bg-yellow-500 dark:text-white dark:hover:bg-yellow-600    "
                                                         onClick={() =>
                                                             handleDisable(
-                                                                article.id
+                                                                article.id,
                                                             )
                                                         }
                                                     >
@@ -541,7 +534,7 @@ export default function ArticleView() {
                                                         className="dark:bg-green-700 dark:text-white dark:hover:bg-green-600 bg-green-200 hover:bg-green-300 text-green-700"
                                                         onClick={() =>
                                                             handleEnable(
-                                                                article.id
+                                                                article.id,
                                                             )
                                                         }
                                                     >
@@ -552,8 +545,6 @@ export default function ArticleView() {
                                             </>
                                         )
                                     )}
-
-                                    {/* delete button (left of Edit) */}
                                     <Button
                                         className="dark:bg-red-600 dark:text-white dark:hover:bg-red-500 bg-red-200 hover:bg-red-300 text-red-700"
                                         onClick={() => handleDelete(article.id)}
@@ -625,7 +616,7 @@ export default function ArticleView() {
                     </div>
                 </div>
 
-                {/* THUMBNAIL */}
+                {/* Thumbnail */}
                 {article.thumbnail_url && (
                     <div>
                         <h2 className="font-semibold text-lg mb-2">
@@ -641,7 +632,7 @@ export default function ArticleView() {
                     </div>
                 )}
 
-                {/* CONTENT GRID */}
+                {/* Content */}
                 <div className="">
                     <h2 className="font-semibold text-lg mb-4">Content</h2>
 
@@ -650,7 +641,7 @@ export default function ArticleView() {
                         style={{
                             gridTemplateColumns: `repeat(${Math.max(
                                 1,
-                                maxX
+                                maxX,
                             )}, minmax(0,1fr))`,
                         }}
                     >
@@ -679,8 +670,6 @@ export default function ArticleView() {
 
                                         {renderCellControls({ x, y }, blockIdx)}
                                     </div>
-
-                                    {/* RENDER CONTENT */}
                                     {block ? (
                                         block.type === "text" ||
                                         block.type === "paragraph" ? (
@@ -708,7 +697,7 @@ export default function ArticleView() {
                                                         <Button
                                                             onClick={() =>
                                                                 applyTextToBlock(
-                                                                    blockIdx
+                                                                    blockIdx,
                                                                 )
                                                             }
                                                             className="dark:bg-green-700 dark:text-white dark:hover:bg-green-600 bg-green-200 hover:bg-green-300 text-green-700"
@@ -739,7 +728,7 @@ export default function ArticleView() {
                                                 className="w-full rounded shadow cursor-pointer"
                                                 onClick={() =>
                                                     handleImageClick(
-                                                        block.preview
+                                                        block.preview,
                                                     )
                                                 }
                                             />
@@ -755,7 +744,7 @@ export default function ArticleView() {
                     </div>
                 </div>
 
-                {/* CROP MODAL */}
+                {/* Crop Modal */}
                 {cropFile && (
                     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
                         <div className="bg-white p-6 rounded shadow">
@@ -794,7 +783,7 @@ export default function ArticleView() {
                     </div>
                 )}
 
-                {/* FULL IMAGE PREVIEW */}
+                {/* Full Image Preview */}
                 {selectedImage && (
                     <div
                         className="fixed inset-0 bg-black/70 z-50 flex justify-center items-center"
@@ -808,7 +797,7 @@ export default function ArticleView() {
                 )}
             </div>
 
-            {/* UNSAVED CHANGES POPUP */}
+            {/* Unsaved Changes Popup */}
             <Popup
                 triggerText=""
                 title="Unsaved Changes"
@@ -828,7 +817,7 @@ export default function ArticleView() {
                 onClose={() => setUnsavedPopupOpen(false)}
             />
 
-            {/* REJECT MODAL */}
+            {/* Reject Modal */}
             {rejectModalOpen && (
                 <Popup
                     triggerText=""
@@ -840,7 +829,7 @@ export default function ArticleView() {
                     onConfirm={() => {
                         if (!rejectReason.trim()) {
                             setSuccessPopupMessage(
-                                "Please provide a rejection reason."
+                                "Please provide a rejection reason.",
                             );
                             setPopupType("reject");
                             setSuccessPopupOpen(true);

@@ -23,9 +23,8 @@ const scrollDonations = (data, idx) => {
     return (
         <Card
             key={idx}
-            className="w-[300px] h-[100px] mx-auto flex flex-row items-center justify-between px-4 dark:bg-gray-800 dark:border-gray-800"
-        >
-            <div className="overflow-hidden flex items-center justify-center shrink-0">
+            className="w-[300px] h-[100px] flex flex-row items-center justify-between dark:bg-gray-800 dark:border-gray-800">
+            <div className="overflow-hidden flex items-center justify-center shrink-0 ml-4">
                 <Avatar className="w-14 h-14 border-2 dark:bg-white">
                     <AvatarImage src={data.user ?? data?.user?.images[0].url} />
                     <AvatarFallback>
@@ -35,8 +34,8 @@ const scrollDonations = (data, idx) => {
             </div>
 
             <div className="flex flex-col items-center text-right gap-1 flex-1">
-                <CardHeader className="flex text-center justify-center">
-                    <CardTitle className="text-xl font-bold dark:text-white">
+                <CardHeader className="flex text-center justify-center w-full">
+                    <CardTitle className="text-base font-bold dark:text-white">
                         {data.anonymous === 0
                             ? data.user.nickname
                             : "anonymous"}
@@ -152,7 +151,7 @@ export default function Create() {
 
     const mainData = () => {
         return (
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-7xl mx-auto px-4 items-center">
                 <Button
                     className="mt-8 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white cursor-pointer"
                     onClick={() => router.get(backUrl)}
@@ -164,14 +163,10 @@ export default function Create() {
                 </h1>
                 <Separator className="flex-1 bg-gray-200 dark:bg-gray-600 h-[1px]" />
                 <div className="flex flex-col gap-2 my-4">
-                    <div className="w-full overflow-hidden p-2">
-                        <div className={donations.length > 4 ? "auto-scroll-horizontal" : "flex flex-row gap-4"}>
+                    <div className="w-full auto-scroll-wrapper p-2">
+                        <div className={donations.length > 4 ? "auto-scroll-horizontal" : "flex flex-row gap-4 justify-center items-center"}>
                             {donations.length > 0 ? (
-                                donations
-                                    .slice(0, 10)
-                                    .map((donation, idx) =>
-                                        scrollDonations(donation, idx)
-                                    )
+                                [...donations.slice(0, 10), ...donations.slice(0, 10)].map((donation, idx) => (scrollDonations(donation, idx)))
                             ) : (
                                 <p key={0} className="text-lg text-center">
                                     No Donations, yet...
@@ -201,10 +196,10 @@ export default function Create() {
                         <div className="flex flex-row gap-4 my-5 justify-center items-center">
                             <Map />
                             <p className="text-center">
-                                {campaign.location
+                                {campaign.locations
                                     ? campaign.locations.region +
-                                      ", " +
-                                      campaign.locations.country
+                                    ", " +
+                                    campaign.locations.country
                                     : campaign.address}
                             </p>
                         </div>
@@ -237,20 +232,20 @@ export default function Create() {
                                 {donations.length.toString() +
                                     " " +
                                     (donations.length > 1
-                                        ? " Donators"
-                                        : " Donator")}
+                                        ? " Donations"
+                                        : " Donation")}
                             </h1>
-                            {campaign.status != "completed" ?
+                            {campaign.status != "completed" || campaign.end_campaign < Date.now() ?
                                 <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {Math.ceil(
-                                    (new Date(campaign.end_campaign) -
-                                    new Date()) /
-                                    (1000 * 60 * 60 * 24)
-                                ) + " Days left"}
-                            </h1> :
-                            <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
-                                {"Campaign " + campaign.status}
-                            </h1>
+                                    {Math.ceil(
+                                        (new Date(campaign.end_campaign) -
+                                            new Date()) /
+                                        (1000 * 60 * 60 * 24)
+                                    ) + " Days left"}
+                                </h1> :
+                                <h1 className="text-2xl text-end font-semibold my-4 text-[#7C4789] dark:text-gray-300">
+                                    {"Campaign " + campaign.status}
+                                </h1>
                             }
                         </div>
                         <div className="relative flex flex-col justify-end gap-4 mt-2">
@@ -289,7 +284,7 @@ export default function Create() {
                                 )}
                         </p>
                         <div className="flex flex-row items-center justify-between mt-5">
-                            <Toggle
+                            {user && user.role !== 'admin' &&(<Toggle
                                 pressed={like}
                                 onPressedChange={() => handleLikes(campaign.id)}
                                 size="lg"
@@ -301,12 +296,15 @@ export default function Create() {
                                     ? "Like This Campaign"
                                     : "Campaign Liked"}
                             </Toggle>
+                            )}
 
-                            <Link href={`/donate?campaign_id=${campaign.id}`}>
-                                <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
-                                    Donate
-                                </Button>
-                            </Link>
+                            {user && user.role !== 'admin' && campaign.status != 'completed' && (
+                                <Link href={`/donate?campaign_id=${campaign.id}`}>
+                                    <Button className="min-h-10 min-w-56 font-semibold text-lg bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white">
+                                        Donate
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -316,7 +314,7 @@ export default function Create() {
                         defaultValue={flash?.activeTab ?? 1}
                         className="w-full">
                         <div className="dark:border-t-1 sticky top-[72px] z-40 bg-none pt-3 dark:pt-2 h-auto">
-                            <TabsList className="text-gray-500 flex gap-30 bg-[#fcfcfc] dark:bg-gray-800 shadow-md w-full mx-auto rounded-md dark:text-white h-[48px] ">
+                            <TabsList className="overflow-auto text-gray-500 flex gap-30 bg-[#fcfcfc] dark:bg-gray-800 shadow-md w-full mx-auto rounded-md dark:text-white h-[48px] ">
                                 {data.map((dat, idx) => {
                                     return (
                                         <TabsTrigger

@@ -227,19 +227,19 @@ const CampaignList = () => {
         <Layout>
             {/* upper part (banner and category picker) */}
             <div className="w-full flex flex-col">
-                <div
-                    className="relative h-72 w-full bg-cover bg-center"
-                    style={{
-                        backgroundImage: "url('/images/handshake.jpg')",
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
-                    }}
-                >
-                    <div className="absolute inset-0 bg-black opacity-30"></div>
-                    <div className="text-2xl font-bold mb-4 text-center flex items-center justify-center h-full relative z-10">
-                        <h1 className="text-4xl font-bold text-white text-center dark:text-white">
-                            <p>Together we Rise ToGather we Grow</p>
+                <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
+                    <img
+                        src="http://127.0.0.1:8000/images/handshake.jpg"
+                        alt="Campaign Banner"
+                        className="absolute inset-0 w-full h-full object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md dark:text-white">
+                            {"Browse Campaigns"}
                         </h1>
+                        <p className="text-white/90 mt-2 text-sm md:text-base">
+                            {"Browse campaigns curated by others and join us in making a difference!"}
+                        </p>
                     </div>
                 </div>
                 <div
@@ -248,7 +248,6 @@ const CampaignList = () => {
                 >
                     {lookups?.length > 0 && (
                         <Button
-                            key={998}
                             onClick={() => handleCategoryChange("All")}
                             className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
                                 chosenCategory === "All"
@@ -259,11 +258,7 @@ const CampaignList = () => {
                             Home
                         </Button>
                     )}
-                    {lookups
-                        ?.filter(
-                            (dat) => dat.lookup_type === "CampaignCategory"
-                        )
-                        .map((item, idx) => (
+                    {lookups?.filter((dat) => dat.lookup_type === "CampaignCategory").map((item, idx) => (
                             <Button
                                 key={idx}
                                 onClick={() =>
@@ -279,7 +274,6 @@ const CampaignList = () => {
                             </Button>
                         ))}
                     <Button
-                        key={999}
                         onClick={() => handleCategoryChange("Completed")}
                         className={`px-4 py-2 rounded-md text-white transition-all duration-200 ${
                             chosenCategory === "Completed"
@@ -287,7 +281,7 @@ const CampaignList = () => {
                                 : " text-white hover:bg-purple-700 bg-purple-800"
                         }`}
                     >
-                        Completed
+                        {"Completed Campaigns"}
                     </Button>
                 </div>
             </div>
@@ -306,7 +300,7 @@ const CampaignList = () => {
                 </ButtonGroup>
             </div>
 
-            {/* lower part (campaigns) */}
+            {/* lower part (campaigns list) */}
             <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4 dark:text-white">
@@ -335,7 +329,7 @@ const CampaignList = () => {
                             <Separator className="flex-1 bg-gray-400 h-px" />
                             <p
                                 onClick={handleShowMore}
-                                className=" text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2"
+                                className=" text-xl text-black font-medium cursor-pointer inline-flex items-center gap-2 dark:text-gray-400"
                             >
                                 {isShowMoreLoading && (
                                     <Spinner className="w-4 h-4" />

@@ -3,7 +3,7 @@ import { Heart, Instagram, Facebook, Twitter } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="bg-purple-50 mt-16 border-t border-purple-10 dark:bg-purple-900 ">
+        <footer className="bg-purple-50 border-t border-purple-10 dark:bg-purple-900 ">
             <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between text-gray-700 text-left gap-12">
                 {/*Brand & About */}
                 <div className="flex-2">

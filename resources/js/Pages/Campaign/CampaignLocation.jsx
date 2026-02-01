@@ -20,6 +20,7 @@ const CampaignLocation = ({ open, setCampaignLocation, onClose, locationData }) 
     const [address, setAddress] = useState("");
     const [coords, setCoords] = useState({ lat:-6.200284252332842, lng: 106.78547062682863});
 
+    // if locationData exists, set initial location and coords
     useEffect(() => {
         if(locationData != null){
             setLocation(locationData)
@@ -27,6 +28,7 @@ const CampaignLocation = ({ open, setCampaignLocation, onClose, locationData }) 
         }
     }, [locationData])
 
+    // location picker search bar
 function SearchBar() {
     const map = useMap();
     useEffect(() => {
@@ -76,7 +78,7 @@ function SearchBar() {
                     const { y, x } = result.location;
                     setCoords({ lat: y, lng: x });
                 } else {
-                    console.warn("returned undefined!");
+                    console.warn("returned undefined data!");
                 }
             });
 
@@ -86,6 +88,7 @@ function SearchBar() {
 
      useEffect(() => {
          if (!coords.lat || !coords.lng) return;
+
          const getLocation = async () => {
              setLocation({});
              const strUrl = `https://us1.locationiq.com/v1/reverse?key=${API_KEY}&lat=${coords.lat}&lon=${coords.lng}&format=json&addressdetails=1`;
@@ -153,7 +156,7 @@ function SearchBar() {
                             </MapContainer>
                         </div>
                         <div className="flex text-center  p-2 border-1 rounded">
-                            <p>{address.split(",").slice(0, 6).join(",").trim() }</p>
+                            <p className="dark:text-gray-100 text-sm">{address.split(",").slice(0, 6).join(",").trim() }</p>
                         </div>
                     </div>
 
@@ -187,7 +190,7 @@ function SearchBar() {
                                     />
                                 </div>
                             </div>
-                            <div className="grid w-full max-w-sm items-center gap-2">
+                            <div className="grid w-full items-center gap-2">
                                 <Label className="dark:text-gray-100" htmlFor="sb">Suburb</Label>
                                 <Input
                                 className={"w-full"}
@@ -201,7 +204,7 @@ function SearchBar() {
                                             }))}
                                 />
                             </div>
-                            <div className="grid w-full max-w-sm items-center gap-2">
+                            <div className="grid w-full items-center gap-2">
                                 <Label className="dark:text-gray-100" htmlFor="ct">City</Label>
                                 <Input
                                     type="ct"
@@ -216,7 +219,7 @@ function SearchBar() {
                             </div>
 
                             <div className="flex flex-row gap-4">
-                                <div className="grid w-full max-w-sm items-center gap-3">
+                                <div className="grid w-full items-center gap-3">
                                     <Label className="dark:text-gray-100" htmlFor="rg">Region</Label>
                                     <Input
                                         type="rg"
@@ -262,17 +265,7 @@ function SearchBar() {
 
                 <DialogFooter>
                     <Button
-                        onClick={() =>
-                            setCampaignLocation(
-                                {
-                                    ...location,
-                                    lat: coords.lat,
-                                    lon: coords.lng,
-                                },
-                                address
-                            )
-                        }
-                    >
+                        onClick={() => setCampaignLocation({...location, lat: coords.lat, lon: coords.lng}, address)}>
                         Confirm
                     </Button>
                 </DialogFooter>
