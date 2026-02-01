@@ -23,10 +23,6 @@ Route::get('/', function () {
 });
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/check-email', [UserController::class, 'checkEmail']);
-Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
-Route::get('/articles/view/{id}', [ArticleController::class, 'show'])->name('articles.show');
-Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
-Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
 
 
 
@@ -34,6 +30,10 @@ Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDe
 // --- Guest Routes ---
 // Only accessible by users who are NOT logged in. Ini Buat Login
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
+    Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('/articles/view/{id}', [ArticleController::class, 'show'])->name('articles.show');
+    Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
+    Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
     Route::get('/login', [UserController::class, 'showLogin'])->name('login');
     Route::post('/user/login', [UserController::class, 'login']);
 
