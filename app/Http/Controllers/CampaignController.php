@@ -86,6 +86,7 @@ class CampaignController extends Controller
 
     public function AdminChangeStatus(Request $request, $id)
     {
+        $fromVerification = false;
         $campaign = Campaign::findOrFail($id);
         $campaign->update(['status' => $request->status]);
         if ($campaign->status === "pending" && $request->status === "active") {
@@ -97,6 +98,7 @@ class CampaignController extends Controller
                     'end_campaign' => $end,
                 ]);
             }
+            $fromVerification = true;
         }
         // Notify user about article approval
         NotificationController::notifyUser(
@@ -106,7 +108,7 @@ class CampaignController extends Controller
             "Your Campaign '{$campaign->title}' status is now: {$request->status}!",
             ['campaign_id' => $campaign->id]
         );
-        if ($campaign->status === "pending" && $request->status === "active") {
+        if ($fromVerification) {
             return redirect()->route('admin.campaign.verification')->with('success', "Campaign status changed to '{$request->status}' !");
         } else {
             return redirect()->route('admin.campaign.adminIndex')->with('success', "Campaign status changed to '{$request->status}' !");
