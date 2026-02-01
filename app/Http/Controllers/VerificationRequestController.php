@@ -167,6 +167,7 @@ class VerificationRequestController extends Controller
 
             return redirect()->route('home')->with('success', 'Verification request submitted successfully.');
         } catch (\Exception $e) {
+            Log::error('Verification request error: ' . $e->getMessage());
             return back()->with('error', 'Something went wrong. Please try again.');
         }
     }

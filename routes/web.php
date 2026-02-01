@@ -23,16 +23,18 @@ Route::get('/', function () {
 });
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/check-email', [UserController::class, 'checkEmail']);
+
+
+
+
+// --- Public Routes ---
+// Accessible by everyone (guest + logged in)
 Route::get('/articles/list', [ArticleController::class, 'index'])->name('articles.index');
-Route::get('/articles/view/{id}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/campaigns/list', [CampaignController::class, 'showList'])->name('campaigns.showList');
 Route::get('/campaigns/details/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaigns.getCampaignDetail');
 
-
-
-
 // --- Guest Routes ---
-// Only accessible by users who are NOT logged in. Ini Buat Login
+// Only accessible by users who are NOT logged in.
 Route::middleware(RedirectIfAuthenticated::class)->group(function () {
     Route::get('/login', [UserController::class, 'showLogin'])->name('login');
     Route::post('/user/login', [UserController::class, 'login']);
@@ -77,15 +79,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/articles/likedArticles', [ArticleController::class, 'showLiked'])->name('articles.liked');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
-    Route::get('/articles/view/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticles');
+    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticleDetails');
     Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
     Route::get('/minio/{path}', [ArticleController::class, 'serveImage'])->where('path', '.*')->name('minio.serve');
     Route::post('/articles/{id}/like', [ArticleController::class, 'toggleLike'])->name('articles.toggleLike');
-
-
-
 
 
     // User Verification
@@ -103,6 +102,7 @@ Route::middleware('auth')->group(function () {
 
     // Donations
     Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
+    Route::get('/donations', fn () => redirect('/donate'));
     Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
     Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
 
@@ -120,6 +120,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 });
+
+// Public article show route - must be after specific /articles/* routes to avoid catching them
+Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
 
 // Video upload and retrieval
 Route::post('/api/upload-video', [FileController::class, 'uploadVideo'])->name('api.upload.video');
@@ -147,12 +150,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/campaigns/view/{id}', [CampaignController::class, 'getCampaignDetails'])->name('campaign.adminView');
     Route::post('/campaigns/delete/{id}', [CampaignController::class, 'AdminDelete'])->name('campaign.adminDelete');
     Route::post('/campaigns/changeStatus/{id}', [CampaignController::class, 'AdminChangeStatus'])->name('campaign.adminChangeStatus');
-    Route::post('/campaigns/bulkEnable', [CampaignController::class, 'AdminBulkEnable'])->name('campaign.bulkEnable');
-    Route::post('/campaigns/bulkDisable', [CampaignController::class, 'AdminBulkDisable'])->name('campaign.bulkDisable');
-    Route::post('/campaigns/bulkDelete', [CampaignController::class, 'AdminBulkDelete'])->name('campaign.bulkDelete');
-    Route::post('/campaigns/bulkUnban', [CampaignController::class, 'AdminBulkUnban'])->name('campaign.bulkUnban');
-    Route::post('campaigns/bulkAccept', [CampaignController::class, 'AdminBulkAcceptVerification'])->name('campaign.bulkAcceptVerification');
-    Route::post('campaigns/bulkReject', [CampaignController::class, 'AdminBulkRejectVerification'])->name('campaign.bulkRejectVerification');
 
     Route::get('/articles/list', [ArticleController::class, 'adminIndex'])->name('articles.index');
     Route::get('/articles/requests', [ArticleController::class, 'adminRequestIndex'])->name('articles.requests');

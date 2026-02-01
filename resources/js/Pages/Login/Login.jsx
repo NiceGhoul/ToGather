@@ -53,6 +53,7 @@ export default function Login() {
     const handleChange = (e) => {
         setData(e.target.name, e.target.value);
         setTouched((prev) => ({ ...prev, [e.target.name]: true }));
+        // Clear error saat user mengetik
         setClientErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
     };
 
@@ -66,8 +67,9 @@ export default function Login() {
         setTouched({ email: true, password: true });
         const validationErrors = validate();
         if (Object.keys(validationErrors).length > 0) {
-            setBackendError("");
+            setBackendError(""); // Hapus error backend jika validasi gagal
             clearErrors();
+            // Fokus ke field error pertama
             if (validationErrors.email) {
                 emailRef.current && emailRef.current.focus();
             } else if (validationErrors.password) {
@@ -91,19 +93,17 @@ export default function Login() {
                     setBackendError("");
                     setShowBannedAlert(false);
                 }
-                setIsSubmitLoading(false);
+                setIsSubmitLoading(false)
             },
             onFinish: () => setIsSubmitLoading(false),
+
         });
     };
 
     return (
         <Layout_L>
             {/* Banned Account Alert Dialog */}
-            <AlertDialog
-                open={showBannedAlert}
-                onOpenChange={setShowBannedAlert}
-            >
+            <AlertDialog open={showBannedAlert} onOpenChange={setShowBannedAlert}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="flex items-center gap-2">
@@ -123,8 +123,7 @@ export default function Login() {
                             Account Banned
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {errors.banned ||
-                                "Your account has been banned. Please contact support for more information."}
+                            {errors.banned || 'Your account has been banned. Please contact support for more information.'}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -140,9 +139,7 @@ export default function Login() {
 
             <Card className="bg-[#BCA3CA] dark:bg-gray-800">
                 <CardHeader className="mt-5">
-                    <CardTitle className="text-2xl mx-auto dark:text-white">
-                        Login
-                    </CardTitle>
+                    <CardTitle className="text-2xl mx-auto dark:text-white">Login</CardTitle>
                     <CardDescription className="mx-auto dark:text-gray-300">
                         Please fill out the form below to login.
                     </CardDescription>
@@ -151,12 +148,7 @@ export default function Login() {
                 <CardContent className="mb-5">
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label
-                                htmlFor="email"
-                                className="dark:text-gray-200"
-                            >
-                                Email
-                            </label>
+                            <label htmlFor="email" className="dark:text-gray-200">Email</label>
                             <input
                                 ref={emailRef}
                                 value={data.email}
@@ -181,12 +173,7 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <label
-                                htmlFor="password"
-                                className="dark:text-gray-200"
-                            >
-                                Password
-                            </label>
+                            <label htmlFor="password" className="dark:text-gray-200">Password</label>
                             <input
                                 ref={passwordRef}
                                 value={data.password}
@@ -225,11 +212,10 @@ export default function Login() {
                                 className="register-btn disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                                 disabled={isSubmitLoading}
                             >
-                                {isSubmitLoading && (
-                                    <Spinner className="w-4 h-4" />
-                                )}
+                                {isSubmitLoading && <Spinner className="w-4 h-4" />}
                                 Submit
                             </button>
+                            {/* Error dari backend (email/password missmatch) hanya di bawah tombol submit */}
                         </CardFooter>
                         <CardFooter className="flex justify-end p-0">
                             <Link href="/" className="back-btn mt-4">
@@ -240,10 +226,7 @@ export default function Login() {
 
                     <p className="text-sm mt-4 mx-auto dark:text-gray-300">
                         Didn't have an account yet?{" "}
-                        <Link
-                            href="/users/create"
-                            className="font-semibold dark:text-white"
-                        >
+                        <Link href="/users/create" className="font-semibold dark:text-white">
                             Register
                         </Link>
                     </p>

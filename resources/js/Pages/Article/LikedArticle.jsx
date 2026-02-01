@@ -22,18 +22,22 @@ import { Spinner } from "@/Components/ui/spinner";
 export default function LikedArticlesPage() {
     const { likedArticles } = usePage().props;
 
-    // State
-    const [searchTerm, setSearchTerm] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
+    // =========================
+    // STATE
+    // =========================
+    const [searchTerm, setSearchTerm] = useState(""); // input user
+    const [searchQuery, setSearchQuery] = useState(""); // yang dipakai filter saat tombol search
     const [chosenCategory, setChosenCategory] = useState("All");
     const [sortOrder, setSortOrder] = useState("desc");
     const [visibleArticles, setVisibleArticles] = useState(8);
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
 
-    // Categories
+    // =========================
+    // CATEGORY LIST
+    // =========================
     const categories = useMemo(() => {
         const unique = Array.from(
-            new Set(likedArticles.map((a) => a.category)),
+            new Set(likedArticles.map((a) => a.category))
         );
         return ["All", ...unique];
     }, [likedArticles]);
@@ -56,7 +60,9 @@ export default function LikedArticlesPage() {
         </div>
     );
 
-    // Search Handler
+    // =========================
+    // HANDLE SEARCH
+    // =========================
     const handleSearch = () => {
         setIsLoading(true);
         setTimeout(() => {
@@ -79,6 +85,7 @@ export default function LikedArticlesPage() {
     };
 
     const handleShowMore = () => {
+        // show spinner, then load more (small delay so spinner is visible)
         setIsShowMoreloading(true);
         setTimeout(() => {
             setVisibleArticles((prev) => prev + 8);
@@ -86,7 +93,9 @@ export default function LikedArticlesPage() {
         }, 400);
     };
 
-    // Filter List
+    // =========================
+    // FILTERING SYSTEM
+    // =========================
     const filteredList = useMemo(() => {
         let data = [...likedArticles];
 
@@ -99,20 +108,22 @@ export default function LikedArticlesPage() {
             data = data.filter(
                 (a) =>
                     a.title.toLowerCase().includes(t) ||
-                    a.user?.nickname?.toLowerCase().includes(t),
+                    a.user?.nickname?.toLowerCase().includes(t)
             );
         }
 
         data.sort((a, b) =>
             sortOrder === "asc"
                 ? new Date(a.created_at) - new Date(b.created_at)
-                : new Date(b.created_at) - new Date(a.created_at),
+                : new Date(b.created_at) - new Date(a.created_at)
         );
 
         return data;
     }, [chosenCategory, searchQuery, sortOrder, likedArticles]);
 
-    // Card
+    // =========================
+    // CARD COMPONENT
+    // =========================
     const cardRepeater = (data) =>
         data.slice(0, visibleArticles).map((article, idx) => {
             const previewText =
@@ -120,7 +131,7 @@ export default function LikedArticlesPage() {
                     (c) =>
                         (c.type === "text" || c.type === "paragraph") &&
                         c.order_x === 1 &&
-                        c.order_y === 1,
+                        c.order_y === 1
                 )?.content ?? "";
 
             return (
@@ -158,7 +169,7 @@ export default function LikedArticlesPage() {
 
                     <div className="flex justify-between items-center mt-auto">
                         <Link
-                            href={`/articles/view/${article.id}?from=liked_articles`}
+                            href={`/articles/${article.id}?from=liked_articles`}
                             className="text-purple-700 hover:underline"
                         >
                             Read more →
@@ -208,15 +219,18 @@ export default function LikedArticlesPage() {
 
     return (
         <Layout_User>
-            {/* Banner */}
+            {/* === Banner Section === */}
             <div className="w-full flex flex-col">
-                <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
-                    <img
-                        src="http://127.0.0.1:8000/images/writingArticle.jpg"
-                        alt="Article Banner"
-                        className="absolute inset-0 w-full h-full object-cover opacity-60"
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <div
+                    className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden"
+                    style={{
+                        backgroundImage: "url('/images/articleBook.jpg')",
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                    }}
+                >
+                    <div className="absolute inset-0 bg-black opacity-30"></div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10">
                         <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">
                             Liked Articles
                         </h1>
@@ -226,7 +240,7 @@ export default function LikedArticlesPage() {
                     </div>
                 </div>
 
-                {/* Category */}
+                {/* === Category Bar === */}
                 <div
                     className="flex flex-row space-x-4 h-[75px] bg-purple-700 bg-cover bg-center w-full items-center justify-center"
                     style={{ background: "#7A338C" }}
@@ -254,7 +268,7 @@ export default function LikedArticlesPage() {
                 </div>
             </div>
 
-            {/* Search Parameter */}
+            {/* === Search + Sort === */}
             <div className="w-11/12 flex m-10 items-end justify-end gap-3 ">
                 {/* Sort */}
                 <select
@@ -302,7 +316,7 @@ export default function LikedArticlesPage() {
                 </div>
             </div>
 
-            {/* Content */}
+            {/* === Content Section === */}
             <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4">
@@ -313,7 +327,7 @@ export default function LikedArticlesPage() {
                 </CardHeader>
 
                 <CardContent>
-                    {isShowMoreLoading ? (
+                    {isLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {[...Array(8)].map((_, idx) => (
                                 <ArticleSkeleton key={idx} />

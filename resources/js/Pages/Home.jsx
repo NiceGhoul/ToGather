@@ -161,12 +161,15 @@ export default function Home() {
         <Layout>
             <style>{customSwiperStyle}</style>
             {/* 🟣 HERO BANNER */}
-            <section className="relative w-full h-[300px] md:h-[400px] bg-purple-200 overflow-hidden">
-                <img
-                    src="http://127.0.0.1:8000/images/shakeHand.jpg"
-                    alt="ToGather Banner"
-                    className="absolute inset-0 w-full h-full object-cover opacity-70"
-                />
+            <section
+                className="relative w-full h-[300px] md:h-[400px] bg-purple-200 overflow-hidden"
+                style={{
+                    backgroundImage: "url('/images/shakeHand.jpg')",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                }}
+            >
+                <div className="absolute inset-0 bg-black opacity-30"></div>
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                     <h1 className="text-2xl md:text-4xl font-bold text-white drop-shadow-lg mb-6">

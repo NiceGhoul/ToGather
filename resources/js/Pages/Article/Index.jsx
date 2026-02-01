@@ -13,6 +13,7 @@ import { Toggle } from "@/Components/ui/toggle";
 import { Spinner } from "@/Components/ui/spinner";
 
 const ArticleList = () => {
+    // 🟣 Ambil props dari backend
     const {
         articles,
         categories,
@@ -21,7 +22,7 @@ const ArticleList = () => {
     } = usePage().props;
     const [isShowMoreLoading, setIsShowMoreloading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    // States
+    // 🟣 Inisialisasi state lokal
     const [visibleArticles, setVisibleArticles] = useState(8);
     const [articleList, setArticleList] = useState(articles || []);
     const [chosenCategory, setChosenCategory] = useState("All");
@@ -29,16 +30,16 @@ const ArticleList = () => {
     const [sortOrder, setSortOrder] = useState(initialSortOrder || "desc");
     const [isLogin, setIsLogin] = useState(false);
 
-    // Check auth
+    // 🟣 Check authentication status
     useEffect(() => {
         setIsLogin(!!auth?.user);
     }, [auth]);
 
-    // Like State
+    // 🟣 State untuk Like
     const [likesState, setLikesState] = useState(
         Object.fromEntries(
-            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false]),
-        ),
+            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false])
+        )
     );
 
     useEffect(() => {
@@ -46,7 +47,7 @@ const ArticleList = () => {
             setArticleList(articles);
             setIsLoading(false);
         } else {
-            // loading
+            // Simulate loading for initial page load
             const timer = setTimeout(() => setIsLoading(false), 500);
             return () => clearTimeout(timer);
         }
@@ -62,7 +63,7 @@ const ArticleList = () => {
             "/articles/list",
             {
                 category: activeCategory,
-                search: searchTerm,
+                search: searchTerm, // ⬅️ ikutkan search
                 sort: sortOrder,
             },
             {
@@ -75,7 +76,7 @@ const ArticleList = () => {
                     setIsLoading(false);
                 },
                 onError: () => setIsLoading(false),
-            },
+            }
         );
     };
 
@@ -86,7 +87,7 @@ const ArticleList = () => {
             {
                 category: chosenCategory === "" ? "All" : chosenCategory,
                 sort: sortOrder,
-                search: searchTerm,
+                search: searchTerm, // ⬅️ kirim ke backend
             },
             {
                 preserveScroll: true,
@@ -96,7 +97,7 @@ const ArticleList = () => {
                     setIsLoading(false);
                 },
                 onError: () => setIsLoading(false),
-            },
+            }
         );
     };
 
@@ -131,7 +132,7 @@ const ArticleList = () => {
     };
 
     const handleShowMore = () => {
-        // handle show more button
+        // show spinner, then load more (small delay so spinner is visible)
         setIsShowMoreloading(true);
         setTimeout(() => {
             setVisibleArticles((prev) => prev + 8);
@@ -167,7 +168,7 @@ const ArticleList = () => {
                         (c) =>
                             (c.type === "text" || c.type === "paragraph") &&
                             c.order_x === 1 &&
-                            c.order_y === 1,
+                            c.order_y === 1
                     )?.content || "";
 
                 const liked = likesState[article.id] || false;
@@ -209,7 +210,7 @@ const ArticleList = () => {
 
                         <div className="flex justify-between items-center mt-auto">
                             <Link
-                                href={`/articles/view/${article.id}?from=articles_list`}
+                                href={`/articles/${article.id}?from=articles_list`}
                                 className="text-purple-700 hover:underline font-medium"
                             >
                                 Read more →
@@ -238,19 +239,23 @@ const ArticleList = () => {
         }
     };
 
+    // 🟣 Dynamic Layout based on authentication
     const Layout = isLogin ? Layout_User : Layout_Guest;
 
     return (
         <Layout>
-            {/* Banner */}
+            {/* === Banner Section === */}
             <div className="w-full flex flex-col">
-                <div className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden">
-                    <img
-                        src="http://127.0.0.1:8000/images/articleBook.jpg"
-                        alt="Article Banner"
-                        className="absolute inset-0 w-full h-full object-cover opacity-60"
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <div
+                    className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden"
+                    style={{
+                        backgroundImage: "url('/images/articleBook.jpg')",
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                    }}
+                >
+                    <div className="absolute inset-0 bg-black opacity-30"></div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10">
                         <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md dark:text-white">
                             Discover Stories, Insights & Ideas
                         </h1>
@@ -261,7 +266,7 @@ const ArticleList = () => {
                     </div>
                 </div>
 
-                {/* Category Bar*/}
+                {/* === Category Bar === */}
                 <div
                     className="flex flex-row space-x-4 h-[75px] bg-gray-300 bg-cover bg-center w-full items-center justify-center"
                     style={{ background: "#7A338C" }}
@@ -296,9 +301,9 @@ const ArticleList = () => {
                 </div>
             </div>
 
-            {/* Search Parameter*/}
+            {/* === Search Bar + Sort === */}
             <div className="w-11/12 flex m-10 items-end justify-end gap-3">
-                {/* Sort Dropdown */}
+                {/* Dropdown Sort */}
                 <select
                     value={sortOrder}
                     onChange={(e) => {
@@ -311,7 +316,7 @@ const ArticleList = () => {
                                 category:
                                     chosenCategory === ""
                                         ? "All"
-                                        : chosenCategory,
+                                        : chosenCategory, // ⬅️ pastikan tetap kirim kategori
                                 sort: newSort,
                                 search: searchTerm,
                             },
@@ -323,7 +328,7 @@ const ArticleList = () => {
                                     setIsLoading(false);
                                 },
                                 onError: () => setIsLoading(false),
-                            },
+                            }
                         );
                     }}
                     className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none  bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:text-white dark:border-gray-600"
@@ -368,7 +373,7 @@ const ArticleList = () => {
                                         setIsLoading(false);
                                     },
                                     onError: () => setIsLoading(false),
-                                },
+                                }
                             );
                         }}
                         className="hover:ring-1 ml-0.5 hover:ring-red-500 text-red-600 hover:bg-red-100 hover:text-red-800"
@@ -378,7 +383,7 @@ const ArticleList = () => {
                 </ButtonGroup>
             </div>
 
-            {/* Article List */}
+            {/* === Article Section === */}
             <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4">
