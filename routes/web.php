@@ -79,7 +79,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/articles/likedArticles', [ArticleController::class, 'showLiked'])->name('articles.liked');
     Route::get('/articles/myArticles', [ArticleController::class, 'showMyArticles'])->name('articles.myArticles');
-    Route::get('/articles/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticleDetails');
+    Route::get('/articles/view/{id}/details', [ArticleController::class, 'showMyArticleDetails'])->name('articles.myArticleDetails');
     Route::get('/articles/{id}/edit', [ArticleController::class, 'userEdit'])->name('articles.userEdit');
     Route::post('/articles/{id}/update', [ArticleController::class, 'userUpdate'])->name('articles.userUpdate');
     Route::post('/articles/upload-image', [ArticleController::class, 'uploadContentImage']);
@@ -102,7 +102,7 @@ Route::middleware('auth')->group(function () {
 
     // Donations
     Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
-    Route::get('/donations', fn () => redirect('/donate'));
+    Route::get('/donations', fn() => redirect('/donate'));
     Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
     Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
 
