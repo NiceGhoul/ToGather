@@ -13,27 +13,18 @@ import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
 import { router } from "@inertiajs/react";
 import { Trash } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Toaster } from "@/Components/ui/sonner";
 
-export const UpdateBuilder = ({ campaign, contents }) => {
+export const UpdateBuilder = ({ campaign, contents, insertHandler }) => {
     const [editMode, setEditMode] = useState(false);
     const [openPopUp, setOpenPopUp] = useState(-1);
-
     // useState that saves what will be shown on the right side
     const [updates, setUpdates] = useState(contents);
+    const [oldUpdates, setOldUpdates] = useState(contents);
     const [selectedUpdate, setSelectedUpdate] = useState(
-        updates[updates.length - 1],
+        updates[updates.length - 1]
     );
-    const fileInputRef = useRef(null);
-    const [successPopupOpen, setSuccessPopupOpen] = useState(false);
-    const [successPopupMessage, setSuccessPopupMessage] = useState("");
-
-    useEffect(() => {;
-        setUpdates(contents);
-        setSelectedUpdate(contents[contents.length - 1]);
-    }, [contents]);
 
     const handleAddUpdate = () => {
         const date = new Date();
@@ -48,10 +39,13 @@ export const UpdateBuilder = ({ campaign, contents }) => {
             };
 
             const updated = [...prev, newUpdate];
-            setSelectedUpdate(newUpdate); 
+
+            setSelectedUpdate(newUpdate); // newest one
+
             return updated;
         });
     };
+    // console.log(selectedUpdate)
     const [formData, setFormData] = useState({
         tabs: selectedUpdate?.tabs || "",
         content: selectedUpdate?.content || "",
@@ -59,21 +53,13 @@ export const UpdateBuilder = ({ campaign, contents }) => {
     });
 
     const handleSaveUpdate = () => {
-        if (!formData.content || formData.content.trim() === "" || !formData.title || formData.title.trim() === "") {
-             toast.error("Unable to save changes", {
-                duration: 2500,
-                style: {
-            '--normal-bg':
-              'light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))',
-            '--normal-text': 'var(--color-white)',
-            '--normal-border': 'transparent'
-          },
-                description: (
-                    <div className="text-white text-md">
-                       Input cannot be empty! please check your input before saving.
-                    </div>
-                ),
-            });
+        if (!formData.title || formData.title.trim() === "") {
+            () => toast("Title cannot be empty!");
+            return;
+        }
+
+        if (!formData.content || formData.content.trim() === "") {
+            toast("description cannot be empty!");
             return;
         }
 
@@ -81,6 +67,7 @@ export const UpdateBuilder = ({ campaign, contents }) => {
             (dat) => dat && (dat.file || dat.url)
         );
 
+        // console.log(cleanedMedia)
 
         const updatedList = updates.map((upd) =>
             upd.id === selectedUpdate.id
@@ -108,15 +95,11 @@ export const UpdateBuilder = ({ campaign, contents }) => {
         setSelectedUpdate(updatesPreview);
         setEditMode(false);
 
-            router.post(`/campaigns/insertUpdates`, updatedUpdate, {
-                onError: (errors) => uploadErrorHandler(errors),
-                onSuccess: () => {
-                    setSuccessPopupMessage("Update Saved!");
-                    setSuccessPopupOpen(true);
-                }
-            });
+        if (insertHandler) {
+            // console.log(updatedUpdate)
+            insertHandler(updatedUpdate);
+        }
     };
-
 
     const handleMediaChange = (e) => {
         const files = Array.from(e.target.files);
@@ -128,19 +111,11 @@ export const UpdateBuilder = ({ campaign, contents }) => {
         setFormData({ ...formData, media: previews });
     };
 
-    const handleUpdatesDelete = async (id) => {
-        if (contents.some((dat) => dat.id === id)) {
-            await router.post(
-                `/campaigns/deleteContent/${id}`,
-                { id },
-                {
-                    onSuccess: () => {
-                        setSuccessPopupMessage("Update Deleted!");
-                        setSuccessPopupOpen(true);
-                    },
-                },
-            );
+    const handleUpdatesDelete = async (openPopUp) => {
+        if (contents.some((dat) => dat.id === openPopUp)) {
+            await router.post(`/campaigns/deleteContent/${openPopUp}`);
             setUpdates(contents);
+            console.log(openPopUp);
             setOpenPopUp(-1);
             return;
         }
@@ -162,25 +137,9 @@ export const UpdateBuilder = ({ campaign, contents }) => {
             return filtered;
         });
     };
-
-    const handleSuccessClose = () => {
-        setSuccessPopupOpen(false);
-        router.reload();
-    };
-
+    // console.log(selectedUpdate.id)
     return (
         <>
-            <Popup
-                triggerText=""
-                title={successPopupMessage}
-                description=""
-                confirmText="OK"
-                confirmColor={"bg-purple-800 hover:bg-purple-700 text-white"}
-                open={successPopupOpen}
-                onConfirm={handleSuccessClose}
-                onClose={handleSuccessClose}
-                triggerClass=""
-            />
             <Label className="text-3xl justify-center items-center font-bold text-[#7C4789] dark:text-purple-400">
                 Project Updates
             </Label>
@@ -212,7 +171,7 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                                     <Label className="text-2xl font-bold text-[#7C4789] dark:text-purple-400">
                                         {selectedUpdate.content
                                             ? selectedUpdate.content.split(
-                                                  "~;",
+                                                  "~;"
                                               )[0]
                                             : "New Update"}
                                     </Label>
@@ -225,24 +184,21 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                                                   .toLocaleDateString("en-GB")
                                                   .replaceAll("/", "-")
                                             : new Date(
-                                                  selectedUpdate.created_at,
+                                                  selectedUpdate.created_at
                                               )
                                                   .toLocaleDateString("en-GB")
                                                   .replaceAll("/", "-")}
                                     </p>
                                 )}
                                 {/* media carousel */}
-                                {(selectedUpdate.media.length > 0 ||
-                                    formData.media.length > 0) && (
+                                {
                                     <div className="flex flex-col gap-2 my-10">
-                                        {editMode && (
-                                            <Label className="text-base text-gray-500 ">
-                                                {"Media Preview"}
-                                            </Label>
-                                        )}
-                                        <Carousel className="w-full max-w-[80%] mx-auto my-10">
+                                        <Label className="text-base text-gray-500">
+                                            Media Preview
+                                        </Label>
+                                        <Carousel className="w-full max-w-[80%] mx-auto">
                                             <CarouselContent>
-                                                {(formData.media.length != 0
+                                                {(editMode
                                                     ? formData
                                                     : selectedUpdate
                                                 ).media.map((m, idx) => (
@@ -277,43 +233,35 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                                             <CarouselNext className="text-[#7C4789]" />
                                         </Carousel>
                                     </div>
-                                )}
-                                {/* upload Media and description field */}
+                                }
+
                                 {editMode && (
                                     <div className="flex flex-col gap-2 mb-5">
                                         <Label className="text-base text-gray-500">
-                                            {"Upload Media"}
+                                            Upload Media
                                         </Label>
                                         <div className="flex flex-row gap-5">
                                             <Input
-                                                ref={fileInputRef}
-                                                value={formData.media.file}
                                                 type="file"
                                                 multiple
                                                 accept="image/*,video/*"
-                                                onChange={(e) =>
-                                                    handleMediaChange(e)
-                                                }
+                                                onChange={handleMediaChange}
                                             />
                                             <Button
                                                 className="bg-red-300 hover:bg-red-400 text-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white"
-                                                onClick={() => {
+                                                onClick={() =>
                                                     setFormData((dat) => ({
                                                         ...dat,
                                                         media: [],
-                                                    }));
-                                                    if (fileInputRef.current) {
-                                                        fileInputRef.current.value =
-                                                            "";
-                                                    }
-                                                }}
+                                                    }))
+                                                }
                                             >
-                                                {"Clear Media"}
+                                                Clear Media
                                             </Button>
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             <Label className="text-base text-gray-500 dark:text-gray-200">
-                                                {"Updates Description"}
+                                                Updates Description
                                             </Label>
                                             <Textarea
                                                 rows={12}
@@ -331,7 +279,7 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                                     </div>
                                 )}
 
-                                {/* Content if editMode is inactive */}
+                                {/* Content */}
                                 {!editMode && (
                                     <p className="text-left text-md text-gray-700 dark:text-gray-300 whitespace-pre-line ">
                                         {selectedUpdate.content.split("~;")[1]}
@@ -363,7 +311,7 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                                                 className="bg-red-300 hover:bg-red-400 text-red-700 dark:bg-red-500 dark:hover:bg-red-600 dark:text-white p-0 w-12 h-12 rounded-md"
                                                 onClick={() =>
                                                     setOpenPopUp(
-                                                        selectedUpdate.id,
+                                                        selectedUpdate.id
                                                     )
                                                 }
                                             >
@@ -376,11 +324,11 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                                                 onClick={() => {
                                                     setFormData({
                                                         title: selectedUpdate.content.split(
-                                                            "~;",
+                                                            "~;"
                                                         )[0],
                                                         content:
                                                             selectedUpdate.content.split(
-                                                                "~;",
+                                                                "~;"
                                                             )[1],
                                                         media: selectedUpdate.media,
                                                     });
@@ -396,7 +344,7 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                         ) : (
                             <div className="w-full h-full">
                                 <Label className="w-full h-full items-center justify-center text-lg italic text-gray-400 dark:text-gray-500">
-                                    {"No updates have been made."}
+                                    No updates have been made.
                                 </Label>
                             </div>
                         )}
@@ -405,7 +353,7 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                     {/* kanan */}
                     <div className="w-[280px] rounded-2xl p-4 flex flex-col gap-3 h-fit shadow-md justify-center dark:bg-gray-900 w-80 p-4 sticky top-30">
                         <Label className="w-full justify-center dark:text-white font-semibold text-xl py-3 border-b-1 border-black dark: border-gray-400">
-                            {"Campaign Updates"}
+                            Campaign Updates
                         </Label>
                         {[...updates].reverse().map((upd) => (
                             <Card
@@ -454,7 +402,7 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                             className=" border-dotted bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
                             onClick={handleAddUpdate}
                         >
-                            {" + Add Project Update"}
+                            + Add Project Update
                         </Button>
                     </div>
                 </div>
@@ -469,11 +417,6 @@ export const UpdateBuilder = ({ campaign, contents }) => {
                     showCancel={true}
                     confirmColor={"bg-red-600 hover:bg-red-700 text-white"}
                     onConfirm={() => handleUpdatesDelete(openPopUp)}
-                />
-                <Toaster
-                    className="text-xl"
-                    toastOptions={{ duration: 2500 }}
-                    position="top-center"
                 />
             </div>
         </>

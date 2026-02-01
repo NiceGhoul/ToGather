@@ -3,14 +3,14 @@ import { useState } from "react";
 
 export const AboutDetails = ({contents}) => {
 
-    const description = contents
+    const [description, setDescription] = useState(contents)
 
     return (
         <div className="w-full p-6 justify-center flex flex-col items-center">
-            {contents.length > 0 ? (
+            {description.length > 0 ? (
                 <div className="flex flex-col gap-10 w-[100%]">
                     <div className="flex flex-col gap-4">
-                        {contents.map((block, index) => (
+                        {description.map((block, index) => (
                             <div key={index}className="rounded-lg p-3 flex flex-col gap-2 relative">
                                 {block.type === "paragraph" ? (
                                         <div className="flex flex-col gap-4 flex">
@@ -42,7 +42,7 @@ export const AboutDetails = ({contents}) => {
             ) : (
                 <div className="flex h-[480px] w-full justify-center items-center text-gray-300 italic">
                     <Label className={"text-base font-extralight italic text-gray-300"}>
-                        {"There are no description for the selected campaign!"}
+                        There are no description for the selected campaign!
                     </Label>
                 </div>
             )}

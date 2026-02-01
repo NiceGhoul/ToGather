@@ -26,12 +26,13 @@ export default function Lookup() {
             {},
             {
                 onSuccess: () => {
+                    // opsional: bisa tambahkan notifikasi kalau kamu pakai toast
                     console.log("Lookup deleted successfully.");
                 },
                 onError: (err) => {
                     console.error("Error deleting lookup:", err);
                 },
-            },
+            }
         );
     };
 
@@ -49,11 +50,13 @@ export default function Lookup() {
 
         router.post(url, editData, {
             onSuccess: () => {
+                // ✅ Save berhasil → tutup modal + tampilkan popup success
                 setShowModal(false);
                 setEditData(null);
                 setSuccessPopup(true);
             },
             onError: (err) => {
+                // ❌ Validasi error → tampilkan popup error
                 const firstError =
                     err[Object.keys(err)[0]] || "An error occurred.";
                 setErrorPopup({
@@ -143,6 +146,7 @@ export default function Lookup() {
                                     {lookup.lookup_description}
                                 </td>
                                 <td className="border px-4 py-2 text-center space-x-2 dark:border-gray-700 dark:text-gray-200">
+                                    {/* Tombol Edit */}
                                     <Button
                                         variant="outline"
                                         size="icon"
@@ -151,6 +155,8 @@ export default function Lookup() {
                                     >
                                         <Pencil className="w-4 h-4 text-purple-700 hover:text-purple-700" />
                                     </Button>
+
+                                    {/* Tombol Delete */}
                                     <Popup
                                         triggerText={
                                             <Trash className="w-4 h-4" />
@@ -171,7 +177,7 @@ export default function Lookup() {
                 </table>
             </div>
 
-            {/* Edit Modal */}
+            {/* Modal Edit */}
             {showModal && editData && (
                 <div
                     className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 dark:bg-black/50"

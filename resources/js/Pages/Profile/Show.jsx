@@ -39,6 +39,9 @@ export default function Show({
     verificationStatus,
     verificationRequest,
 }) {
+    // Debug: Log user data
+    console.log("User data:", user);
+    console.log("Profile image URL:", user.profile_image_url);
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [detailsModal, setDetailsModal] = useState({

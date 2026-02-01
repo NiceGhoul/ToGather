@@ -17,17 +17,17 @@ export default function Register() {
     // State step form
     const [step, setStep] = useState(1);
 
-    // Input OTP (6 digit)
+    // Ref input OTP (6 digit)
     const otpRefs = Array.from({ length: 6 }, () => useRef(null));
 
-    // Input field
+    // Ref input field lain (untuk auto focus)
     const emailRef = useRef(null);
     const passwordRef = useRef(null);
     const confirmPasswordRef = useRef(null);
     const nicknameRef = useRef(null);
     const addressRef = useRef(null);
 
-    // State formData
+    // State data form
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -37,18 +37,20 @@ export default function Register() {
         otp: "",
     });
 
-    // States
+    // Error dan touched
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
 
+    // Timer OTP
     const [otpTimer, setOtpTimer] = useState(60);
     const [isCounting, setIsCounting] = useState(true);
 
+    // Loading states
     const [isNextLoading, setIsNextLoading] = useState(false);
     const [isResendLoading, setIsResendLoading] = useState(false);
     const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
-    // Countdown Timer OTP
+    // Countdown OTP
     React.useEffect(() => {
         let interval;
         if (step === 2 && isCounting && otpTimer > 0) {
@@ -59,7 +61,7 @@ export default function Register() {
         return () => clearInterval(interval);
     }, [step, isCounting, otpTimer]);
 
-    // Resend OTP Handler
+    // Resend OTP
     const handleResendOtp = async () => {
         setIsResendLoading(true);
         try {
@@ -77,7 +79,7 @@ export default function Register() {
         }
     };
 
-    // Input form handler
+    // Handler input form
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -94,7 +96,7 @@ export default function Register() {
         });
     };
 
-    // Check email existence
+    // Cek email ke backend
     const [emailExists, setEmailExists] = useState(false);
     const [emailChecked, setEmailChecked] = useState(false);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -124,7 +126,7 @@ export default function Register() {
 
         try {
             const res = await axios.get(
-                `/check-email?email=${encodeURIComponent(value)}`,
+                `/check-email?email=${encodeURIComponent(value)}`
             );
             const exists = res.data.exists;
             setEmailExists(exists);
@@ -143,6 +145,7 @@ export default function Register() {
         }
     };
 
+    // Validasi step 1
     const validateStep1 = () => {
         const newErrors = {};
         setTouched({
@@ -189,6 +192,7 @@ export default function Register() {
         return Object.keys(newErrors).length === 0;
     };
 
+    // Validasi step 2
     const validateStep2 = () => {
         const newErrors = {};
         setTouched((prev) => ({ ...prev, otp: true }));
@@ -200,6 +204,7 @@ export default function Register() {
         return Object.keys(newErrors).length === 0;
     };
 
+    // Tombol next
     const handleNext = async () => {
         if (step === 1 && !validateStep1()) return;
         if (step === 2 && !validateStep2()) return;
@@ -234,6 +239,7 @@ export default function Register() {
         }
     };
 
+    // Submit terakhir
     const handleSubmit = (e) => {
         e.preventDefault();
         setIsSubmitLoading(true);
@@ -248,10 +254,11 @@ export default function Register() {
                 onSuccess: () => Inertia.visit("/Login"),
                 onError: () => setIsSubmitLoading(false),
                 onFinish: () => setIsSubmitLoading(false),
-            },
+            }
         );
     };
 
+    // Tombol back
     const handleBack = () => {
         if (step === 1) window.location.href = "/";
         else setStep(step - 1);
@@ -266,7 +273,7 @@ export default function Register() {
         formData.confirmPassword &&
         formData.confirmPassword === formData.password;
 
-    // Auto focus
+    // Auto focus tiap step
     React.useEffect(() => {
         if (step === 1) setTimeout(() => emailRef.current?.focus(), 0);
         if (step === 2) {
@@ -277,7 +284,7 @@ export default function Register() {
         if (step === 3) setTimeout(() => nicknameRef.current?.focus(), 0);
     }, [step]);
 
-    // Auto reset 5 mins
+    // Auto reset 5 menit
     React.useEffect(() => {
         const timeout = setTimeout(() => setStep(1), 300000);
         return () => clearTimeout(timeout);
@@ -291,8 +298,8 @@ export default function Register() {
                         {step === 1
                             ? "Sign Up"
                             : step === 2
-                              ? "OTP Authentication"
-                              : "Finish Your Account"}
+                            ? "OTP Authentication"
+                            : "Finish Your Account"}
                     </CardTitle>
                     <CardDescription className="mt-2 text-gray-600 dark:text-gray-300">
                         {step === 1 &&
@@ -345,16 +352,11 @@ export default function Register() {
                             }
                         }}
                     >
-                        {/* Step 1 */}
+                        {/* STEP 1 */}
                         {step === 1 && (
                             <>
                                 <div>
-                                    <label
-                                        htmlFor="email"
-                                        className="dark:text-gray-200"
-                                    >
-                                        Email
-                                    </label>
+                                    <label htmlFor="email" className="dark:text-gray-200">Email</label>
                                     <input
                                         ref={emailRef}
                                         value={formData.email}
@@ -372,8 +374,8 @@ export default function Register() {
                                             touched.email && !emailValid
                                                 ? "border-red-500 ring-red-500"
                                                 : touched.email && emailValid
-                                                  ? "border-green-500 ring-green-500"
-                                                  : ""
+                                                ? "border-green-500 ring-green-500"
+                                                : ""
                                         }`}
                                         placeholder="Example@gmail.com"
                                     />
@@ -385,12 +387,7 @@ export default function Register() {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="password"
-                                        className="dark:text-gray-200"
-                                    >
-                                        Password
-                                    </label>
+                                    <label htmlFor="password" className="dark:text-gray-200">Password</label>
                                     <input
                                         ref={passwordRef}
                                         value={formData.password}
@@ -448,10 +445,7 @@ export default function Register() {
                                 </div>
 
                                 <div>
-                                    <label
-                                        htmlFor="confirmPassword"
-                                        className="dark:text-gray-200"
-                                    >
+                                    <label htmlFor="confirmPassword" className="dark:text-gray-200">
                                         Confirm Password
                                     </label>
                                     <input
@@ -472,9 +466,9 @@ export default function Register() {
                                             !confirmValid
                                                 ? "border-red-500 ring-red-500"
                                                 : touched.confirmPassword &&
-                                                    confirmValid
-                                                  ? "border-green-500 ring-green-500"
-                                                  : ""
+                                                  confirmValid
+                                                ? "border-green-500 ring-green-500"
+                                                : ""
                                         }`}
                                         placeholder="Confirm your password"
                                     />
@@ -497,7 +491,7 @@ export default function Register() {
                             </>
                         )}
 
-                        {/* Step 2 */}
+                        {/* STEP 2 */}
                         {step === 2 && (
                             <div className="text-center">
                                 <div className="flex justify-center gap-2">
@@ -517,7 +511,7 @@ export default function Register() {
                                                 const value =
                                                     e.target.value.replace(
                                                         /\D/,
-                                                        "",
+                                                        ""
                                                     );
                                                 const newOtp =
                                                     formData.otp.split("");
@@ -586,16 +580,11 @@ export default function Register() {
                             </div>
                         )}
 
-                        {/* Step 3 */}
+                        {/* STEP 3 */}
                         {step === 3 && (
                             <>
                                 <div>
-                                    <label
-                                        htmlFor="nickname"
-                                        className="dark:text-gray-200"
-                                    >
-                                        Nickname
-                                    </label>
+                                    <label htmlFor="nickname" className="dark:text-gray-200">Nickname</label>
                                     <input
                                         ref={nicknameRef}
                                         value={formData.nickname}
@@ -608,12 +597,7 @@ export default function Register() {
                                     />
                                 </div>
                                 <div>
-                                    <label
-                                        htmlFor="address"
-                                        className="dark:text-gray-200"
-                                    >
-                                        Alamat
-                                    </label>
+                                    <label htmlFor="address" className="dark:text-gray-200">Alamat</label>
                                     <input
                                         ref={addressRef}
                                         value={formData.address}

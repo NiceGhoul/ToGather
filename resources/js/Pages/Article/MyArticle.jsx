@@ -26,7 +26,6 @@ export default function MyArticle({
     categories = [],
     sortOrder: initialSortOrder,
 }) {
-    // States
     const [isLoading, setIsLoading] = useState(true);
     const [visibleArticles, setVisibleArticles] = useState(8);
     const [articleList, setArticleList] = useState(articles || []);
@@ -37,10 +36,11 @@ export default function MyArticle({
 
     const [likesState, setLikesState] = useState(
         Object.fromEntries(
-            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false]),
-        ),
+            (articles || []).map((a) => [a.id, a.is_liked_by_user ?? false])
+        )
     );
     const handleShowMore = () => {
+        // show spinner, then load more (small delay so spinner is visible)
         setIsShowMoreloading(true);
         setTimeout(() => {
             setVisibleArticles((prev) => prev + 8);
@@ -53,6 +53,7 @@ export default function MyArticle({
             setArticleList(articles);
             setIsLoading(false);
         } else {
+            // Simulate loading for initial page load
             const timer = setTimeout(() => setIsLoading(false), 500);
             return () => clearTimeout(timer);
         }
@@ -62,7 +63,6 @@ export default function MyArticle({
         setVisibleArticles(8);
     }, [chosenCategory, searchTerm]);
 
-    // Change Category Handler
     const handleCategoryChange = (activeCategory) => {
         setIsLoading(true);
         router.get(
@@ -83,11 +83,10 @@ export default function MyArticle({
                     setIsLoading(false);
                 },
                 onError: () => setIsLoading(false),
-            },
+            }
         );
     };
 
-    // Search Handler
     const handleSearch = () => {
         setIsLoading(true);
         router.get(
@@ -95,7 +94,7 @@ export default function MyArticle({
             {
                 category: chosenCategory === "" ? "All" : chosenCategory,
                 sort: sortOrder,
-                search: searchTerm,
+                search: searchTerm, // ⬅️ kirim ke backend
             },
             {
                 preserveScroll: true,
@@ -105,11 +104,10 @@ export default function MyArticle({
                     setIsLoading(false);
                 },
                 onError: () => setIsLoading(false),
-            },
+            }
         );
     };
 
-    // Like Handler
     const handleLike = async (articleId) => {
         try {
             const response = await fetch(`/articles/${articleId}/like`, {
@@ -124,11 +122,13 @@ export default function MyArticle({
             });
             const data = await response.json();
 
+            // ubah status liked
             setLikesState((prev) => ({
                 ...prev,
                 [articleId]: data.isLiked,
             }));
 
+            // 🔥 update juga jumlah likes di articleList supaya langsung kelihatan
             setArticleList((prevList) =>
                 prevList.map((article) =>
                     article.id === articleId
@@ -138,8 +138,8 @@ export default function MyArticle({
                                   data.likesCount ??
                                   article.likes_count + (data.isLiked ? 1 : -1),
                           }
-                        : article,
-                ),
+                        : article
+                )
             );
         } catch (error) {
             console.error("Error liking article:", error);
@@ -167,7 +167,6 @@ export default function MyArticle({
         </div>
     );
 
-    // Card
     const cardRepeater = (data) => {
         if (!data || data.length === 0) {
             return <p>No articles available.</p>;
@@ -178,7 +177,7 @@ export default function MyArticle({
                         (c) =>
                             (c.type === "text" || c.type === "paragraph") &&
                             c.order_x === 1 &&
-                            c.order_y === 1,
+                            c.order_y === 1
                     )?.content || "";
 
                 const liked = likesState[article.id] || false;
@@ -224,10 +223,10 @@ export default function MyArticle({
                                 article.status === "approved"
                                     ? "bg-green-100 text-green-700"
                                     : article.status === "pending"
-                                      ? "bg-yellow-100 text-yellow-700"
-                                      : article.status === "rejected"
-                                        ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                                        : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : article.status === "rejected"
+                                    ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                                    : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                             }`}
                             >
                                 {article.status.toUpperCase()}
@@ -236,7 +235,7 @@ export default function MyArticle({
 
                         <div className="flex justify-between items-center mt-auto">
                             <Link
-                                href={`/articles/view/${article.id}/details`}
+                                href={`/articles/${article.id}/details`}
                                 className="text-purple-700 hover:underline font-medium"
                             >
                                 Read more →
@@ -267,7 +266,7 @@ export default function MyArticle({
 
     return (
         <Layout_User>
-            {/* Banner */}
+            {/* === Banner Section === */}
             <div className="w-full flex flex-col">
                 <div
                     className="relative w-full h-[260px] md:h-[300px] bg-purple-700 overflow-hidden"
@@ -289,7 +288,7 @@ export default function MyArticle({
                     </div>
                 </div>
 
-                {/* Categories */}
+                {/* === Category Bar === */}
                 <div
                     className="flex flex-row space-x-4 h-[75px] bg-gray-300 bg-cover bg-center w-full items-center justify-center"
                     style={{ background: "#7A338C" }}
@@ -324,9 +323,8 @@ export default function MyArticle({
                 </div>
             </div>
 
-            {/* Search Parameter */}
+            {/* === Search + Sort === */}
             <div className="w-11/12 flex m-10 items-end justify-end gap-3 ">
-                {/* Sort */}
                 <select
                     value={sortOrder}
                     onChange={(e) => {
@@ -351,7 +349,7 @@ export default function MyArticle({
                                     setIsLoading(false);
                                 },
                                 onError: () => setIsLoading(false),
-                            },
+                            }
                         );
                     }}
                     className="border rounded-md px-3 text-sm h-[38px] flex items-center focus:outline-none focus:ring-1 focus:ring-purple-700 appearance-none bg-white hover:ring-1 hover:ring-purple-700 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
@@ -359,11 +357,11 @@ export default function MyArticle({
                     <option value="desc">Newest First</option>
                     <option value="asc">Oldest First</option>
                 </select>
-                {/* Search */}
+
                 <ButtonGroup className="w-84 ">
                     <Input
                         placeholder="Search My Articles"
-                        value={searchTerm}
+                        value={searchTerm} // ⬅️ ini penting biar gak hilang
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className=" focus-visible:ring-1 focus-visible:ring-purple-700 hover:ring-1 hover:ring-purple-700 focus-visible:bg-purple-100 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                     />
@@ -396,7 +394,7 @@ export default function MyArticle({
                                         setIsLoading(false);
                                     },
                                     onError: () => setIsLoading(false),
-                                },
+                                }
                             );
                         }}
                         className="hover:ring-1 ml-0.5 hover:ring-red-500 text-red-600 hover:bg-red-100 hover:text-red-800"
@@ -406,7 +404,7 @@ export default function MyArticle({
                 </ButtonGroup>
             </div>
 
-            {/* Article List */}
+            {/* === Article Grid === */}
             <div className="w-11/12 mx-auto flex flex-col justify-center mt-10 mb-10">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold mb-20 text-center flex items-center justify-center h-full gap-4">
@@ -428,6 +426,7 @@ export default function MyArticle({
                             {cardRepeater(articleList)}
                         </div>
                     ) : (
+                        // ⬇️ Ganti bagian ini
                         <Empty>
                             <EmptyHeader>
                                 <EmptyMedia variant="icon">

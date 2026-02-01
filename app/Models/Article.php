@@ -34,6 +34,11 @@ class Article extends Model
         return $this->hasMany(ArticleContent::class);
     }
 
+    // An Article can have many Comments
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable')->whereNull('parent_id');
+    }
 
 
     public function images(): MorphMany
