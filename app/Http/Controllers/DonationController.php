@@ -105,7 +105,7 @@ class DonationController extends Controller
             // Return a generic, safe error message to the user
             return response()->json([
                 'error' => 'Payment initialization failed',
-                'message' => 'Please check the server logs for details.',
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
