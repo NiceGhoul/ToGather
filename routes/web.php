@@ -122,7 +122,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Public article show route - must be after specific /articles/* routes to avoid catching them
-Route::get('/articles/{id}', [ArticleController::class, 'show'])->name('articles.show');
+Route::get('/articles/view/{id}', [ArticleController::class, 'show'])->name('articles.show');
 
 // Video upload and retrieval
 Route::post('/api/upload-video', [FileController::class, 'uploadVideo'])->name('api.upload.video');
