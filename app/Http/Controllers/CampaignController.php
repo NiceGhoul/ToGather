@@ -98,7 +98,6 @@ class CampaignController extends Controller
                 ]);
             }
         }
-
         // Notify user about article approval
         NotificationController::notifyUser(
             $campaign->user_id,
@@ -107,8 +106,11 @@ class CampaignController extends Controller
             "Your Campaign '{$campaign->title}' status is now: {$request->status}!",
             ['campaign_id' => $campaign->id]
         );
-
-        return redirect()->route('admin.campaign.verification')->with('success', `Campaign status changed to '{$request->status}' !`);
+        if ($campaign->status === "pending" && $request->status === "active") {
+            return redirect()->route('admin.campaign.verification')->with('success', "Campaign status changed to '{$request->status}' !");
+        } else {
+            return redirect()->route('admin.campaign.adminIndex')->with('success', "Campaign status changed to '{$request->status}' !");
+        }
     }
     /**
      * Show the form for creating a new resource.
@@ -488,7 +490,7 @@ class CampaignController extends Controller
         // validate gambar
         $request->validate([
             'thumbnail' => ['required', 'mimetypes:image/*', 'max:4096'],
-            'logo' => ['nullable', 'exclude_if:logo,null','mimetypes:image/*', 'max:4096'],
+            'logo' => ['nullable', 'exclude_if:logo,null', 'mimetypes:image/*', 'max:4096'],
             'campaign_id' => 'required|integer|exists:campaigns,id',
         ], [
             'logo.mimetypes' => 'The logo must be a valid image (jpg, png, webp, avif).',
