@@ -19,7 +19,6 @@ import { Map } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const PreviewLayout = ({ user, campaign, images }) => {
-    console.log(campaign)
     return (
         <div className="flex container px-4 py-4 flex-row gap-16 justify-center items-center mx-auto scale-90 border-2 rounded-xl border-gray-300">
             <div className="flex flex-col min-w-[45%] max-h-full">
@@ -32,7 +31,7 @@ export const PreviewLayout = ({ user, campaign, images }) => {
                         />
                     ) : (
                         <span className="flex items-center justify-center text-gray-500 text-md w-full h-[400px] text-center italic">
-                            No image available
+                            {"No image available"}
                         </span>
                     )}
                 </div>
@@ -110,17 +109,13 @@ export const PreviewLayout = ({ user, campaign, images }) => {
 export const UploadSupportingMedia = ({ handler }) => {
     return (
         <div className="w-3/6 flex container flex-col gap-4 justify-center items-start mx-auto scale-90 mt-5">
-            <Label className="text-xl dark:text-white">
-                Upload Supporting Media
-            </Label>
-
             <div className="flex container h-24 px-8 py-8 flex-row gap-4 justify-center items-center mx-auto border-2 rounded-xl border-gray-300">
                 <div>
                     <Label htmlFor="picture" className="mb-1 dark:text-white">
-                        Thumbnail*
+                        {"Thumbnail*"}
                     </Label>
                     <Input
-                    required
+                        required
                         id="picture"
                         type="file"
                         accept="image/*"
@@ -144,6 +139,13 @@ export const UploadSupportingMedia = ({ handler }) => {
                         onChange={(e) => handler(e, "logo")}
                     />
                 </div>
+            </div>
+            <div className="justify-center items-center flex text-center mx-auto">
+                <Label className="text-xs dark:text-gray-300 text-gray-400 font-light">
+                    {
+                        "please use these file extensions for the uploaded files: (jpg, jpeg, png, webp, avif)"
+                    }
+                </Label>
             </div>
         </div>
     );
@@ -254,17 +256,10 @@ const CreatePreview = () => {
             formData.append("campaign_id", campaign.id);
 
             router.post("/campaigns/upload-image", formData, {
-                // forceFormData: true,
                 onError: (errors) => uploadErrorHandler(errors),
             });
         }
     };
-
-    // const handleBack = () => {
-    //     const params = new URLSearchParams(window.location.search);
-    //     const from = params.get("from");
-    //     router.get(`/campaigns/create/${campaign.id}?from=${from}`);
-    // };
 
     const backToPreview = () => {
         const params = new URLSearchParams(window.location.search);
@@ -292,14 +287,6 @@ const CreatePreview = () => {
             <div>
                 <Card>
                     <CardHeader className="flex flex-row">
-                        {/* <div className="justify-center items-center">
-                            <Button
-                                className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
-                                onClick={() => backToForm()}
-                            >
-                                ← Back
-                            </Button>
-                        </div> */}
                         <div className="w-full justify-center items-center">
                             <CardTitle className="text-center text-3xl">
                                 Media Preview
@@ -308,14 +295,6 @@ const CreatePreview = () => {
                                 Upload your campaign thumbnail and logo here!
                             </CardDescription>
                         </div>
-                        {/* <div className="justify-center items-center">
-                            <Button
-                                className="bg-transparent text-purple-700 hover:bg-purple-100 text-xl "
-                                onClick={() => backToPreview()}
-                            >
-                                Go to Preview →
-                            </Button>
-                        </div> */}
                     </CardHeader>
                     <CardContent>
                         <Breadcrumb className="flex w-full items-start justify-start mb-5 ml-4 p-0">
@@ -359,9 +338,8 @@ const CreatePreview = () => {
                         <div className="items-center text-center justify-center flex gap-5">
                             <Button
                                 className="mt-5 w-20 bg-purple-200 hover:bg-purple-300 text-purple-700 dark:bg-purple-800 dark:hover:bg-purple-700 dark:text-white"
-                                onClick={handleNext}
-                            >
-                                Next
+                                onClick={handleNext}>
+                                Save
                             </Button>
                         </div>
                     </CardContent>

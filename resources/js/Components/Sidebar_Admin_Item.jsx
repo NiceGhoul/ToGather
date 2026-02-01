@@ -115,14 +115,14 @@ const teamsData = [
 
 export function AppSidebar({ ...props }) {
     return (
-        <Sidebar collapsible="icon" {...props}>
+        <Sidebar collapsible="icon" {...props}  className="flex flex-col h-screen">
             <SidebarHeader>
                 <TeamSwitcher teams={teamsData} />
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="flex-1 overflow-y-auto">
                 <NavMain items={sidebarNavItems} />
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="mt-auto">
                 {/* The NavUser component has been restored in the footer */}
                 <NavUser user={userData} />
             </SidebarFooter>

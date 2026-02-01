@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('article_id')->constrained()->onDelete('cascade');
             $table->enum('type', ['image', 'paragraph', 'text']);
             $table->longText('content')->nullable(); // text content / image URL
-            $table->integer('order_x')->default(1); // 1 = left, 2 = right
+            $table->integer('order_x')->default(1); // 1 = left
             $table->integer('order_y')->default(1); // row order
             $table->timestamps();
         });

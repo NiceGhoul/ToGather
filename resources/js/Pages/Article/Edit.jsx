@@ -20,9 +20,9 @@ import MiniEditor from "@/Components/MiniEditor";
 export default function Edit() {
     const { article } = usePage().props;
 
-    // ------------------------ STATES ------------------------
+    // State
     const [editingMode, setEditingMode] = useState(false);
-    const [isDirty, setIsDirty] = useState(false); // track unsaved changes
+    const [isDirty, setIsDirty] = useState(false);
     const [confirmExitOpen, setConfirmExitOpen] = useState(false);
     const [exitAction, setExitAction] = useState(() => null);
 
@@ -36,7 +36,7 @@ export default function Edit() {
             order_y: Number(c.order_y),
             newFile: null,
             preview: c.image_url || null,
-        }))
+        })),
     );
 
     const [extraRows, setExtraRows] = useState(0);
@@ -45,7 +45,7 @@ export default function Edit() {
     const [successPopupOpen, setSuccessPopupOpen] = useState(false);
     const [successPopupMessage, setSuccessPopupMessage] = useState("");
 
-    // ------------------------ GRID STRUCTURE ------------------------
+    // Block grid
     const { maxY, gridCells } = useMemo(() => {
         const ys = blocks.map((b) => b.order_y || 1);
         const rawMaxY = Math.max(1, ...(ys.length ? ys : [1]));
@@ -59,7 +59,7 @@ export default function Edit() {
         return { maxY: computedMaxY, gridCells: cells };
     }, [blocks, extraRows]);
 
-    // ------------------------ IMAGE HANDLING ------------------------
+    // Image handling
     const onSelectImageForBlock = (file, idx) => {
         setIsDirty(true);
         const url = URL.createObjectURL(file);
@@ -71,7 +71,7 @@ export default function Edit() {
         });
     };
 
-    // ------------------------ ADD BLOCK ------------------------
+    // Add / Remove Blocks
     const addBlock = (type) => {
         setIsDirty(true);
 
@@ -100,7 +100,7 @@ export default function Edit() {
             let updated = prev.filter((_, i) => i !== idx);
 
             updated = updated.map((b) =>
-                b.order_y > removedY ? { ...b, order_y: b.order_y - 1 } : b
+                b.order_y > removedY ? { ...b, order_y: b.order_y - 1 } : b,
             );
 
             return updated;
@@ -112,7 +112,7 @@ export default function Edit() {
         setExtraRows((r) => r + 1);
     };
 
-    // ------------------------ EDIT TEXT ------------------------
+    // Edit Text Blocks
     const startEdit = (idx) => setEditingIndex(idx);
 
     const applyEdit = (idx, value) => {
@@ -129,7 +129,7 @@ export default function Edit() {
 
     const cancelEdit = () => setEditingIndex(null);
 
-    // ------------------------ SAVE ------------------------
+    // Save
     const saveAllChanges = () => {
         const fd = new FormData();
 
@@ -140,13 +140,10 @@ export default function Edit() {
             fd.append(`contents[${i}][order_y]`, b.order_y);
 
             if (b.type === "text" || b.type === "paragraph") {
-                // === TEXT ===
                 fd.append(`contents[${i}][content]`, b.content ?? "");
             } else if (b.newFile) {
-                // === IMAGE (NEW FILE) ===
                 fd.append(`contents[${i}][content]`, b.newFile);
             } else {
-                // === IMAGE (USE OLD URL) ===
                 fd.append(`contents[${i}][content]`, b.content ?? "");
             }
         });
@@ -163,7 +160,7 @@ export default function Edit() {
         });
     };
 
-    // ------------------------ CANCEL ALL ------------------------
+    // Cancel All Changes
     const cancelAll = () => {
         setBlocks(
             (article.contents || []).map((c) => ({
@@ -174,7 +171,7 @@ export default function Edit() {
                 order_y: Number(c.order_y),
                 newFile: null,
                 preview: c.image_url || null,
-            }))
+            })),
         );
 
         setEditingMode(false);
@@ -182,7 +179,7 @@ export default function Edit() {
         setIsDirty(false);
     };
 
-    // ------------------------ REQUEST EXIT ------------------------
+    // Exit Editing Mode
     const requestExit = (callback) => {
         if (editingMode && isDirty) {
             setExitAction(() => callback);
@@ -192,7 +189,7 @@ export default function Edit() {
         }
     };
 
-    // ------------------------ RENDER CELL CONTENT ------------------------
+    // Render Cell Content
     const renderCellContent = (block, idx) => {
         if (!block)
             return (
@@ -339,16 +336,15 @@ export default function Edit() {
         }
     };
 
-    // ------------------------ RENDER ------------------------
     return (
         <Layout_User>
             <div className="p-6 max-w-4xl mx-auto space-y-6">
-                {/* HEADER */}
+                {/* Header */}
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-bold">{article.title}</h1>
 
                     <div className="flex gap-2">
-                        {/* EXIT EDIT BUTTON */}
+                        {/* Exit Edit Button */}
                         <Button
                             onClick={() =>
                                 requestExit(() => {
@@ -398,20 +394,20 @@ export default function Edit() {
                                         setIsDirty(true);
                                         addRow();
                                     }}
-                                    className="bg-purple-800 hover:bg-purple-700 text-whtie"
+                                    className="bg-purple-800 hover:bg-purple-700 text-white"
                                 >
                                     Add Row
                                 </Button>
                             </>
                         )}
 
-                        {/* BACK BUTTON */}
+                        {/* Back Button */}
                         <Button
                             className="bg-purple-800 text-white hover:bg-purple-700"
                             onClick={() =>
                                 requestExit(() => {
                                     router.get(
-                                        `/articles/${article.id}/details`
+                                        `/articles/${article.id}/details`,
                                     );
                                     router.reload();
                                 })
@@ -422,7 +418,7 @@ export default function Edit() {
                     </div>
                 </div>
 
-                {/* GRID */}
+                {/* Block Grid */}
                 <div className="space-y-6">
                     {gridCells.map(({ y }, i) => {
                         const idx = blocks.findIndex((b) => b.order_y === y);
@@ -450,7 +446,7 @@ export default function Edit() {
                     })}
                 </div>
 
-                {/* SUCCESS POPUP (UNCONTROLLED) */}
+                {/* Success Popup */}
                 {successPopupOpen && (
                     <Popup
                         title={successPopupMessage}
@@ -466,7 +462,7 @@ export default function Edit() {
                     />
                 )}
 
-                {/* EXIT CONFIRMATION POPUP (UNCONTROLLED, ALWAYS WORKS) */}
+                {/* Exit Confirmation Popup */}
                 {confirmExitOpen && (
                     <Popup
                         title="Unsaved Changes"

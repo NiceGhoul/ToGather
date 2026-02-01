@@ -11,12 +11,12 @@ export default function Details() {
     const { article, auth } = usePage().props;
     const [isLogin, setIsLogin] = useState(false);
 
-    // 🟣 Check authentication status
+    // Check Auth
     useEffect(() => {
         setIsLogin(!!auth?.user);
     }, [auth]);
 
-    // ---------- LIKE ----------
+    // Like state
     const [liked, setLiked] = useState(article.is_liked_by_user ?? false);
     const [likeCount, setLikeCount] = useState(article.likes_count ?? 0);
 
@@ -44,24 +44,23 @@ export default function Details() {
         }
     };
 
-    // ---------- MODAL ----------
+    // Modal state
     const [showModal, setShowModal] = useState(false);
     const [modalImage, setModalImage] = useState(null);
 
-    // ---------- SORTED CONTENT ----------
+    // Sort Content
     const sortedContents = [...(article.contents || [])].sort((a, b) => {
         if (a.order_y === b.order_y) return a.order_x - b.order_x;
         return a.order_y - b.order_y;
     });
 
-    // 🟣 Dynamic Layout based on authentication
     const Layout = isLogin ? Layout_User : Layout_Guest;
 
     return (
         <Layout>
             <div className="w-full flex flex-col items-center py-10">
-                {/* HEADER */}
-                <div className="w-full max-w-4xl flex items-center justify-start mb-6">
+                {/* Header */}
+                <div className="w-full max-w-4xl flex items-center justify-start mb-6 mt-10">
                     <Button
                         variant="secondary"
                         className="flex items-center gap-2"
@@ -72,7 +71,7 @@ export default function Details() {
                     </Button>
                 </div>
 
-                {/* THUMBNAIL */}
+                {/* Thumbnail */}
                 {article.thumbnail_url && (
                     <div className="w-full max-w-4xl h-[300px] rounded-xl overflow-hidden bg-gray-100 shadow-sm mb-8 dark:bg-gray-800">
                         <img
@@ -87,7 +86,7 @@ export default function Details() {
                     </div>
                 )}
 
-                {/* TITLE & AUTHOR */}
+                {/* Title & Author */}
                 <div className="w-full max-w-4xl text-left mb-4">
                     <h1 className="text-3xl font-bold dark:text-white">
                         {article.title}
@@ -100,7 +99,7 @@ export default function Details() {
                         {new Date(article.created_at).toLocaleDateString()}
                     </p>
 
-                    {/* LIKE SECTION */}
+                    {/* Like Button */}
                     <div className="ml-auto flex items-center gap-2">
                         <Toggle
                             pressed={liked}
@@ -117,15 +116,15 @@ export default function Details() {
                     </div>
                 </div>
 
-                {/* CONTENT */}
+                {/* Content */}
                 <div className="w-full max-w-4xl">
                     {sortedContents.length > 0 ? (
                         (() => {
                             const maxX = Math.max(
-                                ...sortedContents.map((b) => b.order_x)
+                                ...sortedContents.map((b) => b.order_x),
                             );
                             const maxY = Math.max(
-                                ...sortedContents.map((b) => b.order_y)
+                                ...sortedContents.map((b) => b.order_y),
                             );
                             const cells = [];
 
@@ -133,7 +132,7 @@ export default function Details() {
                                 for (let x = 1; x <= maxX; x++) {
                                     const block = sortedContents.find(
                                         (b) =>
-                                            b.order_x === x && b.order_y === y
+                                            b.order_x === x && b.order_y === y,
                                     );
                                     cells.push({ x, y, block });
                                 }
@@ -182,10 +181,10 @@ export default function Details() {
                                                                 className="w-full max-h-[400px] object-contain rounded-lg shadow-md bg-white hover:scale-[1.02] transition-transform cursor-pointer dark:bg-gray-800"
                                                                 onClick={() => {
                                                                     setModalImage(
-                                                                        block.image_url
+                                                                        block.image_url,
                                                                     );
                                                                     setShowModal(
-                                                                        true
+                                                                        true,
                                                                     );
                                                                 }}
                                                             />
@@ -208,7 +207,7 @@ export default function Details() {
                 </div>
             </div>
 
-            {/* IMAGE MODAL VIEWER */}
+            {/* Image Modal Viewer */}
             {showModal && modalImage && (
                 <div
                     className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"

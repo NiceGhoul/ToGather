@@ -197,19 +197,25 @@ export default function LikedCampaign() {
 
                     <div className="flex justify-center gap-2 mb-4">
                         <span
-                            className={`inline-block text-xs font-semibold px-2 py-1 rounded-full
+                            className={`inline-block text-sm font-semibold px-2 py-1 rounded-full ${
+                                campaign.duration
+                            }
                             ${
                                 campaign.status === "active"
-                                    ? "dark:bg-green-700 dark:text-white  bg-green-200  text-green-700"
-                                    : campaign.status === "pending"
-                                    ? "bg-yellow-200 text-yellow-700 dark:bg-yellow-600 dark:text-white"
-                                    : campaign.status === "rejected" ||
-                                      campaign.status === "banned"
-                                    ? "bg-red-200 text-red-700 dark:bg-red-600 dark:text-white"
-                                    : "bg-purple-200 text-purple-700 dark:bg-purple-800 dark:text-white"
+                                    ? "bg-gray-100 text-gray-700 dark:bg-gray-500 dark:text-white"
+                                    : "bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-white"
                             }`}
                         >
-                            {campaign.status?.toUpperCase?.() ?? "UNKNOWN"}
+                            {campaign.status === "completed"
+                                ? campaign.status.toUpperCase()
+                                : `${Math.max(
+                                      Math.floor(
+                                          (new Date(campaign.end_campaign) -
+                                              Date.now()) /
+                                              (1000 * 60 * 60 * 24)
+                                      ),
+                                      0
+                                  )} Days left`}
                         </span>
                     </div>
 

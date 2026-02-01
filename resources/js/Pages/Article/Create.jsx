@@ -13,8 +13,6 @@ import { useForm, usePage, router } from "@inertiajs/react";
 import { useState, useRef } from "react";
 import Popup from "@/Components/Popup";
 import { CaseSensitive, Image } from "lucide-react";
-
-// 🔥 QUILL VERSION
 import MiniEditor from "@/Components/MiniEditor";
 
 export default function Create() {
@@ -49,7 +47,7 @@ export default function Create() {
         }
     };
 
-    // Block logic
+    // Block content logic
     const updateBlockContent = (index, newContent) => {
         const updated = [...blocks];
         updated[index].content = newContent;
@@ -72,7 +70,7 @@ export default function Create() {
     };
 
     const removeBlock = (index) => {
-        if (index === 0) return; // first block always exist
+        if (index === 0) return;
         const updated = [...blocks];
         updated.splice(index, 1);
         setBlocks(updated);
@@ -109,7 +107,7 @@ export default function Create() {
             onSuccess: () => {
                 setShowSuccess(true);
 
-                // reset
+                // reset blocks & form
                 setData({
                     title: "",
                     category: "",
@@ -182,7 +180,7 @@ export default function Create() {
                                 </select>
                             </div>
 
-                            {/* THUMBNAIL */}
+                            {/* Thumbnail */}
                             <div>
                                 <Label className="mb-1 dark:text-white">
                                     Thumbnail
@@ -204,7 +202,7 @@ export default function Create() {
                                 )}
                             </div>
 
-                            {/* BLOCK LIST */}
+                            {/* Blocks */}
 
                             <div className="space-y-5">
                                 {blocks.map((block, idx) => (
@@ -222,7 +220,7 @@ export default function Create() {
                                                 onChange={(html) =>
                                                     updateBlockContent(
                                                         idx,
-                                                        html
+                                                        html,
                                                     )
                                                 }
                                             />
@@ -234,7 +232,7 @@ export default function Create() {
                                                     onChange={(e) =>
                                                         handleImageChange(
                                                             idx,
-                                                            e
+                                                            e,
                                                         )
                                                     }
                                                 />
@@ -242,7 +240,7 @@ export default function Create() {
                                                     <div className="mt-3 bg-white border rounded-md p-2 flex justify-center">
                                                         <img
                                                             src={URL.createObjectURL(
-                                                                block.content
+                                                                block.content,
                                                             )}
                                                             className="max-h-[250px] object-contain rounded-md"
                                                         />
@@ -264,7 +262,7 @@ export default function Create() {
                                     </div>
                                 ))}
 
-                                {/* ADD NEW BLOCK */}
+                                {/* Add New Block */}
                                 <div className="flex gap-2">
                                     <Button
                                         variant="outline"
@@ -335,7 +333,7 @@ export default function Create() {
                             by Unknown · {new Date().toLocaleDateString()}
                         </p>
 
-                        {/* PREVIEW BLOCKS */}
+                        {/* Blocks */}
                         <div className="space-y-6 ">
                             {blocks.map((block, i) => (
                                 <div key={i}>
@@ -352,7 +350,7 @@ export default function Create() {
                                         block.content && (
                                             <img
                                                 src={URL.createObjectURL(
-                                                    block.content
+                                                    block.content,
                                                 )}
                                                 className="max-h-[300px] object-contain rounded"
                                             />
@@ -364,7 +362,7 @@ export default function Create() {
                     </CardContent>
                 </Card>
 
-                {/* POPUPS */}
+                {/* Popups */}
                 {showConfirm && (
                     <Popup
                         title="Submit Article?"

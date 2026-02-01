@@ -16,34 +16,28 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // Get overview statistics
          $user = auth()->user();
         $stats = [
             'total_users' => User::count(),
             'total_campaigns' => Campaign::count(),
             'total_articles' => Article::count(),
-            // TODO: Change back to 'successful' when Midtrans callback is working
             'total_donations' => Donation::whereIn('status', ['successful', 'pending'])->sum('amount'),
             'pending_verifications' => VerificationRequest::where('status', 'pending')->count(),
             'pending_campaigns' => Campaign::where('status', 'pending')->count(),
             'pending_articles' => Article::where('status', 'pending')->count(),
         ];
 
-        // Daily donation trends (custom date range)
-        // TODO: Change back to 'successful' when Midtrans callback is working
         $dailyStart = request('daily_start');
         $dailyEnd = request('daily_end');
 
         $dailyQuery = Donation::whereIn('status', ['successful', 'pending']);
 
-        // Apply date range filter if provided
         if ($dailyStart && $dailyEnd) {
             $dailyQuery->whereBetween('created_at', [
                 Carbon::parse($dailyStart)->startOfDay(),
                 Carbon::parse($dailyEnd)->endOfDay()
             ]);
         } else {
-            // Default to current week if no range specified
             $dailyQuery->whereBetween('created_at', [
                 Carbon::now()->startOfWeek(),
                 Carbon::now()->endOfWeek()
@@ -67,8 +61,6 @@ class AdminDashboardController extends Controller
             ];
         });
 
-        // Weekly donation trends (weeks 1-4 of current month)
-        // TODO: Change back to 'successful' when Midtrans callback is working
         $currentMonth = request('weekly_month', Carbon::now()->month);
         $currentYear = request('weekly_year', Carbon::now()->year);
 
@@ -91,8 +83,6 @@ class AdminDashboardController extends Controller
             ];
         });
 
-        // Monthly donation trends (last 6 months)
-        // TODO: Change back to 'successful' when Midtrans callback is working
         $monthlyDonations = Donation::whereIn('status', ['successful', 'pending'])
         ->where('created_at', '>=', Carbon::now()->subMonths(6))
         ->select(
@@ -111,8 +101,6 @@ class AdminDashboardController extends Controller
             ];
         });
 
-        // Yearly donation trends (last 3 years)
-        // TODO: Change back to 'successful' when Midtrans callback is working
         $yearlyDonations = Donation::whereIn('status', ['successful', 'pending'])
         ->where('created_at', '>=', Carbon::now()->subYears(3))
         ->select(
@@ -131,8 +119,6 @@ class AdminDashboardController extends Controller
             ];
         });
 
-        // Recent donations
-        // TODO: Change back to 'successful' when Midtrans callback is working
         $recentDonations = Donation::with(['user', 'campaign'])
         ->whereIn('status', ['successful', 'pending'])
         ->latest()
@@ -149,7 +135,6 @@ class AdminDashboardController extends Controller
             ];
         });
 
-        // User statistics
         $userStats = [
             'verified_users' => User::whereHas('verificationRequests', function($query) {
                 $query->where('status', 'accepted');
@@ -158,7 +143,6 @@ class AdminDashboardController extends Controller
             'active_users' => User::where('status', 'active')->count(),
         ];
 
-        // Campaign status distribution
         $campaignStats = Campaign::select('status', DB::raw('count(*) as count'))
         ->groupBy('status')
         ->get()
@@ -166,7 +150,6 @@ class AdminDashboardController extends Controller
             return [$item->status->value => $item->count];
         });
 
-        // Article status distribution
         $articleStats = Article::select('status', DB::raw('count(*) as count'))
         ->groupBy('status')
         ->get()
