@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
 
     // Donations
     Route::get('/donate', [DonationController::class, 'create'])->name('donations.create');
+    Route::get('/donations', fn () => redirect('/donate'));
     Route::post('/donations', [DonationController::class, 'store'])->name('donations.store');
     Route::get('/api/search-campaigns', [DonationController::class, 'searchCampaigns'])->name('api.search.campaigns');
 
