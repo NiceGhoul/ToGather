@@ -169,7 +169,7 @@ export default function LikedArticlesPage() {
 
                     <div className="flex justify-between items-center mt-auto">
                         <Link
-                            href={`/articles/${article.id}?from=liked_articles`}
+                            href={`/articles/view/${article.id}?from=liked_articles`}
                             className="text-purple-700 hover:underline"
                         >
                             Read more →

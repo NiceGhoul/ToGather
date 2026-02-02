@@ -561,7 +561,7 @@ export default function Home() {
                                     </p>
                                 </div>
                                 <Link
-                                    href={`/articles/${article.id}?from=home`}
+                                    href={`/articles/view/${article.id}?from=home`}
                                     className="text-purple-800 font-semibold text-sm hover:underline hover:text-purple-600"
                                 >
                                     Read more →

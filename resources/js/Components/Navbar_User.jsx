@@ -198,13 +198,7 @@ export default function Navbar_User() {
                     <span className="nav-link font-semibold">
                         Welcome {auth?.user?.nickname ?? "Guest"}
                     </span>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="relative h-10 w-10 flex items-center justify-center rounded-md bg-white text-black hover:bg-purple-800 dark:bg-purple-200"
-                    >
-                        <ThemeToggle />
-                    </Button>
+                    <ThemeToggle />
                     <DropdownMenu
                         onOpenChange={(open) => {
                             if (open) {
