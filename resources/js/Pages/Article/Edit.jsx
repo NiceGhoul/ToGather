@@ -411,7 +411,7 @@ export default function Edit() {
                             onClick={() =>
                                 requestExit(() => {
                                     router.get(
-                                        `/articles/${article.id}/details`
+                                        `/articles/view/${article.id}/details`
                                     );
                                     router.reload();
                                 })
