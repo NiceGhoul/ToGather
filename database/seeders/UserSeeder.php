@@ -47,4 +47,5 @@ class UserSeeder extends Seeder
                 'status' => 'active',
             ]
         );
+    }
 }
